@@ -16,6 +16,9 @@ require_once "./functions/sg_functions.php";
 
 $default_img = '/images/sg/objeto_default.png';
 
+$uid = intval($mybb->user['uid']);
+$es_staff = (is_mod($uid) || is_staff($uid));
+
 $codigo = trim($mybb->get_input('codigo'));
 $npc = null;
 if ($codigo !== '') {
@@ -57,7 +60,12 @@ if ($npc === null) {
         . "</div>";
     $npc_html .= "<div class=\"sg-npc-headinfo\">";
     if ($clan !== '') { $npc_html .= "<div class=\"sg-npc-eyebrow\">$clan</div>"; }
-    $npc_html .= "<h1 class=\"sg-npc-name\">$nom</h1>";
+    if ($es_staff) {
+        $npcid = intval($npc['npc_id']);
+        $npc_html .= "<h1 class=\"sg-npc-name\"><a class=\"sg-npc-name-link\" href=\"/sg/admin/gestionar_npcs.php?npc_id=$npcid\" title=\"Gestionar NPC\">$nom</a></h1>";
+    } else {
+        $npc_html .= "<h1 class=\"sg-npc-name\">$nom</h1>";
+    }
     if ($cargo !== '') { $npc_html .= "<div class=\"sg-npc-cargo\">$cargo</div>"; }
     $npc_html .= "<div class=\"sg-npc-tags\">$tags</div>";
     if ($frase !== '') {
