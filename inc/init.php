@@ -264,7 +264,8 @@ else
 	define('THREAD_URL_ACTION', 'showthread.php?tid={tid}&action={action}');
 	define('THREAD_URL_POST', 'showthread.php?tid={tid}&pid={pid}');
 	define('POST_URL', "showthread.php?pid={pid}");
-	define('PROFILE_URL', "member.php?action=profile&uid={uid}");
+	// define('PROFILE_URL', "member.php?action=profile&uid={uid}");
+	define('PROFILE_URL', "/sg/ficha.php?uid={uid}");
 	define('ANNOUNCEMENT_URL', "announcements.php?aid={aid}");
 	define('CALENDAR_URL', "calendar.php?calendar={calendar}");
 	define('CALENDAR_URL_MONTH', "calendar.php?calendar={calendar}&year={year}&month={month}");

@@ -99,17 +99,8 @@
     .fx-identity__name { font-family: 'Cinzel', serif; font-weight: 900; font-size: clamp(24px, 4vw, 34px); letter-spacing: 1px; line-height: 1.05; margin: 0; color: var(--ink); }
     .fx-identity__alias { font-family: 'Noto Serif JP', serif; font-weight: 300; font-style: italic; color: var(--accent); font-size: 15px; margin: 4px 0 0; }
 
-    .fx-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
-    .fx-chip {
-      display: flex; flex-direction: column; gap: 1px;
-      border: 0.5px solid var(--border); padding: 6px 12px; background: var(--card);
-      min-width: 78px;
-    }
-    .fx-chip__k { font-family: 'Cinzel', serif; font-size: 8px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--mist); }
-    .fx-chip__v { font-family: 'Cinzel', serif; font-size: 15px; font-weight: 700; color: var(--ink); font-variant-numeric: tabular-nums; }
-
     .fx-week { position: relative; cursor: help; }
-    .fx-week .fx-chip__v { color: var(--accent); }
+    .fx-week .fx-row__v { color: var(--accent); }
     .fx-week__tip {
       position: absolute; left: 50%; bottom: calc(100% + 8px); transform: translateX(-50%);
       white-space: nowrap; padding: 6px 10px; background: var(--ink); color: var(--bg);
@@ -150,20 +141,12 @@
       font-size: 88px; line-height: 1; color: var(--accent); opacity: 0.06; letter-spacing: 4px;
     }
 
-    /* Marginalia manuscrita */
-    .fx-margin {
-      position: absolute; z-index: 2; max-width: 160px;
-      font-family: 'Noto Serif JP', serif; font-style: italic; font-weight: 300;
-      font-size: 12px; line-height: 1.45; color: var(--accent); opacity: 0.72;
-      transform: rotate(-4deg); pointer-events: none;
-    }
-    .fx-margin::before { content: '✦ '; font-style: normal; opacity: 0.7; }
-
     /* ── PESTAÑAS ─────────────────────────────────────── */
     .fx input.fx-radio { position: absolute; width: 1px; height: 1px; opacity: 0; overflow: hidden; }
     .fx-tabs {
       display: flex; gap: 4px; margin: 14px 0 0; padding-left: 4px;
       border-bottom: 0.5px solid var(--border);
+      position: sticky; top: 0; z-index: 15; background: var(--bg2);
     }
     .fx-tab {
       display: flex; align-items: center; gap: 8px;
@@ -200,6 +183,7 @@
       position: relative;
       border: 0.5px solid var(--border); border-top: none;
       background: var(--card); padding: 24px 26px 30px;
+      perspective: 1400px;
     }
     /* Pliegue central + sombra de lomo */
     .fx-panels::before {
@@ -218,7 +202,15 @@
     #fx-dossier:checked ~ .fx-panels .fx-panel--dossier,
     #fx-inventario:checked ~ .fx-panels .fx-panel--inventario,
     #fx-tecnicas:checked ~ .fx-panels .fx-panel--tecnicas,
-    #fx-perfil:checked ~ .fx-panels .fx-panel--perfil { display: block; }
+    #fx-perfil:checked ~ .fx-panels .fx-panel--perfil { display: block; animation: fxPageIn .4s cubic-bezier(.2,.7,.3,1) both; }
+    /* Page-flip: la hoja entra girando desde el lomo (izquierda) */
+    @keyframes fxPageIn { from { opacity: 0; transform: rotateY(-7deg) translateX(-10px); transform-origin: left center; } to { opacity: 1; transform: none; } }
+    @media (prefers-reduced-motion: reduce) {
+      #fx-dossier:checked ~ .fx-panels .fx-panel--dossier,
+      #fx-inventario:checked ~ .fx-panels .fx-panel--inventario,
+      #fx-tecnicas:checked ~ .fx-panels .fx-panel--tecnicas,
+      #fx-perfil:checked ~ .fx-panels .fx-panel--perfil { animation: none; }
+    }
 
     /* Kanji watermark por pestaña */
     .fx-panel::before {
@@ -318,6 +310,10 @@
     .fx-panel--tecnicas .fx-photo  { transform: rotate(-1.5deg); }
     /* Expediente = retrato oficial/cover: más grande y con caption destacada */
     .fx-panel--dossier .fx-photo__cap { font-size: 10px; letter-spacing: 3px; color: var(--accent); }
+    /* Expediente: columna de identidad (foto + datos + recursos apilados) */
+    .fx-side { display: grid; gap: 20px; align-content: start; }
+    .fx-side .fx-data { grid-template-columns: 1fr; }
+    @media (max-width: 760px) { .fx-side { grid-template-columns: 1fr; } }
 
     /* Trasfondo: retrato flotante con la biografía envolviéndolo */
     .fx-trasfondo::after { content: ''; display: block; clear: both; }
@@ -346,6 +342,8 @@
     .fx-row:last-child { border-bottom: none; }
     .fx-row__k { font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--mist); align-self: center; }
     .fx-row__v { font-family: 'Noto Serif JP', serif; font-weight: 700; font-size: 14px; color: var(--ink); text-align: right; font-variant-numeric: tabular-nums; }
+    .fx-row__link { cursor: pointer; transition: color .15s ease; }
+    .fx-row__link:hover { color: var(--accent); text-decoration: underline; }
 
     /* Recursos como celdas */
     .fx-res { display: grid; grid-template-columns: repeat(2,1fr); gap: 10px; }
@@ -360,7 +358,8 @@
     .fx-gauge__v { font-family: 'Cinzel', serif; font-size: 16px; font-weight: 700; color: var(--ink); font-variant-numeric: tabular-nums; }
     .fx-gauge__v small { color: var(--mist); font-size: 11px; font-weight: 400; }
     .fx-bar { height: 10px; border: 0.5px solid var(--border); background: var(--card2); position: relative; overflow: hidden; }
-    .fx-bar::before { content:''; position: absolute; inset: 0; width: var(--fill, 50%); background: linear-gradient(90deg, var(--accent), var(--accent-2)); }
+    .fx-bar::before { content:''; position: absolute; inset: 0; width: var(--fill, 50%); background: linear-gradient(90deg, var(--accent), var(--accent-2)); transition: width 1.1s cubic-bezier(.22,1,.36,1); }
+    @media (prefers-reduced-motion: reduce) { .fx-bar::before { transition: none; } }
     .fx-bar--vida::before   { background: linear-gradient(90deg, #a8321f, #e0533a); }
     .fx-bar--chakra::before { background: linear-gradient(90deg, #2f6fd0, #58a6ff); }
 
@@ -373,14 +372,21 @@
     .fx-stat__mod { position: absolute; top: 7px; right: 9px; font-family: 'Cinzel', serif; font-size: 11px; font-weight: 700; color: var(--accent); }
     .fx-stat__mod::before { content: 'M '; font-size: 8px; }
 
-    /* Radar de estadísticas */
-    .fx-statwrap { display: flex; gap: 22px; align-items: center; flex-wrap: wrap; }
-    .fx-statwrap .fx-stats { flex: 1; min-width: 220px; }
-    .fx-radar { flex-shrink: 0; }
-    @media (max-width: 640px){ .fx-radar { margin: 0 auto; } }
+    /* Estadísticas: cada radar emparejado con sus 4 stats */
+    .fx-statgroups { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+    @media (max-width: 640px){ .fx-statgroups { grid-template-columns: 1fr; } }
+    .fx-statgroup { display: grid; justify-items: center; gap: 12px; }
+    .fx-radar { display: block; cursor: crosshair; margin: 0 auto; }
+    .fx-radar-cap { font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--accent); }
+    .fx-stats--pair { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; width: 100%; }
+    .fx-radar-tip {
+      position: absolute; z-index: 60; pointer-events: none; opacity: 0; transition: opacity .1s ease;
+      background: var(--ink); color: var(--bg); padding: 4px 9px; white-space: nowrap;
+      font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 1px; font-weight: 700;
+    }
 
     /* Barra de progreso al siguiente nivel (hero) — grande + animada */
-    .fx-levelbar { margin-top: 16px; max-width: 460px; }
+    .fx-levelbar { margin-top: 16px; }
     .fx-levelbar__head { display: flex; align-items: baseline; gap: 10px; margin-bottom: 7px; }
     .fx-levelbar__lvl { font-family: 'Cinzel', serif; font-weight: 900; font-size: 15px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--ink); }
     .fx-levelbar__next { font-family: 'Cinzel', serif; font-size: 11px; letter-spacing: 1px; color: var(--mist); }
@@ -391,6 +397,20 @@
     .fx-levelbar--max span { font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--accent); }
     @keyframes fxLevelPulse { 0%, 100% { box-shadow: inset 0 0 6px rgba(255,255,255,0.08); filter: brightness(1); } 50% { box-shadow: inset 0 0 16px rgba(255,255,255,0.30); filter: brightness(1.12); } }
     @media (prefers-reduced-motion: reduce) { .fx-levelbar__fill { transition: none; animation: none; } }
+
+    /* Aviso de puntos sin asignar (solo dueño) */
+    .fx-assign {
+      display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; margin-top: 12px;
+      padding: 9px 14px; border: 1px solid #d9b35c; background: rgba(217, 179, 92, 0.12);
+      font-family: 'Cinzel', serif; font-size: 11px; font-weight: 700; letter-spacing: 0.8px;
+      text-transform: uppercase; color: #e6c877; line-height: 1.4;
+      animation: fxAssignPulse 2s ease-in-out infinite;
+    }
+    .fx-assign:hover { background: rgba(217, 179, 92, 0.2); border-color: #e6c877; }
+    .fx-assign__i { color: #e6c877; font-size: 9px; }
+    .fx-assign__go { margin-left: auto; color: var(--ink); opacity: 0.8; }
+    @keyframes fxAssignPulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(217,179,92,0.0); } 50% { box-shadow: 0 0 0 3px rgba(217,179,92,0.18); } }
+    @media (prefers-reduced-motion: reduce) { .fx-assign { animation: none; } }
 
     /* Inventario (placeholder) */
     .fx-inv-empty { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 12px; min-height: 300px; }
@@ -511,29 +531,6 @@
             <span class="fx-identity__accent"></span>
             <h1 class="fx-identity__name">{$ficha['nombre']}</h1>
             <if $ficha['apodo'] then><p class="fx-identity__alias">{$ficha['apodo']}</p></if>
-            <div class="fx-chips">
-              <div class="fx-chip"><span class="fx-chip__k">Nivel</span><span class="fx-chip__v">{$ficha['nivel']}</span></div>
-              <div class="fx-chip"><span class="fx-chip__k">Rango</span><span class="fx-chip__v">{$ficha['rango']}</span></div>
-              <div class="fx-chip"><span class="fx-chip__k">Experiencia</span><span class="fx-chip__v">{$puntos_rol}</span></div>
-              <div class="fx-chip fx-week" id="sg-week-chip" data-end="{$fin_semana_ts}">
-                <span class="fx-chip__k">Exp · Sem {$semana_display}</span>
-                <span class="fx-chip__v">{$exp_semanal} / 100</span>
-                <span class="fx-week__tip" id="sg-week-tip">Calculando…</span>
-              </div>
-            </div>
-            <if $sgNivelMax then>
-              <div class="fx-levelbar fx-levelbar--max"><span>Nivel máximo alcanzado</span></div>
-            <else>
-              <div class="fx-levelbar">
-                <div class="fx-levelbar__head">
-                  <span class="fx-levelbar__lvl">Nivel {$ficha['nivel']}</span>
-                  <span class="fx-levelbar__next">→ Nivel {$sgNivelSig}</span>
-                  <span class="fx-levelbar__pct">{$sgNivelPct}%</span>
-                </div>
-                <div class="fx-levelbar__track"><div class="fx-levelbar__fill" data-pct="{$sgNivelPct}" style="width:0"></div></div>
-                <div class="fx-levelbar__meta">Faltan {$sgXpFaltan} XP para subir de nivel</div>
-              </div>
-            </if>
           </div>
 
           <div class="fx-actions">
@@ -566,8 +563,8 @@
 
         <!-- ── DOSSIER ── -->
         <section class="fx-panel fx-panel--dossier" role="tabpanel">
-          <div class="fx-margin" style="bottom: 10px; left: 16px;">Objetivo verificado en campo.</div>
           <div class="fx-layout">
+            <div class="fx-side">
             <div class="fx-photo <if $is_owner then>fx-photo--edit</if>" <if $is_owner then>onclick="openProfileAssetModal('foto_expediente')"</if>>
               <div class="fx-photo__rod"></div>
               <div class="fx-photo__frame">
@@ -580,7 +577,6 @@
               <div class="fx-photo__cap">Retrato oficial</div>
             </div>
 
-            <div class="fx-stack">
               <div class="fx-card">
                 <div class="fx-card__head"><span class="fx-card__title">Datos personales</span></div>
                 <div class="fx-card__body">
@@ -608,16 +604,63 @@
               </div>
 
               <div class="fx-card">
+                <div class="fx-card__head"><span class="fx-card__title">Actividad en el foro</span></div>
+                <div class="fx-card__body">
+                  <div class="fx-data">
+                    <div class="fx-row"><span class="fx-row__k">Mensajes</span><a class="fx-row__v fx-row__link" href="/search.php?action=finduser&uid={$ficha['fid']}" title="Buscar sus mensajes">{$sgPostnum}</a></div>
+                    <div class="fx-row"><span class="fx-row__k">Temas</span><a class="fx-row__v fx-row__link" href="/search.php?action=finduserthreads&uid={$ficha['fid']}" title="Buscar sus temas">{$sgThreadnum}</a></div>
+                    <div class="fx-row"><span class="fx-row__k">Ingresó</span><span class="fx-row__v">{$sgRegdateFmt}</span></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="fx-stack">
+              <div class="fx-card">
+                <div class="fx-card__head"><span class="fx-card__title">Progreso</span></div>
+                <div class="fx-card__body">
+                  <div class="fx-data">
+                    <div class="fx-row"><span class="fx-row__k">Nivel</span><span class="fx-row__v">{$ficha['nivel']}</span></div>
+                    <div class="fx-row"><span class="fx-row__k">Rango</span><span class="fx-row__v">{$ficha['rango']}</span></div>
+                    <div class="fx-row"><span class="fx-row__k">Experiencia</span><span class="fx-row__v">{$puntos_rol}</span></div>
+                    <div class="fx-row fx-week" id="sg-week-chip" data-end="{$fin_semana_ts}">
+                      <span class="fx-row__k">Exp · Sem {$semana_display}</span>
+                      <span class="fx-row__v">{$exp_semanal} / 100</span>
+                      <span class="fx-week__tip" id="sg-week-tip">Calculando…</span>
+                    </div>
+                  </div>
+                  <if $sgNivelMax then>
+                    <div class="fx-levelbar fx-levelbar--max"><span>Nivel máximo alcanzado</span></div>
+                  <else>
+                    <div class="fx-levelbar">
+                      <div class="fx-levelbar__head">
+                        <span class="fx-levelbar__lvl">Nivel {$ficha['nivel']}</span>
+                        <span class="fx-levelbar__next">→ Nivel {$sgNivelSig}</span>
+                        <span class="fx-levelbar__pct">{$sgNivelPct}%</span>
+                      </div>
+                      <div class="fx-levelbar__track"><div class="fx-levelbar__fill" data-pct="{$sgNivelPct}" style="width:0"></div></div>
+                      <div class="fx-levelbar__meta">Faltan {$sgXpFaltan} XP para subir de nivel</div>
+                    </div>
+                  </if>
+                  <if $sgPuntosAviso then>
+                    <a class="fx-assign" href="{$mybb->settings['bburl']}/sg/editar_ficha.php?uid={$ficha['fid']}">
+                      <span class="fx-assign__i">▲</span>{$sgPuntosMsg}<span class="fx-assign__go">Asignar →</span>
+                    </a>
+                  </if>
+                </div>
+              </div>
+
+              <div class="fx-card">
                 <div class="fx-card__head"><span class="fx-card__title">Constantes</span></div>
                 <div class="fx-card__body">
                   <div class="fx-gauges">
                     <div class="fx-gauge">
                       <div class="fx-gauge__top"><span class="fx-gauge__k">Vida</span><span class="fx-gauge__v">{$ficha['vida']} <small>/ {$vida} base</small></span></div>
-                      <div class="fx-bar fx-bar--vida" style="--fill: {$sgVidaBar}%"></div>
+                      <div class="fx-bar fx-bar--vida" data-fill="{$sgVidaBar}" style="--fill:0%"></div>
                     </div>
                     <div class="fx-gauge">
                       <div class="fx-gauge__top"><span class="fx-gauge__k">Chakra</span><span class="fx-gauge__v">{$ficha['chakra']} <small>/ {$chakra} base</small></span></div>
-                      <div class="fx-bar fx-bar--chakra" style="--fill: {$sgChakraBar}%"></div>
+                      <div class="fx-bar fx-bar--chakra" data-fill="{$sgChakraBar}" style="--fill:0%"></div>
                     </div>
                     <div class="fx-gauge">
                       <div class="fx-gauge__top"><span class="fx-gauge__k">Reg. de Chakra</span><span class="fx-gauge__v">{$regC}</span></div>
@@ -629,20 +672,52 @@
               <div class="fx-card">
                 <div class="fx-card__head"><span class="fx-card__title">Estadísticas</span></div>
                 <div class="fx-card__body">
-                  <div class="fx-statwrap">
-                  <canvas id="fx-radar" class="fx-radar" width="220" height="220"
-                    data-vals="{$ficha['fuerza']},{$ficha['destreza']},{$ficha['cchakra']},{$ficha['inteligencia']}"
-                    data-labels="FUE,DES,CHK,INT" aria-label="Radar de estadísticas"></canvas>
-                  <div class="fx-stats">
-                    <div class="fx-stat"><span class="fx-stat__mod">{$ficha['mfuerza']}</span><div class="fx-stat__v">{$ficha['fuerza']}</div><div class="fx-stat__k">Fuerza</div></div>
-                    <div class="fx-stat"><span class="fx-stat__mod">{$ficha['mdestreza']}</span><div class="fx-stat__v">{$ficha['destreza']}</div><div class="fx-stat__k">Destreza</div></div>
-                    <div class="fx-stat"><span class="fx-stat__mod">{$ficha['mcchakra']}</span><div class="fx-stat__v">{$ficha['cchakra']}</div><div class="fx-stat__k">Ctrl. Chakra</div></div>
-                    <div class="fx-stat"><span class="fx-stat__mod">{$ficha['minteligencia']}</span><div class="fx-stat__v">{$ficha['inteligencia']}</div><div class="fx-stat__k">Inteligencia</div></div>
-                    <div class="fx-stat"><div class="fx-stat__v">{$ficha['salud']}</div><div class="fx-stat__k">Salud</div></div>
-                    <div class="fx-stat"><div class="fx-stat__v">{$ficha['velocidad']}</div><div class="fx-stat__k">Velocidad</div></div>
-                    <div class="fx-stat"><div class="fx-stat__v">{$ficha['tenketsu']}</div><div class="fx-stat__k">Tenketsu</div></div>
-                    <div class="fx-stat"><div class="fx-stat__v">{$ficha['sigilo']}</div><div class="fx-stat__k">Sigilo</div></div>
+                  <div class="fx-statgroups">
+                    <div class="fx-statgroup">
+                      <div class="fx-radar-cap">Principales</div>
+                      <canvas class="fx-radar" width="190" height="190"
+                        data-vals="{$ficha['fuerza']},{$ficha['destreza']},{$ficha['cchakra']},{$ficha['inteligencia']}"
+                        data-labels="FUE,DES,CHK,INT" aria-label="Radar de estadísticas principales"></canvas>
+                      <div class="fx-stats fx-stats--pair">
+                        <div class="fx-stat"><span class="fx-stat__mod">{$ficha['mfuerza']}</span><div class="fx-stat__v">{$ficha['fuerza']}</div><div class="fx-stat__k">Fuerza</div></div>
+                        <div class="fx-stat"><span class="fx-stat__mod">{$ficha['mdestreza']}</span><div class="fx-stat__v">{$ficha['destreza']}</div><div class="fx-stat__k">Destreza</div></div>
+                        <div class="fx-stat"><span class="fx-stat__mod">{$ficha['mcchakra']}</span><div class="fx-stat__v">{$ficha['cchakra']}</div><div class="fx-stat__k">Ctrl. Chakra</div></div>
+                        <div class="fx-stat"><span class="fx-stat__mod">{$ficha['minteligencia']}</span><div class="fx-stat__v">{$ficha['inteligencia']}</div><div class="fx-stat__k">Inteligencia</div></div>
+                      </div>
+                    </div>
+                    <div class="fx-statgroup">
+                      <div class="fx-radar-cap">Secundarias</div>
+                      <canvas class="fx-radar" width="190" height="190"
+                        data-vals="{$ficha['salud']},{$ficha['velocidad']},{$ficha['tenketsu']},{$ficha['sigilo']}"
+                        data-labels="SAL,VEL,TEN,SIG" aria-label="Radar de estadísticas secundarias"></canvas>
+                      <div class="fx-stats fx-stats--pair">
+                        <div class="fx-stat"><div class="fx-stat__v">{$ficha['salud']}</div><div class="fx-stat__k">Salud</div></div>
+                        <div class="fx-stat"><div class="fx-stat__v">{$ficha['velocidad']}</div><div class="fx-stat__k">Velocidad</div></div>
+                        <div class="fx-stat"><div class="fx-stat__v">{$ficha['tenketsu']}</div><div class="fx-stat__k">Tenketsu</div></div>
+                        <div class="fx-stat"><div class="fx-stat__v">{$ficha['sigilo']}</div><div class="fx-stat__k">Sigilo</div></div>
+                      </div>
+                    </div>
                   </div>
+                </div>
+              </div>
+
+              <div class="fx-traits">
+                <div class="fx-card fx-card--virtues">
+                  <div class="fx-card__head"><span class="fx-card__title">Virtudes</span></div>
+                  <div class="fx-card__body">
+                    <!-- Texto libre: en desuso, se eliminará cuando la lista de abajo lo reemplace por completo -->
+                    <div class="fx-prose">{$virtudes}</div>
+                    <div class="fx-vt-note">Asignadas ({$nVirtudesAuto})</div>
+                    <div class="fx-vt-list">{$virtudesAutoHtml}</div>
+                  </div>
+                </div>
+                <div class="fx-card fx-card--defects">
+                  <div class="fx-card__head"><span class="fx-card__title">Defectos</span></div>
+                  <div class="fx-card__body">
+                    <!-- Texto libre: en desuso, se eliminará cuando la lista de abajo lo reemplace por completo -->
+                    <div class="fx-prose">{$defectos}</div>
+                    <div class="fx-vt-note">Asignados ({$nDefectosAuto})</div>
+                    <div class="fx-vt-list">{$defectosAutoHtml}</div>
                   </div>
                 </div>
               </div>
@@ -671,7 +746,6 @@
 
         <!-- ── TÉCNICAS ── -->
         <section class="fx-panel fx-panel--tecnicas" role="tabpanel">
-          <div class="fx-margin" style="bottom: 10px; left: 16px;">Repertorio confirmado.</div>
           <div class="fx-tecnicas-host">
               <section class="sg-profile-private">
                 <div class="sg-profile-panel sg-profile-panel--techniques">
@@ -737,27 +811,6 @@
             <div class="fx-clear"></div>
 
             <div class="fx-stack">
-              <div class="fx-traits">
-                <div class="fx-card fx-card--virtues">
-                  <div class="fx-card__head"><span class="fx-card__title">Virtudes</span></div>
-                  <div class="fx-card__body">
-                    <!-- Texto libre: en desuso, se eliminará cuando la lista de abajo lo reemplace por completo -->
-                    <div class="fx-prose">{$virtudes}</div>
-                    <div class="fx-vt-note">Asignadas ({$nVirtudesAuto})</div>
-                    <div class="fx-vt-list">{$virtudesAutoHtml}</div>
-                  </div>
-                </div>
-                <div class="fx-card fx-card--defects">
-                  <div class="fx-card__head"><span class="fx-card__title">Defectos</span></div>
-                  <div class="fx-card__body">
-                    <!-- Texto libre: en desuso, se eliminará cuando la lista de abajo lo reemplace por completo -->
-                    <div class="fx-prose">{$defectos}</div>
-                    <div class="fx-vt-note">Asignados ({$nDefectosAuto})</div>
-                    <div class="fx-vt-list">{$defectosAutoHtml}</div>
-                  </div>
-                </div>
-              </div>
-
               <div class="fx-card">
                 <div class="fx-card__head"><span class="fx-card__title">Apariencia</span></div>
                 <div class="fx-card__body"><div class="fx-prose">{$apariencia}</div></div>
@@ -817,6 +870,8 @@
       </div>
     </div>
   </div>
+
+  <div id="fx-radar-tip" class="fx-radar-tip" aria-hidden="true"></div>
 
   {$footer}
 
@@ -933,21 +988,19 @@
 
     window.addEventListener('load', sgWeekCountdown);
 
-    function sgFichaRadar() {
-      var c = document.getElementById('fx-radar');
+    function sgFichaSetupRadar(c) {
       if (!c || !c.getContext) { return; }
       var raw = (c.getAttribute('data-vals') || '').split(',').map(function (x) { return parseFloat(x) || 0; });
       if (raw.length < 3) { return; }
       var labels = (c.getAttribute('data-labels') || '').split(',');
       var n = raw.length;
-      var size = parseInt(c.getAttribute('width'), 10) || 240;
+      var size = parseInt(c.getAttribute('width'), 10) || 200;
       var dpr = window.devicePixelRatio || 1;
       c.width = size * dpr; c.height = size * dpr;
       c.style.width = size + 'px'; c.style.height = size + 'px';
       var ctx = c.getContext('2d');
-      ctx.scale(dpr, dpr);
 
-      var cx = size / 2, cy = size / 2, R = size / 2 - 30;
+      var cx = size / 2, cy = size / 2, R = size / 2 - 26;
       var cs = getComputedStyle(document.documentElement);
       var accent = (cs.getPropertyValue('--accent') || '#8e3145').trim();
       var ink = (cs.getPropertyValue('--ink') || '#333').trim();
@@ -959,37 +1012,89 @@
         return [cx + Math.cos(a) * r, cy + Math.sin(a) * r];
       }
 
-      ctx.strokeStyle = grid; ctx.lineWidth = 0.5; ctx.globalAlpha = 0.35;
-      for (var g = 1; g <= 3; g++) {
+      // Guardar vértices (en px CSS) para el hover
+      var verts = [];
+      for (var v = 0; v < n; v++) { var pv = pt(v, R * (raw[v] / maxv)); verts.push({ x: pv[0], y: pv[1], label: labels[v] || '', value: raw[v] }); }
+      c._verts = verts;
+
+      function frame(prog) {
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        ctx.clearRect(0, 0, size, size);
+        ctx.strokeStyle = grid; ctx.lineWidth = 0.5; ctx.globalAlpha = 0.35;
+        for (var g = 1; g <= 3; g++) {
+          ctx.beginPath();
+          for (var i = 0; i < n; i++) { var p = pt(i, R * g / 3); if (i === 0) { ctx.moveTo(p[0], p[1]); } else { ctx.lineTo(p[0], p[1]); } }
+          ctx.closePath(); ctx.stroke();
+        }
+        for (var i = 0; i < n; i++) { var pe = pt(i, R); ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(pe[0], pe[1]); ctx.stroke(); }
+        ctx.globalAlpha = 1;
+
         ctx.beginPath();
-        for (var i = 0; i < n; i++) { var p = pt(i, R * g / 3); if (i === 0) { ctx.moveTo(p[0], p[1]); } else { ctx.lineTo(p[0], p[1]); } }
-        ctx.closePath(); ctx.stroke();
+        for (var i = 0; i < n; i++) { var pp = pt(i, R * (raw[i] / maxv) * prog); if (i === 0) { ctx.moveTo(pp[0], pp[1]); } else { ctx.lineTo(pp[0], pp[1]); } }
+        ctx.closePath();
+        ctx.fillStyle = accent; ctx.globalAlpha = 0.18 * prog; ctx.fill();
+        ctx.globalAlpha = 1; ctx.strokeStyle = accent; ctx.lineWidth = 1.5; ctx.stroke();
+
+        ctx.fillStyle = accent;
+        for (var i = 0; i < n; i++) { var pd = pt(i, R * (raw[i] / maxv) * prog); ctx.beginPath(); ctx.arc(pd[0], pd[1], 2, 0, Math.PI * 2); ctx.fill(); }
+
+        ctx.fillStyle = ink; ctx.font = '9px Cinzel, serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        for (var i = 0; i < n; i++) { var pl = pt(i, R + 13); ctx.fillText(labels[i] || '', pl[0], pl[1]); }
       }
-      for (var i = 0; i < n; i++) { var pe = pt(i, R); ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(pe[0], pe[1]); ctx.stroke(); }
-      ctx.globalAlpha = 1;
 
-      ctx.beginPath();
-      for (var i = 0; i < n; i++) { var pv = pt(i, R * (raw[i] / maxv)); if (i === 0) { ctx.moveTo(pv[0], pv[1]); } else { ctx.lineTo(pv[0], pv[1]); } }
-      ctx.closePath();
-      ctx.fillStyle = accent; ctx.globalAlpha = 0.18; ctx.fill();
-      ctx.globalAlpha = 1; ctx.strokeStyle = accent; ctx.lineWidth = 1.5; ctx.stroke();
+      var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (reduce) { frame(1); }
+      else {
+        var start = null, dur = 650;
+        (function step(ts) {
+          if (!start) { start = ts; }
+          var prog = Math.min(1, (ts - start) / dur);
+          frame(prog);
+          if (prog < 1) { requestAnimationFrame(step); }
+        })(performance.now());
+      }
 
-      ctx.fillStyle = accent;
-      for (var i = 0; i < n; i++) { var pd = pt(i, R * (raw[i] / maxv)); ctx.beginPath(); ctx.arc(pd[0], pd[1], 2, 0, Math.PI * 2); ctx.fill(); }
-
-      ctx.fillStyle = ink; ctx.font = '9px Cinzel, serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-      for (var i = 0; i < n; i++) { var pl = pt(i, R + 15); ctx.fillText(labels[i], pl[0], pl[1]); }
+      // Hover: tooltip con label + valor
+      var tip = document.getElementById('fx-radar-tip');
+      c.addEventListener('mousemove', function (e) {
+        var found = null, best = 220;
+        for (var i = 0; i < c._verts.length; i++) {
+          var dx = c._verts[i].x - e.offsetX, dy = c._verts[i].y - e.offsetY;
+          var d = dx * dx + dy * dy;
+          if (d < best) { best = d; found = c._verts[i]; }
+        }
+        if (found && tip) {
+          tip.textContent = found.label + ': ' + found.value;
+          tip.style.left = (e.pageX + 12) + 'px';
+          tip.style.top = (e.pageY - 6) + 'px';
+          tip.style.opacity = '1';
+        } else if (tip) { tip.style.opacity = '0'; }
+      });
+      c.addEventListener('mouseleave', function () { if (tip) { tip.style.opacity = '0'; } });
     }
 
-    window.addEventListener('load', sgFichaRadar);
-
-    function sgFichaLevelBar() {
-      var f = document.querySelector('.fx-levelbar__fill');
-      if (!f) { return; }
-      var pct = parseFloat(f.getAttribute('data-pct')) || 0;
-      requestAnimationFrame(function () { requestAnimationFrame(function () { f.style.width = pct + '%'; }); });
+    function sgFichaRadars() {
+      var list = document.querySelectorAll('.fx-radar');
+      for (var i = 0; i < list.length; i++) { sgFichaSetupRadar(list[i]); }
     }
-    window.addEventListener('load', sgFichaLevelBar);
+    window.addEventListener('load', sgFichaRadars);
+
+    function sgFichaBars() {
+      var bars = document.querySelectorAll('.fx-levelbar__fill, .fx-bar[data-fill]');
+      requestAnimationFrame(function () {
+        requestAnimationFrame(function () {
+          for (var i = 0; i < bars.length; i++) {
+            var b = bars[i];
+            if (b.classList.contains('fx-levelbar__fill')) {
+              b.style.width = (parseFloat(b.getAttribute('data-pct')) || 0) + '%';
+            } else {
+              b.style.setProperty('--fill', (parseFloat(b.getAttribute('data-fill')) || 0) + '%');
+            }
+          }
+        });
+      });
+    }
+    window.addEventListener('load', sgFichaBars);
   </script>
 </body>
 </html>

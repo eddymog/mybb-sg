@@ -120,6 +120,15 @@ if ($ficha_existe == true && ($moderated == true || (is_mod($s_uid) || is_staff(
         $puntos_rol = intval(floor($usuario['newpoints']));
     }
 
+    // Actividad en el foro (mensajes, temas, fecha de ingreso) — ya vive en mybb_sg_users
+    $sg_postnum     = isset($usuario['postnum']) ? intval($usuario['postnum']) : 0;
+    $sg_threadnum   = isset($usuario['threadnum']) ? intval($usuario['threadnum']) : 0;
+    $sg_regdate     = isset($usuario['regdate']) ? intval($usuario['regdate']) : 0;
+    $sg_regdate_fmt = $sg_regdate > 0 ? date('d/m/Y', $sg_regdate) : '—';
+    eval('$sgPostnum = $sg_postnum;');
+    eval('$sgThreadnum = $sg_threadnum;');
+    eval('$sgRegdateFmt = $sg_regdate_fmt;');
+
     // Semana actual (mismo epoch que newpoints) y timestamp de cierre para el contador
     $sg_exp_epoch  = 1721620800;
     $semana_actual = (int) ceil((time() - $sg_exp_epoch) / 604800);
@@ -505,6 +514,19 @@ if ($ficha_existe == true && ($moderated == true || (is_mod($s_uid) || is_staff(
         eval('$frase = $frase_var;');
         eval('$sgVidaBar = $sg_vida_bar;');
         eval('$sgChakraBar = $sg_chakra_bar;');
+
+        // Aviso al dueño: puntos de estadística / mejoras sin asignar
+        $sg_puntos_aviso = 0;
+        $sg_puntos_msg = '';
+        if ($is_owner && ($puntos_estadistica > 0 || $mejoras > 0)) {
+            $sg_puntos_aviso = 1;
+            $partes = array();
+            if ($puntos_estadistica > 0) { $partes[] = $puntos_estadistica . ' de estadística'; }
+            if ($mejoras > 0) { $partes[] = $mejoras . ' mejora' . ($mejoras > 1 ? 's' : ''); }
+            $sg_puntos_msg = 'Tienes ' . implode(' y ', $partes) . ' sin asignar';
+        }
+        eval('$sgPuntosAviso = $sg_puntos_aviso;');
+        eval('$sgPuntosMsg = "'.addslashes($sg_puntos_msg).'";');
 
         // Fotos por pestaña (columnas opcionales; vacío si aún no existen)
         $sg_foto_expediente  = isset($f['foto_expediente'])  ? $f['foto_expediente']  : '';
