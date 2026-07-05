@@ -17,7 +17,7 @@
       --border-strong: {$sgFichaBorderStrong};
       --ink:           #f3edf3;
       --stone:         #c6bacf;
-      --mist:          #ab9fb6;
+      --mist:          #cac0d6;
       --fiber:         rgba(255, 255, 255, 0.03);
       --paper:         {$sgFichaPaper};
       --paper-ink:     {$sgFichaPaperText};
@@ -58,7 +58,7 @@
     /* Tipografía base */
     .fx-eyebrow {
       font-family: 'Cinzel', serif; text-transform: uppercase;
-      font-size: 9px; letter-spacing: 2px; color: var(--accent);
+      font-size: 10px; letter-spacing: 2px; color: var(--accent);
     }
     .fx-h {
       font-family: 'Cinzel', serif; font-weight: 900; letter-spacing: 2px;
@@ -92,7 +92,7 @@
     .fx-identity { min-width: 0; padding-bottom: 4px; }
     .fx-identity__village {
       font-family: 'Cinzel', serif; text-transform: uppercase;
-      font-size: 10px; letter-spacing: 3px; color: var(--accent);
+      font-size: 11px; letter-spacing: 3px; color: var(--accent);
       margin-bottom: 4px;
     }
     .fx-identity__accent { display:inline-block; width: 32px; height: 2px; background: var(--accent); margin-bottom: 8px; }
@@ -104,7 +104,7 @@
     .fx-week__tip {
       position: absolute; left: 50%; bottom: calc(100% + 8px); transform: translateX(-50%);
       white-space: nowrap; padding: 6px 10px; background: var(--ink); color: var(--bg);
-      font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 1px;
+      font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 1px;
       opacity: 0; visibility: hidden; transition: opacity .15s ease; z-index: 20;
     }
     .fx-week:hover .fx-week__tip { opacity: 1; visibility: visible; }
@@ -112,7 +112,7 @@
     .fx-actions { display: flex; flex-direction: column; gap: 6px; align-items: stretch; padding-bottom: 4px; }
     .fx-action {
       font-family: 'Cinzel', serif; text-transform: uppercase; letter-spacing: 1.5px;
-      font-size: 10px; font-weight: 700; color: var(--stone);
+      font-size: 11px; font-weight: 700; color: var(--stone);
       border: 0.5px solid var(--border); padding: 8px 14px; text-align: center;
       background: var(--card); transition: border-color .15s ease, color .15s ease;
     }
@@ -121,7 +121,7 @@
     /* ── CABECERA DE EXPEDIENTE ───────────────────────── */
     .fx-hero__file {
       position: absolute; top: 12px; left: 14px; z-index: 5;
-      font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 2px; text-transform: uppercase;
+      font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
       color: #fff; background: rgba(20,12,36,0.55); border: 0.5px solid rgba(255,255,255,0.25);
       padding: 4px 10px;
     }
@@ -132,9 +132,9 @@
       background: var(--accent-soft);
     }
     .fx-hero__stamp span { display: block; font-family: 'Cinzel', serif; letter-spacing: 2px; text-transform: uppercase; }
-    .fx-hero__stamp-k { font-size: 7px; opacity: 0.85; }
+    .fx-hero__stamp-k { font-size: 8px; opacity: 0.85; }
     .fx-hero__stamp strong { display: block; font-family: 'Cinzel', serif; font-weight: 900; font-size: 16px; letter-spacing: 1px; line-height: 1.15; }
-    .fx-hero__stamp-e { font-size: 8px; margin-top: 1px; }
+    .fx-hero__stamp-e { font-size: 9px; margin-top: 1px; }
     .fx-hero__tate {
       position: absolute; right: 18px; bottom: -8px; z-index: 0; pointer-events: none;
       writing-mode: vertical-rl; font-family: 'Noto Serif JP', serif; font-weight: 700;
@@ -151,7 +151,7 @@
     .fx-tab {
       display: flex; align-items: center; gap: 8px;
       font-family: 'Cinzel', serif; text-transform: uppercase; letter-spacing: 1.5px;
-      font-size: 11px; font-weight: 700; color: var(--stone);
+      font-size: 12px; font-weight: 700; color: var(--stone);
       padding: 13px 20px; cursor: pointer; user-select: none;
       border: 0.5px solid transparent; border-bottom: none;
       transition: color .15s ease, background .15s ease;
@@ -226,7 +226,7 @@
     /* Folio (número de página) por pestaña */
     .fx-panel::after {
       position: absolute; bottom: -6px; right: 4px; z-index: 2; pointer-events: none;
-      font-family: 'Cinzel', serif; font-size: 11px; letter-spacing: 2px; color: var(--mist);
+      font-family: 'Cinzel', serif; font-size: 12px; letter-spacing: 2px; color: var(--mist);
     }
     .fx-panel--dossier::after  { content: 'Folio i'; }
     .fx-panel--perfil::after   { content: 'Folio ii'; }
@@ -248,7 +248,7 @@
     /* Etiqueta "FOTO" (esquina) */
     .fx-photo__frame::before {
       content: 'FOTO'; position: absolute; top: 0; left: 0; z-index: 3;
-      font-family: 'Cinzel', serif; font-size: 8px; letter-spacing: 2px; color: #fff;
+      font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 2px; color: #fff;
       background: var(--accent); padding: 3px 8px;
     }
     /* Marcas de registro en las 4 esquinas */
@@ -273,12 +273,12 @@
       content: '影'; font-family: 'Noto Serif JP', serif; font-size: 78px; font-weight: 700;
       color: var(--accent); opacity: 0.08; position: absolute; line-height: 1;
     }
-    .fx-photo__empty span { position: relative; font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 2px; text-transform: uppercase; }
+    .fx-photo__empty span { position: relative; font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; }
     .fx-photo--edit .fx-photo__frame { cursor: pointer; }
     .fx-photo--edit:hover .fx-photo__hint { opacity: 1; }
     .fx-photo__hint {
       position: absolute; left: 8px; right: 8px; bottom: 6px; z-index: 5;
-      font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase;
+      font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase;
       color: #fff; background: rgba(20,12,36,0.7); padding: 6px; text-align: center;
       opacity: 0; transition: opacity .15s ease;
     }
@@ -289,7 +289,7 @@
       font-family: 'Noto Serif JP', serif; font-size: 15px; font-weight: 700; color: var(--accent);
       background: var(--accent-soft);
     }
-    .fx-photo__cap { text-align: center; font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--mist); margin-top: 8px; }
+    .fx-photo__cap { text-align: center; font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--mist); margin-top: 8px; }
 
     /* Sticker: washi-tape + leve rotación (distinta por pestaña) */
     .fx-photo { transition: transform .2s ease; }
@@ -309,7 +309,7 @@
     .fx-panel--tecnicas .fx-layout { grid-template-columns: 190px 1fr; }
     .fx-panel--tecnicas .fx-photo  { transform: rotate(-1.5deg); }
     /* Expediente = retrato oficial/cover: más grande y con caption destacada */
-    .fx-panel--dossier .fx-photo__cap { font-size: 10px; letter-spacing: 3px; color: var(--accent); }
+    .fx-panel--dossier .fx-photo__cap { font-size: 11px; letter-spacing: 3px; color: var(--accent); }
     /* Expediente: columna de identidad (foto + datos + recursos apilados) */
     .fx-side { display: grid; gap: 20px; align-content: start; }
     .fx-side .fx-data { grid-template-columns: 1fr; }
@@ -326,13 +326,32 @@
     .fx-bio-head .fx-card__title { white-space: nowrap; }
     @media (max-width: 620px) { .fx-trasfondo .fx-photo { float: none; width: 100%; margin: 0 0 16px; } }
 
+    /* Biografía larga: colapsar con "Leer más" */
+    .fx-bio-toggle-input { position: absolute; width: 1px; height: 1px; opacity: 0; overflow: hidden; }
+    .fx-bio-content--clamped { max-height: 280px; overflow: hidden; position: relative; }
+    .fx-bio-content--clamped::after {
+      content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 64px;
+      background: linear-gradient(180deg, transparent, var(--card)); pointer-events: none;
+    }
+    .fx-bio-toggle-input:checked ~ .fx-bio-content--clamped { max-height: none; }
+    .fx-bio-toggle-input:checked ~ .fx-bio-content--clamped::after { display: none; }
+    .fx-bio-more {
+      display: inline-flex; margin-top: 10px; cursor: pointer;
+      font-family: 'Cinzel', serif; font-size: 11px; letter-spacing: 1.5px;
+      text-transform: uppercase; color: var(--accent);
+    }
+    .fx-bio-more:hover { text-decoration: underline; }
+    .fx-bio-more__less { display: none; }
+    .fx-bio-toggle-input:checked ~ .fx-bio-more .fx-bio-more__more { display: none; }
+    .fx-bio-toggle-input:checked ~ .fx-bio-more .fx-bio-more__less { display: inline; }
+
     /* ── CARDS ────────────────────────────────────────── */
     .fx-stack { display: grid; gap: 20px; }
     .fx-card { border: 0.5px solid var(--border); background: var(--card); }
     .fx-card__head { display: flex; align-items: center; gap: 10px; padding: 14px 16px 0; }
     .fx-card__head::before { content:''; width: 3px; height: 15px; background: var(--accent); flex-shrink: 0; }
     .fx-card__head::after { content:''; flex: 1; height: 0.5px; background: var(--border); }
-    .fx-card__title { font-family: 'Cinzel', serif; font-size: 13px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; color: var(--ink); }
+    .fx-card__title { font-family: 'Cinzel', serif; font-size: 14px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; color: var(--ink); }
     .fx-card__body { padding: 14px 16px 18px; }
 
     /* Datos: label izq / valor der */
@@ -340,8 +359,8 @@
     @media (max-width: 480px){ .fx-data { grid-template-columns: 1fr; } }
     .fx-row { display: flex; justify-content: space-between; gap: 10px; padding: 8px 0; border-bottom: 0.5px solid var(--border); }
     .fx-row:last-child { border-bottom: none; }
-    .fx-row__k { font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--mist); align-self: center; }
-    .fx-row__v { font-family: 'Noto Serif JP', serif; font-weight: 700; font-size: 14px; color: var(--ink); text-align: right; font-variant-numeric: tabular-nums; }
+    .fx-row__k { font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--mist); align-self: center; }
+    .fx-row__v { font-family: 'Noto Serif JP', serif; font-weight: 700; font-size: 15px; color: var(--ink); text-align: right; font-variant-numeric: tabular-nums; }
     .fx-row__link { cursor: pointer; transition: color .15s ease; }
     .fx-row__link:hover { color: var(--accent); text-decoration: underline; }
 
@@ -349,14 +368,14 @@
     .fx-res { display: grid; grid-template-columns: repeat(2,1fr); gap: 10px; }
     .fx-res__cell { text-align: center; border: 0.5px solid var(--border); padding: 12px 6px; background: var(--card2); }
     .fx-res__v { font-family: 'Cinzel', serif; font-weight: 700; font-size: 20px; color: var(--accent); font-variant-numeric: tabular-nums; }
-    .fx-res__k { font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--mist); margin-top: 2px; }
+    .fx-res__k { font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--mist); margin-top: 2px; }
 
     /* Barras (constantes) */
     .fx-gauges { display: grid; gap: 14px; }
     .fx-gauge__top { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px; }
-    .fx-gauge__k { font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--stone); }
+    .fx-gauge__k { font-family: 'Cinzel', serif; font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--stone); }
     .fx-gauge__v { font-family: 'Cinzel', serif; font-size: 16px; font-weight: 700; color: var(--ink); font-variant-numeric: tabular-nums; }
-    .fx-gauge__v small { color: var(--mist); font-size: 11px; font-weight: 400; }
+    .fx-gauge__v small { color: var(--mist); font-size: 12px; font-weight: 400; }
     .fx-bar { height: 10px; border: 0.5px solid var(--border); background: var(--card2); position: relative; overflow: hidden; }
     .fx-bar::before { content:''; position: absolute; inset: 0; width: var(--fill, 50%); background: linear-gradient(90deg, var(--accent), var(--accent-2)); transition: width 1.1s cubic-bezier(.22,1,.36,1); }
     @media (prefers-reduced-motion: reduce) { .fx-bar::before { transition: none; } }
@@ -368,33 +387,33 @@
     @media (max-width: 640px){ .fx-stats { grid-template-columns: repeat(2, 1fr); } }
     .fx-stat { position: relative; text-align: center; border: 0.5px solid var(--border); padding: 14px 6px 12px; background: var(--card2); }
     .fx-stat__v { font-family: 'Cinzel', serif; font-weight: 900; font-size: 24px; color: var(--ink); font-variant-numeric: tabular-nums; line-height: 1; }
-    .fx-stat__k { font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 1px; text-transform: uppercase; color: var(--mist); margin-top: 6px; }
-    .fx-stat__mod { position: absolute; top: 7px; right: 9px; font-family: 'Cinzel', serif; font-size: 11px; font-weight: 700; color: var(--accent); }
-    .fx-stat__mod::before { content: 'M '; font-size: 8px; }
+    .fx-stat__k { font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: var(--mist); margin-top: 6px; }
+    .fx-stat__mod { position: absolute; top: 7px; right: 9px; font-family: 'Cinzel', serif; font-size: 12px; font-weight: 700; color: var(--accent); }
+    .fx-stat__mod::before { content: 'M '; font-size: 9px; }
 
     /* Estadísticas: cada radar emparejado con sus 4 stats */
     .fx-statgroups { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
     @media (max-width: 640px){ .fx-statgroups { grid-template-columns: 1fr; } }
     .fx-statgroup { display: grid; justify-items: center; gap: 12px; }
     .fx-radar { display: block; cursor: crosshair; margin: 0 auto; }
-    .fx-radar-cap { font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--accent); }
+    .fx-radar-cap { font-family: 'Cinzel', serif; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--accent); }
     .fx-stats--pair { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; width: 100%; }
     .fx-radar-tip {
       position: absolute; z-index: 60; pointer-events: none; opacity: 0; transition: opacity .1s ease;
       background: var(--ink); color: var(--bg); padding: 4px 9px; white-space: nowrap;
-      font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 1px; font-weight: 700;
+      font-family: 'Cinzel', serif; font-size: 11px; letter-spacing: 1px; font-weight: 700;
     }
 
     /* Barra de progreso al siguiente nivel (hero) — grande + animada */
     .fx-levelbar { margin-top: 16px; }
     .fx-levelbar__head { display: flex; align-items: baseline; gap: 10px; margin-bottom: 7px; }
     .fx-levelbar__lvl { font-family: 'Cinzel', serif; font-weight: 900; font-size: 15px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--ink); }
-    .fx-levelbar__next { font-family: 'Cinzel', serif; font-size: 11px; letter-spacing: 1px; color: var(--mist); }
+    .fx-levelbar__next { font-family: 'Cinzel', serif; font-size: 12px; letter-spacing: 1px; color: var(--mist); }
     .fx-levelbar__pct { margin-left: auto; font-family: 'Cinzel', serif; font-weight: 900; font-size: 20px; color: var(--accent); font-variant-numeric: tabular-nums; }
     .fx-levelbar__track { height: 16px; border: 0.5px solid var(--border-strong); background: var(--card2); position: relative; overflow: hidden; }
     .fx-levelbar__fill { position: absolute; top: 0; left: 0; bottom: 0; width: 0; background: linear-gradient(90deg, var(--accent), var(--accent-2)); transition: width 1.1s cubic-bezier(.22,1,.36,1); animation: fxLevelPulse 2.6s ease-in-out infinite; }
-    .fx-levelbar__meta { margin-top: 6px; font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 1px; text-transform: uppercase; color: var(--mist); }
-    .fx-levelbar--max span { font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--accent); }
+    .fx-levelbar__meta { margin-top: 6px; font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: var(--mist); }
+    .fx-levelbar--max span { font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--accent); }
     @keyframes fxLevelPulse { 0%, 100% { box-shadow: inset 0 0 6px rgba(255,255,255,0.08); filter: brightness(1); } 50% { box-shadow: inset 0 0 16px rgba(255,255,255,0.30); filter: brightness(1.12); } }
     @media (prefers-reduced-motion: reduce) { .fx-levelbar__fill { transition: none; animation: none; } }
 
@@ -402,12 +421,12 @@
     .fx-assign {
       display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; margin-top: 12px;
       padding: 9px 14px; border: 1px solid #d9b35c; background: rgba(217, 179, 92, 0.12);
-      font-family: 'Cinzel', serif; font-size: 11px; font-weight: 700; letter-spacing: 0.8px;
+      font-family: 'Cinzel', serif; font-size: 12px; font-weight: 700; letter-spacing: 0.8px;
       text-transform: uppercase; color: #e6c877; line-height: 1.4;
       animation: fxAssignPulse 2s ease-in-out infinite;
     }
     .fx-assign:hover { background: rgba(217, 179, 92, 0.2); border-color: #e6c877; }
-    .fx-assign__i { color: #e6c877; font-size: 9px; }
+    .fx-assign__i { color: #e6c877; font-size: 10px; }
     .fx-assign__go { margin-left: auto; color: var(--ink); opacity: 0.8; }
     @keyframes fxAssignPulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(217,179,92,0.0); } 50% { box-shadow: 0 0 0 3px rgba(217,179,92,0.18); } }
     @media (prefers-reduced-motion: reduce) { .fx-assign { animation: none; } }
@@ -416,7 +435,7 @@
     .fx-inv-empty { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 12px; min-height: 300px; }
     .fx-inv-empty__k { font-family: 'Noto Serif JP', serif; font-weight: 700; font-size: 88px; line-height: 1; color: var(--accent); opacity: 0.18; }
     .fx-inv-empty__t { font-family: 'Cinzel', serif; font-weight: 900; font-size: 20px; letter-spacing: 2px; text-transform: uppercase; color: var(--ink); }
-    .fx-inv-empty__p { margin: 0; color: var(--stone); font-size: 14px; max-width: 320px; line-height: 1.6; }
+    .fx-inv-empty__p { margin: 0; color: var(--stone); font-size: 15px; max-width: 320px; line-height: 1.6; }
 
     /* Estampado del sello de rango al cargar */
     @keyframes fxStampIn { 0% { opacity: 0; transform: rotate(7deg) scale(1.6); } 60% { opacity: 1; } 100% { opacity: 1; transform: rotate(7deg) scale(1); } }
@@ -424,16 +443,28 @@
     @media (prefers-reduced-motion: reduce) { .fx-hero__stamp { animation: none; } }
 
     /* Prosa */
-    .fx-prose { font-family: 'Noto Serif JP', serif; font-weight: 300; font-size: 14px; line-height: 1.9; color: var(--ink); text-align: justify; }
+    .fx-prose { font-family: 'Noto Serif JP', serif; font-weight: 300; font-size: 15px; line-height: 1.9; color: var(--ink); text-align: justify; }
     .fx-prose p { margin: 0 0 12px; }
     .fx-prose--lead { font-weight: 400; }
     .fx-traits { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
     @media (max-width: 560px){ .fx-traits { grid-template-columns: 1fr; } }
-    .fx-origin { margin-top: 18px; font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--mist); }
+    .fx-origin { margin-top: 18px; font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--mist); }
+
+    /* Balance neto de puntos entre virtudes y defectos */
+    .fx-vt-balance {
+      display: flex; flex-wrap: wrap; gap: 10px 20px; align-items: center;
+      margin-bottom: 14px; padding: 10px 14px; border: 0.5px solid var(--border); background: var(--card2);
+    }
+    .fx-vt-balance__item {
+      font-family: 'Cinzel', serif; font-size: 11px; letter-spacing: 1px; text-transform: uppercase; color: var(--stone);
+    }
+    .fx-vt-balance__item b { font-size: 14px; letter-spacing: 0; margin-left: 5px; }
+    .fx-vt-balance__total { margin-left: auto; color: var(--ink); }
+    .fx-vt-balance__total b { color: var(--accent); font-size: 15px; }
 
     /* Virtudes/Defectos asignados (catálogo real) — lista con scroll */
     .fx-vt-note {
-      margin: 2px 0 10px; font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 1px;
+      margin: 2px 0 10px; font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 1px;
       text-transform: uppercase; color: var(--mist); font-style: italic;
     }
     .fx-vt-list {
@@ -453,24 +484,24 @@
       border-color: rgba(200, 60, 45, 0.3);
     }
     .fx-vt-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
-    .fx-vt-name { margin: 0; flex: 1; font-family: 'Cinzel', serif; font-size: 12px; font-weight: 700; color: var(--ink); line-height: 1.3; }
-    .fx-vt-cost { flex-shrink: 0; padding: 2px 8px; font-family: 'Cinzel', serif; font-size: 11px; font-weight: 700; border: 0.5px solid var(--border-strong); }
+    .fx-vt-name { margin: 0; flex: 1; font-family: 'Cinzel', serif; font-size: 13px; font-weight: 700; color: var(--ink); line-height: 1.3; }
+    .fx-vt-cost { flex-shrink: 0; padding: 2px 8px; font-family: 'Cinzel', serif; font-size: 12px; font-weight: 700; border: 0.5px solid var(--border-strong); }
     .fx-vt-cost--v { color: #6fcb8f; border-color: rgba(79, 157, 105, 0.5); background: rgba(79, 157, 105, 0.12); }
     .fx-vt-cost--d { color: #e0776a; border-color: rgba(200, 60, 45, 0.5); background: rgba(200, 60, 45, 0.12); }
     .fx-vt-meta { display: flex; flex-wrap: wrap; gap: 5px; margin: 6px 0; }
     .fx-vt-badge {
       padding: 2px 8px; border: 0.5px solid var(--border-strong); background: var(--panel); color: var(--mist);
-      font-family: 'Cinzel', serif; font-size: 8px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase;
+      font-family: 'Cinzel', serif; font-size: 9px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase;
     }
     .fx-vt-badge--excl { color: #d9b35c; border-color: rgba(217, 179, 92, 0.5); background: rgba(217, 179, 92, 0.14); }
-    .fx-vt-desc { margin: 0; color: var(--stone); font-size: 12.5px; line-height: 1.55; }
-    .fx-vt-empty { padding: 14px; text-align: center; color: var(--mist); font-size: 12.5px; border: 0.5px dashed var(--border); }
+    .fx-vt-desc { margin: 0; color: var(--stone); font-size: 13.5px; line-height: 1.55; }
+    .fx-vt-empty { padding: 14px; text-align: center; color: var(--mist); font-size: 13.5px; border: 0.5px dashed var(--border); }
 
     /* Notas de staff */
     .fx-notes textarea {
       width: 100%; min-height: 120px; resize: vertical;
       border: 0.5px solid var(--border); background: var(--card2); color: var(--ink);
-      font-family: 'Noto Serif JP', serif; font-size: 13px; line-height: 1.7; padding: 12px;
+      font-family: 'Noto Serif JP', serif; font-size: 14px; line-height: 1.7; padding: 12px;
     }
     .fx-pill { font-family:'Cinzel',serif; font-size:8px; letter-spacing:2px; text-transform:uppercase; color: var(--accent); border:0.5px solid var(--accent); padding:2px 8px; }
 
@@ -565,10 +596,10 @@
         <section class="fx-panel fx-panel--dossier" role="tabpanel">
           <div class="fx-layout">
             <div class="fx-side">
-            <div class="fx-photo <if $is_owner then>fx-photo--edit</if>" <if $is_owner then>onclick="openProfileAssetModal('foto_expediente')"</if>>
+            <div class="fx-photo <if $is_owner then>fx-photo--edit</if>" <if $is_owner then>onclick="openProfileAssetModal('avatar')"</if>>
               <div class="fx-photo__rod"></div>
               <div class="fx-photo__frame">
-                <if $sgFotoExpediente then><img src="{$sgFotoExpediente}" alt="Retrato de {$ficha['nombre']}">
+                <if $avatar then><img src="{$avatar}" alt="Retrato de {$ficha['nombre']}">
                 <else><div class="fx-photo__empty"><span>Sin retrato</span></div></if>
                 <if $is_owner then><div class="fx-photo__hint">Pulsa para cambiar</div></if>
                 <div class="fx-photo__seal">忍</div>
@@ -655,11 +686,11 @@
                 <div class="fx-card__body">
                   <div class="fx-gauges">
                     <div class="fx-gauge">
-                      <div class="fx-gauge__top"><span class="fx-gauge__k">Vida</span><span class="fx-gauge__v">{$ficha['vida']} <small>/ {$vida} base</small></span></div>
+                      <div class="fx-gauge__top"><span class="fx-gauge__k">Vida</span><span class="fx-gauge__v">{$ficha['vida']}</span></div>
                       <div class="fx-bar fx-bar--vida" data-fill="{$sgVidaBar}" style="--fill:0%"></div>
                     </div>
                     <div class="fx-gauge">
-                      <div class="fx-gauge__top"><span class="fx-gauge__k">Chakra</span><span class="fx-gauge__v">{$ficha['chakra']} <small>/ {$chakra} base</small></span></div>
+                      <div class="fx-gauge__top"><span class="fx-gauge__k">Chakra</span><span class="fx-gauge__v">{$ficha['chakra']}</span></div>
                       <div class="fx-bar fx-bar--chakra" data-fill="{$sgChakraBar}" style="--fill:0%"></div>
                     </div>
                     <div class="fx-gauge">
@@ -699,6 +730,12 @@
                     </div>
                   </div>
                 </div>
+              </div>
+
+              <div class="fx-vt-balance">
+                <span class="fx-vt-balance__item">Virtudes <b class="fx-vt-cost--v">{$sgBalanceVFmt}</b></span>
+                <span class="fx-vt-balance__item">Defectos <b class="fx-vt-cost--d">{$sgBalanceDFmt}</b></span>
+                <span class="fx-vt-balance__item fx-vt-balance__total">Balance <b>{$sgBalanceTFmt}</b></span>
               </div>
 
               <div class="fx-traits">
@@ -800,12 +837,23 @@
                 <div class="fx-photo__seal">魂</div>
               </div>
               <div class="fx-photo__rod fx-photo__rod--b"></div>
-              <div class="fx-photo__cap">Semblanza</div>
+              <div class="fx-photo__cap"></div>
             </div>
 
             <div class="fx-bio">
               <div class="fx-bio-head"><span class="fx-card__title">Biografía</span></div>
-              <div class="fx-prose">{$historia}</div>
+              <if $sgHistoriaLarga then>
+                <input type="checkbox" id="fx-bio-toggle" class="fx-bio-toggle-input">
+                <div class="fx-bio-content fx-bio-content--clamped">
+                  <div class="fx-prose">{$historia}</div>
+                </div>
+                <label class="fx-bio-more" for="fx-bio-toggle">
+                  <span class="fx-bio-more__more">Leer más ↓</span>
+                  <span class="fx-bio-more__less">Leer menos ↑</span>
+                </label>
+              <else>
+                <div class="fx-prose">{$historia}</div>
+              </if>
             </div>
 
             <div class="fx-clear"></div>
@@ -849,8 +897,8 @@
   </main>
 
   <form id="sg-profile-asset-form" method="post" action="{$mybb->settings['bburl']}/sg/ficha.php?uid={$ficha['fid']}" style="display:none;">
+    <input type="hidden" id="in-avatar" name="cambiar_avatar1" value="">
     <input type="hidden" id="in-banner" name="cambiar_avatar2" value="">
-    <input type="hidden" id="in-foto_expediente" name="cambiar_foto_expediente" value="">
     <input type="hidden" id="in-foto_perfil" name="cambiar_foto_perfil" value="">
   </form>
 
@@ -879,8 +927,8 @@
     var sgProfileState = { currentAsset: '' };
 
     var sgAssetCopy = {
+      avatar:  ['Editar avatar', 'La imagen del avatar debe funcionar bien en formato vertical o cuadrado. Se recomienda una composición clara y centrada.'],
       banner:  ['Editar banner', 'Formato panorámico para la cabecera de la ficha. Tamaño recomendado: 1200 × 300 px.'],
-      foto_expediente:  ['Retrato oficial', 'Imagen vertical tipo ficha. Tamaño recomendado: 400 × 520 px (proporción 3:4).'],
       foto_perfil:   ['Semblanza', 'Imagen vertical de retrato. Tamaño recomendado: 400 × 520 px (proporción 3:4).']
     };
 
@@ -951,7 +999,7 @@
       var value = urlInput.value.replace(/^\s+|\s+$/g, '');
       if (!value) { return; }
 
-      var ids = ['banner','foto_expediente','foto_perfil'];
+      var ids = ['avatar','banner','foto_perfil'];
       for (var i = 0; i < ids.length; i++) {
         var el = document.getElementById('in-' + ids[i]);
         if (el) { el.value = ''; }
@@ -1038,7 +1086,7 @@
         ctx.fillStyle = accent;
         for (var i = 0; i < n; i++) { var pd = pt(i, R * (raw[i] / maxv) * prog); ctx.beginPath(); ctx.arc(pd[0], pd[1], 2, 0, Math.PI * 2); ctx.fill(); }
 
-        ctx.fillStyle = ink; ctx.font = '9px Cinzel, serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.fillStyle = ink; ctx.font = '10px Cinzel, serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
         for (var i = 0; i < n; i++) { var pl = pt(i, R + 13); ctx.fillText(labels[i] || '', pl[0], pl[1]); }
       }
 

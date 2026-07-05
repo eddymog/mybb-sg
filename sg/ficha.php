@@ -64,7 +64,6 @@ if ($cambiar_avatar2 != '') {
 // Fotos por pestaña. Las columnas se agregan luego a mybb_sg_sg_fichas;
 // se guarda solo si la columna existe, así no rompe mientras no estén.
 $foto_fields = array(
-    'foto_expediente'  => 'cambiar_foto_expediente',
     'foto_perfil'   => 'cambiar_foto_perfil',
 );
 $hay_foto_post = false;
@@ -372,6 +371,7 @@ if ($ficha_existe == true && ($moderated == true || (is_mod($s_uid) || is_staff(
         $sg_chakra_bar = min(100, max(8, round(($f['chakra'] / max($c, 1)) * 100)));
 
         $historia_var     = nl2br($ficha['historia']);
+        $sg_historia_larga = (mb_strlen($ficha['historia']) > 600) ? 1 : 0;
         $apariencia_var   = nl2br($ficha['apariencia']);
         $personalidad_var = nl2br($ficha['personalidad']);
         $virtudes_var     = nl2br($ficha['virtudes']);
@@ -476,6 +476,7 @@ if ($ficha_existe == true && ($moderated == true || (is_mod($s_uid) || is_staff(
         eval('$regA = $reg_a;');
         eval('$regC = $reg_c;');
         eval('$historia = $historia_var;');
+        eval('$sgHistoriaLarga = $sg_historia_larga;');
         eval('$apariencia = $apariencia_var;');
         eval('$personalidad = $personalidad_var;');
         eval('$virtudes = $virtudes_var;');
@@ -488,6 +489,8 @@ if ($ficha_existe == true && ($moderated == true || (is_mod($s_uid) || is_staff(
         $defectos_auto_html = '';
         $n_virtudes_auto = 0;
         $n_defectos_auto = 0;
+        $sg_puntos_virtudes = 0; // suma de puntos de virtudes (positivos)
+        $sg_puntos_defectos = 0; // suma de puntos de defectos (negativos)
         $query_vt_auto = $db->query("
             SELECT v.virtud_id, v.nombre, v.puntos, v.exclusivo, v.descripcion
             FROM mybb_sg_sg_virtudes_usuarios vu
@@ -496,12 +499,15 @@ if ($ficha_existe == true && ($moderated == true || (is_mod($s_uid) || is_staff(
             ORDER BY v.nombre ASC
         ");
         while ($vt = $db->fetch_array($query_vt_auto)) {
-            if (intval($vt['puntos']) >= 0) {
+            $pts = intval($vt['puntos']);
+            if ($pts >= 0) {
                 $virtudes_auto_html .= fx_virtud_card($vt);
                 $n_virtudes_auto++;
+                $sg_puntos_virtudes += $pts;
             } else {
                 $defectos_auto_html .= fx_virtud_card($vt);
                 $n_defectos_auto++;
+                $sg_puntos_defectos += $pts;
             }
         }
         if ($n_virtudes_auto === 0) { $virtudes_auto_html = "<div class=\"fx-vt-empty\">Sin virtudes asignadas.</div>"; }
@@ -510,6 +516,15 @@ if ($ficha_existe == true && ($moderated == true || (is_mod($s_uid) || is_staff(
         eval('$defectosAutoHtml = $defectos_auto_html;');
         eval('$nVirtudesAuto = $n_virtudes_auto;');
         eval('$nDefectosAuto = $n_defectos_auto;');
+
+        // Balance neto entre virtudes y defectos (puntos de virtud - puntos de defecto)
+        $sg_puntos_balance = $sg_puntos_virtudes + $sg_puntos_defectos;
+        $sg_balance_v_fmt = '+' . $sg_puntos_virtudes;
+        $sg_balance_d_fmt = ($sg_puntos_defectos < 0 ? '−' : '+') . abs($sg_puntos_defectos);
+        $sg_balance_t_fmt = ($sg_puntos_balance < 0 ? '−' : '+') . abs($sg_puntos_balance);
+        eval('$sgBalanceVFmt = $sg_balance_v_fmt;');
+        eval('$sgBalanceDFmt = $sg_balance_d_fmt;');
+        eval('$sgBalanceTFmt = $sg_balance_t_fmt;');
         eval('$extra = $extra_var;');
         eval('$frase = $frase_var;');
         eval('$sgVidaBar = $sg_vida_bar;');
@@ -526,12 +541,10 @@ if ($ficha_existe == true && ($moderated == true || (is_mod($s_uid) || is_staff(
             $sg_puntos_msg = 'Tienes ' . implode(' y ', $partes) . ' sin asignar';
         }
         eval('$sgPuntosAviso = $sg_puntos_aviso;');
-        eval('$sgPuntosMsg = "'.addslashes($sg_puntos_msg).'";');
+        eval('$sgPuntosMsg = $sg_puntos_msg;');
 
         // Fotos por pestaña (columnas opcionales; vacío si aún no existen)
-        $sg_foto_expediente  = isset($f['foto_expediente'])  ? $f['foto_expediente']  : '';
-        $sg_foto_perfil   = isset($f['foto_perfil'])   ? $f['foto_perfil']   : '';
-        eval('$sgFotoExpediente = $sg_foto_expediente;');
+        $sg_foto_perfil = isset($f['foto_perfil']) ? $f['foto_perfil'] : '';
         eval('$sgFotoPerfil = $sg_foto_perfil;');
 
         // Estado del sujeto para la cabecera de expediente (villa 7 = renegados)
