@@ -32,6 +32,30 @@ if ($cambiar_avatar2 != '') {
     $db->query(" UPDATE `mybb_sg_sg_fichas` SET `banner`='$cambiar_avatar2' WHERE `fid`='$s_uid'; ");
 }
 
+// Fotos por pestaña. Las columnas se agregan luego a mybb_sg_sg_fichas;
+// se guarda solo si la columna existe, así no rompe mientras no estén.
+$foto_fields = array(
+    'foto_expediente'  => 'cambiar_foto_expediente',
+    'foto_combate'  => 'cambiar_foto_combate',
+    'foto_tecnicas' => 'cambiar_foto_tecnicas',
+    'foto_perfil'   => 'cambiar_foto_perfil',
+);
+$hay_foto_post = false;
+foreach ($foto_fields as $postkey) {
+    if (isset($_POST[$postkey]) && trim($_POST[$postkey]) !== '') { $hay_foto_post = true; }
+}
+if ($hay_foto_post) {
+    $cols_fichas = array();
+    $q_cols = $db->query("SHOW COLUMNS FROM mybb_sg_sg_fichas");
+    while ($c = $db->fetch_array($q_cols)) { $cols_fichas[$c['Field']] = true; }
+    foreach ($foto_fields as $col => $postkey) {
+        if (isset($_POST[$postkey]) && trim($_POST[$postkey]) !== '' && isset($cols_fichas[$col])) {
+            $val = addslashes(trim($_POST[$postkey]));
+            $db->query("UPDATE `mybb_sg_sg_fichas` SET `$col`='$val' WHERE `fid`='$s_uid'");
+        }
+    }
+}
+
 $is_owner = $mybb->user['uid'] == $mybb->get_input('uid');
 
 $ficha_existe = false;
@@ -424,6 +448,16 @@ if ($ficha_existe == true && ($moderated == true || (is_mod($s_uid) || is_staff(
         eval('$frase = $frase_var;');
         eval('$sgVidaBar = $sg_vida_bar;');
         eval('$sgChakraBar = $sg_chakra_bar;');
+
+        // Fotos por pestaña (columnas opcionales; vacío si aún no existen)
+        $sg_foto_expediente  = isset($f['foto_expediente'])  ? $f['foto_expediente']  : '';
+        $sg_foto_combate  = isset($f['foto_combate'])  ? $f['foto_combate']  : '';
+        $sg_foto_tecnicas = isset($f['foto_tecnicas']) ? $f['foto_tecnicas'] : '';
+        $sg_foto_perfil   = isset($f['foto_perfil'])   ? $f['foto_perfil']   : '';
+        eval('$sgFotoExpediente = $sg_foto_expediente;');
+        eval('$sgFotoCombate = $sg_foto_combate;');
+        eval('$sgFotoTecnicas = $sg_foto_tecnicas;');
+        eval('$sgFotoPerfil = $sg_foto_perfil;');
     }
     $can_view_staff_notes = ($s_uid == $uid || is_staff($s_uid) || is_peti_mod($s_uid));
     $query_tec_aprendidas = $db->query("

@@ -24,7 +24,6 @@ $es_staff = (is_mod($uid) || is_staff($uid));
 
 $query_objetos = $db->query("
     SELECT * FROM `mybb_sg_sg_objetos`
-    WHERE en_tienda='1'
     ORDER BY tipo, nombre
 ");
 

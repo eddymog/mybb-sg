@@ -3,91 +3,332 @@
   <title>Ficha</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Source+Serif+4:wght@300;400;600;700&family=Zen+Old+Mincho:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Noto+Serif+JP:wght@300;400;700&display=swap" rel="stylesheet">
   {$headerinclude}
   <style>
     :root {
-      --ficha-accent: {$sgFichaAccent};
-      --ficha-accent-strong: {$sgFichaAccentStrong};
-      --ficha-accent-soft: {$sgFichaAccentSoft};
-      --ficha-accent-glow: {$sgFichaAccentGlow};
-      --ficha-surface: {$sgFichaSurface};
-      --ficha-surface-2: {$sgFichaSurface2};
-      --ficha-panel: {$sgFichaPanel};
-      --ficha-card: {$sgFichaCard};
-      --ficha-card-soft: {$sgFichaCardSoft};
-      --ficha-border: {$sgFichaBorder};
-      --ficha-border-strong: {$sgFichaBorderStrong};
-      --ficha-paper: {$sgFichaPaper};
-      --ficha-paper-text: {$sgFichaPaperText};
+      /* Washi frío (STYLE.md — light) */
+      --bg:        #f4f2f8;
+      --bg2:       #ede9f4;
+      --card:      #ffffff;
+      --card2:     #e6e1f0;
+      --border:    rgba(90, 46, 154, 0.14);
+      --ink:       #1e1428;
+      --stone:     #6a587a;
+      --mist:      #a898b8;
+      --fiber:     rgba(140, 120, 180, 0.06);
+      --paper:     {$sgFichaPaper};
+      --paper-ink: {$sgFichaPaperText};
+      /* Acento = color de la aldea */
+      --accent:    {$sgFichaAccent};
+      --accent-2:  {$sgFichaAccentStrong};
+      --accent-soft: {$sgFichaAccentSoft};
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg:   #0f0c18; --bg2:#130f1e; --card:#171224; --card2:#1c162c;
+        --border: rgba(156,107,204,0.12);
+        --ink:  #e8dff8; --stone:#8a7a9a; --mist:#5a4a6a;
+        --fiber: rgba(156,107,204,0.04);
+        --accent: {$sgFichaAccentStrong};
+      }
+    }
+    :root[data-theme="light"] {
+      --bg:#f4f2f8; --bg2:#ede9f4; --card:#ffffff; --card2:#e6e1f0;
+      --border: rgba(90,46,154,0.14);
+      --ink:#1e1428; --stone:#6a587a; --mist:#a898b8;
+      --fiber: rgba(140,120,180,0.06);
+      --accent: {$sgFichaAccent};
+    }
+    :root[data-theme="dark"] {
+      --bg:#0f0c18; --bg2:#130f1e; --card:#171224; --card2:#1c162c;
+      --border: rgba(156,107,204,0.12);
+      --ink:#e8dff8; --stone:#8a7a9a; --mist:#5a4a6a;
+      --fiber: rgba(156,107,204,0.04);
+      --accent: {$sgFichaAccentStrong};
     }
 
-    .sg-dossier-traits-grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 12px;
+    .fx *, .fx *::before, .fx *::after { box-sizing: border-box; }
+
+    body.sg-profile-theme-{$sgFichaTheme} {
+      background: var(--bg);
+      color: var(--ink);
+      font-family: 'Noto Serif JP', serif;
     }
 
-    @media (max-width: 580px) {
-      .sg-dossier-traits-grid { grid-template-columns: 1fr; }
+    .fx {
+      position: relative;
+      max-width: 1080px;
+      margin: 26px auto 60px;
+      padding: 0 18px;
+      font-family: 'Noto Serif JP', serif;
+      color: var(--ink);
     }
-
-    /* Modificador de estadística: la etiqueta a la izquierda y el valor base
-       junto al modificador entre paréntesis a la derecha, en la misma línea. */
-    .sg-dossier-stat--mod > span:first-child { margin-right: auto; }
-
-    .sg-dossier-stat__mod {
-      color: var(--ficha-accent-strong);
-      font: 700 13px/1 "Source Serif 4", serif;
-      white-space: nowrap;
-    }
-
-    .sg-dossier-stat__mod::before { content: "(M: "; }
-    .sg-dossier-stat__mod::after { content: ")"; }
-
-    .sg-week-chip { position: relative; cursor: help; overflow: visible; }
-    .sg-week-tip {
-      position: absolute;
-      left: 50%;
-      bottom: calc(100% + 8px);
-      transform: translateX(-50%);
-      white-space: nowrap;
-      padding: 6px 10px;
-      background: rgba(10, 8, 16, 0.96);
-      border: 0.5px solid var(--ficha-border-strong);
-      color: var(--ficha-accent-strong);
-      font: 700 10px/1 "Cinzel", serif;
-      letter-spacing: 0.5px;
-      border-radius: 4px;
-      opacity: 0;
-      visibility: hidden;
-      pointer-events: none;
-      transition: opacity 0.15s ease;
-      z-index: 50;
-    }
-    .sg-week-tip::after {
+    .fx::before { /* textura washi */
       content: '';
-      position: absolute;
-      top: 100%;
-      left: 50%;
-      transform: translateX(-50%);
-      border: 5px solid transparent;
-      border-top-color: var(--ficha-border-strong);
+      position: absolute; inset: 0;
+      pointer-events: none; z-index: 0;
+      background-image:
+        repeating-linear-gradient(13deg,  transparent 0, transparent 24px, var(--fiber) 24px, var(--fiber) 25px),
+        repeating-linear-gradient(82deg,  transparent 0, transparent 36px, var(--fiber) 36px, var(--fiber) 37px),
+        repeating-linear-gradient(151deg, transparent 0, transparent 19px, var(--fiber) 19px, var(--fiber) 19.5px);
     }
-    .sg-week-chip:hover .sg-week-tip { opacity: 1; visibility: visible; }
+    .fx-shell { position: relative; z-index: 1; }
+    .fx a { text-decoration: none; color: inherit; }
+
+    /* Tipografía base */
+    .fx-eyebrow {
+      font-family: 'Cinzel', serif; text-transform: uppercase;
+      font-size: 9px; letter-spacing: 2px; color: var(--accent);
+    }
+    .fx-h {
+      font-family: 'Cinzel', serif; font-weight: 900; letter-spacing: 2px;
+      text-transform: uppercase; color: var(--ink); margin: 0;
+    }
+
+    /* ── HERO ─────────────────────────────────────────── */
+    .fx-hero {
+      position: relative;
+      border: 0.5px solid var(--border);
+      background: var(--bg2);
+      overflow: hidden;
+    }
+    .fx-hero__banner {
+      height: 190px; background-size: cover; background-position: center;
+      filter: saturate(1.05);
+    }
+    .fx-hero__banner.sg-profile-editable { cursor: pointer; }
+    .fx-hero__scrim {
+      position: absolute; top: 0; left: 0; right: 0; height: 190px;
+      background: linear-gradient(180deg, rgba(15,10,20,0.05), rgba(15,10,20,0.55));
+      pointer-events: none;
+    }
+    .fx-hero__body {
+      position: relative;
+      display: grid; grid-template-columns: auto 1fr auto; gap: 20px;
+      align-items: flex-end;
+      padding: 0 24px 20px; margin-top: -64px;
+    }
+    .fx-avatar {
+      width: 116px; height: 116px; flex-shrink: 0;
+      border: 0.5px solid var(--border);
+      background: var(--card); overflow: hidden;
+      box-shadow: 0 0 0 4px var(--bg2);
+    }
+    .fx-avatar.sg-profile-editable { cursor: pointer; }
+    .fx-avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+    .fx-identity { min-width: 0; padding-bottom: 4px; }
+    .fx-identity__village {
+      font-family: 'Cinzel', serif; text-transform: uppercase;
+      font-size: 10px; letter-spacing: 3px; color: var(--accent);
+      margin-bottom: 4px;
+    }
+    .fx-identity__accent { display:inline-block; width: 32px; height: 2px; background: var(--accent); margin-bottom: 8px; }
+    .fx-identity__name { font-family: 'Cinzel', serif; font-weight: 900; font-size: clamp(24px, 4vw, 34px); letter-spacing: 1px; line-height: 1.05; margin: 0; color: var(--ink); }
+    .fx-identity__alias { font-family: 'Noto Serif JP', serif; font-weight: 300; font-style: italic; color: var(--accent); font-size: 15px; margin: 4px 0 0; }
+
+    .fx-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+    .fx-chip {
+      display: flex; flex-direction: column; gap: 1px;
+      border: 0.5px solid var(--border); padding: 6px 12px; background: var(--card);
+      min-width: 78px;
+    }
+    .fx-chip__k { font-family: 'Cinzel', serif; font-size: 8px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--mist); }
+    .fx-chip__v { font-family: 'Cinzel', serif; font-size: 15px; font-weight: 700; color: var(--ink); font-variant-numeric: tabular-nums; }
+
+    .fx-week { position: relative; cursor: help; }
+    .fx-week .fx-chip__v { color: var(--accent); }
+    .fx-week__tip {
+      position: absolute; left: 50%; bottom: calc(100% + 8px); transform: translateX(-50%);
+      white-space: nowrap; padding: 6px 10px; background: var(--ink); color: var(--bg);
+      font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 1px;
+      opacity: 0; visibility: hidden; transition: opacity .15s ease; z-index: 20;
+    }
+    .fx-week:hover .fx-week__tip { opacity: 1; visibility: visible; }
+
+    .fx-actions { display: flex; flex-direction: column; gap: 6px; align-items: stretch; padding-bottom: 4px; }
+    .fx-action {
+      font-family: 'Cinzel', serif; text-transform: uppercase; letter-spacing: 1.5px;
+      font-size: 10px; font-weight: 700; color: var(--stone);
+      border: 0.5px solid var(--border); padding: 8px 14px; text-align: center;
+      background: var(--card); transition: border-color .15s ease, color .15s ease;
+    }
+    .fx-action:hover { border-color: var(--accent); color: var(--ink); }
+
+    /* ── PESTAÑAS ─────────────────────────────────────── */
+    .fx input.fx-radio { position: absolute; width: 1px; height: 1px; opacity: 0; overflow: hidden; }
+    .fx-tabs {
+      display: flex; gap: 4px; margin: 14px 0 0; padding-left: 4px;
+      border-bottom: 0.5px solid var(--border);
+    }
+    .fx-tab {
+      display: flex; align-items: center; gap: 8px;
+      font-family: 'Cinzel', serif; text-transform: uppercase; letter-spacing: 1.5px;
+      font-size: 11px; font-weight: 700; color: var(--stone);
+      padding: 13px 20px; cursor: pointer; user-select: none;
+      border: 0.5px solid transparent; border-bottom: none;
+      transition: color .15s ease, background .15s ease;
+    }
+    .fx-tab:hover { color: var(--ink); }
+    .fx-tab__gem { width: 5px; height: 5px; background: var(--accent); clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%); flex-shrink: 0; opacity: 0; transition: opacity .15s ease; }
+
+    #fx-dossier:checked ~ .fx-tabs .fx-tab[for="fx-dossier"],
+    #fx-combate:checked ~ .fx-tabs .fx-tab[for="fx-combate"],
+    #fx-tecnicas:checked ~ .fx-tabs .fx-tab[for="fx-tecnicas"],
+    #fx-perfil:checked ~ .fx-tabs .fx-tab[for="fx-perfil"] {
+      color: var(--ink); background: var(--card);
+      border-color: var(--border); border-bottom-color: var(--card);
+      margin-bottom: -0.5px;
+    }
+    #fx-dossier:checked ~ .fx-tabs .fx-tab[for="fx-dossier"] .fx-tab__gem,
+    #fx-combate:checked ~ .fx-tabs .fx-tab[for="fx-combate"] .fx-tab__gem,
+    #fx-tecnicas:checked ~ .fx-tabs .fx-tab[for="fx-tecnicas"] .fx-tab__gem,
+    #fx-perfil:checked ~ .fx-tabs .fx-tab[for="fx-perfil"] .fx-tab__gem { opacity: 1; }
+
+    .fx-radio:focus-visible ~ .fx-tabs .fx-tab { outline: none; }
+    #fx-dossier:focus-visible ~ .fx-tabs .fx-tab[for="fx-dossier"],
+    #fx-combate:focus-visible ~ .fx-tabs .fx-tab[for="fx-combate"],
+    #fx-tecnicas:focus-visible ~ .fx-tabs .fx-tab[for="fx-tecnicas"],
+    #fx-perfil:focus-visible ~ .fx-tabs .fx-tab[for="fx-perfil"] { outline: 2px solid var(--accent); outline-offset: -2px; }
+
+    /* ── PANELES ──────────────────────────────────────── */
+    .fx-panels {
+      border: 0.5px solid var(--border); border-top: none;
+      background: var(--card); padding: 24px;
+    }
+    .fx-panel { display: none; }
+    #fx-dossier:checked ~ .fx-panels .fx-panel--dossier,
+    #fx-combate:checked ~ .fx-panels .fx-panel--combate,
+    #fx-tecnicas:checked ~ .fx-panels .fx-panel--tecnicas,
+    #fx-perfil:checked ~ .fx-panels .fx-panel--perfil { display: block; }
+
+    .fx-layout { display: grid; grid-template-columns: 260px 1fr; gap: 26px; align-items: start; }
+    @media (max-width: 760px){ .fx-layout { grid-template-columns: 1fr; } }
+
+    /* ── FOTO (kakejiku + hanko) ──────────────────────── */
+    .fx-photo { position: relative; }
+    .fx-photo__rod {
+      height: 8px; background: linear-gradient(180deg, var(--accent), var(--accent-2));
+      border: 0.5px solid var(--border);
+    }
+    .fx-photo__rod--b { margin-top: 0; }
+    .fx-photo__frame {
+      position: relative; margin: 6px 8px; border: 0.5px solid var(--border);
+      background: var(--paper); overflow: hidden; aspect-ratio: 3 / 4;
+    }
+    .fx-photo__frame img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .fx-photo__empty {
+      position: absolute; inset: 0; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 4px; text-align: center;
+      color: var(--stone);
+    }
+    .fx-photo__empty::before {
+      content: '影'; font-family: 'Noto Serif JP', serif; font-size: 78px; font-weight: 700;
+      color: var(--accent); opacity: 0.08; position: absolute; line-height: 1;
+    }
+    .fx-photo__empty span { position: relative; font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 2px; text-transform: uppercase; }
+    .fx-photo--edit .fx-photo__frame { cursor: pointer; }
+    .fx-photo--edit:hover .fx-photo__hint { opacity: 1; }
+    .fx-photo__hint {
+      position: absolute; left: 8px; right: 8px; bottom: 6px; z-index: 3;
+      font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase;
+      color: #fff; background: rgba(20,12,36,0.7); padding: 6px; text-align: center;
+      opacity: 0; transition: opacity .15s ease;
+    }
+    .fx-photo__seal {
+      position: absolute; right: 14px; bottom: 12px; z-index: 4;
+      width: 40px; height: 40px; border: 1.5px solid var(--accent); border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Noto Serif JP', serif; font-size: 15px; font-weight: 700; color: var(--accent);
+      background: var(--accent-soft);
+    }
+    .fx-photo__cap { text-align: center; font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--mist); margin-top: 8px; }
+
+    /* ── CARDS ────────────────────────────────────────── */
+    .fx-stack { display: grid; gap: 20px; }
+    .fx-card { border: 0.5px solid var(--border); background: var(--card); }
+    .fx-card__head { display: flex; align-items: center; gap: 10px; padding: 14px 16px 0; }
+    .fx-card__head::before { content:''; width: 3px; height: 15px; background: var(--accent); flex-shrink: 0; }
+    .fx-card__head::after { content:''; flex: 1; height: 0.5px; background: var(--border); }
+    .fx-card__title { font-family: 'Cinzel', serif; font-size: 13px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; color: var(--ink); }
+    .fx-card__body { padding: 14px 16px 18px; }
+
+    /* Datos: label izq / valor der */
+    .fx-data { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 0 24px; }
+    @media (max-width: 480px){ .fx-data { grid-template-columns: 1fr; } }
+    .fx-row { display: flex; justify-content: space-between; gap: 10px; padding: 8px 0; border-bottom: 0.5px solid var(--border); }
+    .fx-row:last-child { border-bottom: none; }
+    .fx-row__k { font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--mist); align-self: center; }
+    .fx-row__v { font-family: 'Noto Serif JP', serif; font-weight: 700; font-size: 14px; color: var(--ink); text-align: right; font-variant-numeric: tabular-nums; }
+
+    /* Recursos como celdas */
+    .fx-res { display: grid; grid-template-columns: repeat(2,1fr); gap: 10px; }
+    .fx-res__cell { text-align: center; border: 0.5px solid var(--border); padding: 12px 6px; background: var(--card2); }
+    .fx-res__v { font-family: 'Cinzel', serif; font-weight: 700; font-size: 20px; color: var(--accent); font-variant-numeric: tabular-nums; }
+    .fx-res__k { font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--mist); margin-top: 2px; }
+
+    /* Barras de combate */
+    .fx-gauges { display: grid; gap: 14px; }
+    .fx-gauge__top { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px; }
+    .fx-gauge__k { font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--stone); }
+    .fx-gauge__v { font-family: 'Cinzel', serif; font-size: 16px; font-weight: 700; color: var(--ink); font-variant-numeric: tabular-nums; }
+    .fx-gauge__v small { color: var(--mist); font-size: 11px; font-weight: 400; }
+    .fx-bar { height: 10px; border: 0.5px solid var(--border); background: var(--card2); position: relative; overflow: hidden; }
+    .fx-bar::before { content:''; position: absolute; inset: 0; width: var(--fill, 50%); background: linear-gradient(90deg, var(--accent), var(--accent-2)); }
+
+    /* Estadísticas */
+    .fx-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+    @media (max-width: 640px){ .fx-stats { grid-template-columns: repeat(2, 1fr); } }
+    .fx-stat { position: relative; text-align: center; border: 0.5px solid var(--border); padding: 14px 6px 12px; background: var(--card2); }
+    .fx-stat__v { font-family: 'Cinzel', serif; font-weight: 900; font-size: 24px; color: var(--ink); font-variant-numeric: tabular-nums; line-height: 1; }
+    .fx-stat__k { font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 1px; text-transform: uppercase; color: var(--mist); margin-top: 6px; }
+    .fx-stat__mod { position: absolute; top: 7px; right: 9px; font-family: 'Cinzel', serif; font-size: 11px; font-weight: 700; color: var(--accent); }
+    .fx-stat__mod::before { content: 'M '; font-size: 8px; }
+
+    /* Prosa */
+    .fx-prose { font-family: 'Noto Serif JP', serif; font-weight: 300; font-size: 14px; line-height: 1.9; color: var(--ink); text-align: justify; }
+    .fx-prose p { margin: 0 0 12px; }
+    .fx-prose--lead { font-weight: 400; }
+    .fx-traits { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    @media (max-width: 560px){ .fx-traits { grid-template-columns: 1fr; } }
+    .fx-origin { margin-top: 18px; font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--mist); }
+
+    /* Notas de staff */
+    .fx-notes textarea {
+      width: 100%; min-height: 120px; resize: vertical;
+      border: 0.5px solid var(--border); background: var(--card2); color: var(--ink);
+      font-family: 'Noto Serif JP', serif; font-size: 13px; line-height: 1.7; padding: 12px;
+    }
+    .fx-pill { font-family:'Cinzel',serif; font-size:8px; letter-spacing:2px; text-transform:uppercase; color: var(--accent); border:0.5px solid var(--accent); padding:2px 8px; }
+
+    /* Técnicas: dejamos el estilo del tema; solo ajustamos el hueco */
+    .fx-tecnicas-host { min-width: 0; }
+    .fx-tecnicas-host .sg-profile-private { margin: 0; }
+
+    @media (max-width: 620px) {
+      .fx-hero__body { grid-template-columns: 1fr; margin-top: -52px; }
+      .fx-actions { flex-direction: row; flex-wrap: wrap; }
+      .fx-tabs { overflow-x: auto; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .fx-action, .fx-tab, .fx-photo__hint, .fx-week__tip { transition: none; }
+    }
   </style>
 </head>
 
 <body class="sg-profile-theme-{$sgFichaTheme}">
   {$header}
 
-  <main class="sg-profile-page">
-    <div class="sg-profile-shell">
-      <section class="sg-dossier-hero">
-        <div class="sg-dossier-hero__banner <if $is_owner then>sg-profile-editable</if>" style="background-image: url({$ficha['banner']});" <if $is_owner then>onclick="openProfileAssetModal('banner')"</if>></div>
-        <div class="sg-dossier-hero__overlay"></div>
-        <div class="sg-dossier-hero__content">
-          <div class="sg-dossier-hero__avatar <if $is_owner then>sg-profile-editable</if>" <if $is_owner then>onclick="openProfileAssetModal('avatar')"</if>>
+  <main class="fx">
+    <div class="fx-shell">
+
+      <!-- ═══ HERO ═══ -->
+      <section class="fx-hero">
+        <div class="fx-hero__banner <if $is_owner then>sg-profile-editable</if>" style="background-image: url({$ficha['banner']});" <if $is_owner then>onclick="openProfileAssetModal('banner')"</if>></div>
+        <div class="fx-hero__scrim"></div>
+        <div class="fx-hero__body">
+          <div class="fx-avatar <if $is_owner then>sg-profile-editable</if>" <if $is_owner then>onclick="openProfileAssetModal('avatar')"</if>>
             <if $avatar then>
               <img src="{$avatar}" alt="Avatar de {$ficha['nombre']}">
             <else>
@@ -95,228 +336,247 @@
             </if>
           </div>
 
-          <div class="sg-dossier-hero__identity">
-            <div class="sg-dossier-hero__village">{$sgFichaThemeLabel}</div>
-            <h1 class="sg-dossier-hero__name">{$ficha['nombre']}</h1>
-            <if $ficha['apodo'] then>
-              <p class="sg-dossier-hero__alias">{$ficha['apodo']}</p>
-            </if>
-            <div class="sg-dossier-hero__summary">
-              <div class="sg-dossier-chip">
-                <span class="sg-dossier-chip__label">Nivel</span>
-                <span class="sg-dossier-chip__value">{$ficha['nivel']}</span>
-              </div>
-              <div class="sg-dossier-chip">
-                <span class="sg-dossier-chip__label">Vida Base</span>
-                <span class="sg-dossier-chip__value">{$vida}</span>
-              </div>
-              <div class="sg-dossier-chip">
-                <span class="sg-dossier-chip__label">Chakra Base</span>
-                <span class="sg-dossier-chip__value">{$chakra}</span>
-              </div>
-              <div class="sg-dossier-chip">
-                <span class="sg-dossier-chip__label">Experiencia</span>
-                <span class="sg-dossier-chip__value">{$puntos_rol}</span>
-              </div>
-              <div class="sg-dossier-chip sg-week-chip" id="sg-week-chip" data-end="{$fin_semana_ts}">
-                <span class="sg-dossier-chip__label">Exp. Semanal · Sem {$semana_display}</span>
-                <span class="sg-dossier-chip__value">{$exp_semanal} / 100</span>
-                <span class="sg-week-tip" id="sg-week-tip">Calculando…</span>
+          <div class="fx-identity">
+            <div class="fx-identity__village">{$sgFichaThemeLabel}</div>
+            <span class="fx-identity__accent"></span>
+            <h1 class="fx-identity__name">{$ficha['nombre']}</h1>
+            <if $ficha['apodo'] then><p class="fx-identity__alias">{$ficha['apodo']}</p></if>
+            <div class="fx-chips">
+              <div class="fx-chip"><span class="fx-chip__k">Nivel</span><span class="fx-chip__v">{$ficha['nivel']}</span></div>
+              <div class="fx-chip"><span class="fx-chip__k">Rango</span><span class="fx-chip__v">{$ficha['rango']}</span></div>
+              <div class="fx-chip"><span class="fx-chip__k">Experiencia</span><span class="fx-chip__v">{$puntos_rol}</span></div>
+              <div class="fx-chip fx-week" id="sg-week-chip" data-end="{$fin_semana_ts}">
+                <span class="fx-chip__k">Exp · Sem {$semana_display}</span>
+                <span class="fx-chip__v">{$exp_semanal} / 100</span>
+                <span class="fx-week__tip" id="sg-week-tip">Calculando…</span>
               </div>
             </div>
           </div>
 
-          <div class="sg-dossier-hero__actions">
-            <a class="sg-profile-action" href="/sg/inventario.php?uid={$ficha['fid']}">Inventario</a>
-            <a class="sg-profile-action" href="/member.php?action=profile&uid={$ficha['fid']}">Perfil</a>
+          <div class="fx-actions">
+            <a class="fx-action" href="/sg/inventario.php?uid={$ficha['fid']}">Inventario</a>
+            <a class="fx-action" href="/member.php?action=profile&uid={$ficha['fid']}">Perfil</a>
             <if $mybb->user['uid'] == $ficha['fid'] then>
-              <a class="sg-profile-action" href="{$mybb->settings['bburl']}/sg/editar_ficha.php?uid={$ficha['fid']}">Asignar Stats</a>
+              <a class="fx-action" href="{$mybb->settings['bburl']}/sg/editar_ficha.php?uid={$ficha['fid']}">Asignar Stats</a>
             </if>
             <if $mybb->user['uid'] == $ficha['fid'] || $g_is_staff then>
-              <a class="sg-profile-action" href="{$mybb->settings['bburl']}/sg/editar_descripcion.php?uid={$ficha['fid']}">Editar Ficha</a>
+              <a class="fx-action" href="{$mybb->settings['bburl']}/sg/editar_descripcion.php?uid={$ficha['fid']}">Editar Ficha</a>
             </if>
           </div>
         </div>
       </section>
 
-      <section class="sg-dossier-grid">
-        <div class="sg-dossier-card sg-dossier-card--compact sg-dossier-card--identity">
-          <div class="sg-dossier-card__head">
-            <h2>Dossier</h2>
-          </div>
-          <div class="sg-dossier-card__body">
-            <div class="sg-dossier-meta-grid">
-              <div class="sg-dossier-meta">
-                <span class="sg-dossier-meta__label">Edad</span>
-                <span class="sg-dossier-meta__value">{$ficha['edad']} años</span>
-              </div>
-              <div class="sg-dossier-meta">
-                <span class="sg-dossier-meta__label">Rango</span>
-                <span class="sg-dossier-meta__value">{$ficha['rango']}</span>
-              </div>
-              <div class="sg-dossier-meta">
-                <span class="sg-dossier-meta__label">Aldea</span>
-                <span class="sg-dossier-meta__value">{$villa['nombreVilla']}</span>
-              </div>
-              <div class="sg-dossier-meta">
-                <span class="sg-dossier-meta__label">Sexo</span>
-                <span class="sg-dossier-meta__value">{$ficha['sexo']}</span>
-              </div>
-              <div class="sg-dossier-meta">
-                <span class="sg-dossier-meta__label">Clan</span>
-                <span class="sg-dossier-meta__value">{$nClan}</span>
-              </div>
-              <div class="sg-dossier-meta">
-                <span class="sg-dossier-meta__label">Peso</span>
-                <span class="sg-dossier-meta__value">{$ficha['peso']}</span>
-              </div>
-              <div class="sg-dossier-meta">
-                <span class="sg-dossier-meta__label">Altura</span>
-                <span class="sg-dossier-meta__value">{$ficha['altura']}</span>
-              </div>
-            </div>
-          </div>
-        </div>
+      <!-- ═══ PESTAÑAS ═══ -->
+      <input class="fx-radio" type="radio" name="fxtab" id="fx-dossier" checked>
+      <input class="fx-radio" type="radio" name="fxtab" id="fx-combate">
+      <input class="fx-radio" type="radio" name="fxtab" id="fx-tecnicas">
+      <input class="fx-radio" type="radio" name="fxtab" id="fx-perfil">
 
-        <div class="sg-dossier-card sg-dossier-card--compact sg-dossier-card--resources">
-          <div class="sg-dossier-card__head">
-            <h2>Recursos</h2>
-          </div>
-          <div class="sg-dossier-card__body">
-            <div class="sg-dossier-meta-grid">
-              <div class="sg-dossier-meta">
-                <span class="sg-dossier-meta__label">Rins</span>
-                <span class="sg-dossier-meta__value">{$ficha['rin']}</span>
-              </div>
-              <div class="sg-dossier-meta">
-                <span class="sg-dossier-meta__label">Tobis</span>
-                <span class="sg-dossier-meta__value">{$ficha['tobi']}</span>
-              </div>
-              <div class="sg-dossier-meta">
-                <span class="sg-dossier-meta__label">Ryos</span>
-                <span class="sg-dossier-meta__value">{$ficha['ryos']}</span>
-              </div>
-              <div class="sg-dossier-meta">
-                <span class="sg-dossier-meta__label">Bingo</span>
-                <span class="sg-dossier-meta__value">{$ficha['bingo']}</span>
-              </div>
-            </div>
-          </div>
-        </div>
+      <nav class="fx-tabs" role="tablist" aria-label="Secciones de la ficha">
+        <label class="fx-tab" for="fx-dossier"><span class="fx-tab__gem"></span>Expediente</label>
+        <label class="fx-tab" for="fx-perfil"><span class="fx-tab__gem"></span>Trasfondo</label>
+        <label class="fx-tab" for="fx-combate"><span class="fx-tab__gem"></span>Combate</label>
+        <label class="fx-tab" for="fx-tecnicas"><span class="fx-tab__gem"></span>Técnicas</label>
+      </nav>
 
-        <div class="sg-dossier-card sg-dossier-card--compact sg-dossier-card--combat">
-          <div class="sg-dossier-card__head">
-            <h2>Combate</h2>
-          </div>
-          <div class="sg-dossier-card__body">
-            <div class="sg-dossier-bars">
-              <div class="sg-dossier-bar-card">
-                <div class="sg-dossier-bar-card__top">
-                  <span class="sg-dossier-meta__label">Vida</span>
-                  <strong>{$ficha['vida']}</strong>
-                </div>
-                <div class="sg-profile-bar sg-profile-bar--life" style="--fill: {$sgVidaBar}%;"></div>
+      <div class="fx-panels">
+
+        <!-- ── DOSSIER ── -->
+        <section class="fx-panel fx-panel--dossier" role="tabpanel">
+          <div class="fx-layout">
+            <div class="fx-photo <if $is_owner then>fx-photo--edit</if>" <if $is_owner then>onclick="openProfileAssetModal('foto_expediente')"</if>>
+              <div class="fx-photo__rod"></div>
+              <div class="fx-photo__frame">
+                <if $sgFotoExpediente then><img src="{$sgFotoExpediente}" alt="Retrato de {$ficha['nombre']}">
+                <else><div class="fx-photo__empty"><span>Sin retrato</span></div></if>
+                <if $is_owner then><div class="fx-photo__hint">Pulsa para cambiar</div></if>
+                <div class="fx-photo__seal">忍</div>
               </div>
-              <div class="sg-dossier-bar-card">
-                <div class="sg-dossier-bar-card__top">
-                  <span class="sg-dossier-meta__label">Chakra</span>
-                  <strong>{$ficha['chakra']}</strong>
-                </div>
-                <div class="sg-profile-bar sg-profile-bar--chakra" style="--fill: {$sgChakraBar}%;"></div>
-              </div>
-              <div class="sg-dossier-bar-card">
-                <div class="sg-dossier-bar-card__top">
-                  <span class="sg-dossier-meta__label">Reg. Chakra</span>
-                  <strong>{$regC}</strong>
+              <div class="fx-photo__rod fx-photo__rod--b"></div>
+              <div class="fx-photo__cap">Retrato oficial</div>
+            </div>
+
+            <div class="fx-stack">
+              <div class="fx-card">
+                <div class="fx-card__head"><span class="fx-card__title">Datos personales</span></div>
+                <div class="fx-card__body">
+                  <div class="fx-data">
+                    <div class="fx-row"><span class="fx-row__k">Edad</span><span class="fx-row__v">{$ficha['edad']} años</span></div>
+                    <div class="fx-row"><span class="fx-row__k">Sexo</span><span class="fx-row__v">{$ficha['sexo']}</span></div>
+                    <div class="fx-row"><span class="fx-row__k">Aldea</span><span class="fx-row__v">{$villa['nombreVilla']}</span></div>
+                    <div class="fx-row"><span class="fx-row__k">Clan</span><span class="fx-row__v">{$nClan}</span></div>
+                    <div class="fx-row"><span class="fx-row__k">Peso</span><span class="fx-row__v">{$ficha['peso']}</span></div>
+                    <div class="fx-row"><span class="fx-row__k">Altura</span><span class="fx-row__v">{$ficha['altura']}</span></div>
+                  </div>
                 </div>
               </div>
+
+              <div class="fx-card">
+                <div class="fx-card__head"><span class="fx-card__title">Recursos</span></div>
+                <div class="fx-card__body">
+                  <div class="fx-res">
+                    <div class="fx-res__cell"><div class="fx-res__v">{$ficha['rin']}</div><div class="fx-res__k">Rins</div></div>
+                    <div class="fx-res__cell"><div class="fx-res__v">{$ficha['tobi']}</div><div class="fx-res__k">Tobis</div></div>
+                    <div class="fx-res__cell"><div class="fx-res__v">{$ficha['ryos']}</div><div class="fx-res__k">Ryos</div></div>
+                    <div class="fx-res__cell"><div class="fx-res__v">{$ficha['bingo']}</div><div class="fx-res__k">Bingo</div></div>
+                  </div>
+                </div>
+              </div>
+
+              <if $sgFichaCanViewStaffNotes then>
+              <div class="fx-card">
+                <div class="fx-card__head"><span class="fx-card__title">Anotaciones de Staff</span><span class="fx-pill">Privado</span></div>
+                <div class="fx-card__body">
+                  <div class="fx-notes"><textarea disabled>{$ficha['notas']}</textarea></div>
+                </div>
+              </div>
+              </if>
             </div>
           </div>
-        </div>
+        </section>
 
-        <div class="sg-dossier-card sg-dossier-card--wide sg-dossier-card--stats">
-          <div class="sg-dossier-card__head">
-            <h2>Estadísticas</h2>
-          </div>
-          <div class="sg-dossier-card__body">
-            <div class="sg-dossier-stat-grid">
-              <div class="sg-dossier-stat sg-dossier-stat--mod"><span>Fuerza</span><strong>{$ficha['fuerza']}</strong><span class="sg-dossier-stat__mod">{$ficha['mfuerza']}</span></div>
-              <div class="sg-dossier-stat sg-dossier-stat--mod"><span>Destreza</span><strong>{$ficha['destreza']}</strong><span class="sg-dossier-stat__mod">{$ficha['mdestreza']}</span></div>
-              <div class="sg-dossier-stat sg-dossier-stat--mod"><span>Ctrl. de Chakra</span><strong>{$ficha['cchakra']}</strong><span class="sg-dossier-stat__mod">{$ficha['mcchakra']}</span></div>
-              <div class="sg-dossier-stat sg-dossier-stat--mod"><span>Inteligencia</span><strong>{$ficha['inteligencia']}</strong><span class="sg-dossier-stat__mod">{$ficha['minteligencia']}</span></div>
-              <div class="sg-dossier-stat"><span>Salud</span><strong>{$ficha['salud']}</strong></div>
-              <div class="sg-dossier-stat"><span>Velocidad</span><strong>{$ficha['velocidad']}</strong></div>
-              <div class="sg-dossier-stat"><span>Tenketsu</span><strong>{$ficha['tenketsu']}</strong></div>
-              <div class="sg-dossier-stat"><span>Sigilo</span><strong>{$ficha['sigilo']}</strong></div>
+        <!-- ── COMBATE ── -->
+        <section class="fx-panel fx-panel--combate" role="tabpanel">
+          <div class="fx-layout">
+            <div class="fx-photo <if $is_owner then>fx-photo--edit</if>" <if $is_owner then>onclick="openProfileAssetModal('foto_combate')"</if>>
+              <div class="fx-photo__rod"></div>
+              <div class="fx-photo__frame">
+                <if $sgFotoCombate then><img src="{$sgFotoCombate}" alt="Pose de combate de {$ficha['nombre']}">
+                <else><div class="fx-photo__empty"><span>Sin imagen</span></div></if>
+                <if $is_owner then><div class="fx-photo__hint">Pulsa para cambiar</div></if>
+                <div class="fx-photo__seal">戦</div>
+              </div>
+              <div class="fx-photo__rod fx-photo__rod--b"></div>
+              <div class="fx-photo__cap">Pose de combate</div>
+            </div>
+
+            <div class="fx-stack">
+              <div class="fx-card">
+                <div class="fx-card__head"><span class="fx-card__title">Constantes</span></div>
+                <div class="fx-card__body">
+                  <div class="fx-gauges">
+                    <div class="fx-gauge">
+                      <div class="fx-gauge__top"><span class="fx-gauge__k">Vida</span><span class="fx-gauge__v">{$ficha['vida']} <small>/ {$vida} base</small></span></div>
+                      <div class="fx-bar" style="--fill: {$sgVidaBar}%"></div>
+                    </div>
+                    <div class="fx-gauge">
+                      <div class="fx-gauge__top"><span class="fx-gauge__k">Chakra</span><span class="fx-gauge__v">{$ficha['chakra']} <small>/ {$chakra} base</small></span></div>
+                      <div class="fx-bar" style="--fill: {$sgChakraBar}%"></div>
+                    </div>
+                    <div class="fx-gauge">
+                      <div class="fx-gauge__top"><span class="fx-gauge__k">Reg. de Chakra</span><span class="fx-gauge__v">{$regC}</span></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="fx-card">
+                <div class="fx-card__head"><span class="fx-card__title">Estadísticas</span></div>
+                <div class="fx-card__body">
+                  <div class="fx-stats">
+                    <div class="fx-stat"><span class="fx-stat__mod">{$ficha['mfuerza']}</span><div class="fx-stat__v">{$ficha['fuerza']}</div><div class="fx-stat__k">Fuerza</div></div>
+                    <div class="fx-stat"><span class="fx-stat__mod">{$ficha['mdestreza']}</span><div class="fx-stat__v">{$ficha['destreza']}</div><div class="fx-stat__k">Destreza</div></div>
+                    <div class="fx-stat"><span class="fx-stat__mod">{$ficha['mcchakra']}</span><div class="fx-stat__v">{$ficha['cchakra']}</div><div class="fx-stat__k">Ctrl. Chakra</div></div>
+                    <div class="fx-stat"><span class="fx-stat__mod">{$ficha['minteligencia']}</span><div class="fx-stat__v">{$ficha['inteligencia']}</div><div class="fx-stat__k">Inteligencia</div></div>
+                    <div class="fx-stat"><div class="fx-stat__v">{$ficha['salud']}</div><div class="fx-stat__k">Salud</div></div>
+                    <div class="fx-stat"><div class="fx-stat__v">{$ficha['velocidad']}</div><div class="fx-stat__k">Velocidad</div></div>
+                    <div class="fx-stat"><div class="fx-stat__v">{$ficha['tenketsu']}</div><div class="fx-stat__k">Tenketsu</div></div>
+                    <div class="fx-stat"><div class="fx-stat__v">{$ficha['sigilo']}</div><div class="fx-stat__k">Sigilo</div></div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      <section class="sg-dossier-story">
-        <div class="sg-dossier-card sg-dossier-card--full sg-dossier-card--bio">
-          <div class="sg-dossier-card__head">
-            <h2>Biografía</h2>
-          </div>
-          <div class="sg-dossier-card__body sg-dossier-prose">{$historia}</div>
-        </div>
-
-        <div class="sg-dossier-traits-grid">
-          <div class="sg-dossier-card sg-dossier-card--virtues">
-            <div class="sg-dossier-card__head">
-              <h2>Virtudes</h2>
+        <!-- ── TÉCNICAS ── -->
+        <section class="fx-panel fx-panel--tecnicas" role="tabpanel">
+          <div class="fx-layout">
+            <div class="fx-photo <if $is_owner then>fx-photo--edit</if>" <if $is_owner then>onclick="openProfileAssetModal('foto_tecnicas')"</if>>
+              <div class="fx-photo__rod"></div>
+              <div class="fx-photo__frame">
+                <if $sgFotoTecnicas then><img src="{$sgFotoTecnicas}" alt="Técnica de {$ficha['nombre']}">
+                <else><div class="fx-photo__empty"><span>Sin imagen</span></div></if>
+                <if $is_owner then><div class="fx-photo__hint">Pulsa para cambiar</div></if>
+                <div class="fx-photo__seal">術</div>
+              </div>
+              <div class="fx-photo__rod fx-photo__rod--b"></div>
+              <div class="fx-photo__cap">Sello de técnica</div>
             </div>
-            <div class="sg-dossier-card__body sg-dossier-prose">{$virtudes}</div>
-          </div>
 
-          <div class="sg-dossier-card sg-dossier-card--defects">
-            <div class="sg-dossier-card__head">
-              <h2>Defectos</h2>
-            </div>
-            <div class="sg-dossier-card__body sg-dossier-prose">{$defectos}</div>
-          </div>
-        </div>
-
-        <div class="sg-dossier-story-grid">
-          <div class="sg-dossier-card sg-dossier-card--appearance">
-            <div class="sg-dossier-card__head">
-              <h2>Apariencia</h2>
-            </div>
-            <div class="sg-dossier-card__body sg-dossier-prose">{$apariencia}</div>
-          </div>
-
-          <div class="sg-dossier-card sg-dossier-card--personality">
-            <div class="sg-dossier-card__head">
-              <h2>Personalidad</h2>
-            </div>
-            <div class="sg-dossier-card__body sg-dossier-prose">{$personalidad}</div>
-          </div>
-
-          <div class="sg-dossier-card sg-dossier-card--extras">
-            <div class="sg-dossier-card__head">
-              <h2>Frase y Extras</h2>
-            </div>
-            <div class="sg-dossier-card__body sg-dossier-prose">
-              <if $frase then><p class="sg-dossier-prose__lead">{$frase}</p></if>
-              <if $extra then><p class="sg-dossier-prose__tail">{$extra}</p></if>
+            <div class="fx-tecnicas-host">
+              {$fichaprivate}
             </div>
           </div>
-        </div>
+        </section>
 
-        <if $ficha['fisico_de_pj'] then>
-          <div class="sg-dossier-origin">Origen físico del personaje: {$ficha['fisico_de_pj']}</div>
-        </if>
-      </section>
+        <!-- ── PERFIL ── -->
+        <section class="fx-panel fx-panel--perfil" role="tabpanel">
+          <div class="fx-layout">
+            <div class="fx-photo <if $is_owner then>fx-photo--edit</if>" <if $is_owner then>onclick="openProfileAssetModal('foto_perfil')"</if>>
+              <div class="fx-photo__rod"></div>
+              <div class="fx-photo__frame">
+                <if $sgFotoPerfil then><img src="{$sgFotoPerfil}" alt="Retrato de {$ficha['nombre']}">
+                <else><div class="fx-photo__empty"><span>Sin retrato</span></div></if>
+                <if $is_owner then><div class="fx-photo__hint">Pulsa para cambiar</div></if>
+                <div class="fx-photo__seal">魂</div>
+              </div>
+              <div class="fx-photo__rod fx-photo__rod--b"></div>
+              <div class="fx-photo__cap">Semblanza</div>
+            </div>
 
-      <if $fichaprivate then>
-        {$fichaprivate}
-      </if>
+            <div class="fx-stack">
+              <div class="fx-card">
+                <div class="fx-card__head"><span class="fx-card__title">Biografía</span></div>
+                <div class="fx-card__body"><div class="fx-prose">{$historia}</div></div>
+              </div>
+
+              <div class="fx-traits">
+                <div class="fx-card">
+                  <div class="fx-card__head"><span class="fx-card__title">Virtudes</span></div>
+                  <div class="fx-card__body"><div class="fx-prose">{$virtudes}</div></div>
+                </div>
+                <div class="fx-card">
+                  <div class="fx-card__head"><span class="fx-card__title">Defectos</span></div>
+                  <div class="fx-card__body"><div class="fx-prose">{$defectos}</div></div>
+                </div>
+              </div>
+
+              <div class="fx-card">
+                <div class="fx-card__head"><span class="fx-card__title">Apariencia</span></div>
+                <div class="fx-card__body"><div class="fx-prose">{$apariencia}</div></div>
+              </div>
+
+              <div class="fx-card">
+                <div class="fx-card__head"><span class="fx-card__title">Personalidad</span></div>
+                <div class="fx-card__body"><div class="fx-prose">{$personalidad}</div></div>
+              </div>
+
+              <div class="fx-card">
+                <div class="fx-card__head"><span class="fx-card__title">Frase y Extras</span></div>
+                <div class="fx-card__body">
+                  <div class="fx-prose">
+                    <if $frase then><p class="fx-prose--lead">{$frase}</p></if>
+                    <if $extra then><p>{$extra}</p></if>
+                  </div>
+                  <if $ficha['fisico_de_pj'] then><div class="fx-origin">Origen físico del personaje: {$ficha['fisico_de_pj']}</div></if>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </div>
     </div>
   </main>
 
   <form id="sg-profile-asset-form" method="post" action="{$mybb->settings['bburl']}/sg/ficha.php?uid={$ficha['fid']}" style="display:none;">
-    <input type="hidden" id="sg-avatar-input" name="cambiar_avatar1" value="">
-    <input type="hidden" id="sg-banner-input" name="cambiar_avatar2" value="">
+    <input type="hidden" id="in-avatar" name="cambiar_avatar1" value="">
+    <input type="hidden" id="in-banner" name="cambiar_avatar2" value="">
+    <input type="hidden" id="in-foto_expediente" name="cambiar_foto_expediente" value="">
+    <input type="hidden" id="in-foto_combate" name="cambiar_foto_combate" value="">
+    <input type="hidden" id="in-foto_tecnicas" name="cambiar_foto_tecnicas" value="">
+    <input type="hidden" id="in-foto_perfil" name="cambiar_foto_perfil" value="">
   </form>
 
   <div id="sg-profile-modal" class="sg-profile-modal" aria-hidden="true">
@@ -339,8 +599,15 @@
   {$footer}
 
   <script>
-    var sgProfileState = {
-      currentAsset: ''
+    var sgProfileState = { currentAsset: '' };
+
+    var sgAssetCopy = {
+      avatar:  ['Editar avatar', 'La imagen del avatar debe funcionar bien en formato vertical. Se recomienda una composición clara y centrada.'],
+      banner:  ['Editar banner', 'El banner debe funcionar en formato panorámico para la cabecera principal de la ficha.'],
+      foto_expediente:  ['Retrato oficial', 'Imagen vertical para el dossier. Idealmente un retrato tipo ficha.'],
+      foto_combate:  ['Pose de combate', 'Imagen vertical que muestre al personaje en acción o pose de combate.'],
+      foto_tecnicas: ['Sello de técnica', 'Imagen vertical: una técnica, sello o pose de manos característica.'],
+      foto_perfil:   ['Semblanza', 'Imagen vertical de retrato: apariencia o personalidad del personaje.']
     };
 
     function sgCreateSpoiler(config) {
@@ -373,10 +640,7 @@
 
     function sgToggleSpoiler(button) {
       var wrapper = button.parentNode;
-      if (!wrapper || !wrapper.classList.contains('sg-spoiler')) {
-        return;
-      }
-
+      if (!wrapper || !wrapper.classList.contains('sg-spoiler')) { return; }
       var isOpen = wrapper.classList.contains('is-open');
       wrapper.classList.toggle('is-open', !isOpen);
       button.setAttribute('aria-expanded', !isOpen ? 'true' : 'false');
@@ -390,14 +654,9 @@
       var input = document.getElementById('sg-profile-modal-input');
 
       sgProfileState.currentAsset = type;
-
-      if (type === 'avatar') {
-        title.textContent = 'Editar avatar';
-        copy.textContent = 'La imagen del avatar debe funcionar bien en formato vertical. Se recomienda una composición clara y centrada.';
-      } else {
-        title.textContent = 'Editar banner';
-        copy.textContent = 'El banner debe funcionar en formato panorámico para la cabecera principal de la ficha.';
-      }
+      var texts = sgAssetCopy[type] || ['Editar imagen', 'Introduce la URL de la imagen.'];
+      title.textContent = texts[0];
+      copy.textContent = texts[1];
 
       input.value = '';
       modal.classList.add('is-open');
@@ -414,32 +673,23 @@
 
     function saveProfileAsset() {
       var form = document.getElementById('sg-profile-asset-form');
-      var avatarInput = document.getElementById('sg-avatar-input');
-      var bannerInput = document.getElementById('sg-banner-input');
       var urlInput = document.getElementById('sg-profile-modal-input');
       var value = urlInput.value.replace(/^\s+|\s+$/g, '');
+      if (!value) { return; }
 
-      if (!value) {
-        return;
+      var ids = ['avatar','banner','foto_expediente','foto_combate','foto_tecnicas','foto_perfil'];
+      for (var i = 0; i < ids.length; i++) {
+        var el = document.getElementById('in-' + ids[i]);
+        if (el) { el.value = ''; }
       }
-
-      avatarInput.value = '';
-      bannerInput.value = '';
-
-      if (sgProfileState.currentAsset === 'avatar') {
-        avatarInput.value = value;
-      } else if (sgProfileState.currentAsset === 'banner') {
-        bannerInput.value = value;
-      }
-
+      var target = document.getElementById('in-' + sgProfileState.currentAsset);
+      if (target) { target.value = value; }
       form.submit();
     }
 
     window.addEventListener('click', function(event) {
       var modal = document.getElementById('sg-profile-modal');
-      if (event.target === modal) {
-        closeProfileAssetModal();
-      }
+      if (event.target === modal) { closeProfileAssetModal(); }
     });
 
     function sgWeekCountdown() {
@@ -451,17 +701,13 @@
 
       function tick() {
         var left = end - Math.floor(Date.now() / 1000);
-        if (left <= 0) {
-          tip.textContent = 'Nueva semana disponible';
-          return;
-        }
+        if (left <= 0) { tip.textContent = 'Nueva semana disponible'; return; }
         var d = Math.floor(left / 86400);
         var h = Math.floor((left % 86400) / 3600);
         var m = Math.floor((left % 3600) / 60);
         var s = left % 60;
         tip.textContent = 'Cierra en ' + d + 'd ' + h + 'h ' + m + 'm ' + s + 's';
       }
-
       tick();
       setInterval(tick, 1000);
     }
