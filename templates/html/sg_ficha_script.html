@@ -43,7 +43,9 @@ function sgFichaCreateTechniqueCard(tecnica) {
   var effectText = tecnica.efecto ? tecnica.efecto : 'No tiene efecto adicional especificado.';
   var costText = tecnica.coste ? tecnica.coste : 'Sin coste indicado';
 
-  // badges.push(sgFichaCreateTechniqueBadge('', 'Rango ' + tecnica.rango, true));
+  if (tecnica.rango) {
+    badges.push(sgFichaCreateTechniqueBadge('', 'Rango ' + tecnica.rango, true));
+  }
 
   if (tecnica.requisito) {
     badges.push(sgFichaCreateTechniqueBadge('', tecnica.requisito, false));
@@ -60,7 +62,7 @@ function sgFichaCreateTechniqueCard(tecnica) {
   if (tecnica.tiempo) {
     badges.push(sgFichaCreateTechniqueBadge('', 'Aprendida en ' + tecnica.tiempo, false));
   }
-  badges.push(sgFichaCreateTechniqueBadge('', 'ID: ' + tecnica.tid, false));
+  badges.push(sgFichaCreateTechniqueBadge('', 'Jutsu Nº ' + tecnica.tid, false));
 
   return ''
     + '<div class="sg-technique">'
@@ -150,7 +152,7 @@ function sgFichaCreateTechniqueGroup(key, techniques) {
     + sgCreateSpoiler({
     classes: '',
     icon: '◈',
-    eyebrow: 'Árbol',
+    eyebrow: 'Capítulo',
     title: sgFichaEscapeHtml(familyLabel),
     count: sorted.length + ' tecnicas',
     open: false,

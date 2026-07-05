@@ -16,7 +16,36 @@ require_once "./functions/sg_functions.php";
 
 global $templates, $mybb;
 
-$uid = $mybb->get_input('uid'); 
+// Tarjeta de virtud/defecto asignado (mismo formato que sg_vt_card en
+// registro_virtudes.php, con clases fx- para heredar el tema de la ficha).
+function fx_virtud_card($r)
+{
+    $puntos    = intval($r['puntos']);
+    $es_virtud = $puntos >= 0;
+
+    $nombre = htmlspecialchars($r['nombre'], ENT_QUOTES);
+    $vid    = htmlspecialchars($r['virtud_id'], ENT_QUOTES);
+    $desc   = nl2br(htmlspecialchars($r['descripcion'], ENT_QUOTES));
+
+    $abs       = abs($puntos);
+    $costo_lbl = ($es_virtud ? '+' : '−') . $abs;
+    $costo_cls = $es_virtud ? 'fx-vt-cost--v' : 'fx-vt-cost--d';
+
+    $excl = intval($r['exclusivo']) === 1
+        ? "<span class=\"fx-vt-badge fx-vt-badge--excl\">Exclusivo</span>"
+        : '';
+
+    return "<article class=\"fx-vt-item\">"
+        . "<div class=\"fx-vt-head\">"
+        . "<h4 class=\"fx-vt-name\">$nombre</h4>"
+        . "<span class=\"fx-vt-cost $costo_cls\">$costo_lbl</span>"
+        . "</div>"
+        . "<div class=\"fx-vt-meta\"><span class=\"fx-vt-badge\">$vid</span>$excl</div>"
+        . "<p class=\"fx-vt-desc\">$desc</p>"
+        . "</article>";
+}
+
+$uid = $mybb->get_input('uid');
 $action = $mybb->get_input('action');
 $module = $mybb->get_input('module'); 
 $s_uid = $mybb->user['uid'];
@@ -36,8 +65,6 @@ if ($cambiar_avatar2 != '') {
 // se guarda solo si la columna existe, así no rompe mientras no estén.
 $foto_fields = array(
     'foto_expediente'  => 'cambiar_foto_expediente',
-    'foto_combate'  => 'cambiar_foto_combate',
-    'foto_tecnicas' => 'cambiar_foto_tecnicas',
     'foto_perfil'   => 'cambiar_foto_perfil',
 );
 $hay_foto_post = false;
@@ -444,6 +471,36 @@ if ($ficha_existe == true && ($moderated == true || (is_mod($s_uid) || is_staff(
         eval('$personalidad = $personalidad_var;');
         eval('$virtudes = $virtudes_var;');
         eval('$defectos = $defectos_var;');
+        // NOTA: $ficha['virtudes'] / $ficha['defectos'] (texto libre, arriba) quedan
+        // en desuso — se eliminarán cuando la lista automática de abajo los reemplace.
+
+        // Virtudes/defectos asignados de verdad (catálogo real, no texto libre)
+        $virtudes_auto_html = '';
+        $defectos_auto_html = '';
+        $n_virtudes_auto = 0;
+        $n_defectos_auto = 0;
+        $query_vt_auto = $db->query("
+            SELECT v.virtud_id, v.nombre, v.puntos, v.exclusivo, v.descripcion
+            FROM mybb_sg_sg_virtudes_usuarios vu
+            INNER JOIN mybb_sg_sg_virtudes v ON v.virtud_id = vu.virtud_id
+            WHERE vu.uid='$uid'
+            ORDER BY v.nombre ASC
+        ");
+        while ($vt = $db->fetch_array($query_vt_auto)) {
+            if (intval($vt['puntos']) >= 0) {
+                $virtudes_auto_html .= fx_virtud_card($vt);
+                $n_virtudes_auto++;
+            } else {
+                $defectos_auto_html .= fx_virtud_card($vt);
+                $n_defectos_auto++;
+            }
+        }
+        if ($n_virtudes_auto === 0) { $virtudes_auto_html = "<div class=\"fx-vt-empty\">Sin virtudes asignadas.</div>"; }
+        if ($n_defectos_auto === 0) { $defectos_auto_html = "<div class=\"fx-vt-empty\">Sin defectos asignados.</div>"; }
+        eval('$virtudesAutoHtml = $virtudes_auto_html;');
+        eval('$defectosAutoHtml = $defectos_auto_html;');
+        eval('$nVirtudesAuto = $n_virtudes_auto;');
+        eval('$nDefectosAuto = $n_defectos_auto;');
         eval('$extra = $extra_var;');
         eval('$frase = $frase_var;');
         eval('$sgVidaBar = $sg_vida_bar;');
@@ -451,13 +508,33 @@ if ($ficha_existe == true && ($moderated == true || (is_mod($s_uid) || is_staff(
 
         // Fotos por pestaña (columnas opcionales; vacío si aún no existen)
         $sg_foto_expediente  = isset($f['foto_expediente'])  ? $f['foto_expediente']  : '';
-        $sg_foto_combate  = isset($f['foto_combate'])  ? $f['foto_combate']  : '';
-        $sg_foto_tecnicas = isset($f['foto_tecnicas']) ? $f['foto_tecnicas'] : '';
         $sg_foto_perfil   = isset($f['foto_perfil'])   ? $f['foto_perfil']   : '';
         eval('$sgFotoExpediente = $sg_foto_expediente;');
-        eval('$sgFotoCombate = $sg_foto_combate;');
-        eval('$sgFotoTecnicas = $sg_foto_tecnicas;');
         eval('$sgFotoPerfil = $sg_foto_perfil;');
+
+        // Estado del sujeto para la cabecera de expediente (villa 7 = renegados)
+        $sg_estado = (intval($f['villa']) == 7) ? 'Desertor' : 'Activo';
+        eval('$sgEstado = $sg_estado;');
+
+        // Progreso al siguiente nivel (mismos umbrales de XP que la subida de nivel de arriba)
+        $xp_umbrales = array(1=>50,2=>150,3=>300,4=>500,5=>750,6=>1050,7=>1400,8=>1800,9=>2250,10=>2750,11=>3300,12=>3900,13=>4550,14=>5250,15=>6000,16=>6800,17=>7700,18=>8700,19=>9800);
+        $niv = intval($nivel);
+        $xp  = intval($puntos_rol);
+        if ($niv >= 20 || !isset($xp_umbrales[$niv])) {
+            $sg_nivel_pct = 100; $sg_xp_faltan = 0; $sg_nivel_max = 1;
+        } else {
+            $prev = ($niv >= 2 && isset($xp_umbrales[$niv - 1])) ? $xp_umbrales[$niv - 1] : 0;
+            $next = $xp_umbrales[$niv];
+            $span = max(1, $next - $prev);
+            $sg_nivel_pct = max(0, min(100, round((($xp - $prev) / $span) * 100)));
+            $sg_xp_faltan = max(0, $next - $xp);
+            $sg_nivel_max = 0;
+        }
+        $sg_nivel_sig = $niv + 1;
+        eval('$sgNivelPct = $sg_nivel_pct;');
+        eval('$sgXpFaltan = $sg_xp_faltan;');
+        eval('$sgNivelMax = $sg_nivel_max;');
+        eval('$sgNivelSig = $sg_nivel_sig;');
     }
     $can_view_staff_notes = ($s_uid == $uid || is_staff($s_uid) || is_peti_mod($s_uid));
     $query_tec_aprendidas = $db->query("
@@ -483,8 +560,7 @@ if ($ficha_existe == true && ($moderated == true || (is_mod($s_uid) || is_staff(
     
     eval('$tec_aprendidas = "'.addslashes($tec_aprendidas_json).'";');
     eval('$sgFichaCanViewStaffNotes = "'.$can_view_staff_notes.'";');
-    eval("\$fichaprivate_script = \"".$templates->get("sg_fichaprivate_script")."\";");
-    eval("\$fichaprivate = \"".$templates->get("sg_fichaprivate")."\";");
+    eval("\$ficha_script = \"".$templates->get("sg_ficha_script")."\";");
 
     eval("\$page = \"".$templates->get("sg_ficha")."\";");
     output_page($page);

@@ -7,45 +7,24 @@
   {$headerinclude}
   <style>
     :root {
-      /* Washi frío (STYLE.md — light) */
-      --bg:        #f4f2f8;
-      --bg2:       #ede9f4;
-      --card:      #ffffff;
-      --card2:     #e6e1f0;
-      --border:    rgba(90, 46, 154, 0.14);
-      --ink:       #1e1428;
-      --stone:     #6a587a;
-      --mist:      #a898b8;
-      --fiber:     rgba(140, 120, 180, 0.06);
-      --paper:     {$sgFichaPaper};
-      --paper-ink: {$sgFichaPaperText};
+      /* Fondo basado en el color de la aldea (superficies inyectadas por ficha.php) */
+      --bg:            {$sgFichaSurface};
+      --bg2:           {$sgFichaSurface2};
+      --card:          {$sgFichaCard};
+      --card2:         {$sgFichaCardSoft};
+      --panel:         {$sgFichaPanel};
+      --border:        {$sgFichaBorder};
+      --border-strong: {$sgFichaBorderStrong};
+      --ink:           #f3edf3;
+      --stone:         #c6bacf;
+      --mist:          #ab9fb6;
+      --fiber:         rgba(255, 255, 255, 0.03);
+      --paper:         {$sgFichaPaper};
+      --paper-ink:     {$sgFichaPaperText};
       /* Acento = color de la aldea */
-      --accent:    {$sgFichaAccent};
-      --accent-2:  {$sgFichaAccentStrong};
-      --accent-soft: {$sgFichaAccentSoft};
-    }
-    @media (prefers-color-scheme: dark) {
-      :root {
-        --bg:   #0f0c18; --bg2:#130f1e; --card:#171224; --card2:#1c162c;
-        --border: rgba(156,107,204,0.12);
-        --ink:  #e8dff8; --stone:#8a7a9a; --mist:#5a4a6a;
-        --fiber: rgba(156,107,204,0.04);
-        --accent: {$sgFichaAccentStrong};
-      }
-    }
-    :root[data-theme="light"] {
-      --bg:#f4f2f8; --bg2:#ede9f4; --card:#ffffff; --card2:#e6e1f0;
-      --border: rgba(90,46,154,0.14);
-      --ink:#1e1428; --stone:#6a587a; --mist:#a898b8;
-      --fiber: rgba(140,120,180,0.06);
-      --accent: {$sgFichaAccent};
-    }
-    :root[data-theme="dark"] {
-      --bg:#0f0c18; --bg2:#130f1e; --card:#171224; --card2:#1c162c;
-      --border: rgba(156,107,204,0.12);
-      --ink:#e8dff8; --stone:#8a7a9a; --mist:#5a4a6a;
-      --fiber: rgba(156,107,204,0.04);
-      --accent: {$sgFichaAccentStrong};
+      --accent:        {$sgFichaAccent};
+      --accent-2:      {$sgFichaAccentStrong};
+      --accent-soft:   {$sgFichaAccentSoft};
     }
 
     .fx *, .fx *::before, .fx *::after { box-sizing: border-box; }
@@ -105,18 +84,10 @@
     }
     .fx-hero__body {
       position: relative;
-      display: grid; grid-template-columns: auto 1fr auto; gap: 20px;
+      display: grid; grid-template-columns: 1fr auto; gap: 20px;
       align-items: flex-end;
-      padding: 0 24px 20px; margin-top: -64px;
+      padding: 0 24px 20px; margin-top: -48px;
     }
-    .fx-avatar {
-      width: 116px; height: 116px; flex-shrink: 0;
-      border: 0.5px solid var(--border);
-      background: var(--card); overflow: hidden;
-      box-shadow: 0 0 0 4px var(--bg2);
-    }
-    .fx-avatar.sg-profile-editable { cursor: pointer; }
-    .fx-avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
     .fx-identity { min-width: 0; padding-bottom: 4px; }
     .fx-identity__village {
@@ -156,6 +127,38 @@
     }
     .fx-action:hover { border-color: var(--accent); color: var(--ink); }
 
+    /* ── CABECERA DE EXPEDIENTE ───────────────────────── */
+    .fx-hero__file {
+      position: absolute; top: 12px; left: 14px; z-index: 5;
+      font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 2px; text-transform: uppercase;
+      color: #fff; background: rgba(20,12,36,0.55); border: 0.5px solid rgba(255,255,255,0.25);
+      padding: 4px 10px;
+    }
+    .fx-hero__stamp {
+      position: absolute; top: 14px; right: 16px; z-index: 5; text-align: center;
+      transform: rotate(7deg); padding: 6px 14px 5px;
+      border: 2px solid var(--accent); border-radius: 5px; color: var(--accent);
+      background: var(--accent-soft);
+    }
+    .fx-hero__stamp span { display: block; font-family: 'Cinzel', serif; letter-spacing: 2px; text-transform: uppercase; }
+    .fx-hero__stamp-k { font-size: 7px; opacity: 0.85; }
+    .fx-hero__stamp strong { display: block; font-family: 'Cinzel', serif; font-weight: 900; font-size: 16px; letter-spacing: 1px; line-height: 1.15; }
+    .fx-hero__stamp-e { font-size: 8px; margin-top: 1px; }
+    .fx-hero__tate {
+      position: absolute; right: 18px; bottom: -8px; z-index: 0; pointer-events: none;
+      writing-mode: vertical-rl; font-family: 'Noto Serif JP', serif; font-weight: 700;
+      font-size: 88px; line-height: 1; color: var(--accent); opacity: 0.06; letter-spacing: 4px;
+    }
+
+    /* Marginalia manuscrita */
+    .fx-margin {
+      position: absolute; z-index: 2; max-width: 160px;
+      font-family: 'Noto Serif JP', serif; font-style: italic; font-weight: 300;
+      font-size: 12px; line-height: 1.45; color: var(--accent); opacity: 0.72;
+      transform: rotate(-4deg); pointer-events: none;
+    }
+    .fx-margin::before { content: '✦ '; font-style: normal; opacity: 0.7; }
+
     /* ── PESTAÑAS ─────────────────────────────────────── */
     .fx input.fx-radio { position: absolute; width: 1px; height: 1px; opacity: 0; overflow: hidden; }
     .fx-tabs {
@@ -174,7 +177,7 @@
     .fx-tab__gem { width: 5px; height: 5px; background: var(--accent); clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%); flex-shrink: 0; opacity: 0; transition: opacity .15s ease; }
 
     #fx-dossier:checked ~ .fx-tabs .fx-tab[for="fx-dossier"],
-    #fx-combate:checked ~ .fx-tabs .fx-tab[for="fx-combate"],
+    #fx-inventario:checked ~ .fx-tabs .fx-tab[for="fx-inventario"],
     #fx-tecnicas:checked ~ .fx-tabs .fx-tab[for="fx-tecnicas"],
     #fx-perfil:checked ~ .fx-tabs .fx-tab[for="fx-perfil"] {
       color: var(--ink); background: var(--card);
@@ -182,42 +185,93 @@
       margin-bottom: -0.5px;
     }
     #fx-dossier:checked ~ .fx-tabs .fx-tab[for="fx-dossier"] .fx-tab__gem,
-    #fx-combate:checked ~ .fx-tabs .fx-tab[for="fx-combate"] .fx-tab__gem,
+    #fx-inventario:checked ~ .fx-tabs .fx-tab[for="fx-inventario"] .fx-tab__gem,
     #fx-tecnicas:checked ~ .fx-tabs .fx-tab[for="fx-tecnicas"] .fx-tab__gem,
     #fx-perfil:checked ~ .fx-tabs .fx-tab[for="fx-perfil"] .fx-tab__gem { opacity: 1; }
 
     .fx-radio:focus-visible ~ .fx-tabs .fx-tab { outline: none; }
     #fx-dossier:focus-visible ~ .fx-tabs .fx-tab[for="fx-dossier"],
-    #fx-combate:focus-visible ~ .fx-tabs .fx-tab[for="fx-combate"],
+    #fx-inventario:focus-visible ~ .fx-tabs .fx-tab[for="fx-inventario"],
     #fx-tecnicas:focus-visible ~ .fx-tabs .fx-tab[for="fx-tecnicas"],
     #fx-perfil:focus-visible ~ .fx-tabs .fx-tab[for="fx-perfil"] { outline: 2px solid var(--accent); outline-offset: -2px; }
 
     /* ── PANELES ──────────────────────────────────────── */
     .fx-panels {
+      position: relative;
       border: 0.5px solid var(--border); border-top: none;
-      background: var(--card); padding: 24px;
+      background: var(--card); padding: 24px 26px 30px;
     }
-    .fx-panel { display: none; }
+    /* Pliegue central + sombra de lomo */
+    .fx-panels::before {
+      content: ''; position: absolute; top: 0; bottom: 0; left: 50%; width: 40px;
+      transform: translateX(-50%); z-index: 0; pointer-events: none;
+      background: linear-gradient(90deg, transparent, rgba(20,12,36,0.05) 45%, rgba(20,12,36,0.08) 50%, rgba(20,12,36,0.05) 55%, transparent);
+    }
+    /* Esquina doblada (dog-ear) */
+    .fx-panels::after {
+      content: ''; position: absolute; right: 0; bottom: 0; z-index: 3; pointer-events: none;
+      border-width: 0 0 20px 20px; border-style: solid;
+      border-color: transparent transparent var(--bg2) transparent;
+      box-shadow: -2px -2px 0 rgba(20,12,36,0.06);
+    }
+    .fx-panel { display: none; position: relative; }
     #fx-dossier:checked ~ .fx-panels .fx-panel--dossier,
-    #fx-combate:checked ~ .fx-panels .fx-panel--combate,
+    #fx-inventario:checked ~ .fx-panels .fx-panel--inventario,
     #fx-tecnicas:checked ~ .fx-panels .fx-panel--tecnicas,
     #fx-perfil:checked ~ .fx-panels .fx-panel--perfil { display: block; }
 
-    .fx-layout { display: grid; grid-template-columns: 260px 1fr; gap: 26px; align-items: start; }
+    /* Kanji watermark por pestaña */
+    .fx-panel::before {
+      position: absolute; top: 8px; right: 12px; z-index: 0; pointer-events: none;
+      font-family: 'Noto Serif JP', serif; font-weight: 700; font-size: 128px; line-height: 1;
+      color: var(--accent); opacity: 0.05;
+    }
+    .fx-panel--dossier::before { content: '記'; }
+    .fx-panel--tecnicas::before { content: '術'; }
+    .fx-panel--perfil::before  { content: '魂'; }
+    .fx-panel--inventario::before { content: '蔵'; }
+
+    /* Folio (número de página) por pestaña */
+    .fx-panel::after {
+      position: absolute; bottom: -6px; right: 4px; z-index: 2; pointer-events: none;
+      font-family: 'Cinzel', serif; font-size: 11px; letter-spacing: 2px; color: var(--mist);
+    }
+    .fx-panel--dossier::after  { content: 'Folio i'; }
+    .fx-panel--perfil::after   { content: 'Folio ii'; }
+    .fx-panel--tecnicas::after { content: 'Folio iii'; }
+    .fx-panel--inventario::after { content: 'Folio iv'; }
+
+    .fx-layout { position: relative; z-index: 1; display: grid; grid-template-columns: 260px 1fr; gap: 26px; align-items: start; }
     @media (max-width: 760px){ .fx-layout { grid-template-columns: 1fr; } }
 
-    /* ── FOTO (kakejiku + hanko) ──────────────────────── */
+    /* ── FOTO (ficha oficial: marcas de registro + hanko) ─ */
     .fx-photo { position: relative; }
-    .fx-photo__rod {
-      height: 8px; background: linear-gradient(180deg, var(--accent), var(--accent-2));
-      border: 0.5px solid var(--border);
-    }
+    .fx-photo__rod { height: 3px; background: var(--accent); }
     .fx-photo__rod--b { margin-top: 0; }
     .fx-photo__frame {
       position: relative; margin: 6px 8px; border: 0.5px solid var(--border);
       background: var(--paper); overflow: hidden; aspect-ratio: 3 / 4;
     }
     .fx-photo__frame img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    /* Etiqueta "FOTO" (esquina) */
+    .fx-photo__frame::before {
+      content: 'FOTO'; position: absolute; top: 0; left: 0; z-index: 3;
+      font-family: 'Cinzel', serif; font-size: 8px; letter-spacing: 2px; color: #fff;
+      background: var(--accent); padding: 3px 8px;
+    }
+    /* Marcas de registro en las 4 esquinas */
+    .fx-photo__frame::after {
+      content: ''; position: absolute; inset: 6px; z-index: 2; pointer-events: none;
+      background:
+        linear-gradient(var(--accent),var(--accent)) top left/13px 2px no-repeat,
+        linear-gradient(var(--accent),var(--accent)) top left/2px 13px no-repeat,
+        linear-gradient(var(--accent),var(--accent)) top right/13px 2px no-repeat,
+        linear-gradient(var(--accent),var(--accent)) top right/2px 13px no-repeat,
+        linear-gradient(var(--accent),var(--accent)) bottom left/13px 2px no-repeat,
+        linear-gradient(var(--accent),var(--accent)) bottom left/2px 13px no-repeat,
+        linear-gradient(var(--accent),var(--accent)) bottom right/13px 2px no-repeat,
+        linear-gradient(var(--accent),var(--accent)) bottom right/2px 13px no-repeat;
+    }
     .fx-photo__empty {
       position: absolute; inset: 0; display: flex; flex-direction: column;
       align-items: center; justify-content: center; gap: 4px; text-align: center;
@@ -231,19 +285,50 @@
     .fx-photo--edit .fx-photo__frame { cursor: pointer; }
     .fx-photo--edit:hover .fx-photo__hint { opacity: 1; }
     .fx-photo__hint {
-      position: absolute; left: 8px; right: 8px; bottom: 6px; z-index: 3;
+      position: absolute; left: 8px; right: 8px; bottom: 6px; z-index: 5;
       font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase;
       color: #fff; background: rgba(20,12,36,0.7); padding: 6px; text-align: center;
       opacity: 0; transition: opacity .15s ease;
     }
     .fx-photo__seal {
-      position: absolute; right: 14px; bottom: 12px; z-index: 4;
+      position: absolute; right: 14px; bottom: 12px; z-index: 6;
       width: 40px; height: 40px; border: 1.5px solid var(--accent); border-radius: 50%;
       display: flex; align-items: center; justify-content: center;
       font-family: 'Noto Serif JP', serif; font-size: 15px; font-weight: 700; color: var(--accent);
       background: var(--accent-soft);
     }
     .fx-photo__cap { text-align: center; font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--mist); margin-top: 8px; }
+
+    /* Sticker: washi-tape + leve rotación (distinta por pestaña) */
+    .fx-photo { transition: transform .2s ease; }
+    .fx-photo::before {
+      content: ''; position: absolute; top: -9px; left: 50%; z-index: 7;
+      transform: translateX(-50%) rotate(-3deg);
+      width: 74px; height: 20px; background: var(--accent-soft);
+      border-left: 1px dashed var(--accent); border-right: 1px dashed var(--accent);
+    }
+    .fx-photo:hover { transform: rotate(0deg) !important; }
+
+    /* Colocación por pestaña */
+    /* Expediente: retrato a la IZQUIERDA */
+    .fx-panel--dossier .fx-layout  { grid-template-columns: 300px 1fr; }
+    .fx-panel--dossier .fx-photo   { transform: rotate(-2deg); }
+    /* Técnicas: foto a la IZQUIERDA */
+    .fx-panel--tecnicas .fx-layout { grid-template-columns: 190px 1fr; }
+    .fx-panel--tecnicas .fx-photo  { transform: rotate(-1.5deg); }
+    /* Expediente = retrato oficial/cover: más grande y con caption destacada */
+    .fx-panel--dossier .fx-photo__cap { font-size: 10px; letter-spacing: 3px; color: var(--accent); }
+
+    /* Trasfondo: retrato flotante con la biografía envolviéndolo */
+    .fx-trasfondo::after { content: ''; display: block; clear: both; }
+    .fx-trasfondo .fx-photo { float: right; width: 230px; margin: 2px 0 16px 24px; transform: rotate(2deg); }
+    .fx-clear { clear: both; }
+    .fx-bio { margin-bottom: 20px; }
+    .fx-bio-head { display: flex; align-items: center; gap: 10px; margin: 2px 0 12px; }
+    .fx-bio-head::before { content: ''; width: 3px; height: 15px; background: var(--accent); flex-shrink: 0; }
+    .fx-bio-head::after { content: ''; flex: 1; height: 0.5px; background: var(--border); }
+    .fx-bio-head .fx-card__title { white-space: nowrap; }
+    @media (max-width: 620px) { .fx-trasfondo .fx-photo { float: none; width: 100%; margin: 0 0 16px; } }
 
     /* ── CARDS ────────────────────────────────────────── */
     .fx-stack { display: grid; gap: 20px; }
@@ -268,7 +353,7 @@
     .fx-res__v { font-family: 'Cinzel', serif; font-weight: 700; font-size: 20px; color: var(--accent); font-variant-numeric: tabular-nums; }
     .fx-res__k { font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--mist); margin-top: 2px; }
 
-    /* Barras de combate */
+    /* Barras (constantes) */
     .fx-gauges { display: grid; gap: 14px; }
     .fx-gauge__top { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px; }
     .fx-gauge__k { font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--stone); }
@@ -276,6 +361,8 @@
     .fx-gauge__v small { color: var(--mist); font-size: 11px; font-weight: 400; }
     .fx-bar { height: 10px; border: 0.5px solid var(--border); background: var(--card2); position: relative; overflow: hidden; }
     .fx-bar::before { content:''; position: absolute; inset: 0; width: var(--fill, 50%); background: linear-gradient(90deg, var(--accent), var(--accent-2)); }
+    .fx-bar--vida::before   { background: linear-gradient(90deg, #a8321f, #e0533a); }
+    .fx-bar--chakra::before { background: linear-gradient(90deg, #2f6fd0, #58a6ff); }
 
     /* Estadísticas */
     .fx-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
@@ -286,6 +373,36 @@
     .fx-stat__mod { position: absolute; top: 7px; right: 9px; font-family: 'Cinzel', serif; font-size: 11px; font-weight: 700; color: var(--accent); }
     .fx-stat__mod::before { content: 'M '; font-size: 8px; }
 
+    /* Radar de estadísticas */
+    .fx-statwrap { display: flex; gap: 22px; align-items: center; flex-wrap: wrap; }
+    .fx-statwrap .fx-stats { flex: 1; min-width: 220px; }
+    .fx-radar { flex-shrink: 0; }
+    @media (max-width: 640px){ .fx-radar { margin: 0 auto; } }
+
+    /* Barra de progreso al siguiente nivel (hero) — grande + animada */
+    .fx-levelbar { margin-top: 16px; max-width: 460px; }
+    .fx-levelbar__head { display: flex; align-items: baseline; gap: 10px; margin-bottom: 7px; }
+    .fx-levelbar__lvl { font-family: 'Cinzel', serif; font-weight: 900; font-size: 15px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--ink); }
+    .fx-levelbar__next { font-family: 'Cinzel', serif; font-size: 11px; letter-spacing: 1px; color: var(--mist); }
+    .fx-levelbar__pct { margin-left: auto; font-family: 'Cinzel', serif; font-weight: 900; font-size: 20px; color: var(--accent); font-variant-numeric: tabular-nums; }
+    .fx-levelbar__track { height: 16px; border: 0.5px solid var(--border-strong); background: var(--card2); position: relative; overflow: hidden; }
+    .fx-levelbar__fill { position: absolute; top: 0; left: 0; bottom: 0; width: 0; background: linear-gradient(90deg, var(--accent), var(--accent-2)); transition: width 1.1s cubic-bezier(.22,1,.36,1); animation: fxLevelPulse 2.6s ease-in-out infinite; }
+    .fx-levelbar__meta { margin-top: 6px; font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 1px; text-transform: uppercase; color: var(--mist); }
+    .fx-levelbar--max span { font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--accent); }
+    @keyframes fxLevelPulse { 0%, 100% { box-shadow: inset 0 0 6px rgba(255,255,255,0.08); filter: brightness(1); } 50% { box-shadow: inset 0 0 16px rgba(255,255,255,0.30); filter: brightness(1.12); } }
+    @media (prefers-reduced-motion: reduce) { .fx-levelbar__fill { transition: none; animation: none; } }
+
+    /* Inventario (placeholder) */
+    .fx-inv-empty { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 12px; min-height: 300px; }
+    .fx-inv-empty__k { font-family: 'Noto Serif JP', serif; font-weight: 700; font-size: 88px; line-height: 1; color: var(--accent); opacity: 0.18; }
+    .fx-inv-empty__t { font-family: 'Cinzel', serif; font-weight: 900; font-size: 20px; letter-spacing: 2px; text-transform: uppercase; color: var(--ink); }
+    .fx-inv-empty__p { margin: 0; color: var(--stone); font-size: 14px; max-width: 320px; line-height: 1.6; }
+
+    /* Estampado del sello de rango al cargar */
+    @keyframes fxStampIn { 0% { opacity: 0; transform: rotate(7deg) scale(1.6); } 60% { opacity: 1; } 100% { opacity: 1; transform: rotate(7deg) scale(1); } }
+    .fx-hero__stamp { animation: fxStampIn .5s cubic-bezier(.2,1.3,.4,1) both .25s; }
+    @media (prefers-reduced-motion: reduce) { .fx-hero__stamp { animation: none; } }
+
     /* Prosa */
     .fx-prose { font-family: 'Noto Serif JP', serif; font-weight: 300; font-size: 14px; line-height: 1.9; color: var(--ink); text-align: justify; }
     .fx-prose p { margin: 0 0 12px; }
@@ -293,6 +410,41 @@
     .fx-traits { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
     @media (max-width: 560px){ .fx-traits { grid-template-columns: 1fr; } }
     .fx-origin { margin-top: 18px; font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--mist); }
+
+    /* Virtudes/Defectos asignados (catálogo real) — lista con scroll */
+    .fx-vt-note {
+      margin: 2px 0 10px; font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 1px;
+      text-transform: uppercase; color: var(--mist); font-style: italic;
+    }
+    .fx-vt-list {
+      max-height: 260px; overflow-y: auto; display: grid; gap: 8px; padding-right: 4px;
+      scrollbar-width: thin; scrollbar-color: var(--accent-soft) transparent;
+    }
+    .fx-vt-list::-webkit-scrollbar { width: 7px; }
+    .fx-vt-list::-webkit-scrollbar-track { background: transparent; }
+    .fx-vt-list::-webkit-scrollbar-thumb { background: var(--accent-soft); }
+    .fx-vt-item { border: 0.5px solid var(--border); background: var(--card2); padding: 10px 12px; }
+    .fx-traits .fx-card--virtues .fx-vt-item {
+      background: linear-gradient(180deg, rgba(79, 157, 105, 0.16), rgba(79, 157, 105, 0.05) 60%), var(--card2);
+      border-color: rgba(79, 157, 105, 0.3);
+    }
+    .fx-traits .fx-card--defects .fx-vt-item {
+      background: linear-gradient(180deg, rgba(200, 60, 45, 0.16), rgba(200, 60, 45, 0.05) 60%), var(--card2);
+      border-color: rgba(200, 60, 45, 0.3);
+    }
+    .fx-vt-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+    .fx-vt-name { margin: 0; flex: 1; font-family: 'Cinzel', serif; font-size: 12px; font-weight: 700; color: var(--ink); line-height: 1.3; }
+    .fx-vt-cost { flex-shrink: 0; padding: 2px 8px; font-family: 'Cinzel', serif; font-size: 11px; font-weight: 700; border: 0.5px solid var(--border-strong); }
+    .fx-vt-cost--v { color: #6fcb8f; border-color: rgba(79, 157, 105, 0.5); background: rgba(79, 157, 105, 0.12); }
+    .fx-vt-cost--d { color: #e0776a; border-color: rgba(200, 60, 45, 0.5); background: rgba(200, 60, 45, 0.12); }
+    .fx-vt-meta { display: flex; flex-wrap: wrap; gap: 5px; margin: 6px 0; }
+    .fx-vt-badge {
+      padding: 2px 8px; border: 0.5px solid var(--border-strong); background: var(--panel); color: var(--mist);
+      font-family: 'Cinzel', serif; font-size: 8px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase;
+    }
+    .fx-vt-badge--excl { color: #d9b35c; border-color: rgba(217, 179, 92, 0.5); background: rgba(217, 179, 92, 0.14); }
+    .fx-vt-desc { margin: 0; color: var(--stone); font-size: 12.5px; line-height: 1.55; }
+    .fx-vt-empty { padding: 14px; text-align: center; color: var(--mist); font-size: 12.5px; border: 0.5px dashed var(--border); }
 
     /* Notas de staff */
     .fx-notes textarea {
@@ -305,6 +457,24 @@
     /* Técnicas: dejamos el estilo del tema; solo ajustamos el hueco */
     .fx-tecnicas-host { min-width: 0; }
     .fx-tecnicas-host .sg-profile-private { margin: 0; }
+    /* Reparar layout 2 columnas de cada técnica (rail | main) dentro del panel.
+       Con !important para ganarle a la CSS del tema. */
+    .fx-tecnicas-host .sg-technique,
+    .fx-tecnicas-host .sg-technique__layout,
+    .fx-tecnicas-host .sg-technique__main,
+    .fx-tecnicas-host .sg-technique__section,
+    .fx-tecnicas-host .sg-technique__text { width: auto !important; max-width: none !important; }
+    .fx-tecnicas-host .sg-technique { display: block !important; }
+    .fx-tecnicas-host .sg-technique__layout {
+      display: grid !important; grid-template-columns: 240px minmax(0, 1fr) !important;
+      gap: 18px !important; align-items: start !important; width: 100% !important;
+    }
+    .fx-tecnicas-host .sg-technique__rail { display: grid !important; gap: 10px; min-width: 0; align-content: start; }
+    .fx-tecnicas-host .sg-technique__main { min-width: 0; }
+    .fx-tecnicas-host .sg-technique__text { column-count: auto !important; }
+    @media (max-width: 760px) {
+      .fx-tecnicas-host .sg-technique__layout { grid-template-columns: 1fr !important; }
+    }
 
     @media (max-width: 620px) {
       .fx-hero__body { grid-template-columns: 1fr; margin-top: -52px; }
@@ -323,19 +493,19 @@
   <main class="fx">
     <div class="fx-shell">
 
+
       <!-- ═══ HERO ═══ -->
       <section class="fx-hero">
         <div class="fx-hero__banner <if $is_owner then>sg-profile-editable</if>" style="background-image: url({$ficha['banner']});" <if $is_owner then>onclick="openProfileAssetModal('banner')"</if>></div>
         <div class="fx-hero__scrim"></div>
+        <div class="fx-hero__file">Exp. Nº {$ficha['fid']} · Clasificado</div>
+        <div class="fx-hero__stamp" aria-hidden="true">
+          <span class="fx-hero__stamp-k">Rango</span>
+          <strong>{$ficha['rango']}</strong>
+          <span class="fx-hero__stamp-e">{$sgEstado}</span>
+        </div>
+        <div class="fx-hero__tate" aria-hidden="true">忍</div>
         <div class="fx-hero__body">
-          <div class="fx-avatar <if $is_owner then>sg-profile-editable</if>" <if $is_owner then>onclick="openProfileAssetModal('avatar')"</if>>
-            <if $avatar then>
-              <img src="{$avatar}" alt="Avatar de {$ficha['nombre']}">
-            <else>
-              <img src="/images/default_avatar.png" alt="Avatar por defecto">
-            </if>
-          </div>
-
           <div class="fx-identity">
             <div class="fx-identity__village">{$sgFichaThemeLabel}</div>
             <span class="fx-identity__accent"></span>
@@ -351,6 +521,19 @@
                 <span class="fx-week__tip" id="sg-week-tip">Calculando…</span>
               </div>
             </div>
+            <if $sgNivelMax then>
+              <div class="fx-levelbar fx-levelbar--max"><span>Nivel máximo alcanzado</span></div>
+            <else>
+              <div class="fx-levelbar">
+                <div class="fx-levelbar__head">
+                  <span class="fx-levelbar__lvl">Nivel {$ficha['nivel']}</span>
+                  <span class="fx-levelbar__next">→ Nivel {$sgNivelSig}</span>
+                  <span class="fx-levelbar__pct">{$sgNivelPct}%</span>
+                </div>
+                <div class="fx-levelbar__track"><div class="fx-levelbar__fill" data-pct="{$sgNivelPct}" style="width:0"></div></div>
+                <div class="fx-levelbar__meta">Faltan {$sgXpFaltan} XP para subir de nivel</div>
+              </div>
+            </if>
           </div>
 
           <div class="fx-actions">
@@ -368,21 +551,22 @@
 
       <!-- ═══ PESTAÑAS ═══ -->
       <input class="fx-radio" type="radio" name="fxtab" id="fx-dossier" checked>
-      <input class="fx-radio" type="radio" name="fxtab" id="fx-combate">
+      <input class="fx-radio" type="radio" name="fxtab" id="fx-inventario">
       <input class="fx-radio" type="radio" name="fxtab" id="fx-tecnicas">
       <input class="fx-radio" type="radio" name="fxtab" id="fx-perfil">
 
       <nav class="fx-tabs" role="tablist" aria-label="Secciones de la ficha">
         <label class="fx-tab" for="fx-dossier"><span class="fx-tab__gem"></span>Expediente</label>
         <label class="fx-tab" for="fx-perfil"><span class="fx-tab__gem"></span>Trasfondo</label>
-        <label class="fx-tab" for="fx-combate"><span class="fx-tab__gem"></span>Combate</label>
         <label class="fx-tab" for="fx-tecnicas"><span class="fx-tab__gem"></span>Técnicas</label>
+        <label class="fx-tab" for="fx-inventario"><span class="fx-tab__gem"></span>Inventario</label>
       </nav>
 
       <div class="fx-panels">
 
         <!-- ── DOSSIER ── -->
         <section class="fx-panel fx-panel--dossier" role="tabpanel">
+          <div class="fx-margin" style="bottom: 10px; left: 16px;">Objetivo verificado en campo.</div>
           <div class="fx-layout">
             <div class="fx-photo <if $is_owner then>fx-photo--edit</if>" <if $is_owner then>onclick="openProfileAssetModal('foto_expediente')"</if>>
               <div class="fx-photo__rod"></div>
@@ -423,6 +607,46 @@
                 </div>
               </div>
 
+              <div class="fx-card">
+                <div class="fx-card__head"><span class="fx-card__title">Constantes</span></div>
+                <div class="fx-card__body">
+                  <div class="fx-gauges">
+                    <div class="fx-gauge">
+                      <div class="fx-gauge__top"><span class="fx-gauge__k">Vida</span><span class="fx-gauge__v">{$ficha['vida']} <small>/ {$vida} base</small></span></div>
+                      <div class="fx-bar fx-bar--vida" style="--fill: {$sgVidaBar}%"></div>
+                    </div>
+                    <div class="fx-gauge">
+                      <div class="fx-gauge__top"><span class="fx-gauge__k">Chakra</span><span class="fx-gauge__v">{$ficha['chakra']} <small>/ {$chakra} base</small></span></div>
+                      <div class="fx-bar fx-bar--chakra" style="--fill: {$sgChakraBar}%"></div>
+                    </div>
+                    <div class="fx-gauge">
+                      <div class="fx-gauge__top"><span class="fx-gauge__k">Reg. de Chakra</span><span class="fx-gauge__v">{$regC}</span></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="fx-card">
+                <div class="fx-card__head"><span class="fx-card__title">Estadísticas</span></div>
+                <div class="fx-card__body">
+                  <div class="fx-statwrap">
+                  <canvas id="fx-radar" class="fx-radar" width="220" height="220"
+                    data-vals="{$ficha['fuerza']},{$ficha['destreza']},{$ficha['cchakra']},{$ficha['inteligencia']}"
+                    data-labels="FUE,DES,CHK,INT" aria-label="Radar de estadísticas"></canvas>
+                  <div class="fx-stats">
+                    <div class="fx-stat"><span class="fx-stat__mod">{$ficha['mfuerza']}</span><div class="fx-stat__v">{$ficha['fuerza']}</div><div class="fx-stat__k">Fuerza</div></div>
+                    <div class="fx-stat"><span class="fx-stat__mod">{$ficha['mdestreza']}</span><div class="fx-stat__v">{$ficha['destreza']}</div><div class="fx-stat__k">Destreza</div></div>
+                    <div class="fx-stat"><span class="fx-stat__mod">{$ficha['mcchakra']}</span><div class="fx-stat__v">{$ficha['cchakra']}</div><div class="fx-stat__k">Ctrl. Chakra</div></div>
+                    <div class="fx-stat"><span class="fx-stat__mod">{$ficha['minteligencia']}</span><div class="fx-stat__v">{$ficha['inteligencia']}</div><div class="fx-stat__k">Inteligencia</div></div>
+                    <div class="fx-stat"><div class="fx-stat__v">{$ficha['salud']}</div><div class="fx-stat__k">Salud</div></div>
+                    <div class="fx-stat"><div class="fx-stat__v">{$ficha['velocidad']}</div><div class="fx-stat__k">Velocidad</div></div>
+                    <div class="fx-stat"><div class="fx-stat__v">{$ficha['tenketsu']}</div><div class="fx-stat__k">Tenketsu</div></div>
+                    <div class="fx-stat"><div class="fx-stat__v">{$ficha['sigilo']}</div><div class="fx-stat__k">Sigilo</div></div>
+                  </div>
+                  </div>
+                </div>
+              </div>
+
               <if $sgFichaCanViewStaffNotes then>
               <div class="fx-card">
                 <div class="fx-card__head"><span class="fx-card__title">Anotaciones de Staff</span><span class="fx-pill">Privado</span></div>
@@ -435,84 +659,64 @@
           </div>
         </section>
 
-        <!-- ── COMBATE ── -->
-        <section class="fx-panel fx-panel--combate" role="tabpanel">
-          <div class="fx-layout">
-            <div class="fx-photo <if $is_owner then>fx-photo--edit</if>" <if $is_owner then>onclick="openProfileAssetModal('foto_combate')"</if>>
-              <div class="fx-photo__rod"></div>
-              <div class="fx-photo__frame">
-                <if $sgFotoCombate then><img src="{$sgFotoCombate}" alt="Pose de combate de {$ficha['nombre']}">
-                <else><div class="fx-photo__empty"><span>Sin imagen</span></div></if>
-                <if $is_owner then><div class="fx-photo__hint">Pulsa para cambiar</div></if>
-                <div class="fx-photo__seal">戦</div>
-              </div>
-              <div class="fx-photo__rod fx-photo__rod--b"></div>
-              <div class="fx-photo__cap">Pose de combate</div>
-            </div>
-
-            <div class="fx-stack">
-              <div class="fx-card">
-                <div class="fx-card__head"><span class="fx-card__title">Constantes</span></div>
-                <div class="fx-card__body">
-                  <div class="fx-gauges">
-                    <div class="fx-gauge">
-                      <div class="fx-gauge__top"><span class="fx-gauge__k">Vida</span><span class="fx-gauge__v">{$ficha['vida']} <small>/ {$vida} base</small></span></div>
-                      <div class="fx-bar" style="--fill: {$sgVidaBar}%"></div>
-                    </div>
-                    <div class="fx-gauge">
-                      <div class="fx-gauge__top"><span class="fx-gauge__k">Chakra</span><span class="fx-gauge__v">{$ficha['chakra']} <small>/ {$chakra} base</small></span></div>
-                      <div class="fx-bar" style="--fill: {$sgChakraBar}%"></div>
-                    </div>
-                    <div class="fx-gauge">
-                      <div class="fx-gauge__top"><span class="fx-gauge__k">Reg. de Chakra</span><span class="fx-gauge__v">{$regC}</span></div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div class="fx-card">
-                <div class="fx-card__head"><span class="fx-card__title">Estadísticas</span></div>
-                <div class="fx-card__body">
-                  <div class="fx-stats">
-                    <div class="fx-stat"><span class="fx-stat__mod">{$ficha['mfuerza']}</span><div class="fx-stat__v">{$ficha['fuerza']}</div><div class="fx-stat__k">Fuerza</div></div>
-                    <div class="fx-stat"><span class="fx-stat__mod">{$ficha['mdestreza']}</span><div class="fx-stat__v">{$ficha['destreza']}</div><div class="fx-stat__k">Destreza</div></div>
-                    <div class="fx-stat"><span class="fx-stat__mod">{$ficha['mcchakra']}</span><div class="fx-stat__v">{$ficha['cchakra']}</div><div class="fx-stat__k">Ctrl. Chakra</div></div>
-                    <div class="fx-stat"><span class="fx-stat__mod">{$ficha['minteligencia']}</span><div class="fx-stat__v">{$ficha['inteligencia']}</div><div class="fx-stat__k">Inteligencia</div></div>
-                    <div class="fx-stat"><div class="fx-stat__v">{$ficha['salud']}</div><div class="fx-stat__k">Salud</div></div>
-                    <div class="fx-stat"><div class="fx-stat__v">{$ficha['velocidad']}</div><div class="fx-stat__k">Velocidad</div></div>
-                    <div class="fx-stat"><div class="fx-stat__v">{$ficha['tenketsu']}</div><div class="fx-stat__k">Tenketsu</div></div>
-                    <div class="fx-stat"><div class="fx-stat__v">{$ficha['sigilo']}</div><div class="fx-stat__k">Sigilo</div></div>
-                  </div>
-                </div>
-              </div>
-            </div>
+        <!-- ── INVENTARIO (próximamente) ── -->
+        <section class="fx-panel fx-panel--inventario" role="tabpanel">
+          <div class="fx-inv-empty">
+            <div class="fx-inv-empty__k" aria-hidden="true">蔵</div>
+            <div class="fx-inv-empty__t">Inventario</div>
+            <p class="fx-inv-empty__p">Esta sección estará disponible próximamente.</p>
+            <a class="fx-action" href="/sg/inventario.php?uid={$ficha['fid']}">Ver inventario completo</a>
           </div>
         </section>
 
         <!-- ── TÉCNICAS ── -->
         <section class="fx-panel fx-panel--tecnicas" role="tabpanel">
-          <div class="fx-layout">
-            <div class="fx-photo <if $is_owner then>fx-photo--edit</if>" <if $is_owner then>onclick="openProfileAssetModal('foto_tecnicas')"</if>>
-              <div class="fx-photo__rod"></div>
-              <div class="fx-photo__frame">
-                <if $sgFotoTecnicas then><img src="{$sgFotoTecnicas}" alt="Técnica de {$ficha['nombre']}">
-                <else><div class="fx-photo__empty"><span>Sin imagen</span></div></if>
-                <if $is_owner then><div class="fx-photo__hint">Pulsa para cambiar</div></if>
-                <div class="fx-photo__seal">術</div>
-              </div>
-              <div class="fx-photo__rod fx-photo__rod--b"></div>
-              <div class="fx-photo__cap">Sello de técnica</div>
-            </div>
+          <div class="fx-margin" style="bottom: 10px; left: 16px;">Repertorio confirmado.</div>
+          <div class="fx-tecnicas-host">
+              <section class="sg-profile-private">
+                <div class="sg-profile-panel sg-profile-panel--techniques">
+                  <div class="sg-profile-panel__head">
+                    <h2>Técnicas y Progreso</h2>
+                    <span class="sg-profile-meta-pill">Sección pública</span>
+                  </div>
+                  <div class="sg-profile-panel__body sg-profile-private-stack">
 
-            <div class="fx-tecnicas-host">
-              {$fichaprivate}
+                    <div class="sg-profile-panel sg-profile-panel--inner">
+                      <div class="sg-profile-panel__head">
+                        <h3>Técnicas Aprendidas</h3>
+                      </div>
+                      <div class="sg-profile-panel__body">
+                        <div class="sg-profile-techniques-toolbar">
+                          <div class="sg-profile-techniques-toolbar__meta">
+                            <span class="sg-profile-techniques-toolbar__eyebrow">Biblioteca</span>
+                            <strong id="sg-profile-technique-count">0 técnicas</strong>
+                          </div>
+                          <button type="button" id="sg-profile-filter-toggle" class="sg-profile-filter-toggle" onclick="sgFichaToggleTechniqueFilters()">
+                            Filtro
+                          </button>
+                        </div>
+                        <div id="sg-profile-technique-filters" class="sg-profile-technique-filters" aria-hidden="true">
+                          <div class="sg-profile-technique-filters__grid">
+                            <input type="text" id="sg-profile-technique-search" class="sg-profile-technique-search" placeholder="Buscar por nombre, ID o árbol" oninput="sgFichaApplyTechniqueFilters()">
+                            <select id="sg-profile-technique-family" class="sg-profile-technique-select" onchange="sgFichaApplyTechniqueFilters()">
+                              <option value="">Todos los árboles</option>
+                            </select>
+                          </div>
+                        </div>
+                        <div id="sg-profile-techniques" class="sg-profile-techniques"></div>
+                      </div>
+                    </div>
+
+                    {$ficha_script}
+                  </div>
+                </div>
+              </section>
             </div>
-          </div>
         </section>
 
-        <!-- ── PERFIL ── -->
+        <!-- ── PERFIL / TRASFONDO ── -->
         <section class="fx-panel fx-panel--perfil" role="tabpanel">
-          <div class="fx-layout">
+          <div class="fx-trasfondo">
             <div class="fx-photo <if $is_owner then>fx-photo--edit</if>" <if $is_owner then>onclick="openProfileAssetModal('foto_perfil')"</if>>
               <div class="fx-photo__rod"></div>
               <div class="fx-photo__frame">
@@ -525,20 +729,32 @@
               <div class="fx-photo__cap">Semblanza</div>
             </div>
 
-            <div class="fx-stack">
-              <div class="fx-card">
-                <div class="fx-card__head"><span class="fx-card__title">Biografía</span></div>
-                <div class="fx-card__body"><div class="fx-prose">{$historia}</div></div>
-              </div>
+            <div class="fx-bio">
+              <div class="fx-bio-head"><span class="fx-card__title">Biografía</span></div>
+              <div class="fx-prose">{$historia}</div>
+            </div>
 
+            <div class="fx-clear"></div>
+
+            <div class="fx-stack">
               <div class="fx-traits">
-                <div class="fx-card">
+                <div class="fx-card fx-card--virtues">
                   <div class="fx-card__head"><span class="fx-card__title">Virtudes</span></div>
-                  <div class="fx-card__body"><div class="fx-prose">{$virtudes}</div></div>
+                  <div class="fx-card__body">
+                    <!-- Texto libre: en desuso, se eliminará cuando la lista de abajo lo reemplace por completo -->
+                    <div class="fx-prose">{$virtudes}</div>
+                    <div class="fx-vt-note">Asignadas ({$nVirtudesAuto})</div>
+                    <div class="fx-vt-list">{$virtudesAutoHtml}</div>
+                  </div>
                 </div>
-                <div class="fx-card">
+                <div class="fx-card fx-card--defects">
                   <div class="fx-card__head"><span class="fx-card__title">Defectos</span></div>
-                  <div class="fx-card__body"><div class="fx-prose">{$defectos}</div></div>
+                  <div class="fx-card__body">
+                    <!-- Texto libre: en desuso, se eliminará cuando la lista de abajo lo reemplace por completo -->
+                    <div class="fx-prose">{$defectos}</div>
+                    <div class="fx-vt-note">Asignados ({$nDefectosAuto})</div>
+                    <div class="fx-vt-list">{$defectosAutoHtml}</div>
+                  </div>
                 </div>
               </div>
 
@@ -552,14 +768,23 @@
                 <div class="fx-card__body"><div class="fx-prose">{$personalidad}</div></div>
               </div>
 
-              <div class="fx-card">
-                <div class="fx-card__head"><span class="fx-card__title">Frase y Extras</span></div>
-                <div class="fx-card__body">
-                  <div class="fx-prose">
-                    <if $frase then><p class="fx-prose--lead">{$frase}</p></if>
-                    <if $extra then><p>{$extra}</p></if>
+              <div class="fx-traits">
+                <div class="fx-card">
+                  <div class="fx-card__head"><span class="fx-card__title">Frase</span></div>
+                  <div class="fx-card__body">
+                    <div class="fx-prose">
+                      <if $frase then><p class="fx-prose--lead">{$frase}</p></if>
+                    </div>
                   </div>
-                  <if $ficha['fisico_de_pj'] then><div class="fx-origin">Origen físico del personaje: {$ficha['fisico_de_pj']}</div></if>
+                </div>
+                <div class="fx-card">
+                  <div class="fx-card__head"><span class="fx-card__title">Extras</span></div>
+                  <div class="fx-card__body">
+                    <div class="fx-prose">
+                      <if $extra then><p>{$extra}</p></if>
+                    </div>
+                    <if $ficha['fisico_de_pj'] then><div class="fx-origin">Origen físico del personaje: {$ficha['fisico_de_pj']}</div></if>
+                  </div>
                 </div>
               </div>
             </div>
@@ -571,11 +796,8 @@
   </main>
 
   <form id="sg-profile-asset-form" method="post" action="{$mybb->settings['bburl']}/sg/ficha.php?uid={$ficha['fid']}" style="display:none;">
-    <input type="hidden" id="in-avatar" name="cambiar_avatar1" value="">
     <input type="hidden" id="in-banner" name="cambiar_avatar2" value="">
     <input type="hidden" id="in-foto_expediente" name="cambiar_foto_expediente" value="">
-    <input type="hidden" id="in-foto_combate" name="cambiar_foto_combate" value="">
-    <input type="hidden" id="in-foto_tecnicas" name="cambiar_foto_tecnicas" value="">
     <input type="hidden" id="in-foto_perfil" name="cambiar_foto_perfil" value="">
   </form>
 
@@ -602,12 +824,9 @@
     var sgProfileState = { currentAsset: '' };
 
     var sgAssetCopy = {
-      avatar:  ['Editar avatar', 'La imagen del avatar debe funcionar bien en formato vertical. Se recomienda una composición clara y centrada.'],
-      banner:  ['Editar banner', 'El banner debe funcionar en formato panorámico para la cabecera principal de la ficha.'],
-      foto_expediente:  ['Retrato oficial', 'Imagen vertical para el dossier. Idealmente un retrato tipo ficha.'],
-      foto_combate:  ['Pose de combate', 'Imagen vertical que muestre al personaje en acción o pose de combate.'],
-      foto_tecnicas: ['Sello de técnica', 'Imagen vertical: una técnica, sello o pose de manos característica.'],
-      foto_perfil:   ['Semblanza', 'Imagen vertical de retrato: apariencia o personalidad del personaje.']
+      banner:  ['Editar banner', 'Formato panorámico para la cabecera de la ficha. Tamaño recomendado: 1200 × 300 px.'],
+      foto_expediente:  ['Retrato oficial', 'Imagen vertical tipo ficha. Tamaño recomendado: 400 × 520 px (proporción 3:4).'],
+      foto_perfil:   ['Semblanza', 'Imagen vertical de retrato. Tamaño recomendado: 400 × 520 px (proporción 3:4).']
     };
 
     function sgCreateSpoiler(config) {
@@ -677,7 +896,7 @@
       var value = urlInput.value.replace(/^\s+|\s+$/g, '');
       if (!value) { return; }
 
-      var ids = ['avatar','banner','foto_expediente','foto_combate','foto_tecnicas','foto_perfil'];
+      var ids = ['banner','foto_expediente','foto_perfil'];
       for (var i = 0; i < ids.length; i++) {
         var el = document.getElementById('in-' + ids[i]);
         if (el) { el.value = ''; }
@@ -713,6 +932,64 @@
     }
 
     window.addEventListener('load', sgWeekCountdown);
+
+    function sgFichaRadar() {
+      var c = document.getElementById('fx-radar');
+      if (!c || !c.getContext) { return; }
+      var raw = (c.getAttribute('data-vals') || '').split(',').map(function (x) { return parseFloat(x) || 0; });
+      if (raw.length < 3) { return; }
+      var labels = (c.getAttribute('data-labels') || '').split(',');
+      var n = raw.length;
+      var size = parseInt(c.getAttribute('width'), 10) || 240;
+      var dpr = window.devicePixelRatio || 1;
+      c.width = size * dpr; c.height = size * dpr;
+      c.style.width = size + 'px'; c.style.height = size + 'px';
+      var ctx = c.getContext('2d');
+      ctx.scale(dpr, dpr);
+
+      var cx = size / 2, cy = size / 2, R = size / 2 - 30;
+      var cs = getComputedStyle(document.documentElement);
+      var accent = (cs.getPropertyValue('--accent') || '#8e3145').trim();
+      var ink = (cs.getPropertyValue('--ink') || '#333').trim();
+      var grid = (cs.getPropertyValue('--mist') || '#aaa').trim();
+      var maxv = Math.max.apply(null, raw); if (maxv < 1) { maxv = 1; }
+
+      function pt(i, r) {
+        var a = -Math.PI / 2 + i * (2 * Math.PI / n);
+        return [cx + Math.cos(a) * r, cy + Math.sin(a) * r];
+      }
+
+      ctx.strokeStyle = grid; ctx.lineWidth = 0.5; ctx.globalAlpha = 0.35;
+      for (var g = 1; g <= 3; g++) {
+        ctx.beginPath();
+        for (var i = 0; i < n; i++) { var p = pt(i, R * g / 3); if (i === 0) { ctx.moveTo(p[0], p[1]); } else { ctx.lineTo(p[0], p[1]); } }
+        ctx.closePath(); ctx.stroke();
+      }
+      for (var i = 0; i < n; i++) { var pe = pt(i, R); ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(pe[0], pe[1]); ctx.stroke(); }
+      ctx.globalAlpha = 1;
+
+      ctx.beginPath();
+      for (var i = 0; i < n; i++) { var pv = pt(i, R * (raw[i] / maxv)); if (i === 0) { ctx.moveTo(pv[0], pv[1]); } else { ctx.lineTo(pv[0], pv[1]); } }
+      ctx.closePath();
+      ctx.fillStyle = accent; ctx.globalAlpha = 0.18; ctx.fill();
+      ctx.globalAlpha = 1; ctx.strokeStyle = accent; ctx.lineWidth = 1.5; ctx.stroke();
+
+      ctx.fillStyle = accent;
+      for (var i = 0; i < n; i++) { var pd = pt(i, R * (raw[i] / maxv)); ctx.beginPath(); ctx.arc(pd[0], pd[1], 2, 0, Math.PI * 2); ctx.fill(); }
+
+      ctx.fillStyle = ink; ctx.font = '9px Cinzel, serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      for (var i = 0; i < n; i++) { var pl = pt(i, R + 15); ctx.fillText(labels[i], pl[0], pl[1]); }
+    }
+
+    window.addEventListener('load', sgFichaRadar);
+
+    function sgFichaLevelBar() {
+      var f = document.querySelector('.fx-levelbar__fill');
+      if (!f) { return; }
+      var pct = parseFloat(f.getAttribute('data-pct')) || 0;
+      requestAnimationFrame(function () { requestAnimationFrame(function () { f.style.width = pct + '%'; }); });
+    }
+    window.addEventListener('load', sgFichaLevelBar);
   </script>
 </body>
 </html>
