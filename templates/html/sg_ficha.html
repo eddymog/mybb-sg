@@ -561,11 +561,89 @@
 
     /* ── Inventario (pestaña) ─────────────────────────────────── */
     .fx-inv { position: relative; z-index: 1; }
-    .fx-inv-head { display: flex; align-items: baseline; gap: 12px; margin-bottom: 18px; }
+    .fx-inv-head { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 14px; margin-bottom: 16px; }
     .fx-inv-eyebrow { font-family: 'Cinzel', serif; font-size: 12px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; color: var(--accent); }
     .fx-inv-count { font-family: 'Cinzel', serif; font-size: 9px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: var(--mist); }
+    .fx-inv-viewbtn {
+      margin-left: auto; height: 34px; padding: 0 14px;
+      background: var(--card); border: 1px solid var(--border-strong); color: var(--accent);
+      font-family: 'Cinzel', serif; font-size: 9px; font-weight: 700; letter-spacing: 1.4px; text-transform: uppercase;
+      cursor: pointer; white-space: nowrap; transition: color .15s ease, border-color .15s ease, background .15s ease;
+    }
+    .fx-inv-viewbtn:hover { color: var(--ink); border-color: var(--accent); background: var(--accent-soft); }
+    .fx-inv-search {
+      width: 220px; max-width: 100%; height: 34px; padding: 0 12px;
+      background: var(--card); border: 1px solid var(--border-strong); color: var(--ink);
+      font-family: 'Noto Serif JP', serif; font-size: 14px; box-sizing: border-box;
+    }
+    .fx-inv-search:focus { outline: none; border-color: var(--accent); }
+
+    .fx-inv-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
+    .fx-inv-chip {
+      padding: 6px 12px; background: var(--card); border: 1px solid var(--border-strong); color: var(--stone);
+      font-family: 'Cinzel', serif; font-size: 9px; font-weight: 700; letter-spacing: 1.3px; text-transform: uppercase;
+      cursor: pointer; transition: color .15s ease, border-color .15s ease, background .15s ease;
+    }
+    .fx-inv-chip:hover { color: var(--ink); border-color: var(--accent); }
+    .fx-inv-chip.is-active { color: var(--ink); background: var(--accent-soft); border-color: var(--accent); }
+    .fx-inv-chip-n { margin-left: 5px; padding: 1px 5px; font-size: 8px; color: var(--mist); background: rgba(0,0,0,0.22); }
+    .fx-inv-chip.is-active .fx-inv-chip-n { color: var(--accent); }
+
+    .fx-inv-noresults { display: none; margin-top: 12px; padding: 30px 20px; text-align: center; color: var(--mist); font-size: 14px; border: 1px solid var(--border); background: var(--card); }
 
     .fx-inv-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 16px; }
+
+    .fx-inv-main { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+    .fx-inv-detail { display: none; }
+
+    /* Vista detalle: menos columnas, todos los campos visibles */
+    .fx-inv-grid.is-detail { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+    .fx-inv-grid.is-detail .fx-inv-tile { cursor: default; background: var(--card); border: 1px solid var(--border); padding: 12px; }
+    .fx-inv-grid.is-detail .fx-inv-thumb { max-width: 200px; align-self: center; }
+    .fx-inv-grid.is-detail .fx-inv-tile:hover .fx-inv-thumb, .fx-inv-grid.is-detail .fx-inv-tile:focus-visible .fx-inv-thumb {
+      transform: none; box-shadow: none; border-color: var(--border);
+    }
+    .fx-inv-grid.is-detail .fx-inv-name { -webkit-line-clamp: unset; line-clamp: unset; overflow: visible; font-size: 14px; }
+    .fx-inv-grid.is-detail .fx-inv-detail { display: flex; flex-direction: column; gap: 10px; }
+    /* Descripción colapsable (solo en vista detalle) */
+    .fx-inv-grid.is-detail .fx-inv-modal-desc {
+      display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; line-clamp: 3; overflow: hidden; white-space: normal;
+    }
+    .fx-inv-grid.is-detail .fx-inv-modal-desc.is-expanded { -webkit-line-clamp: unset; line-clamp: unset; overflow: visible; white-space: pre-wrap; }
+    .fx-inv-desc-toggle {
+      align-self: flex-start; margin-top: -4px; padding: 0; background: none; border: none; cursor: pointer;
+      font-family: 'Cinzel', serif; font-size: 8px; font-weight: 700; letter-spacing: 1.3px; text-transform: uppercase; color: var(--accent);
+    }
+    @media (max-width: 760px) { .fx-inv-grid.is-detail { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+    @media (max-width: 520px) { .fx-inv-grid.is-detail { grid-template-columns: 1fr; } }
+
+    /* Vender (dentro del modal) */
+    .fx-inv-sell { margin-top: 2px; padding-top: 12px; border-top: 1px solid var(--border); display: flex; flex-direction: column; gap: 8px; }
+    .fx-inv-sell-price { font-family: 'Cinzel', serif; font-size: 10px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: var(--accent); }
+    .fx-inv-sell-form { display: flex; gap: 8px; }
+    .fx-inv-sell-qty {
+      width: 64px; height: 38px; padding: 4px 8px; background: var(--card); border: 1px solid var(--border-strong);
+      color: var(--ink); font-family: 'Noto Serif JP', serif; font-size: 14px; text-align: center; box-sizing: border-box;
+    }
+    .fx-inv-sell-qty:focus { outline: none; border-color: var(--accent); }
+    .fx-inv-sell-btn {
+      flex: 1; display: inline-flex; align-items: center; justify-content: center; height: 38px; padding: 0 16px;
+      background: var(--accent); border: none; color: #fff; font-family: 'Cinzel', serif; font-size: 9px; font-weight: 700;
+      letter-spacing: 1.5px; text-transform: uppercase; cursor: pointer; transition: opacity .15s ease;
+    }
+    .fx-inv-sell-btn:hover { opacity: 0.9; }
+    .fx-inv-sell-btn:disabled { opacity: 0.6; cursor: default; }
+    .fx-inv-sell-total { font-size: 12px; color: var(--stone); }
+    .fx-inv-sell-confirm { display: flex; flex-direction: column; gap: 10px; }
+    .fx-inv-sell-confirm-msg { font-size: 13px; color: var(--ink); line-height: 1.5; }
+    .fx-inv-sell-confirm-row { display: flex; gap: 8px; }
+    .fx-inv-sell-cancel {
+      flex: 1; height: 38px; background: none; border: 1px solid var(--border-strong); color: var(--stone);
+      font-family: 'Cinzel', serif; font-size: 9px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; cursor: pointer;
+    }
+    .fx-inv-sell-cancel:hover { color: var(--ink); border-color: var(--accent); }
+    .fx-inv-sell-ok { font-size: 13px; font-weight: 700; color: var(--accent); }
+    .fx-inv-sell-error { font-size: 13px; color: #e08a7a; }
 
     .fx-inv-tile {
       display: flex; flex-direction: column; gap: 8px;
@@ -722,7 +800,7 @@
                   <div class="fx-res">
                     <div class="fx-res__cell"><div class="fx-res__v">{$ficha['rin']}</div><div class="fx-res__k">Rins</div></div>
                     <div class="fx-res__cell"><div class="fx-res__v">{$ficha['tobi']}</div><div class="fx-res__k">Tobis</div></div>
-                    <div class="fx-res__cell"><div class="fx-res__v">{$ficha['ryos']}</div><div class="fx-res__k">Ryos</div></div>
+                    <div class="fx-res__cell"><div class="fx-res__v" id="fx-inv-ryos">{$ficha['ryos']}</div><div class="fx-res__k">Ryos</div></div>
                     <div class="fx-res__cell"><div class="fx-res__v">{$sgBingoShow}</div><div class="fx-res__k">Bingo</div></div>
                   </div>
                 </div>
@@ -871,9 +949,13 @@
             <div class="fx-inv">
               <div class="fx-inv-head">
                 <span class="fx-inv-eyebrow">Inventario</span>
-                <span class="fx-inv-count">{$sgInventarioCount} objetos</span>
+                <span class="fx-inv-count" id="fx-inv-count">{$sgInventarioCount} objetos</span>
+                <button class="fx-inv-viewbtn" id="fx-inv-viewbtn" type="button" onclick="fxInvToggleView()">Vista detalle</button>
+                <input class="fx-inv-search" id="fx-inv-search" type="text" placeholder="Buscar objeto, tipo o efecto…" oninput="fxInvFilter()">
               </div>
+              <div class="fx-inv-chips" id="fx-inv-chips">{$sgInvChipsHtml}</div>
               <div class="fx-inv-grid" id="fx-inv-grid">{$sgInventarioHtml}</div>
+              <div class="fx-inv-noresults" id="fx-inv-noresults">Ningún objeto coincide con la búsqueda.</div>
             </div>
           <else>
             <div class="fx-inv-empty">

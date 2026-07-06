@@ -646,15 +646,20 @@ if ($ficha_existe == true && ($moderated == true || (is_mod($s_uid) || is_staff(
     
     eval('$tec_aprendidas = "'.addslashes($tec_aprendidas_json).'";');
     eval('$sgFichaCanViewStaffNotes = "'.$can_view_staff_notes.'";');
+    // Solo el dueño (viendo su propia ficha, logueado) puede vender del inventario.
+    // Se define antes del script porque sg_ficha_script lo usa como bandera JS.
+    $sgInvPuedeVender = ($is_owner && intval($mybb->user['uid']) > 0) ? 'true' : 'false';
     eval("\$ficha_script = \"".$templates->get("sg_ficha_script")."\";");
 
     // ── Inventario del personaje (pestaña Inventario) ─────────────
     $inv_default_img = '/images/sg/objeto_default.png';
     $inv_html = '';
     $inv_count = 0;
+    $inv_tipos = array();   // tipos distintos, en orden, para los chips
+    $inv_conteo = array();  // nº de objetos por tipo
     $q_inv = $db->query("
         SELECT o.objeto_id, o.nombre, o.tipo, o.tamano, o.municion, o.descripcion,
-               o.efecto1, o.efecto2, o.efecto3, o.imagen, i.cantidad
+               o.efecto1, o.efecto2, o.efecto3, o.imagen, o.coste, i.cantidad
         FROM mybb_sg_sg_inventario i
         INNER JOIN mybb_sg_sg_objetos o ON o.objeto_id = i.objeto_id
         WHERE i.uid = '$uid' AND i.cantidad > 0
@@ -662,8 +667,10 @@ if ($ficha_existe == true && ($moderated == true || (is_mod($s_uid) || is_staff(
     ");
     while ($it = $db->fetch_array($q_inv)) {
         $inv_count++;
-        $i_nombre = htmlspecialchars($it['nombre'], ENT_QUOTES);
-        $i_tipo   = trim($it['tipo']) !== '' ? htmlspecialchars($it['tipo'], ENT_QUOTES) : 'Otros';
+        $i_tipo_disp = trim($it['tipo']) !== '' ? $it['tipo'] : 'Otros';
+        $i_nombre    = htmlspecialchars($it['nombre'], ENT_QUOTES);
+        $i_tipolabel = htmlspecialchars($i_tipo_disp, ENT_QUOTES);
+        $i_data_tipo = htmlspecialchars(strtolower($i_tipo_disp), ENT_QUOTES);
         $i_tam    = htmlspecialchars($it['tamano'], ENT_QUOTES);
         $i_mun    = htmlspecialchars($it['municion'], ENT_QUOTES);
         $i_desc   = htmlspecialchars($it['descripcion'], ENT_QUOTES);
@@ -671,19 +678,40 @@ if ($ficha_existe == true && ($moderated == true || (is_mod($s_uid) || is_staff(
         $i_ef2    = htmlspecialchars($it['efecto2'], ENT_QUOTES);
         $i_ef3    = htmlspecialchars($it['efecto3'], ENT_QUOTES);
         $i_cant   = intval($it['cantidad']);
+        $i_oid    = htmlspecialchars($it['objeto_id'], ENT_QUOTES);
+        $i_coste  = intval($it['coste']);
+        $i_sell   = ($i_coste >= 99999) ? 0 : (int) floor($i_coste * 0.5); // venta = 50% del coste base
         $i_img    = trim($it['imagen']) !== '' ? htmlspecialchars($it['imagen'], ENT_QUOTES) : $inv_default_img;
+        $i_search = htmlspecialchars(strtolower(
+            $it['nombre'] . ' ' . $i_tipo_disp . ' ' . $it['tamano'] . ' ' . $it['descripcion'] . ' ' .
+            $it['efecto1'] . ' ' . $it['efecto2'] . ' ' . $it['efecto3']
+        ), ENT_QUOTES);
+
+        if (!isset($inv_conteo[$i_data_tipo])) { $inv_conteo[$i_data_tipo] = 0; $inv_tipos[] = array($i_tipolabel, $i_data_tipo); }
+        $inv_conteo[$i_data_tipo]++;
 
         $inv_html .= "<article class=\"fx-inv-tile\" tabindex=\"0\" role=\"button\" aria-label=\"$i_nombre\""
-            . " data-nombre=\"$i_nombre\" data-img=\"$i_img\" data-cant=\"$i_cant\" data-tipo=\"$i_tipo\""
+            . " data-nombre=\"$i_nombre\" data-img=\"$i_img\" data-cant=\"$i_cant\""
+            . " data-oid=\"$i_oid\" data-sell=\"$i_sell\""
+            . " data-tipo=\"$i_data_tipo\" data-tipolabel=\"$i_tipolabel\" data-search=\"$i_search\""
             . " data-tamano=\"$i_tam\" data-municion=\"$i_mun\" data-desc=\"$i_desc\""
             . " data-ef1=\"$i_ef1\" data-ef2=\"$i_ef2\" data-ef3=\"$i_ef3\">"
             . "<div class=\"fx-inv-thumb\"><img class=\"fx-inv-img\" src=\"$i_img\" alt=\"$i_nombre\" loading=\"lazy\" onerror=\"fxInvImgFallback(this)\">"
             . "<span class=\"fx-inv-qty\">&times;$i_cant</span></div>"
-            . "<div class=\"fx-inv-name\">$i_nombre</div>"
+            . "<div class=\"fx-inv-main\"><div class=\"fx-inv-name\">$i_nombre</div><div class=\"fx-inv-detail\"></div></div>"
             . "</article>";
     }
+
+    // Chips de filtro por categoría (Todos + cada tipo distinto), con su conteo.
+    $inv_chips_html = "<button class=\"fx-inv-chip is-active\" type=\"button\" data-tipo=\"\" onclick=\"fxInvSetTipo(this)\">Todos <span class=\"fx-inv-chip-n\">$inv_count</span></button>";
+    foreach ($inv_tipos as $t) {
+        $tn = $inv_conteo[$t[1]];
+        $inv_chips_html .= "<button class=\"fx-inv-chip\" type=\"button\" data-tipo=\"{$t[1]}\" onclick=\"fxInvSetTipo(this)\">{$t[0]} <span class=\"fx-inv-chip-n\">$tn</span></button>";
+    }
+
     $sgInventarioHtml = $inv_html;
     $sgInventarioCount = $inv_count;
+    $sgInvChipsHtml = $inv_chips_html;
 
     eval("\$page = \"".$templates->get("sg_ficha")."\";");
     output_page($page);

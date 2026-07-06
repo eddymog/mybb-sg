@@ -181,7 +181,7 @@ while ($q = $db->fetch_array($query_objetos)) {
         $buy_html = "<div class=\"sg-buy-status sg-buy-status--no\">Ryos insuficientes</div>";
     } else {
         $buystate = 'ok'; $maxbuy = min($espacio, $afford);
-        $buy_html = "<form method=\"post\" action=\"/sg/tienda.php\" class=\"sg-buy\" onclick=\"event.stopPropagation();\">"
+        $buy_html = "<form method=\"post\" action=\"/sg/tienda.php\" class=\"sg-buy\" data-nombre=\"$nombre\" data-precio=\"$coste\" onclick=\"event.stopPropagation();\" onsubmit=\"return sgTiendaConfirm(this);\">"
             . "<input type=\"hidden\" name=\"accion\" value=\"comprar\">"
             . "<input type=\"hidden\" name=\"objeto\" value=\"$oid\">"
             . "<input class=\"sg-buy-qty\" type=\"number\" name=\"cantidad\" min=\"1\" max=\"$maxbuy\" value=\"1\" title=\"Cantidad (máx. $maxbuy)\">"
@@ -210,7 +210,7 @@ while ($q = $db->fetch_array($query_objetos)) {
         . " data-name=\"$data_name\" data-tipo=\"$data_tipo\" data-search=\"$data_search\""
         . " data-nombre=\"$nombre\" data-img=\"$img\" data-coste=\"$coste_label\""
         . " data-oid=\"$oid\" data-tamano=\"$tamano\" data-tipolabel=\"$tipo_esc\" data-municion=\"$municion\""
-        . " data-owned=\"$actual\" data-max=\"$maxq\" data-buystate=\"$buystate\" data-maxbuy=\"$maxbuy\""
+        . " data-owned=\"$actual\" data-max=\"$maxq\" data-buystate=\"$buystate\" data-maxbuy=\"$maxbuy\" data-precionum=\"$coste\""
         . " data-desc=\"$desc_attr\" data-ef1=\"$ef1\" data-ef2=\"$ef2\" data-ef3=\"$ef3\">"
         . "<div class=\"sg-obj-thumb\"><img class=\"sg-obj-img\" src=\"$img\" alt=\"$nombre\" loading=\"lazy\" onerror=\"sgImgFallback(this)\"></div>"
         . "<div class=\"sg-obj-main\"><div class=\"sg-obj-name\">$nombre</div>$gridbuy<div class=\"sg-obj-detail\"></div></div>"

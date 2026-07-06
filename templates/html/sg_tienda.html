@@ -724,6 +724,16 @@
       return idNode;
     }
 
+    // Paso de confirmación al comprar (global: lo usan el form de cuadrícula y el del modal).
+    function sgTiendaConfirm(form) {
+      var qtyEl = form.querySelector('[name=cantidad]');
+      var qty = parseInt(qtyEl ? qtyEl.value : '1', 10) || 1;
+      var nombre = form.getAttribute('data-nombre') || 'este objeto';
+      var precio = parseInt(form.getAttribute('data-precio'), 10) || 0;
+      var total = qty * precio;
+      return confirm('¿Comprar ' + qty + ' × "' + nombre + '" por ' + total + ' ryos?');
+    }
+
     // Control de compra: formulario (cantidad + Comprar) o estado (máximo / sin ryos).
     function sgBuyControl(d) {
       if (d.buystate === 'max') {
@@ -736,6 +746,9 @@
       form.className = 'sg-buy';
       form.method = 'post';
       form.action = '/sg/tienda.php';
+      form.setAttribute('data-nombre', d.nombre);
+      form.setAttribute('data-precio', d.precionum);
+      form.onsubmit = function () { return sgTiendaConfirm(form); };
       form.addEventListener('click', function (ev) { ev.stopPropagation(); });
       var hAccion = sgEl('input'); hAccion.type = 'hidden'; hAccion.name = 'accion'; hAccion.value = 'comprar';
       var hObj = sgEl('input'); hObj.type = 'hidden'; hObj.name = 'objeto'; hObj.value = d.oid;
