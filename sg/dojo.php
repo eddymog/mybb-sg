@@ -26,8 +26,10 @@ if (!does_ficha_exist($uid)) {
 }
 
 // ── Procesa la acción (POST) ──────────────────────────────────
-$msg = '';
-$msg_tipo = '';
+// Post/Redirect/Get: el resultado viaja por querystring para que un
+// refresh posterior sea un GET inofensivo y no reenvíe el POST (esto
+// importa sobre todo para la ruleta, que sí puede repetirse de verdad
+// si el mismo POST se reenvía con slots/Tobis suficientes).
 $action = isset($_POST['action']) ? trim($_POST['action']) : '';
 if ($action !== '' && $uid > 0) {
     $params = array(
@@ -37,11 +39,24 @@ if ($action !== '' && $uid > 0) {
         'mejoras' => (isset($_POST['mejoras']) && is_array($_POST['mejoras'])) ? $_POST['mejoras'] : array(),
     );
     $res = sg_dojo_aplicar_accion($db, $uid, $action, $params);
-    if ($res) {
-        $msg = $res['msg'];
-        $msg_tipo = $res['tipo'];
+
+    $redir = "dojo.php?resultado=" . urlencode($res['tipo']) . "&texto=" . urlencode($res['msg']);
+    if ($action === 'ruleta' && !empty($res['extra']['elemento'])) {
+        $redir .= "&elemento=" . urlencode($res['extra']['elemento']);
     }
+    header("Location: $redir");
+    exit;
 }
+
+// ── Resultado de la acción anterior (llega por GET tras el redirect) ──
+// Valores whitelisteados: 'resultado' y 'elemento' se interpolan en
+// contextos sensibles (clase CSS / string JS) más abajo en el template.
+$resultado_get = trim($mybb->get_input('resultado'));
+$msg_tipo = in_array($resultado_get, array('ok', 'error'), true) ? $resultado_get : '';
+$msg = ($msg_tipo !== '') ? htmlspecialchars(trim($mybb->get_input('texto')), ENT_QUOTES) : '';
+
+$elemento_get = trim($mybb->get_input('elemento'));
+$ruleta_elemento = in_array($elemento_get, sg_arboles_naturales(), true) ? $elemento_get : '';
 
 // ── Estado FRESCO para render ─────────────────────────────────
 $estado = sg_dojo_estado($db, $uid);
@@ -49,14 +64,6 @@ $prog   = $estado['progreso'];
 $costos = $estado['costos'];
 $tobi   = (int) $estado['tobi'];
 $nivel  = (int) $estado['nivel'];
-
-// Resultado de la ruleta: se revela en la animación, no en el banner.
-$ruleta_elemento = '';
-if ($action === 'ruleta' && isset($res) && is_array($res) && !empty($res['extra']['elemento'])) {
-    $ruleta_elemento = $res['extra']['elemento'];
-    $msg = '';
-    $msg_tipo = '';
-}
 
 // Nombres de técnicas para mostrar (un solo query).
 $tids_needed = array();
@@ -146,21 +153,31 @@ if (!empty($directos)) {
 $dojo_html .= "</section>";
 
 // ── Por cada árbol poseído ────────────────────────────────────
-$ramas_disp = (int) $prog['ramas_disponibles'];
-$nivelr_disp = (int) $prog['nivel_rama_disponibles'];
-$clan_arbol = $estado['clan']['arbol'];
-$clan_libre = !empty($estado['clan']['rama_gratis_disponible']);
+$nivelr_disp   = (int) $prog['nivel_rama_disponibles'];
+$clan_arboles  = isset($estado['clan']['arboles']) ? $estado['clan']['arboles'] : array();
+$clan_libre    = !empty($estado['clan']['rama_gratis_disponible']);
+$es_hibrido    = !empty($estado['clan']['es_hibrido']);
+$clan_ramas_n  = (int) $estado['clan']['ramas_desbloqueadas'];
+$clan_ramas_mx = (int) $estado['clan']['ramas_max'];
+$clan_espec_n  = (int) $estado['clan']['espec_aprendidas'];
+$clan_espec_mx = (int) $estado['clan']['espec_max'];
 
 foreach ($estado['arboles'] as $arbol => $ainfo) {
-    $es_clan = ($arbol === $clan_arbol);
+    $es_clan = in_array($arbol, $clan_arboles, true);
     $nivel_arbol = (int) $ainfo['nivel_arbol'];
 
     $dojo_html .= "<section class=\"sg-tree\">";
     $dojo_html .= "<div class=\"sg-tree-head\">";
-    $dojo_html .= "<div class=\"sg-tree-titles\"><span class=\"sg-tree-eyebrow\">Árbol".($es_clan ? " · Clan" : "")."</span>";
+    $eyebrow = "Árbol" . ($es_clan ? ($es_hibrido ? " · Clan (híbrido)" : " · Clan") : "");
+    $dojo_html .= "<div class=\"sg-tree-titles\"><span class=\"sg-tree-eyebrow\">".$eyebrow."</span>";
     $dojo_html .= "<h2 class=\"sg-tree-name\">".ucfirst($esc($arbol))."</h2></div>";
     $dojo_html .= "<span class=\"sg-tree-lvl\">Nivel ".$nivel_arbol." / 9</span>";
     $dojo_html .= "</div>";
+
+    // En híbrido, los dos árboles de clan comparten el tope de 3 ramas y 3 especialidades.
+    if ($es_clan && $es_hibrido) {
+        $dojo_html .= "<div class=\"sg-dnote sg-dnote--soft\">Clan compartido · Ramas ".$clan_ramas_n." / ".$clan_ramas_mx." · Especialidades ".$clan_espec_n." / ".$clan_espec_mx."</div>";
+    }
 
     // Ramas
     $dojo_html .= "<div class=\"sg-ramas\">";
@@ -201,18 +218,20 @@ foreach ($estado['arboles'] as $arbol => $ainfo) {
         } else if (!empty($r['desbloqueable'])) {
             $dojo_html .= "<span class=\"sg-rama-lvl sg-rama-lvl--lock\">Bloqueada</span></div>";
             $dojo_html .= "<div class=\"sg-rama-actions\">";
-            // Desbloquear (crédito o Tobis)
+            // Mientras no se use la rama de clan gratis, ese árbol NO se puede
+            // pagar con Tobis: primero hay que elegir la rama gratis.
+            $clan_pendiente = ($es_clan && (int) $prog['clan_rama_usada'] === 0);
             $hidden = array('arbol' => $arbol, 'rama' => $rama);
-            if ($ramas_disp > 0) {
-                $dojo_html .= $form_accion('rama', $hidden, "Desbloquear · gratis", true, 'free');
-            } else if ($tobi >= $costos['rama']) {
-                $dojo_html .= $form_accion('rama', $hidden, "Desbloquear · ".$costos['rama']." Tobis", true);
-            } else {
-                $dojo_html .= $form_accion('rama', $hidden, "Desbloquear · ".$costos['rama']." Tobis", false);
+            if (!$clan_pendiente) {
+                if ($tobi >= $costos['rama']) {
+                    $dojo_html .= $form_accion('rama', $hidden, "Desbloquear · ".$costos['rama']." Tobis", true);
+                } else {
+                    $dojo_html .= $form_accion('rama', $hidden, "Desbloquear · ".$costos['rama']." Tobis", false);
+                }
             }
-            // Rama de clan gratis (una vez)
+            // Rama de clan gratis (una vez). Sirve para cualquiera de los árboles de clan.
             if ($es_clan && $clan_libre) {
-                $dojo_html .= $form_accion('rama_clan', array('rama' => $rama), "Rama de clan · gratis", true, 'free');
+                $dojo_html .= $form_accion('rama_clan', array('arbol' => $arbol, 'rama' => $rama), "Rama de clan · gratis", true, 'free');
             }
             $dojo_html .= "</div>";
         }
@@ -225,8 +244,12 @@ foreach ($estado['arboles'] as $arbol => $ainfo) {
     $esp = $ainfo['especializaciones'];
     if ((int) $esp['cupo'] > 0) {
         $dojo_html .= "<div class=\"sg-espec\">";
+        // En híbrido el cupo es compartido entre los dos clanes: muestra el total.
+        $cupo_lbl = ($es_clan && $es_hibrido)
+            ? $clan_espec_n." / ".$clan_espec_mx." (clan)"
+            : $esp['aprendidas']." / ".$esp['cupo'];
         $dojo_html .= "<div class=\"sg-espec-head\"><span class=\"sg-espec-title\">Especializaciones</span>";
-        $dojo_html .= "<span class=\"sg-espec-cupo\">".$esp['aprendidas']." / ".$esp['cupo']."</span></div>";
+        $dojo_html .= "<span class=\"sg-espec-cupo\">".$cupo_lbl."</span></div>";
         if (!empty($esp['elegibles']) && (int) $esp['aprendidas'] < (int) $esp['cupo']) {
             $dojo_html .= "<div class=\"sg-dchips\">";
             foreach ($esp['elegibles'] as $etid) {

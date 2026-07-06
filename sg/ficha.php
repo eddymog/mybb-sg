@@ -45,6 +45,33 @@ function fx_virtud_card($r)
         . "</article>";
 }
 
+// Tarjeta SELECCIONABLE de virtud/defecto para la creación de ficha.
+// Cada tarjeta lleva el valor en puntos y su lista de incompatibles para que
+// el JS bloquee combinaciones inválidas y calcule el balance en vivo.
+function nf_vd_card($r, $incompat_map)
+{
+    $puntos = intval($r['puntos']);
+    $nombre = htmlspecialchars($r['nombre'], ENT_QUOTES);
+    $vid    = htmlspecialchars($r['virtud_id'], ENT_QUOTES);
+    $desc   = nl2br(htmlspecialchars($r['descripcion'], ENT_QUOTES));
+
+    $costo_lbl = ($puntos >= 0 ? '+' : '−') . abs($puntos);
+    $costo_cls = $puntos >= 0 ? 'nf-vd-pts--v' : 'nf-vd-pts--d';
+
+    $inc = isset($incompat_map[$r['virtud_id']]) ? $incompat_map[$r['virtud_id']] : array();
+    $inc_attr = htmlspecialchars(implode(',', $inc), ENT_QUOTES);
+
+    return "<label class=\"nf-vd-card\" data-vid=\"$vid\" data-pts=\"$puntos\" data-incompat=\"$inc_attr\">"
+        . "<input type=\"checkbox\" name=\"vd_sel[]\" value=\"$vid\">"
+        . "<span class=\"nf-vd-card-head\">"
+        . "<span class=\"nf-vd-card-name\">$nombre</span>"
+        . "<span class=\"nf-vd-pts $costo_cls\">$costo_lbl</span>"
+        . "</span>"
+        . "<span class=\"nf-vd-card-id\">$vid</span>"
+        . "<span class=\"nf-vd-card-desc\">$desc</span>"
+        . "</label>";
+}
+
 $uid = $mybb->get_input('uid');
 $action = $mybb->get_input('action');
 $module = $mybb->get_input('module'); 
@@ -188,11 +215,28 @@ if ($ficha_existe == true && ($moderated == true || (is_mod($s_uid) || is_staff(
         ");
     
         // clanes
+        $nombreClan = '';
         while ($c = $db->fetch_array($query_clan)) {
             $nombreClan = ucwords($c['nombreClan']);
             eval('$nClan = $nombreClan;');
             eval('$clan = $c;');
         }
+
+        // Clan Híbrido: si la ficha tiene clan2, se muestran ambos clanes.
+        // (clan2 es solo para el display; el dojo no lo usa.)
+        $sg_clan_label = $nombreClan;
+        $clan2_id = isset($f['clan2']) ? trim($f['clan2']) : '';
+        if ($clan2_id !== '' && $clan2_id !== '0' && $clan2_id !== '1001') {
+            $clan2_esc = $db->escape_string($clan2_id);
+            $q_clan2 = $db->query("SELECT nombreClan FROM mybb_sg_sg_clanes WHERE cid='$clan2_esc'");
+            while ($c2 = $db->fetch_array($q_clan2)) {
+                $nombre2 = ucwords($c2['nombreClan']);
+                if ($nombre2 !== '') {
+                    $sg_clan_label = ($sg_clan_label !== '') ? ($sg_clan_label . ' · ' . $nombre2) : $nombre2;
+                }
+            }
+        }
+        eval('$sgClanLabel = $sg_clan_label;');
     
         while ($v = $db->fetch_array($query_villa)) {
             $villa_color = '';
@@ -491,6 +535,7 @@ if ($ficha_existe == true && ($moderated == true || (is_mod($s_uid) || is_staff(
         $n_defectos_auto = 0;
         $sg_puntos_virtudes = 0; // suma de puntos de virtudes (positivos)
         $sg_puntos_defectos = 0; // suma de puntos de defectos (negativos)
+        $sg_bingo_mult = 1.0;    // Fama (+10%) / Impopularidad (−10%) sobre el Bingo
         $query_vt_auto = $db->query("
             SELECT v.virtud_id, v.nombre, v.puntos, v.exclusivo, v.descripcion
             FROM mybb_sg_sg_virtudes_usuarios vu
@@ -500,6 +545,8 @@ if ($ficha_existe == true && ($moderated == true || (is_mod($s_uid) || is_staff(
         ");
         while ($vt = $db->fetch_array($query_vt_auto)) {
             $pts = intval($vt['puntos']);
+            if ($vt['virtud_id'] === 'VFAMA')  { $sg_bingo_mult = 1.10; }
+            if ($vt['virtud_id'] === 'DIMPOP') { $sg_bingo_mult = 0.90; }
             if ($pts >= 0) {
                 $virtudes_auto_html .= fx_virtud_card($vt);
                 $n_virtudes_auto++;
@@ -510,6 +557,10 @@ if ($ficha_existe == true && ($moderated == true || (is_mod($s_uid) || is_staff(
                 $sg_puntos_defectos += $pts;
             }
         }
+
+        // Bingo mostrado = valor guardado ajustado por Fama/Impopularidad (relativo).
+        $sg_bingo_show = (int) round(intval($f['bingo']) * $sg_bingo_mult);
+        eval('$sgBingoShow = $sg_bingo_show;');
         if ($n_virtudes_auto === 0) { $virtudes_auto_html = "<div class=\"fx-vt-empty\">Sin virtudes asignadas.</div>"; }
         if ($n_defectos_auto === 0) { $defectos_auto_html = "<div class=\"fx-vt-empty\">Sin defectos asignados.</div>"; }
         eval('$virtudesAutoHtml = $virtudes_auto_html;');
@@ -597,6 +648,43 @@ if ($ficha_existe == true && ($moderated == true || (is_mod($s_uid) || is_staff(
     eval('$sgFichaCanViewStaffNotes = "'.$can_view_staff_notes.'";');
     eval("\$ficha_script = \"".$templates->get("sg_ficha_script")."\";");
 
+    // ── Inventario del personaje (pestaña Inventario) ─────────────
+    $inv_default_img = '/images/sg/objeto_default.png';
+    $inv_html = '';
+    $inv_count = 0;
+    $q_inv = $db->query("
+        SELECT o.objeto_id, o.nombre, o.tipo, o.tamano, o.municion, o.descripcion,
+               o.efecto1, o.efecto2, o.efecto3, o.imagen, i.cantidad
+        FROM mybb_sg_sg_inventario i
+        INNER JOIN mybb_sg_sg_objetos o ON o.objeto_id = i.objeto_id
+        WHERE i.uid = '$uid' AND i.cantidad > 0
+        ORDER BY o.tipo, o.nombre
+    ");
+    while ($it = $db->fetch_array($q_inv)) {
+        $inv_count++;
+        $i_nombre = htmlspecialchars($it['nombre'], ENT_QUOTES);
+        $i_tipo   = trim($it['tipo']) !== '' ? htmlspecialchars($it['tipo'], ENT_QUOTES) : 'Otros';
+        $i_tam    = htmlspecialchars($it['tamano'], ENT_QUOTES);
+        $i_mun    = htmlspecialchars($it['municion'], ENT_QUOTES);
+        $i_desc   = htmlspecialchars($it['descripcion'], ENT_QUOTES);
+        $i_ef1    = htmlspecialchars($it['efecto1'], ENT_QUOTES);
+        $i_ef2    = htmlspecialchars($it['efecto2'], ENT_QUOTES);
+        $i_ef3    = htmlspecialchars($it['efecto3'], ENT_QUOTES);
+        $i_cant   = intval($it['cantidad']);
+        $i_img    = trim($it['imagen']) !== '' ? htmlspecialchars($it['imagen'], ENT_QUOTES) : $inv_default_img;
+
+        $inv_html .= "<article class=\"fx-inv-tile\" tabindex=\"0\" role=\"button\" aria-label=\"$i_nombre\""
+            . " data-nombre=\"$i_nombre\" data-img=\"$i_img\" data-cant=\"$i_cant\" data-tipo=\"$i_tipo\""
+            . " data-tamano=\"$i_tam\" data-municion=\"$i_mun\" data-desc=\"$i_desc\""
+            . " data-ef1=\"$i_ef1\" data-ef2=\"$i_ef2\" data-ef3=\"$i_ef3\">"
+            . "<div class=\"fx-inv-thumb\"><img class=\"fx-inv-img\" src=\"$i_img\" alt=\"$i_nombre\" loading=\"lazy\" onerror=\"fxInvImgFallback(this)\">"
+            . "<span class=\"fx-inv-qty\">&times;$i_cant</span></div>"
+            . "<div class=\"fx-inv-name\">$i_nombre</div>"
+            . "</article>";
+    }
+    $sgInventarioHtml = $inv_html;
+    $sgInventarioCount = $inv_count;
+
     eval("\$page = \"".$templates->get("sg_ficha")."\";");
     output_page($page);
 
@@ -664,10 +752,38 @@ if ($ficha_existe == true && ($moderated == true || (is_mod($s_uid) || is_staff(
     // while ($q = $db->fetch_array($querySinClanKumo)) {  if (intval($q['numeroPjs']) >= 2) {   $sinClanKumo = 0;   } }
     // while ($q = $db->fetch_array($querySinClanSinAldea)) {  if (intval($q['numeroPjs']) >= 2) {   $sinClanSinAldea = 0;   } }
 
+    // Creación de ficha habilitada. (Para deshabilitarla, poner esto en 0 o
+    // gatearlo por usuario, p. ej. $mybb->user['username'] === 'Testoman'.)
+    $sg_puede_crear = 1;
+
+    // Catálogo de virtudes/defectos seleccionables (solo si puede crear).
+    $virtudes_cards = '';
+    $defectos_cards = '';
+    if ($sg_puede_crear === 1) {
+        $incompat_map = sg_virtudes_incompatibilidades();
+        $q_vd = $db->query("
+            SELECT virtud_id, nombre, puntos, exclusivo, descripcion
+            FROM mybb_sg_sg_virtudes
+            ORDER BY nombre ASC
+        ");
+        while ($vd = $db->fetch_array($q_vd)) {
+            if (intval($vd['puntos']) >= 0) {
+                $virtudes_cards .= nf_vd_card($vd, $incompat_map);
+            } else {
+                $defectos_cards .= nf_vd_card($vd, $incompat_map);
+            }
+        }
+        if ($virtudes_cards === '') { $virtudes_cards = "<div class=\"nf-vd-empty\">No hay virtudes registradas.</div>"; }
+        if ($defectos_cards === '') { $defectos_cards = "<div class=\"nf-vd-empty\">No hay defectos registrados.</div>"; }
+    }
+
     // create variables
     eval('$clanes = "'.addslashes($clanes_json).'";');
     eval('$villas = "'.addslashes($villas_json).'";');
     eval('$nueva_ficha_script = "'.$templates->get('sg_nueva_ficha_script').'";');
+    eval('$sgPuedeCrear = $sg_puede_crear;');
+    eval('$virtudesCards = $virtudes_cards;');
+    eval('$defectosCards = $defectos_cards;');
 
     eval("\$page = \"".$templates->get("sg_nueva_ficha")."\";");
     output_page($page);

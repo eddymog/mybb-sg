@@ -524,7 +524,7 @@ function sg_build_recent_post_card($thread)
 	$up_forum_name = htmlspecialchars_uni($thread['name']);
 	$up_lastpost = (int)$thread['lastpost'];
 	$up_thread_url = "/showthread.php?tid={$up_tid}&action=lastpost";
-	$up_user_profile = "/member.php?action=profile&uid={$up_uid}";
+	$up_user_profile = "/sg/ficha.php?uid={$up_uid}";
 	$up_forum = "/forumdisplay.php?fid={$up_fid}";
 	$up_fecha = date('d/m', $up_lastpost);
 	$up_hora = date('H:i', $up_lastpost);

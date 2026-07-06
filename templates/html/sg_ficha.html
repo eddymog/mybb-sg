@@ -361,8 +361,14 @@
     .fx-row:last-child { border-bottom: none; }
     .fx-row__k { font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--mist); align-self: center; }
     .fx-row__v { font-family: 'Noto Serif JP', serif; font-weight: 700; font-size: 15px; color: var(--ink); text-align: right; font-variant-numeric: tabular-nums; }
-    .fx-row__link { cursor: pointer; transition: color .15s ease; }
-    .fx-row__link:hover { color: var(--accent); text-decoration: underline; }
+    /* Filas clicables (Mensajes / Temas → buscador) */
+    .fx-row--action { text-decoration: none; margin: 0 -8px; padding-left: 8px; padding-right: 8px; border-radius: 5px; cursor: pointer; transition: background .15s ease; }
+    .fx-row--action:hover { background: var(--accent-soft); }
+    .fx-row--action:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+    .fx-row__v--action { color: var(--accent); display: inline-flex; align-items: center; gap: 6px; }
+    .fx-row__go { width: 12px; height: 12px; flex-shrink: 0; opacity: .6; transition: transform .15s ease, opacity .15s ease; }
+    .fx-row--action:hover .fx-row__v--action { text-decoration: underline; text-underline-offset: 2px; }
+    .fx-row--action:hover .fx-row__go { opacity: 1; transform: translate(1px, -1px); }
 
     /* Recursos como celdas */
     .fx-res { display: grid; grid-template-columns: repeat(2,1fr); gap: 10px; }
@@ -430,6 +436,23 @@
     .fx-assign__go { margin-left: auto; color: var(--ink); opacity: 0.8; }
     @keyframes fxAssignPulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(217,179,92,0.0); } 50% { box-shadow: 0 0 0 3px rgba(217,179,92,0.18); } }
     @media (prefers-reduced-motion: reduce) { .fx-assign { animation: none; } }
+
+    /* Barra de herramientas de staff (bajo las pestañas) */
+    .fx-staffbar {
+      border: 0.5px solid #d9b35c; border-top: none; background: rgba(217, 179, 92, 0.06);
+      padding: 12px 26px; display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px;
+    }
+    .fx-staffbar__label {
+      font-family: 'Cinzel', serif; font-size: 10px; font-weight: 700; letter-spacing: 2px;
+      text-transform: uppercase; color: #e6c877; flex-shrink: 0;
+    }
+    .fx-staffbar__link {
+      font-family: 'Cinzel', serif; font-size: 11px; font-weight: 700; letter-spacing: 0.6px;
+      text-transform: uppercase; color: var(--stone);
+      border: 0.5px solid var(--border); padding: 7px 12px; background: var(--card);
+      transition: border-color .15s ease, color .15s ease;
+    }
+    .fx-staffbar__link:hover { border-color: #d9b35c; color: #e6c877; }
 
     /* Inventario (placeholder) */
     .fx-inv-empty { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 12px; min-height: 300px; }
@@ -535,6 +558,87 @@
     @media (prefers-reduced-motion: reduce) {
       .fx-action, .fx-tab, .fx-photo__hint, .fx-week__tip { transition: none; }
     }
+
+    /* ── Inventario (pestaña) ─────────────────────────────────── */
+    .fx-inv { position: relative; z-index: 1; }
+    .fx-inv-head { display: flex; align-items: baseline; gap: 12px; margin-bottom: 18px; }
+    .fx-inv-eyebrow { font-family: 'Cinzel', serif; font-size: 12px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; color: var(--accent); }
+    .fx-inv-count { font-family: 'Cinzel', serif; font-size: 9px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: var(--mist); }
+
+    .fx-inv-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 16px; }
+
+    .fx-inv-tile {
+      display: flex; flex-direction: column; gap: 8px;
+      background: none; border: none; padding: 0; margin: 0;
+      text-align: left; color: inherit; font-family: inherit; cursor: pointer;
+    }
+    .fx-inv-thumb {
+      position: relative; width: 100%; aspect-ratio: 1 / 1;
+      background: var(--card); border: 1px solid var(--border); overflow: hidden;
+      transition: border-color .15s ease, transform .12s ease, box-shadow .15s ease;
+    }
+    .fx-inv-thumb::before {
+      content: '蔵'; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+      font-family: 'Noto Serif JP', serif; font-size: 44px; color: var(--accent); opacity: 0.12; pointer-events: none;
+    }
+    .fx-inv-img { position: relative; z-index: 1; width: 100%; height: 100%; object-fit: contain; display: block; }
+    .fx-inv-tile:hover .fx-inv-thumb, .fx-inv-tile:focus-visible .fx-inv-thumb {
+      border-color: var(--accent); transform: translateY(-2px); box-shadow: 0 10px 24px rgba(0,0,0,0.28);
+    }
+    .fx-inv-tile:focus { outline: none; }
+    .fx-inv-qty {
+      position: absolute; z-index: 2; bottom: 6px; right: 6px; padding: 2px 8px;
+      background: rgba(0,0,0,0.72); border: 1px solid var(--accent); color: var(--ink);
+      font-family: 'Cinzel', serif; font-size: 11px; font-weight: 700;
+    }
+    .fx-inv-name {
+      font-family: 'Cinzel', serif; font-size: 12px; font-weight: 700; color: var(--ink); line-height: 1.35;
+      display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; overflow: hidden;
+    }
+
+    /* Modal de inventario */
+    .fx-inv-modal-backdrop {
+      position: fixed; inset: 0; z-index: 9999; background: rgba(0,0,0,0.72);
+      display: flex; align-items: center; justify-content: center; padding: 20px;
+      opacity: 0; visibility: hidden; transition: opacity .18s ease, visibility .18s ease;
+    }
+    .fx-inv-modal-backdrop.is-open { opacity: 1; visibility: visible; }
+    .fx-inv-modal {
+      position: relative; width: 100%; max-width: 440px; max-height: 88vh; overflow-y: auto;
+      background: var(--panel); border: 1px solid var(--border-strong); box-shadow: 0 24px 60px rgba(0,0,0,0.5);
+      transform: translateY(10px) scale(.98); transition: transform .18s ease;
+    }
+    .fx-inv-modal-backdrop.is-open .fx-inv-modal { transform: none; }
+    .fx-inv-modal-close {
+      position: absolute; top: 8px; right: 8px; z-index: 3; width: 32px; height: 32px;
+      display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.5);
+      border: 1px solid var(--border-strong); color: var(--stone); font-size: 20px; line-height: 1; cursor: pointer;
+      transition: color .15s ease, border-color .15s ease;
+    }
+    .fx-inv-modal-close:hover { color: var(--ink); border-color: var(--accent); }
+    .fx-inv-modal-media {
+      width: 100%; height: 240px; background: var(--card); border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center; position: relative;
+    }
+    .fx-inv-modal-media img { max-width: 100%; max-height: 100%; object-fit: contain; }
+    .fx-inv-modal-body { padding: 18px 20px 22px; display: flex; flex-direction: column; gap: 12px; }
+    #fx-inv-modal-detail { display: flex; flex-direction: column; gap: 12px; }
+    .fx-inv-modal-name { margin: 0; font-family: 'Cinzel', serif; font-size: 18px; font-weight: 900; letter-spacing: .5px; color: var(--ink); line-height: 1.2; }
+    .fx-inv-badges { display: flex; flex-wrap: wrap; gap: 6px; }
+    .fx-inv-badge {
+      padding: 2px 8px; border: 1px solid var(--border-strong); color: var(--accent);
+      font-family: 'Cinzel', serif; font-size: 8px; font-weight: 700; letter-spacing: 1.3px; text-transform: uppercase;
+    }
+    .fx-inv-badge--soft { color: var(--stone); border-color: var(--border); }
+    .fx-inv-modal-desc { color: var(--stone); font-size: 13.5px; line-height: 1.65; white-space: pre-wrap; }
+    .fx-inv-eff { font-size: 13px; line-height: 1.6; color: var(--ink); white-space: pre-wrap; }
+    .fx-inv-eff-label { font-family: 'Cinzel', serif; font-size: 8px; font-weight: 700; letter-spacing: 1.3px; text-transform: uppercase; color: var(--mist); margin-right: 6px; }
+    .fx-inv-meta { display: flex; flex-direction: column; border-top: 1px solid var(--border); margin-top: 2px; }
+    .fx-inv-meta-row { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 9px 0; border-bottom: 1px solid var(--border); }
+    .fx-inv-meta-row:last-child { border-bottom: none; }
+    .fx-inv-meta-k { font-family: 'Cinzel', serif; font-size: 9px; font-weight: 700; letter-spacing: 1.4px; text-transform: uppercase; color: var(--mist); }
+    .fx-inv-meta-v { font-size: 14px; color: var(--ink); text-align: right; }
+    body.fx-inv-modal-open { overflow: hidden; }
   </style>
 </head>
 
@@ -564,16 +668,6 @@
             <if $ficha['apodo'] then><p class="fx-identity__alias">{$ficha['apodo']}</p></if>
           </div>
 
-          <div class="fx-actions">
-            <a class="fx-action" href="/sg/inventario.php?uid={$ficha['fid']}">Inventario</a>
-            <a class="fx-action" href="/member.php?action=profile&uid={$ficha['fid']}">Perfil</a>
-            <if $mybb->user['uid'] == $ficha['fid'] then>
-              <a class="fx-action" href="{$mybb->settings['bburl']}/sg/editar_ficha.php?uid={$ficha['fid']}">Asignar Stats</a>
-            </if>
-            <if $mybb->user['uid'] == $ficha['fid'] || $g_is_staff then>
-              <a class="fx-action" href="{$mybb->settings['bburl']}/sg/editar_descripcion.php?uid={$ficha['fid']}">Editar Ficha</a>
-            </if>
-          </div>
         </div>
       </section>
 
@@ -615,7 +709,7 @@
                     <div class="fx-row"><span class="fx-row__k">Edad</span><span class="fx-row__v">{$ficha['edad']} años</span></div>
                     <div class="fx-row"><span class="fx-row__k">Sexo</span><span class="fx-row__v">{$ficha['sexo']}</span></div>
                     <div class="fx-row"><span class="fx-row__k">Aldea</span><span class="fx-row__v">{$villa['nombreVilla']}</span></div>
-                    <div class="fx-row"><span class="fx-row__k">Clan</span><span class="fx-row__v">{$nClan}</span></div>
+                    <div class="fx-row"><span class="fx-row__k">Clan</span><span class="fx-row__v">{$sgClanLabel}</span></div>
                     <div class="fx-row"><span class="fx-row__k">Peso</span><span class="fx-row__v">{$ficha['peso']}</span></div>
                     <div class="fx-row"><span class="fx-row__k">Altura</span><span class="fx-row__v">{$ficha['altura']}</span></div>
                   </div>
@@ -629,7 +723,7 @@
                     <div class="fx-res__cell"><div class="fx-res__v">{$ficha['rin']}</div><div class="fx-res__k">Rins</div></div>
                     <div class="fx-res__cell"><div class="fx-res__v">{$ficha['tobi']}</div><div class="fx-res__k">Tobis</div></div>
                     <div class="fx-res__cell"><div class="fx-res__v">{$ficha['ryos']}</div><div class="fx-res__k">Ryos</div></div>
-                    <div class="fx-res__cell"><div class="fx-res__v">{$ficha['bingo']}</div><div class="fx-res__k">Bingo</div></div>
+                    <div class="fx-res__cell"><div class="fx-res__v">{$sgBingoShow}</div><div class="fx-res__k">Bingo</div></div>
                   </div>
                 </div>
               </div>
@@ -638,8 +732,8 @@
                 <div class="fx-card__head"><span class="fx-card__title">Actividad en el foro</span></div>
                 <div class="fx-card__body">
                   <div class="fx-data">
-                    <div class="fx-row"><span class="fx-row__k">Mensajes</span><a class="fx-row__v fx-row__link" href="/search.php?action=finduser&uid={$ficha['fid']}" title="Buscar sus mensajes">{$sgPostnum}</a></div>
-                    <div class="fx-row"><span class="fx-row__k">Temas</span><a class="fx-row__v fx-row__link" href="/search.php?action=finduserthreads&uid={$ficha['fid']}" title="Buscar sus temas">{$sgThreadnum}</a></div>
+                    <a class="fx-row fx-row--action" href="/search.php?action=finduser&uid={$ficha['fid']}" title="Ver sus mensajes en el buscador"><span class="fx-row__k">Mensajes</span><span class="fx-row__v fx-row__v--action">{$sgPostnum}<svg class="fx-row__go" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5.5 10.5l5-5"/><path d="M6.5 5.5h4v4"/></svg></span></a>
+                    <a class="fx-row fx-row--action" href="/search.php?action=finduserthreads&uid={$ficha['fid']}" title="Ver sus temas en el buscador"><span class="fx-row__k">Temas</span><span class="fx-row__v fx-row__v--action">{$sgThreadnum}<svg class="fx-row__go" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5.5 10.5l5-5"/><path d="M6.5 5.5h4v4"/></svg></span></a>
                     <div class="fx-row"><span class="fx-row__k">Ingresó</span><span class="fx-row__v">{$sgRegdateFmt}</span></div>
                   </div>
                 </div>
@@ -773,12 +867,21 @@
 
         <!-- ── INVENTARIO (próximamente) ── -->
         <section class="fx-panel fx-panel--inventario" role="tabpanel">
-          <div class="fx-inv-empty">
-            <div class="fx-inv-empty__k" aria-hidden="true">蔵</div>
-            <div class="fx-inv-empty__t">Inventario</div>
-            <p class="fx-inv-empty__p">Esta sección estará disponible próximamente.</p>
-            <a class="fx-action" href="/sg/inventario.php?uid={$ficha['fid']}">Ver inventario completo</a>
-          </div>
+          <if $sgInventarioCount != 0 then>
+            <div class="fx-inv">
+              <div class="fx-inv-head">
+                <span class="fx-inv-eyebrow">Inventario</span>
+                <span class="fx-inv-count">{$sgInventarioCount} objetos</span>
+              </div>
+              <div class="fx-inv-grid" id="fx-inv-grid">{$sgInventarioHtml}</div>
+            </div>
+          <else>
+            <div class="fx-inv-empty">
+              <div class="fx-inv-empty__k" aria-hidden="true">蔵</div>
+              <div class="fx-inv-empty__t">Inventario</div>
+              <p class="fx-inv-empty__p">Este personaje no tiene objetos en su inventario.</p>
+            </div>
+          </if>
         </section>
 
         <!-- ── TÉCNICAS ── -->
@@ -893,6 +996,17 @@
         </section>
 
       </div>
+
+      <if $g_is_staff then>
+        <div class="fx-staffbar">
+          <span class="fx-staffbar__label">Staff</span>
+          <a class="fx-staffbar__link" href="{$mybb->settings['bburl']}/sg/admin/ficha_tecnicas.php?fid={$ficha['fid']}">Modificar técnicas</a>
+          <a class="fx-staffbar__link" href="{$mybb->settings['bburl']}/sg/admin/modificar_ficha.php?fid={$ficha['fid']}">Modificar ficha</a>
+          <a class="fx-staffbar__link" href="{$mybb->settings['bburl']}/sg/admin/ficha_virtudes.php?fid={$ficha['fid']}">Modificar virtudes</a>
+          <a class="fx-staffbar__link" href="{$mybb->settings['bburl']}/sg/admin/ficha_objetos.php?fid={$ficha['fid']}">Modificar objetos</a>
+        </div>
+      </if>
+
     </div>
   </main>
 
@@ -1144,5 +1258,18 @@
     }
     window.addEventListener('load', sgFichaBars);
   </script>
+
+  <!-- Modal de inventario -->
+  <div class="fx-inv-modal-backdrop" id="fx-inv-modal" aria-hidden="true">
+    <div class="fx-inv-modal" role="dialog" aria-modal="true" aria-labelledby="fx-inv-modal-name">
+      <button class="fx-inv-modal-close" type="button" onclick="fxInvClose()" aria-label="Cerrar">&times;</button>
+      <div class="fx-inv-modal-media"><img id="fx-inv-modal-img" src="" alt=""></div>
+      <div class="fx-inv-modal-body">
+        <h2 class="fx-inv-modal-name" id="fx-inv-modal-name"></h2>
+        <div id="fx-inv-modal-detail"></div>
+      </div>
+    </div>
+  </div>
+
 </body>
 </html>

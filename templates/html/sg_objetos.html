@@ -13,7 +13,7 @@
       --border-strong: rgba(156, 107, 204, 0.22);
       --ink: #e8dff8; --plum: #7b4ab8; --plum2: #9c6bcc; --plum3: #b890e0;
       --stone: #8a7a9a; --mist: #5a4a6a; --oxide: #c0582a; --lavender: #ede0fa;
-      --gold: #c09840;
+      --gold: #c09840; --green: #4f9d69;
       max-width: 1100px;
       margin: 24px auto 44px;
       padding: 0 16px;
@@ -75,8 +75,25 @@
       color: var(--stone);
     }
 
-    .sg-cat-search {
+    .sg-cat-viewbtn {
       margin-left: auto;
+      height: 38px;
+      padding: 0 16px;
+      background: var(--bg);
+      border: 0.5px solid var(--border-strong);
+      color: var(--plum3);
+      font-family: 'Cinzel', serif;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 1.4px;
+      text-transform: uppercase;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: color .15s ease, border-color .15s ease, background .15s ease;
+    }
+    .sg-cat-viewbtn:hover { color: var(--lavender); border-color: var(--plum3); background: rgba(123, 74, 184, 0.14); }
+
+    .sg-cat-search {
       width: 240px;
       max-width: 100%;
       height: 38px;
@@ -90,6 +107,44 @@
     }
     .sg-cat-search:focus { outline: none; border-color: var(--plum3); }
 
+    /* Chips de filtro por categoría */
+    .sg-cat-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding: 14px 24px;
+      background: var(--bg2);
+      border-bottom: 0.5px solid var(--border);
+    }
+    .sg-cat-chip {
+      padding: 6px 14px;
+      background: var(--bg);
+      border: 0.5px solid var(--border-strong);
+      color: var(--stone);
+      font-family: 'Cinzel', serif;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 1.4px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: color .15s ease, border-color .15s ease, background .15s ease;
+    }
+    .sg-cat-chip:hover { color: var(--ink); border-color: var(--plum3); }
+    .sg-cat-chip:hover .sg-cat-chip-n { color: var(--plum3); }
+    .sg-cat-chip.is-active {
+      color: var(--lavender);
+      background: rgba(123, 74, 184, 0.18);
+      border-color: var(--plum3);
+    }
+    .sg-cat-chip-n {
+      margin-left: 5px;
+      padding: 1px 5px;
+      font-size: 8px;
+      color: var(--mist);
+      background: rgba(156, 107, 204, 0.12);
+    }
+    .sg-cat-chip.is-active .sg-cat-chip-n { color: var(--plum3); background: rgba(123, 74, 184, 0.28); }
+
     .sg-cat-body { padding: 22px 24px; }
 
     /* Grupos por tipo */
@@ -100,7 +155,7 @@
       display: flex;
       align-items: center;
       gap: 10px;
-      margin: 0 0 14px;
+      margin: 0 0 16px;
       font-family: 'Cinzel', serif;
       font-size: 11px;
       font-weight: 700;
@@ -115,29 +170,39 @@
       background: var(--border);
     }
 
-    .sg-cat-grid {
+    /* Grid de miniaturas 175×175 */
+    .sg-obj-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-      gap: 12px;
+      grid-template-columns: repeat(auto-fill, 175px);
+      gap: 18px 16px;
+      justify-content: center;
     }
 
-    /* Tarjeta de objeto */
-    .sg-item {
+    .sg-obj-tile {
+      width: 175px;
       display: flex;
       flex-direction: column;
-      border: 0.5px solid var(--border);
-      background: var(--bg);
-      overflow: hidden;
+      gap: 8px;
+      padding: 0;
+      margin: 0;
+      background: none;
+      border: none;
+      text-align: left;
+      font-family: inherit;
+      color: inherit;
+      cursor: pointer;
     }
 
-    .sg-item-media {
+    .sg-obj-thumb {
       position: relative;
-      aspect-ratio: 16 / 10;
+      width: 175px;
+      height: 175px;
       background: var(--bg3);
+      border: 0.5px solid var(--border);
       overflow: hidden;
+      transition: border-color .15s ease, transform .12s ease, box-shadow .15s ease;
     }
-
-    .sg-item-media::before {
+    .sg-obj-thumb::before {
       content: '物';
       position: absolute;
       inset: 0;
@@ -145,103 +210,107 @@
       align-items: center;
       justify-content: center;
       font-family: 'Noto Serif JP', serif;
-      font-size: 46px;
-      color: rgba(156, 107, 204, 0.18);
+      font-size: 54px;
+      color: rgba(156, 107, 204, 0.16);
       pointer-events: none;
     }
-
-    .sg-item-img {
+    .sg-obj-img {
       position: relative;
       z-index: 1;
       width: 100%;
       height: 100%;
-      object-fit: cover;
+      object-fit: contain;
       display: block;
-      background: var(--bg3);
     }
 
-    .sg-item-cost {
-      position: absolute;
-      z-index: 2;
-      bottom: 8px;
-      right: 8px;
-      padding: 3px 9px;
-      background: rgba(15, 12, 24, 0.86);
-      border: 0.5px solid rgba(192, 152, 64, 0.45);
-      color: var(--gold);
+    .sg-obj-tile:hover .sg-obj-thumb,
+    .sg-obj-tile:focus-visible .sg-obj-thumb {
+      border-color: var(--plum3);
+      transform: translateY(-2px);
+      box-shadow: 0 10px 24px rgba(0,0,0,0.3);
+    }
+    .sg-obj-tile:focus { outline: none; }
+    .sg-obj-tile:focus-visible .sg-obj-thumb { outline: 2px solid var(--plum3); outline-offset: 2px; }
+
+    .sg-obj-name {
       font-family: 'Cinzel', serif;
-      font-size: 11px;
+      font-size: 12px;
       font-weight: 700;
-      letter-spacing: 0.5px;
-    }
-
-    .sg-item-id {
-      position: absolute;
-      z-index: 2;
-      top: 8px;
-      left: 8px;
-      padding: 3px 8px;
-      background: rgba(15, 12, 24, 0.86);
-      border: 0.5px solid var(--border-strong);
-      color: var(--plum3);
-      font-family: 'Cinzel', serif;
-      font-size: 10px;
-      font-weight: 700;
-      letter-spacing: 0.8px;
-      cursor: pointer;
-      text-decoration: none;
-    }
-    .sg-item-id:hover { border-color: var(--plum3); color: var(--lavender); }
-
-    .sg-item-body {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      padding: 12px 13px;
-    }
-
-    .sg-item-name {
-      margin: 0;
-      font-family: 'Cinzel', serif;
-      font-size: 13px;
-      font-weight: 700;
-      letter-spacing: 0.6px;
+      letter-spacing: 0.4px;
       color: var(--ink);
-    }
-
-    .sg-item-badges { display: flex; flex-wrap: wrap; gap: 6px; }
-
-    .sg-item-badge {
-      padding: 2px 8px;
-      border: 0.5px solid var(--border-strong);
-      color: var(--plum3);
-      font-family: 'Cinzel', serif;
-      font-size: 8px;
-      font-weight: 700;
-      letter-spacing: 1.3px;
-      text-transform: uppercase;
-    }
-    .sg-item-badge--soft { color: var(--stone); border-color: var(--border); }
-
-    .sg-item-desc {
-      margin: 0;
-      color: var(--stone);
-      font-size: 13px;
-      line-height: 1.6;
+      line-height: 1.35;
       display: -webkit-box;
       -webkit-box-orient: vertical;
-      -webkit-line-clamp: 4;
-      line-clamp: 4;
+      -webkit-line-clamp: 2;
+      line-clamp: 2;
       overflow: hidden;
+      min-height: 2.7em;
     }
-    .sg-item-desc.is-expanded {
+
+    .sg-obj-main { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+    .sg-obj-detail { display: none; }
+
+    /* ── Vista Detalle: 4 columnas, imagen arriba, todo visible ── */
+    .sg-cat-body.is-detail .sg-obj-grid {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      justify-content: stretch;
+      gap: 16px;
+    }
+    .sg-cat-body.is-detail .sg-obj-tile {
+      width: auto;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 10px;
+      padding: 12px;
+      background: var(--bg);
+      border: 0.5px solid var(--border);
+      cursor: default;
+    }
+    .sg-cat-body.is-detail .sg-obj-thumb {
+      width: 218px;
+      max-width: 100%;
+      aspect-ratio: 1 / 1;
+      height: auto;
+      align-self: center;
+    }
+    .sg-cat-body.is-detail .sg-obj-tile:hover .sg-obj-thumb,
+    .sg-cat-body.is-detail .sg-obj-tile:focus-visible .sg-obj-thumb {
+      transform: none;
+      box-shadow: none;
+      border-color: var(--border);
+      outline: none;
+    }
+    .sg-cat-body.is-detail .sg-obj-main { flex: 1; gap: 10px; }
+    .sg-cat-body.is-detail .sg-obj-name {
+      font-size: 14px;
       -webkit-line-clamp: unset;
       line-clamp: unset;
       overflow: visible;
+      min-height: 0;
     }
-    .sg-item-more {
-      display: block;
-      margin-top: 4px;
+    .sg-cat-body.is-detail .sg-obj-detail {
+      display: flex;
+      flex-direction: column;
+      gap: 11px;
+    }
+    /* Descripción colapsable (solo en vista detalle) */
+    .sg-cat-body.is-detail .sg-obj-modal-desc {
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 3;
+      line-clamp: 3;
+      overflow: hidden;
+      white-space: normal;
+    }
+    .sg-cat-body.is-detail .sg-obj-modal-desc.is-expanded {
+      -webkit-line-clamp: unset;
+      line-clamp: unset;
+      overflow: visible;
+      white-space: pre-wrap;
+    }
+    .sg-obj-desc-toggle {
+      align-self: flex-start;
+      margin-top: -4px;
       padding: 0;
       background: none;
       border: none;
@@ -253,41 +322,16 @@
       text-transform: uppercase;
       color: var(--plum3);
     }
-    .sg-item-more:hover { color: var(--plum2); }
-
-    .sg-item-effect {
-      font-size: 12.5px;
-      line-height: 1.6;
-      color: var(--ink);
+    .sg-obj-desc-toggle:hover { color: var(--plum2); }
+    @media (max-width: 1000px) {
+      .sg-cat-body.is-detail .sg-obj-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
     }
-    .sg-item-eff-label {
-      font-family: 'Cinzel', serif;
-      font-size: 8px;
-      font-weight: 700;
-      letter-spacing: 1.3px;
-      text-transform: uppercase;
-      color: var(--mist);
+    @media (max-width: 760px) {
+      .sg-cat-body.is-detail .sg-obj-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     }
-
-    .sg-item-meta {
-      font-size: 11px;
-      color: var(--mist);
+    @media (max-width: 520px) {
+      .sg-cat-body.is-detail .sg-obj-grid { grid-template-columns: 1fr; }
     }
-    .sg-item-meta strong { color: var(--stone); }
-
-    .sg-item-code {
-      margin-top: 2px;
-      padding: 6px 8px;
-      background: var(--bg2);
-      border: 0.5px solid var(--border);
-      color: var(--plum3);
-      font-family: 'Cinzel', serif;
-      font-size: 11px;
-      letter-spacing: 0.5px;
-      cursor: pointer;
-      user-select: all;
-    }
-    .sg-item-code:hover { border-color: var(--plum3); }
 
     .sg-cat-empty,
     .sg-cat-noresults {
@@ -300,9 +344,187 @@
     }
     .sg-cat-noresults { display: none; margin-top: 12px; }
 
+    /* ── Modal de detalle ─────────────────────────────────────── */
+    .sg-obj-modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      background: rgba(8, 6, 14, 0.72);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity .18s ease, visibility .18s ease;
+    }
+    .sg-obj-modal-backdrop.is-open { opacity: 1; visibility: visible; }
+
+    .sg-obj-modal {
+      position: relative;
+      width: 100%;
+      max-width: 460px;
+      max-height: 88vh;
+      overflow-y: auto;
+      background: var(--bg2);
+      border: 0.5px solid var(--border-strong);
+      box-shadow: 0 24px 60px rgba(0,0,0,0.5);
+      transform: translateY(10px) scale(.98);
+      transition: transform .18s ease;
+    }
+    .sg-obj-modal-backdrop.is-open .sg-obj-modal { transform: none; }
+
+    .sg-obj-modal::-webkit-scrollbar { width: 8px; }
+    .sg-obj-modal::-webkit-scrollbar-track { background: var(--bg); }
+    .sg-obj-modal::-webkit-scrollbar-thumb { background: rgba(156, 107, 204, 0.25); }
+
+    .sg-obj-modal-close {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      z-index: 3;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(15, 12, 24, 0.7);
+      border: 0.5px solid var(--border-strong);
+      color: var(--stone);
+      font-size: 20px;
+      line-height: 1;
+      cursor: pointer;
+      transition: color .15s ease, border-color .15s ease;
+    }
+    .sg-obj-modal-close:hover { color: var(--lavender); border-color: var(--plum3); }
+
+    .sg-obj-modal-media {
+      width: 100%;
+      height: 260px;
+      background: var(--bg3);
+      border-bottom: 0.5px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+    .sg-obj-modal-media::before {
+      content: '物';
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Noto Serif JP', serif;
+      font-size: 90px;
+      color: rgba(156, 107, 204, 0.12);
+      pointer-events: none;
+    }
+    .sg-obj-modal-media img {
+      position: relative;
+      z-index: 1;
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+    }
+
+    .sg-obj-modal-body {
+      padding: 18px 20px 22px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    #sg-obj-modal-detail { display: flex; flex-direction: column; gap: 12px; }
+    .sg-obj-modal-name {
+      margin: 0;
+      font-family: 'Cinzel', serif;
+      font-size: 18px;
+      font-weight: 900;
+      letter-spacing: .5px;
+      color: var(--ink);
+      line-height: 1.2;
+    }
+    .sg-obj-modal-badges { display: flex; flex-wrap: wrap; gap: 6px; }
+    .sg-obj-badge {
+      padding: 2px 8px;
+      border: 0.5px solid var(--border-strong);
+      color: var(--plum3);
+      font-family: 'Cinzel', serif;
+      font-size: 8px;
+      font-weight: 700;
+      letter-spacing: 1.3px;
+      text-transform: uppercase;
+    }
+    .sg-obj-badge--soft { color: var(--stone); border-color: var(--border); }
+    .sg-obj-badge--ok { color: var(--green); border-color: rgba(79, 157, 105, 0.5); }
+    .sg-obj-badge--off { color: var(--oxide); border-color: rgba(192, 88, 42, 0.5); }
+
+    .sg-obj-modal-desc {
+      color: var(--stone);
+      font-size: 13.5px;
+      line-height: 1.65;
+      white-space: pre-wrap;
+    }
+    .sg-obj-modal-effects { display: flex; flex-direction: column; gap: 8px; }
+    .sg-obj-eff {
+      font-size: 13px;
+      line-height: 1.6;
+      color: var(--ink);
+      white-space: pre-wrap;
+    }
+    .sg-obj-eff-label {
+      font-family: 'Cinzel', serif;
+      font-size: 8px;
+      font-weight: 700;
+      letter-spacing: 1.3px;
+      text-transform: uppercase;
+      color: var(--mist);
+      margin-right: 6px;
+    }
+
+    .sg-obj-modal-meta {
+      display: flex;
+      flex-direction: column;
+      border-top: 0.5px solid var(--border);
+      margin-top: 2px;
+    }
+    .sg-obj-meta-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding: 9px 0;
+      border-bottom: 0.5px solid var(--border);
+    }
+    .sg-obj-meta-row:last-child { border-bottom: none; }
+    .sg-obj-meta-k {
+      font-family: 'Cinzel', serif;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 1.4px;
+      text-transform: uppercase;
+      color: var(--mist);
+    }
+    .sg-obj-meta-v { font-size: 14px; color: var(--ink); text-align: right; }
+    .sg-obj-cost { color: var(--gold); font-family: 'Cinzel', serif; font-weight: 700; }
+    .sg-obj-id-btn {
+      background: var(--bg3);
+      border: 0.5px solid var(--border-strong);
+      color: var(--plum3);
+      font-family: 'Cinzel', serif;
+      font-size: 12px;
+      letter-spacing: 0.5px;
+      padding: 3px 10px;
+      cursor: pointer;
+      text-decoration: none;
+    }
+    .sg-obj-id-btn:hover { border-color: var(--plum3); color: var(--lavender); }
+
+    body.sg-obj-modal-open { overflow: hidden; }
+
     @media (max-width: 640px) {
       .sg-cat-search { margin-left: 0; width: 100%; }
-      .sg-cat-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+      .sg-obj-grid { gap: 14px 12px; }
     }
   </style>
 </head>
@@ -318,9 +540,12 @@
             <h1 class="sg-cat-title">Objetos</h1>
           </div>
         </div>
-        <span class="sg-cat-count">{$total} objetos a la venta</span>
-        <input class="sg-cat-search" type="text" id="sg-cat-search" placeholder="Buscar objeto o tipo…" oninput="sgFilterCatalogo()">
+        <span class="sg-cat-count" id="sg-cat-count">{$total} objetos</span>
+        <button class="sg-cat-viewbtn" id="sg-cat-viewbtn" type="button" onclick="sgToggleView()">Vista detalle</button>
+        <input class="sg-cat-search" type="text" id="sg-cat-search" placeholder="Buscar objeto, tipo o efecto…" oninput="sgFilterCatalogo()">
       </div>
+
+      <div class="sg-cat-chips" id="sg-cat-chips">{$chipsHtml}</div>
 
       <div class="sg-cat-body" id="sg-cat-body">
         {$objetos_html}
@@ -330,64 +555,275 @@
   </main>
   {$footer}
 
+  <!-- Modal de detalle (reutilizable) -->
+  <div class="sg-obj-modal-backdrop" id="sg-obj-modal" aria-hidden="true">
+    <div class="sg-obj-modal" role="dialog" aria-modal="true" aria-labelledby="sg-obj-modal-name">
+      <button class="sg-obj-modal-close" type="button" onclick="sgObjClose()" aria-label="Cerrar">&times;</button>
+      <div class="sg-obj-modal-media"><img id="sg-obj-modal-img" src="" alt=""></div>
+      <div class="sg-obj-modal-body">
+        <h2 class="sg-obj-modal-name" id="sg-obj-modal-name"></h2>
+        <div id="sg-obj-modal-detail"></div>
+      </div>
+    </div>
+  </div>
+
   <script>
+    var SG_ES_STAFF = {$sgEsStaff};
+    var SG_TOTAL = {$total};
+
     function sgImgFallback(img) {
       if (!img.dataset.fallback) {
         img.dataset.fallback = '1';
         img.src = '/images/sg/objeto_default.png';
       } else {
-        img.style.display = 'none';
+        img.style.visibility = 'hidden';
       }
     }
 
-    function sgSelectText(el) {
-      if (window.getSelection && document.createRange) {
-        var range = document.createRange();
-        range.selectNodeContents(el);
-        var sel = window.getSelection();
-        sel.removeAllRanges();
-        sel.addRange(range);
+    var sgModal, sgModalName, sgModalImg, sgModalDetail;
+
+    function sgEl(tag, cls, text) {
+      var e = document.createElement(tag);
+      if (cls) e.className = cls;
+      if (text != null) e.textContent = text;
+      return e;
+    }
+
+    function sgMetaRow(k, valueNode) {
+      var row = sgEl('div', 'sg-obj-meta-row');
+      row.appendChild(sgEl('span', 'sg-obj-meta-k', k));
+      var v = sgEl('span', 'sg-obj-meta-v');
+      v.appendChild(valueNode);
+      row.appendChild(v);
+      return row;
+    }
+
+    // Nodo del código/ID: link para staff, botón que copia para usuarios.
+    function sgIdNode(d) {
+      var idNode;
+      if (SG_ES_STAFF) {
+        idNode = sgEl('a', 'sg-obj-id-btn', d.id);
+        idNode.href = '/sg/admin/gestionar_objetos.php?objeto_id=' + encodeURIComponent(d.id);
+        idNode.title = 'Gestionar objeto';
+      } else {
+        idNode = sgEl('button', 'sg-obj-id-btn', d.id);
+        idNode.type = 'button';
+        idNode.title = 'Clic para copiar';
+        idNode.addEventListener('click', function (ev) {
+          ev.stopPropagation();
+          if (navigator.clipboard) { navigator.clipboard.writeText(d.id); }
+          var old = idNode.textContent;
+          idNode.textContent = '¡Copiado!';
+          setTimeout(function () { idNode.textContent = old; }, 1200);
+        });
       }
+      return idNode;
+    }
+
+    // Construye el detalle (badges + descripción + efectos + meta) desde los
+    // data-* de una tarjeta. Fuente única para el modal y la vista detalle.
+    function sgRenderDetail(d) {
+      var frag = document.createDocumentFragment();
+
+      var badges = sgEl('div', 'sg-obj-modal-badges');
+      if (d.tipolabel) badges.appendChild(sgEl('span', 'sg-obj-badge', d.tipolabel));
+      if (d.tamano) badges.appendChild(sgEl('span', 'sg-obj-badge sg-obj-badge--soft', d.tamano));
+      badges.appendChild(sgEl('span',
+        'sg-obj-badge ' + (d.entienda === '1' ? 'sg-obj-badge--ok' : 'sg-obj-badge--off'),
+        d.entienda === '1' ? 'A la venta' : 'Solo referencia'));
+      frag.appendChild(badges);
+
+      if (d.desc && d.desc.trim() !== '') {
+        var desc = sgEl('div', 'sg-obj-modal-desc', d.desc);
+        frag.appendChild(desc);
+        // Toggle "Ver más/menos": solo se revela si el texto se desborda (vista detalle).
+        var toggle = sgEl('button', 'sg-obj-desc-toggle', 'Ver más');
+        toggle.type = 'button';
+        toggle.style.display = 'none';
+        toggle.addEventListener('click', function (ev) {
+          ev.stopPropagation();
+          var exp = desc.classList.toggle('is-expanded');
+          toggle.textContent = exp ? 'Ver menos' : 'Ver más';
+        });
+        frag.appendChild(toggle);
+      }
+
+      var hayEfectos = [d.ef1, d.ef2, d.ef3].some(function (e) { return e && e.trim() !== ''; });
+      if (hayEfectos) {
+        var effs = sgEl('div', 'sg-obj-modal-effects');
+        [d.ef1, d.ef2, d.ef3].forEach(function (e) {
+          if (e && e.trim() !== '') {
+            var row = sgEl('div', 'sg-obj-eff');
+            row.appendChild(sgEl('span', 'sg-obj-eff-label', 'Efecto'));
+            row.appendChild(document.createTextNode(' ' + e));
+            effs.appendChild(row);
+          }
+        });
+        frag.appendChild(effs);
+      }
+
+      var meta = sgEl('div', 'sg-obj-modal-meta');
+      meta.appendChild(sgMetaRow('Coste', sgEl('span', 'sg-obj-cost', d.coste)));
+      meta.appendChild(sgMetaRow('Límite por ficha', document.createTextNode(d.max)));
+      if (d.municion && d.municion.trim() !== '') {
+        meta.appendChild(sgMetaRow('Munición', document.createTextNode(d.municion)));
+      }
+      meta.appendChild(sgMetaRow('Código', sgIdNode(d)));
+      frag.appendChild(meta);
+
+      return frag;
+    }
+
+    function sgIsDetail() {
+      var body = document.getElementById('sg-cat-body');
+      return !!(body && body.classList.contains('is-detail'));
+    }
+
+    function sgObjOpen(tile) {
+      if (sgIsDetail()) return; // en vista detalle ya está todo visible
+      var d = tile.dataset;
+      sgModalName.textContent = d.nombre;
+      sgModalImg.dataset.fallback = '';
+      sgModalImg.style.visibility = '';
+      sgModalImg.onerror = function () { sgImgFallback(sgModalImg); };
+      sgModalImg.src = d.img;
+      sgModalImg.alt = d.nombre;
+      sgModalDetail.innerHTML = '';
+      sgModalDetail.appendChild(sgRenderDetail(d));
+      sgModal.classList.add('is-open');
+      sgModal.setAttribute('aria-hidden', 'false');
+      document.body.classList.add('sg-obj-modal-open');
+    }
+
+    function sgObjClose() {
+      if (!sgModal) return;
+      sgModal.classList.remove('is-open');
+      sgModal.setAttribute('aria-hidden', 'true');
+      document.body.classList.remove('sg-obj-modal-open');
+    }
+
+    // ── Vista: cuadrícula ↔ detalle ──────────────────────────────
+    var sgDetailBuilt = false;
+    function sgBuildAllDetails() {
+      document.querySelectorAll('.sg-obj-tile').forEach(function (tile) {
+        var cont = tile.querySelector('.sg-obj-detail');
+        if (cont && !cont.dataset.built) {
+          cont.appendChild(sgRenderDetail(tile.dataset));
+          cont.dataset.built = '1';
+        }
+      });
+    }
+    // Muestra el "Ver más" solo en las descripciones que se recortan.
+    function sgUpdateDescToggles() {
+      document.querySelectorAll('.sg-cat-body.is-detail .sg-obj-detail').forEach(function (det) {
+        var desc = det.querySelector('.sg-obj-modal-desc');
+        var toggle = det.querySelector('.sg-obj-desc-toggle');
+        if (!desc || !toggle) return;
+        if (!desc.classList.contains('is-expanded')) {
+          toggle.style.display = (desc.scrollHeight > desc.clientHeight + 2) ? '' : 'none';
+        }
+      });
+    }
+    function sgSetView(detail) {
+      var body = document.getElementById('sg-cat-body');
+      var btn = document.getElementById('sg-cat-viewbtn');
+      if (detail) {
+        if (!sgDetailBuilt) { sgBuildAllDetails(); sgDetailBuilt = true; }
+        sgObjClose(); // por si había un modal abierto
+        body.classList.add('is-detail');
+        if (btn) btn.textContent = 'Vista cuadrícula';
+        sgUpdateDescToggles();
+      } else {
+        body.classList.remove('is-detail');
+        if (btn) btn.textContent = 'Vista detalle';
+      }
+      try { localStorage.setItem('sgObjView', detail ? 'detail' : 'grid'); } catch (e) {}
+    }
+    function sgToggleView() { sgSetView(!sgIsDetail()); }
+
+    // Al cambiar el ancho, el nº de columnas cambia; recalcular los toggles.
+    window.addEventListener('resize', function () {
+      if (sgIsDetail()) { sgUpdateDescToggles(); }
+    });
+
+    var sgActiveTipo = '';
+
+    function sgSetTipo(chip) {
+      sgActiveTipo = chip.getAttribute('data-tipo') || '';
+      var chips = document.querySelectorAll('.sg-cat-chip');
+      chips.forEach(function (c) { c.classList.remove('is-active'); });
+      chip.classList.add('is-active');
+      sgFilterCatalogo();
     }
 
     function sgFilterCatalogo() {
       var q = document.getElementById('sg-cat-search').value.trim().toLowerCase();
-      var items = document.querySelectorAll('.sg-item');
+      var tiles = document.querySelectorAll('.sg-obj-tile');
       var visibles = 0;
-      items.forEach(function (item) {
-        var name = item.getAttribute('data-name') || '';
-        var tipo = item.getAttribute('data-tipo') || '';
-        var match = q === '' || name.indexOf(q) !== -1 || tipo.indexOf(q) !== -1;
-        item.style.display = match ? '' : 'none';
+      tiles.forEach(function (tile) {
+        var hay = tile.getAttribute('data-search') || '';
+        var tipo = tile.getAttribute('data-tipo') || '';
+        var matchTipo = sgActiveTipo === '' || tipo === sgActiveTipo;
+        var matchQ = q === '' || hay.indexOf(q) !== -1;
+        var match = matchTipo && matchQ;
+        tile.style.display = match ? '' : 'none';
         if (match) visibles++;
       });
-
       document.querySelectorAll('.sg-cat-group').forEach(function (group) {
-        var any = group.querySelector('.sg-item:not([style*="display: none"])');
+        var any = group.querySelector('.sg-obj-tile:not([style*="display: none"])');
         group.style.display = any ? '' : 'none';
       });
-
       var nores = document.getElementById('sg-cat-noresults');
       if (nores) { nores.style.display = (visibles === 0) ? 'block' : 'none'; }
+      var count = document.getElementById('sg-cat-count');
+      if (count) {
+        count.textContent = (q === '' && sgActiveTipo === '')
+          ? SG_TOTAL + ' objetos'
+          : visibles + ' de ' + SG_TOTAL + ' objetos';
+      }
     }
 
-    // Añade "Ver más / Ver menos" solo a las descripciones que se cortan.
-    function sgInitClamp() {
-      document.querySelectorAll('.sg-item-desc').forEach(function (desc) {
-        if (desc.scrollHeight > desc.clientHeight + 2) {
-          var btn = document.createElement('button');
-          btn.type = 'button';
-          btn.className = 'sg-item-more';
-          btn.textContent = 'Ver más';
-          btn.addEventListener('click', function () {
-            var exp = desc.classList.toggle('is-expanded');
-            btn.textContent = exp ? 'Ver menos' : 'Ver más';
+    document.addEventListener('DOMContentLoaded', function () {
+      sgModal       = document.getElementById('sg-obj-modal');
+      sgModalName   = document.getElementById('sg-obj-modal-name');
+      sgModalImg    = document.getElementById('sg-obj-modal-img');
+      sgModalDetail = document.getElementById('sg-obj-modal-detail');
+
+      var tiles = document.querySelectorAll('.sg-obj-tile');
+      var canHover = window.matchMedia && window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+      var hoverTimer = null;
+
+      tiles.forEach(function (tile) {
+        tile.addEventListener('click', function () { sgObjOpen(tile); });
+        tile.addEventListener('keydown', function (ev) {
+          if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); sgObjOpen(tile); }
+        });
+        if (canHover) {
+          tile.addEventListener('mouseenter', function () {
+            if (sgIsDetail()) return;
+            hoverTimer = setTimeout(function () { sgObjOpen(tile); }, 350);
           });
-          desc.parentNode.insertBefore(btn, desc.nextSibling);
+          tile.addEventListener('mouseleave', function () { clearTimeout(hoverTimer); });
         }
       });
-    }
-    document.addEventListener('DOMContentLoaded', sgInitClamp);
+
+      // Cerrar: al sacar el mouse de la caja del modal, clic en el fondo o Esc.
+      var sgDialog = sgModal.querySelector('.sg-obj-modal');
+      sgDialog.addEventListener('mouseleave', function () {
+        if (sgModal.classList.contains('is-open')) { sgObjClose(); }
+      });
+      sgModal.addEventListener('click', function (ev) {
+        if (ev.target === sgModal) { sgObjClose(); }
+      });
+      document.addEventListener('keydown', function (ev) {
+        if (ev.key === 'Escape' && sgModal.classList.contains('is-open')) { sgObjClose(); }
+      });
+
+      // Restaurar la vista preferida (cuadrícula por defecto).
+      var saved = 'grid';
+      try { saved = localStorage.getItem('sgObjView') || 'grid'; } catch (e) {}
+      if (saved === 'detail') { sgSetView(true); }
+    });
   </script>
 </body>
 

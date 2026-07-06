@@ -10,18 +10,6 @@
 
       <div class="author_information">{$post['username']}</div>
 
-      <div class="quick_acces_tabs">
-        <div class="inventory_tab">
-          <a href="{$mybb->settings['bburl']}/sg/inventario.php?uid={$post['uid']}" title="Inventario" style="color: var({$post['villa_color']});"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="7" width="19" height="13" rx="2"/><path d="M16 7V5.5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2V7"/><path d="M2.5 12h19"/></svg></a>
-        </div>
-        <div class="profile_tab">
-          <a href="{$mybb->settings['bburl']}/member.php?action=profile&uid={$post['uid']}" title="Perfil" style="color: var({$post['villa_color']});"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c0-3.6 3.1-5.5 7-5.5s7 1.9 7 5.5"/></svg></a>
-        </div>
-        <div class="character_profile_tab">
-          <a href="{$mybb->settings['bburl']}/sg/ficha.php?uid={$post['uid']}" title="Ficha" style="color: var({$post['villa_color']});"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="4.5" width="19" height="15" rx="2"/><circle cx="8.5" cy="11" r="2"/><path d="M5.5 16.5c.5-1.6 1.7-2.4 3-2.4s2.5.8 3 2.4"/><path d="M14.5 10h4M14.5 13.5h4"/></svg></a>
-        </div>
-      </div>
-
       <if $post['has_ficha'] then>
         <div class="character_info">
           <div class="char_data_tab">

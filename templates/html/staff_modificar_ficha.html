@@ -152,8 +152,8 @@
                 <div class="mf-field">
                   <label class="mf-label">Sexo</label>
                   <select name="sexo">
-                    <option value="hombre"<if $ficha['sexo'] == 'hombre' then> selected</if>>Hombre</option>
-                    <option value="mujer"<if $ficha['sexo'] == 'mujer' then> selected</if>>Mujer</option>
+                    <option value="Hombre"<if $ficha['sexo'] == 'Hombre' then> selected</if>>Hombre</option>
+                    <option value="Mujer"<if $ficha['sexo'] == 'Mujer' then> selected</if>>Mujer</option>
                   </select>
                 </div>
                 <div class="mf-field">
@@ -211,6 +211,30 @@
                     <option value="308"<if $ficha['clan'] == '308' then> selected</if>>Akizu</option>
                     <option value="309"<if $ficha['clan'] == '309' then> selected</if>>Funato</option>
                     <option value="310"<if $ficha['clan'] == '310' then> selected</if>>Kodon</option>
+                  </select>
+                </div>
+                <div class="mf-field">
+                  <label class="mf-label">Clan 2 <span style="opacity:.6;">(Híbrido)</span></label>
+                  <select name="clan2">
+                    <option value="">— Ninguno —</option>
+                    <option value="101"<if $ficha['clan2'] == '101' then> selected</if>>Aburame</option>
+                    <option value="102"<if $ficha['clan2'] == '102' then> selected</if>>Senju</option>
+                    <option value="103"<if $ficha['clan2'] == '103' then> selected</if>>Akimichi</option>
+                    <option value="104"<if $ficha['clan2'] == '104' then> selected</if>>Hyuga</option>
+                    <option value="105"<if $ficha['clan2'] == '105' then> selected</if>>Nara</option>
+                    <option value="106"<if $ficha['clan2'] == '106' then> selected</if>>Uchiha</option>
+                    <option value="108"<if $ficha['clan2'] == '108' then> selected</if>>Yamanaka</option>
+                    <option value="109"<if $ficha['clan2'] == '109' then> selected</if>>Inuzuka</option>
+                    <option value="110"<if $ficha['clan2'] == '110' then> selected</if>>Sarutobi</option>
+                    <option value="301"<if $ficha['clan2'] == '301' then> selected</if>>Yuki</option>
+                    <option value="302"<if $ficha['clan2'] == '302' then> selected</if>>Kaguya</option>
+                    <option value="304"<if $ficha['clan2'] == '304' then> selected</if>>Hozuki</option>
+                    <option value="305"<if $ficha['clan2'] == '305' then> selected</if>>Hoshigaki</option>
+                    <option value="306"<if $ficha['clan2'] == '306' then> selected</if>>Heizu</option>
+                    <option value="307"<if $ficha['clan2'] == '307' then> selected</if>>Terumi</option>
+                    <option value="308"<if $ficha['clan2'] == '308' then> selected</if>>Akizu</option>
+                    <option value="309"<if $ficha['clan2'] == '309' then> selected</if>>Funato</option>
+                    <option value="310"<if $ficha['clan2'] == '310' then> selected</if>>Kodon</option>
                   </select>
                 </div>
                 <div class="mf-field">

@@ -1,7 +1,7 @@
 <html>
 
 <head>
-  <title>Técnicas de Ficha</title>
+  <title>Virtudes de Ficha</title>
   {$headerinclude}
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -58,37 +58,41 @@
     .sg-label { font-family: 'Cinzel', serif; font-size: 8px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--mist); }
     .sg-label .req { color: var(--oxide); }
 
-    .sg-input, .sg-select, .sg-textarea {
+    .sg-input, .sg-select {
       width: 100%; padding: 9px 12px; background: var(--bg); border: 0.5px solid var(--border-strong);
       color: var(--ink); font-family: 'Noto Serif JP', serif; font-size: 14px; line-height: 1.5;
-      box-sizing: border-box; transition: border-color 0.15s;
+      box-sizing: border-box; height: 40px; transition: border-color 0.15s;
     }
-    .sg-input, .sg-select { height: 40px; }
-    .sg-textarea { min-height: 90px; resize: vertical; font-size: 13px; }
-    .sg-input:focus, .sg-select:focus, .sg-textarea:focus { outline: none; border-color: var(--plum3); }
+    .sg-input:focus, .sg-select:focus { outline: none; border-color: var(--plum3); }
     .sg-select {
       -webkit-appearance: none; appearance: none; padding-right: 32px;
       background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%238a7a9a' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
       background-repeat: no-repeat; background-position: right 12px center;
     }
 
-    /* Listas de técnicas aprendidas */
+    /* Listas de virtudes/defectos asignados */
     .sg-vt-group { border: 0.5px solid var(--border); }
     .sg-vt-group + .sg-vt-group { margin-top: 14px; }
     .sg-vt-group-head {
       padding: 8px 14px; background: var(--bg3); border-bottom: 0.5px solid var(--border);
       font-family: 'Cinzel', serif; font-size: 8px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;
-      color: var(--plum3);
     }
+    .sg-vt-group--v .sg-vt-group-head { color: var(--green); }
+    .sg-vt-group--d .sg-vt-group-head { color: var(--oxide); }
 
     .sg-vt-row {
-      display: grid; grid-template-columns: 90px 1fr 34px;
+      display: grid; grid-template-columns: 90px 1fr 60px 34px;
       gap: 12px; align-items: center; padding: 8px 14px;
       border-bottom: 0.5px solid var(--border); background: var(--bg);
     }
     .sg-vt-row:last-child { border-bottom: none; }
     .sg-vt-id { font-family: 'Cinzel', serif; font-size: 11px; font-weight: 700; color: var(--plum3); }
     .sg-vt-name { color: var(--ink); font-size: 14px; }
+    .sg-vt-tag {
+      margin-left: 6px; font-family: 'Cinzel', serif; font-size: 8px; letter-spacing: 1px; text-transform: uppercase;
+      color: var(--oxide); border: 0.5px solid var(--oxide); padding: 1px 6px;
+    }
+    .sg-vt-cost { font-family: 'Cinzel', serif; font-size: 13px; font-weight: 700; color: var(--stone); text-align: right; }
 
     .sg-vt-empty { padding: 18px 14px; text-align: center; color: var(--mist); font-size: 13px; background: var(--bg); }
 
@@ -103,19 +107,10 @@
 
     /* Agregar */
     .sg-add {
-      display: grid; grid-template-columns: 1fr; gap: 10px;
+      display: grid; grid-template-columns: 1fr 120px; gap: 10px; align-items: end;
       padding: 14px; border: 0.5px solid var(--border); background: var(--bg3);
     }
     .sg-hint { margin: 8px 0 0; font-size: 12px; line-height: 1.6; color: var(--mist); }
-
-    .sg-tabs { display: flex; gap: 6px; margin-bottom: 14px; }
-    .sg-tab {
-      flex: 1; text-align: center; padding: 9px 10px; cursor: pointer;
-      border: 0.5px solid var(--border-strong); background: var(--bg);
-      font-family: 'Cinzel', serif; font-size: 9px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;
-      color: var(--stone); transition: background 0.15s, color 0.15s;
-    }
-    .sg-tab.active { background: var(--plum); color: var(--lavender); border-color: var(--plum); }
 
     .sg-btn {
       display: inline-flex; align-items: center; justify-content: center; height: 40px; padding: 0 22px;
@@ -128,10 +123,12 @@
     .sg-btn--ghost:hover { background: rgba(123, 74, 184, 0.14); }
 
     .sg-actions { display: flex; justify-content: space-between; gap: 10px; margin-top: 20px; padding-top: 16px; border-top: 0.5px solid var(--border); }
-    .sg-credentials { display: grid; grid-template-columns: 1fr; gap: 14px; margin-top: 18px; }
+    .sg-credentials { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 18px; }
 
     @media (max-width: 640px) {
-      .sg-vt-row { grid-template-columns: 1fr 34px; }
+      .sg-add { grid-template-columns: 1fr; }
+      .sg-credentials { grid-template-columns: 1fr; }
+      .sg-vt-row { grid-template-columns: 1fr auto 34px; }
       .sg-vt-id { display: none; }
     }
   </style>
@@ -142,7 +139,7 @@
   <main class="sg-admin">
     <div class="sg-admin-card">
       <div class="sg-admin-head">
-        <h1>Técnicas de Ficha</h1>
+        <h1>Virtudes de Ficha</h1>
       </div>
       <div class="sg-admin-body">
 
@@ -150,7 +147,7 @@
         <div class="sg-lookup">
           <div class="sg-field" style="flex: 1; min-width: 200px;">
             <label class="sg-label" for="lookup_fid">User ID</label>
-            <input class="sg-input" type="number" min="1" placeholder="243" id="lookup_fid" value="{$fid}">
+            <input class="sg-input" type="number" min="1" placeholder="196" id="lookup_fid" value="{$fid}">
           </div>
           <button class="sg-btn" type="button" onclick="onLoadFicha()">Cargar</button>
         </div>
@@ -160,50 +157,43 @@
             Ficha: <a href="/sg/ficha.php?action=profile&uid={$fid}" target="_blank" style="color: var(--plum3); text-decoration: underline;">{$ficha['nombre']}</a> · UID {$fid}
           </div>
 
-          <form method="post" action="/sg/admin/ficha_tecnicas.php?fid={$fid}" name="ficha_tecnicas" id="ficha_tecnicas">
+          <form method="post" action="/sg/admin/ficha_virtudes.php?fid={$fid}" name="ficha_virtudes" id="ficha_virtudes">
             <input type="hidden" name="ficha_id" value="{$fid}">
 
-            <!-- Vista: aprendidas -->
+            <!-- Vista: asignadas -->
             <div id="sg-mode-list">
-              <div class="sg-section-label">Técnicas aprendidas</div>
-              {$listaTecnicas}
+              <div class="sg-section-label">Virtudes y defectos asignados</div>
+              <div class="sg-vt-group sg-vt-group--v">
+                <div class="sg-vt-group-head">Virtudes</div>
+                {$listaVirtudes}
+              </div>
+              <div class="sg-vt-group sg-vt-group--d">
+                <div class="sg-vt-group-head">Defectos</div>
+                {$listaDefectos}
+              </div>
             </div>
 
             <!-- Vista: agregar -->
             <div id="sg-mode-add" style="display: none;">
-              <div class="sg-tabs">
-                <div class="sg-tab active" id="sg-tab-single" onclick="sgSwitchAddTab('single')">Una técnica</div>
-                <div class="sg-tab" id="sg-tab-bulk" onclick="sgSwitchAddTab('bulk')">Varias por ID</div>
-              </div>
-
-              <div id="sg-add-single">
-                <div class="sg-section-label">Agregar del catálogo</div>
-                <div class="sg-add">
-                  <div class="sg-field">
-                    <label class="sg-label" for="tecnica_add">Técnica</label>
-                    <select class="sg-select" name="tecnica_add" id="tecnica_add">
-                      <option value="">— Selecciona —</option>
-                      {$opcionesAdd}
-                    </select>
-                  </div>
+              <div class="sg-section-label">Agregar del catálogo</div>
+              <div class="sg-add">
+                <div class="sg-field">
+                  <label class="sg-label" for="virtud_add">Virtud / Defecto</label>
+                  <select class="sg-select" name="virtud_add" id="virtud_add">
+                    <option value="">— Selecciona —</option>
+                    {$opcionesAdd}
+                  </select>
                 </div>
-                <p class="sg-hint">Solo se listan las técnicas que la ficha aún no tiene aprendidas.</p>
               </div>
-
-              <div id="sg-add-bulk" style="display: none;">
-                <div class="sg-section-label">Agregar por lote (IDs conocidos)</div>
-                <div class="sg-add">
-                  <div class="sg-field">
-                    <label class="sg-label" for="tecnicas_bulk">IDs de técnica, separados por coma</label>
-                    <textarea class="sg-textarea" name="tecnicas_bulk" id="tecnicas_bulk" placeholder="BUKI101B, BUKI001R, BUKI002R"></textarea>
-                  </div>
-                </div>
-                <p class="sg-hint">Útil para asignar un set inicial de técnicas ya conocido. Los IDs que no existan en el catálogo o que ya estén aprendidos se omiten automáticamente.</p>
-              </div>
+              <p class="sg-hint">Solo se listan las virtudes y defectos que la ficha aún no tiene.</p>
             </div>
 
-            <!-- Razón del cambio -->
+            <!-- Credenciales (compartidas) -->
             <div class="sg-credentials">
+              <div class="sg-field">
+                <label class="sg-label" for="staff">Miembro de Staff <span class="req">*</span></label>
+                <input class="sg-input" type="text" name="staff" id="staff" required>
+              </div>
               <div class="sg-field">
                 <label class="sg-label" for="razon">Razón <span class="req">*</span></label>
                 <input class="sg-input" type="text" name="razon" id="razon" required>
@@ -212,15 +202,14 @@
 
             <!-- Acciones: lista -->
             <div class="sg-actions" id="sg-actions-list">
-              <button class="sg-btn sg-btn--ghost" type="button" onclick="sgShowAdd()">+ Agregar técnicas</button>
+              <button class="sg-btn sg-btn--ghost" type="button" onclick="sgShowAdd()">+ Agregar del catálogo</button>
               <button class="sg-btn" type="submit" name="accion" value="Guardar">Quitar marcadas</button>
             </div>
 
             <!-- Acciones: agregar -->
             <div class="sg-actions" id="sg-actions-add" style="display: none;">
               <button class="sg-btn sg-btn--ghost" type="button" onclick="sgHideAdd()">Cancelar</button>
-              <button class="sg-btn" type="submit" name="accion" value="Añadir" id="sg-btn-add-single">Añadir a la ficha</button>
-              <button class="sg-btn" type="submit" name="accion" value="AñadirLote" id="sg-btn-add-bulk" style="display: none;">Añadir lote a la ficha</button>
+              <button class="sg-btn" type="submit" name="accion" value="Añadir">Añadir a la ficha</button>
             </div>
           </form>
         </if>
@@ -255,16 +244,6 @@
     document.getElementById('sg-actions-add').style.display = 'none';
     document.getElementById('sg-mode-list').style.display = '';
     document.getElementById('sg-actions-list').style.display = '';
-  }
-
-  function sgSwitchAddTab(tab) {
-    const isSingle = tab === 'single';
-    document.getElementById('sg-tab-single').classList.toggle('active', isSingle);
-    document.getElementById('sg-tab-bulk').classList.toggle('active', !isSingle);
-    document.getElementById('sg-add-single').style.display = isSingle ? '' : 'none';
-    document.getElementById('sg-add-bulk').style.display = isSingle ? 'none' : '';
-    document.getElementById('sg-btn-add-single').style.display = isSingle ? '' : 'none';
-    document.getElementById('sg-btn-add-bulk').style.display = isSingle ? 'none' : '';
   }
 </script>
 

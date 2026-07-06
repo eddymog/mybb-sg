@@ -35,6 +35,7 @@ if (!does_ficha_exist($uid)) {
 
 $ficha = select_one_query_with_id('mybb_sg_sg_fichas', 'fid', $uid);
 $ryos = intval($ficha['ryos']);
+$precio_mult = sg_tienda_multiplicador($db, $uid);
 
 // ── Compra (validada y serializada en el servidor) ────────────
 if ($accion === 'comprar' && $objeto_post !== '' && $uid > 0) {
@@ -69,9 +70,10 @@ if ($accion === 'comprar' && $objeto_post !== '' && $uid > 0) {
                 $ryos_actual = intval($r['ryos']);
             }
 
-            $onombre = htmlspecialchars($obj['nombre'], ENT_QUOTES);
-            $coste   = intval($obj['coste']);
-            $maxq    = intval($obj['cantidadMaxima']);
+            $onombre   = htmlspecialchars($obj['nombre'], ENT_QUOTES);
+            $coste_raw = intval($obj['coste']);
+            $coste     = ($coste_raw >= 99999) ? $coste_raw : (int) round($coste_raw * $precio_mult);
+            $maxq      = intval($obj['cantidadMaxima']);
             $n       = $cantidad_post > 0 ? $cantidad_post : 1;
 
             $actual = 0;
@@ -123,6 +125,8 @@ while ($r = $db->fetch_array($qinv)) {
 }
 
 // ── Catálogo a la venta ───────────────────────────────────────
+$es_staff = (is_mod($uid) || is_staff($uid));
+
 $query_objetos = $db->query("
     SELECT * FROM `mybb_sg_sg_objetos`
     WHERE en_tienda='1'
@@ -132,6 +136,8 @@ $query_objetos = $db->query("
 $objetos_html = '';
 $tipoAnterior = null;
 $total = 0;
+$tipos_chips = array();
+$conteo_tipos = array();
 
 while ($q = $db->fetch_array($query_objetos)) {
     $total++;
@@ -142,70 +148,72 @@ while ($q = $db->fetch_array($query_objetos)) {
     $tipo      = trim($q['tipo']) !== '' ? $q['tipo'] : 'Otros';
     $tipo_esc  = htmlspecialchars($tipo, ENT_QUOTES);
     $tamano    = htmlspecialchars($q['tamano'], ENT_QUOTES);
-    $desc      = nl2br(htmlspecialchars($q['descripcion'], ENT_QUOTES));
-    $efecto_items = '';
-    foreach (array($q['efecto1'], $q['efecto2'], $q['efecto3']) as $ef) {
-        if (trim($ef) !== '') {
-            $efecto_items .= "<div class=\"sg-item-effect\"><span class=\"sg-item-eff-label\">Efecto</span> " . nl2br(htmlspecialchars($ef, ENT_QUOTES)) . "</div>";
-        }
-    }
-    $coste     = intval($q['coste']);
+    $municion  = htmlspecialchars($q['municion'], ENT_QUOTES);
+    $desc_attr = htmlspecialchars($q['descripcion'], ENT_QUOTES);
+    $ef1 = htmlspecialchars($q['efecto1'], ENT_QUOTES);
+    $ef2 = htmlspecialchars($q['efecto2'], ENT_QUOTES);
+    $ef3 = htmlspecialchars($q['efecto3'], ENT_QUOTES);
+    $coste_raw = intval($q['coste']);
+    $coste     = ($coste_raw >= 99999) ? $coste_raw : (int) round($coste_raw * $precio_mult);
     $maxq      = intval($q['cantidadMaxima']);
     $img       = trim($q['imagen']) !== '' ? htmlspecialchars($q['imagen'], ENT_QUOTES) : $default_img;
     $data_name = htmlspecialchars(strtolower($q['nombre']), ENT_QUOTES);
     $data_tipo = htmlspecialchars(strtolower($tipo), ENT_QUOTES);
+    $conteo_tipos[$data_tipo] = (isset($conteo_tipos[$data_tipo]) ? $conteo_tipos[$data_tipo] : 0) + 1;
+    $data_search = htmlspecialchars(strtolower(
+        $q['nombre'] . ' ' . $tipo . ' ' . $q['tamano'] . ' ' . $q['descripcion'] . ' ' .
+        $q['efecto1'] . ' ' . $q['efecto2'] . ' ' . $q['efecto3']
+    ), ENT_QUOTES);
 
-    $coste_label = ($coste >= 99999) ? '—' : number_format($coste, 0, ',', '.') . ' ryos';
+    $coste_label = ($coste >= 99999) ? 'No comprable' : number_format($coste, 0, ',', '.') . ' ryos';
 
     $actual  = isset($inv[$oid_raw]) ? $inv[$oid_raw] : 0;
     $espacio = $maxq - $actual;
     $afford  = $coste > 0 ? intdiv($ryos, $coste) : $espacio;
 
-    // Control de compra
+    // Estado de compra. En el modal/vista detalle lo pinta el JS desde los data-*;
+    // en la cuadrícula se muestra ya renderizado bajo la imagen ($gridbuy).
     if ($espacio <= 0) {
-        $buy = "<div class=\"sg-buy-status sg-buy-status--max\">Máximo alcanzado</div>";
+        $buystate = 'max'; $maxbuy = 0;
+        $buy_html = "<div class=\"sg-buy-status sg-buy-status--max\">Máximo alcanzado</div>";
     } else if ($afford <= 0) {
-        $buy = "<div class=\"sg-buy-status sg-buy-status--no\">Ryos insuficientes</div>";
+        $buystate = 'sinryos'; $maxbuy = 0;
+        $buy_html = "<div class=\"sg-buy-status sg-buy-status--no\">Ryos insuficientes</div>";
     } else {
-        $maxbuy = min($espacio, $afford);
-        $buy = "<form method=\"post\" action=\"/sg/tienda.php\" class=\"sg-buy\">"
+        $buystate = 'ok'; $maxbuy = min($espacio, $afford);
+        $buy_html = "<form method=\"post\" action=\"/sg/tienda.php\" class=\"sg-buy\" onclick=\"event.stopPropagation();\">"
             . "<input type=\"hidden\" name=\"accion\" value=\"comprar\">"
             . "<input type=\"hidden\" name=\"objeto\" value=\"$oid\">"
             . "<input class=\"sg-buy-qty\" type=\"number\" name=\"cantidad\" min=\"1\" max=\"$maxbuy\" value=\"1\" title=\"Cantidad (máx. $maxbuy)\">"
             . "<button class=\"sg-btn\" type=\"submit\">Comprar</button>"
             . "</form>";
     }
+    // Precio + compra bajo la imagen (solo cuadrícula; se oculta en vista detalle).
+    $gridbuy = "<div class=\"sg-obj-gridbuy\" onclick=\"event.stopPropagation();\">"
+        . "<div class=\"sg-obj-gridprice\">$coste_label</div>"
+        . $buy_html
+        . "</div>";
 
     // Nuevo grupo por tipo
     if ($tipo !== $tipoAnterior) {
         if ($tipoAnterior !== null) {
             $objetos_html .= "</div></section>";
         }
-        $objetos_html .= "<section class=\"sg-cat-group\"><h2 class=\"sg-cat-group-title\">$tipo_esc</h2><div class=\"sg-cat-grid\">";
+        $objetos_html .= "<section class=\"sg-cat-group\" data-tipo=\"$data_tipo\"><h2 class=\"sg-cat-group-title\">$tipo_esc</h2><div class=\"sg-obj-grid\">";
+        $tipos_chips[] = array($tipo_esc, $data_tipo);
         $tipoAnterior = $tipo;
     }
 
-    $badges = "<span class=\"sg-item-badge\">$tipo_esc</span>";
-    if ($tamano !== '') {
-        $badges .= "<span class=\"sg-item-badge sg-item-badge--soft\">$tamano</span>";
-    }
-
-    $desc_html   = trim($q['descripcion']) !== '' ? "<p class=\"sg-item-desc\">$desc</p>" : '';
-    $efecto_html = $efecto_items;
-
-    $objetos_html .= "<article class=\"sg-item\" data-name=\"$data_name\" data-tipo=\"$data_tipo\">"
-        . "<div class=\"sg-item-media\">"
-        . "<img class=\"sg-item-img\" src=\"$img\" alt=\"$nombre\" loading=\"lazy\" onerror=\"sgImgFallback(this)\">"
-        . "<span class=\"sg-item-cost\">$coste_label</span>"
-        . "</div>"
-        . "<div class=\"sg-item-body\">"
-        . "<h3 class=\"sg-item-name\">$nombre</h3>"
-        . "<div class=\"sg-item-badges\">$badges</div>"
-        . $desc_html
-        . $efecto_html
-        . "<div class=\"sg-item-meta\">Tienes <strong>$actual</strong> / $maxq</div>"
-        . $buy
-        . "</div>"
+    // Miniatura 175×175 + nombre. El detalle (incl. la compra) lo pinta el JS
+    // desde los data-*, para el modal (cuadrícula) y para la vista detalle.
+    $objetos_html .= "<article class=\"sg-obj-tile\" tabindex=\"0\" role=\"button\" aria-label=\"$nombre\""
+        . " data-name=\"$data_name\" data-tipo=\"$data_tipo\" data-search=\"$data_search\""
+        . " data-nombre=\"$nombre\" data-img=\"$img\" data-coste=\"$coste_label\""
+        . " data-oid=\"$oid\" data-tamano=\"$tamano\" data-tipolabel=\"$tipo_esc\" data-municion=\"$municion\""
+        . " data-owned=\"$actual\" data-max=\"$maxq\" data-buystate=\"$buystate\" data-maxbuy=\"$maxbuy\""
+        . " data-desc=\"$desc_attr\" data-ef1=\"$ef1\" data-ef2=\"$ef2\" data-ef3=\"$ef3\">"
+        . "<div class=\"sg-obj-thumb\"><img class=\"sg-obj-img\" src=\"$img\" alt=\"$nombre\" loading=\"lazy\" onerror=\"sgImgFallback(this)\"></div>"
+        . "<div class=\"sg-obj-main\"><div class=\"sg-obj-name\">$nombre</div>$gridbuy<div class=\"sg-obj-detail\"></div></div>"
         . "</article>";
 }
 if ($tipoAnterior !== null) {
@@ -214,6 +222,17 @@ if ($tipoAnterior !== null) {
 if ($total === 0) {
     $objetos_html = "<div class=\"sg-cat-empty\">No hay objetos a la venta por ahora.</div>";
 }
+
+// Chips de filtro por categoría (Todos + cada tipo distinto), con su conteo.
+$chips_html = "<button class=\"sg-cat-chip is-active\" type=\"button\" data-tipo=\"\" onclick=\"sgSetTipo(this)\">Todos <span class=\"sg-cat-chip-n\">$total</span></button>";
+foreach ($tipos_chips as $t) {
+    $n = isset($conteo_tipos[$t[1]]) ? $conteo_tipos[$t[1]] : 0;
+    $chips_html .= "<button class=\"sg-cat-chip\" type=\"button\" data-tipo=\"{$t[1]}\" onclick=\"sgSetTipo(this)\">{$t[0]} <span class=\"sg-cat-chip-n\">$n</span></button>";
+}
+eval('$chipsHtml = $chips_html;');
+
+$sg_es_staff = $es_staff ? 'true' : 'false';
+eval('$sgEsStaff = $sg_es_staff;');
 
 $ryos_label = number_format($ryos, 0, ',', '.');
 

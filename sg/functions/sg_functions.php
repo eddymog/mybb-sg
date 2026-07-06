@@ -359,6 +359,102 @@ function sg_build_arbol_skeleton($db, $arbol)
 }
 
 /* =====================================================================
+ * VIRTUDES/DEFECTOS DE DINERO (Adinerado I-III / Comprador Impulsivo I-III)
+ * Mutuamente excluyentes entre sí. Se eligen una sola vez, al crear la
+ * ficha (nueva_ficha.php), y afectan el saldo inicial de Ryos y el precio
+ * de los objetos en tienda.php. Ver docs/virtudes_inserts.sql / defectos_inserts.sql.
+ * ===================================================================== */
+function sg_virtudes_dinero() {
+    return array(
+        'VADIN1' => array('ryos' =>  1000, 'descuento' =>  0.05),
+        'VADIN2' => array('ryos' =>  2000, 'descuento' =>  0.10),
+        'VADIN3' => array('ryos' =>  3000, 'descuento' =>  0.15),
+        'DCOMP1' => array('ryos' => -1000, 'descuento' => -0.10),
+        'DCOMP2' => array('ryos' => -2000, 'descuento' => -0.20),
+        'DCOMP3' => array('ryos' => -3000, 'descuento' => -0.30),
+    );
+}
+
+// Multiplicador de precio en tienda para una ficha (1.0 = sin cambio).
+function sg_tienda_multiplicador($db, $uid) {
+    $uid = (int) $uid;
+    $dinero = sg_virtudes_dinero();
+    $ids = "'" . implode("','", array_map(array($db, 'escape_string'), array_keys($dinero))) . "'";
+    $q = $db->query("SELECT virtud_id FROM mybb_sg_sg_virtudes_usuarios WHERE uid='$uid' AND virtud_id IN ($ids) LIMIT 1");
+    while ($r = $db->fetch_array($q)) {
+        return 1 - $dinero[$r['virtud_id']]['descuento'];
+    }
+    return 1.0;
+}
+
+/* =====================================================================
+ * INCOMPATIBILIDADES DE VIRTUDES/DEFECTOS (ver docs/virtudes_defectos.txt)
+ * Mapa SIMÉTRICO virtud_id => [ids incompatibles]. Se usa para bloquear
+ * combinaciones en el selector de creación de ficha (cliente y servidor).
+ * ===================================================================== */
+function sg_virtudes_incompatibilidades() {
+    static $mapa = null;
+    if ($mapa !== null) {
+        return $mapa;
+    }
+
+    // Grupos: cada miembro es incompatible con TODOS los demás del grupo.
+    $grupos = array(
+        array('VADIN1', 'VADIN2', 'VADIN3', 'DCOMP1', 'DCOMP2', 'DCOMP3'), // dinero
+        array('VPINF1', 'VPINF2', 'DPOSC1', 'DPOSC2'),                     // pasado familiar
+        array('DALER1', 'DALER2', 'DALER3'),                               // alergias
+        array('DFOBI1', 'DFOBI2', 'DFOBI3'),                               // fobias
+    );
+    // Pares sueltos.
+    $pares = array(
+        array('VATRAC', 'DFEURA'), // Atractivo / Feúra
+        array('VPROD1', 'VPROD2'), // Ninja Prodigio I / II
+        array('VFAMA',  'DIMPOP'), // Fama / Impopularidad
+        array('VINSUP', 'DVACIL'), // Instinto de Supervivencia / Voluntad Vacilante
+        array('VCONT1', 'VCONT2'), // Contactos I / II
+        array('VSENS1', 'VSENS2'), // Capacidad Sensorial I / II
+        array('VRDIF1', 'VRDIF2'), // Rasgo Diferente I / II
+        array('VSANRE', 'DSDILU'), // Sangre Resistente / Sangre Diluida
+        array('DDESHO', 'DLEALT'), // Deshonor / Lealtad
+        array('DVERBO', 'DMUDEZ'), // Verborrea Shinobi / Mudez
+        array('DVERBO', 'DSILEN'), // Verborrea Shinobi / Voto de Silencio
+    );
+
+    $mapa = array();
+    $add = function ($a, $b) use (&$mapa) {
+        if ($a === $b) { return; }
+        if (!isset($mapa[$a])) { $mapa[$a] = array(); }
+        if (!in_array($b, $mapa[$a], true)) { $mapa[$a][] = $b; }
+    };
+    foreach ($grupos as $g) {
+        foreach ($g as $a) {
+            foreach ($g as $b) { $add($a, $b); }
+        }
+    }
+    foreach ($pares as $p) {
+        $add($p[0], $p[1]);
+        $add($p[1], $p[0]);
+    }
+    return $mapa;
+}
+
+// Devuelve el primer par [a, b] incompatible dentro de un conjunto de ids,
+// o null si no hay conflicto.
+function sg_virtudes_conflicto($vids) {
+    $mapa = sg_virtudes_incompatibilidades();
+    $set  = array_flip($vids);
+    foreach ($vids as $vid) {
+        if (!isset($mapa[$vid])) { continue; }
+        foreach ($mapa[$vid] as $inc) {
+            if (isset($set[$inc])) {
+                return array($vid, $inc);
+            }
+        }
+    }
+    return null;
+}
+
+/* =====================================================================
  * DOJO SHINOBI — ver docs/arboles_instruciones.txt
  * ===================================================================== */
 
@@ -388,8 +484,6 @@ function sg_progreso_defaults() {
         'desbloqueo_arboles'     => 0,
         'desbloqueo_ramas'       => 0,
         'desbloqueo_nivel_ramas' => 0,
-        'arboles_disponibles'    => 1,
-        'ramas_disponibles'      => 0,
         'nivel_rama_disponibles' => 0,
         'clan_rama_usada'        => 0,
     );
@@ -526,14 +620,18 @@ function sg_dojo_estado($db, $uid) {
         }
     }
 
-    // Árbol del clan = poseído y que no es ni fijo ni elemental.
-    $clan_arbol = null;
+    // Árboles de clan = poseídos que no son ni fijos ni elementales.
+    // Normalmente 1; con Clan Híbrido (VHIBRI + 2ª base de clan concedida) hay 2.
+    // Ver docs/virtudes_defectos.txt (VHIBRI). El campo mybb_sg_sg_fichas.clan2 es
+    // solo para el display de la ficha; el dojo deriva todo de tec_aprendidas.
+    $clan_arboles = array();
     foreach ($poseidos as $arbol) {
         if (!in_array($arbol, $fijos, true) && !in_array($arbol, $elementales, true)) {
-            $clan_arbol = $arbol;
-            break;
+            $clan_arboles[] = $arbol;
         }
     }
+    $clan_arbol = !empty($clan_arboles) ? $clan_arboles[0] : null; // compat (primer clan)
+    $es_hibrido = (count($clan_arboles) >= 2);
 
     // Detalle por árbol poseído.
     $arboles = array();
@@ -604,6 +702,47 @@ function sg_dojo_estado($db, $uid) {
         );
     }
 
+    // ── Clan Híbrido: topes COMBINADOS entre los dos árboles de clan ──
+    // Los dos árboles de clan cuentan, para los límites, como si fueran UN
+    // solo clan: 3 ramas y 3 especialidades en total (igual que un clan normal).
+    // Solo aplica a híbridos; con un solo clan el comportamiento no cambia.
+    $CLAN_RAMAS_MAX = 3;
+    $CLAN_ESPEC_MAX = 3;
+    $clan_ramas_desbloqueadas = 0;
+    $clan_espec_aprendidas    = 0;
+    foreach ($clan_arboles as $arbol) {
+        if (!isset($arboles[$arbol])) { continue; }
+        foreach ($arboles[$arbol]['ramas'] as $r) {
+            if (!empty($r['desbloqueada'])) { $clan_ramas_desbloqueadas++; }
+        }
+        $clan_espec_aprendidas += (int) $arboles[$arbol]['especializaciones']['aprendidas'];
+    }
+
+    if ($es_hibrido) {
+        $ramas_full = ($clan_ramas_desbloqueadas >= $CLAN_RAMAS_MAX);
+        $espec_full = ($clan_espec_aprendidas >= $CLAN_ESPEC_MAX);
+        $restante_espec = max(0, $CLAN_ESPEC_MAX - $clan_espec_aprendidas);
+        foreach ($clan_arboles as $arbol) {
+            if (!isset($arboles[$arbol])) { continue; }
+            // Ramas: alcanzado el tope combinado, ninguna rama de clan más es desbloqueable.
+            if ($ramas_full) {
+                foreach ($arboles[$arbol]['ramas'] as $rama => $r) {
+                    if (empty($r['desbloqueada'])) {
+                        $arboles[$arbol]['ramas'][$rama]['desbloqueable'] = false;
+                    }
+                }
+            }
+            // Especialidades: cupo por nivel como hoy, pero el TOTAL aprendido se
+            // capa en 3 entre ambos; sin restante global, no hay elegibles.
+            $esp =& $arboles[$arbol]['especializaciones'];
+            $esp['cupo'] = min((int) $esp['cupo'], (int) $esp['aprendidas'] + $restante_espec);
+            if ($espec_full) {
+                $esp['elegibles'] = array();
+            }
+            unset($esp);
+        }
+    }
+
     // Elementos de selección directa (yin/yang) adquiribles.
     $directos = array();
     foreach (sg_arboles_directos() as $el) {
@@ -641,14 +780,14 @@ function sg_dojo_estado($db, $uid) {
         'razon'               => $ruleta_razon,
     );
 
-    // ¿Hay rama de clan gratis disponible?
+    // ¿Hay rama de clan gratis disponible? (sirve para cualquiera de los árboles
+    // de clan y cuenta dentro del tope de 3 ramas del híbrido).
     $clan_rama_disponible = false;
-    if ($clan_arbol !== null && (int) $progreso['clan_rama_usada'] === 0
-        && isset($arboles[$clan_arbol])) {
-        foreach ($arboles[$clan_arbol]['ramas'] as $r) {
-            if (!empty($r['desbloqueable'])) {
-                $clan_rama_disponible = true;
-                break;
+    if ((int) $progreso['clan_rama_usada'] === 0) {
+        foreach ($clan_arboles as $arbol) {
+            if (!isset($arboles[$arbol])) { continue; }
+            foreach ($arboles[$arbol]['ramas'] as $r) {
+                if (!empty($r['desbloqueable'])) { $clan_rama_disponible = true; break 2; }
             }
         }
     }
@@ -665,8 +804,14 @@ function sg_dojo_estado($db, $uid) {
         'ruleta'   => $ruleta,
         'arboles'  => $arboles,
         'clan'     => array(
-            'arbol'                => $clan_arbol,
+            'arbol'                  => $clan_arbol,     // primer clan (compat)
+            'arboles'                => $clan_arboles,   // todos los árboles de clan
+            'es_hibrido'             => $es_hibrido,
             'rama_gratis_disponible' => $clan_rama_disponible,
+            'ramas_desbloqueadas'    => $clan_ramas_desbloqueadas,
+            'ramas_max'              => $CLAN_RAMAS_MAX,
+            'espec_aprendidas'       => $clan_espec_aprendidas,
+            'espec_max'              => $CLAN_ESPEC_MAX,
         ),
     );
 }
@@ -831,11 +976,8 @@ function sg_dojo_aplicar_accion($db, $uid, $action, $params) {
                     $result = $err("Esa rama no está disponible para desbloquear.");
                     break;
                 }
-                if ((int) $progreso['ramas_disponibles'] > 0) {
-                    $progreso['ramas_disponibles']--;
-                    sg_dojo_aprender($db, $uid, $rinfo['base']);
-                    sg_dojo_guardar($db, $uid, $tobi, $progreso);
-                    $result = $ok("Desbloqueaste una rama (gratis).");
+                if (in_array($arbol, $estado['clan']['arboles'], true) && (int) $progreso['clan_rama_usada'] === 0) {
+                    $result = $err("Primero debes elegir tu rama de clan gratis antes de comprar otra rama de ese árbol.");
                     break;
                 }
                 if ($tobi < $costos['rama']) {
@@ -904,9 +1046,17 @@ function sg_dojo_aplicar_accion($db, $uid, $action, $params) {
 
             // ── (E) Rama de clan gratis (una sola vez) ──────────────
             case 'rama_clan':
-                $clan_arbol = $estado['clan']['arbol'];
-                if ($clan_arbol === null || empty($estado['clan']['rama_gratis_disponible'])) {
+                if (empty($estado['clan']['rama_gratis_disponible'])) {
                     $result = $err("No tienes una rama de clan gratis disponible.");
+                    break;
+                }
+                // El árbol puede ser cualquiera de los de clan (híbrido). Si no se
+                // especifica, se toma el primero (compat con el flujo de un clan).
+                $clan_arbol = ($arbol !== '' && in_array($arbol, $estado['clan']['arboles'], true))
+                    ? $arbol
+                    : $estado['clan']['arbol'];
+                if ($clan_arbol === null || !in_array($clan_arbol, $estado['clan']['arboles'], true)) {
+                    $result = $err("Ese árbol no es de clan.");
                     break;
                 }
                 $rinfo = isset($estado['arboles'][$clan_arbol]['ramas'][$rama]) ? $estado['arboles'][$clan_arbol]['ramas'][$rama] : null;

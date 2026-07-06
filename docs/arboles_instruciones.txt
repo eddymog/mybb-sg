@@ -57,14 +57,14 @@ Equivalencias derivadas:
       desbloqueo_arboles ....... veces que se PAGÓ por un árbol (escala costo).
       desbloqueo_ramas ......... veces que se PAGÓ por una rama (escala costo).
       desbloqueo_nivel_ramas ... veces que se PAGÓ por subir nivel (escala costo).
-      arboles_disponibles ...... (en desuso) los árboles SIEMPRE cuestan Tobis;
-                                 se mantiene por compatibilidad. Default 1.
-      ramas_disponibles ........ créditos gratis para rama (default 0; staff puede regalar).
-      nivel_rama_disponibles ... créditos gratis para subir nivel (default 0; staff puede regalar).
+      nivel_rama_disponibles ... créditos gratis para subir nivel (default 0). Hoy nadie
+                                 los otorga; queda previsto para otorgar 1 por cada nivel
+                                 que sube el personaje (pendiente de programar).
       clan_rama_usada .......... 0/1, si ya se usó la rama de clan gratis.
 
-  (Los créditos permiten "banca": el staff puede regalarlos o el sistema
-   los otorga, p. ej. el árbol inicial gratis. Ver sección 7.)
+  Las RAMAS no tienen crédito gratis: SIEMPRE cuestan Tobis, salvo la única
+  rama de clan gratuita (E), que no usa contador de costo sino el flag
+  clan_rama_usada.
 
 ----------------------------------------------------------------
 4. CATÁLOGO CACHEADO  [Mejora 2]
@@ -132,14 +132,15 @@ Las acciones con costo (A/B/C) son de UN SOLO CLIC y atómicas.
 
 ÁRBOLES (A): SIEMPRE cuestan Tobis (no hay crédito gratis). Ver sección 9.
 
-RAMAS y NIVELES (B/C): regla crédito-primero:
-    Si el CRÉDITO correspondiente > 0 -> se consume 1 crédito (GRATIS), crédito -= 1.
-    Si el crédito == 0 -> se cobran los Tobis (fórmula) y el CONTADOR += 1.
-  (Los créditos de B/C empiezan en 0; el staff puede regalarlos.)
+RAMAS (B): SIEMPRE cuestan Tobis (no hay crédito gratis), salvo la rama de
+clan gratuita de la sección (E), que es un caso aparte (una sola vez, no
+escala costo ni usa contador).
 
-Mapa contador / crédito:
-     B) desbloqueo_ramas        <-> ramas_disponibles
-     C) desbloqueo_nivel_ramas  <-> nivel_rama_disponibles
+NIVELES (C): regla crédito-primero:
+    Si nivel_rama_disponibles > 0 -> se consume 1 crédito (GRATIS), crédito -= 1.
+    Si el crédito == 0 -> se cobran los Tobis (fórmula C) y desbloqueo_nivel_ramas += 1.
+  (El crédito empieza en 0; hoy nada lo otorga — pendiente de programar que
+   el personaje reciba 1 crédito por cada nivel que sube.)
 
 ----------------------------------------------------------------
 8. FÓRMULAS DE COSTO (en Tobis)
@@ -184,9 +185,14 @@ Mapa contador / crédito:
 
 (B) DESBLOQUEAR UNA RAMA
     Elige una rama desbloqueable (6.3) de cualquier árbol poseído.
-    - Si ramas_disponibles > 0 -> gratis, ramas_disponibles -= 1.
-    - Si no -> cobra fórmula B, desbloqueo_ramas += 1.
+    Siempre cobra fórmula B, desbloqueo_ramas += 1 (no hay crédito gratis;
+    la única rama gratis del juego es la de clan, ver (E)).
     Efecto: INSERT de catalogo[arbol][rama].base en tec_aprendidas.
+
+    EXCEPCIÓN — árbol de clan: mientras clan_rama_usada == 0, NO se puede
+    pagar ninguna rama de ese árbol con Tobis; primero hay que reclamar la
+    rama de clan gratis (E). Una vez clan_rama_usada == 1, el árbol de clan
+    se compra igual que cualquier otro (fórmula B normal).
 
 (C) SUBIR NIVEL DE UNA RAMA (aprender 2 mejoras)
     Elige una rama YA desbloqueada con >= 2 mejoras libres (6.5) y elige 2 de

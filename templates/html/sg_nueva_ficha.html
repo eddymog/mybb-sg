@@ -1166,6 +1166,154 @@
       }
     }
 
+    /* ─── Virtudes y Defectos (selección) ───────────────────────── */
+    .nf-vd-intro {
+      margin: 0 0 16px;
+      font-size: 13px;
+      line-height: 1.6;
+      color: var(--stone);
+    }
+    .nf-vd-intro strong { color: var(--ink); }
+
+    .nf-vd-balance {
+      position: sticky;
+      top: 8px;
+      z-index: 5;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 22px;
+      padding: 12px 18px;
+      margin-bottom: 20px;
+      background: var(--bg3);
+      border: 0.5px solid var(--border);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.28);
+    }
+    .nf-vd-balance-item { display: flex; flex-direction: column; gap: 2px; }
+    .nf-vd-balance-label {
+      font-family: 'Cinzel', serif; font-size: 8px; font-weight: 700;
+      letter-spacing: 1.8px; text-transform: uppercase; color: var(--mist);
+    }
+    .nf-vd-balance-val {
+      font-family: 'Cinzel', serif; font-size: 17px; font-weight: 900; color: var(--ink);
+    }
+    .nf-vd-pts--v { color: #4f9d69; }
+    .nf-vd-pts--d { color: var(--oxide); }
+    .nf-vd-balance-warn {
+      margin-left: auto;
+      font-size: 11px; font-style: italic; color: var(--oxide);
+      opacity: 0; transition: opacity 0.2s;
+    }
+    .nf-vd-balance.is-invalid { border-color: var(--oxide); }
+    .nf-vd-balance.is-invalid .nf-vd-balance-warn { opacity: 1; }
+
+    .nf-vd-cols {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    .nf-vd-col-head {
+      padding: 8px 12px; margin-bottom: 10px;
+      font-family: 'Cinzel', serif; font-size: 9px; font-weight: 700;
+      letter-spacing: 2px; text-transform: uppercase;
+      background: var(--bg3); border-left: 3px solid var(--border);
+    }
+    .nf-vd-col-head--v { border-left-color: #4f9d69; color: #7cc493; }
+    .nf-vd-col-head--d { border-left-color: var(--oxide); color: var(--oxide); }
+
+    .nf-vd-list { display: flex; flex-direction: column; gap: 8px; max-height: 620px; overflow-y: auto; padding-right: 4px; }
+
+    .nf-vd-card {
+      position: relative;
+      display: block;
+      padding: 11px 13px;
+      background: var(--bg3);
+      border: 0.5px solid var(--border);
+      cursor: pointer;
+      transition: border-color 0.15s, box-shadow 0.15s, opacity 0.15s, transform 0.1s;
+    }
+    .nf-vd-card > input[type="checkbox"] { position: absolute; opacity: 0; width: 0; height: 0; }
+
+    /* Degradado por tipo (como en el registro de virtudes) */
+    .nf-vd-col--v .nf-vd-card {
+      background: linear-gradient(180deg, rgba(79, 157, 105, 0.14), rgba(79, 157, 105, 0.05) 60%), var(--bg3);
+      border-color: rgba(79, 157, 105, 0.28);
+    }
+    .nf-vd-col--d .nf-vd-card {
+      background: linear-gradient(180deg, rgba(192, 88, 42, 0.14), rgba(192, 88, 42, 0.05) 60%), var(--bg3);
+      border-color: rgba(192, 88, 42, 0.28);
+    }
+
+    .nf-vd-card:hover { transform: translateY(-1px); }
+    .nf-vd-col--v .nf-vd-card:hover { border-color: rgba(79, 157, 105, 0.6); }
+    .nf-vd-col--d .nf-vd-card:hover { border-color: rgba(192, 88, 42, 0.6); }
+
+    /* Seleccionada: anillo plum sobre el degradado */
+    .nf-vd-card:has(input:checked) {
+      border-color: var(--plum3);
+      box-shadow: inset 0 0 0 1px var(--plum3), 0 4px 14px rgba(123, 74, 184, 0.25);
+    }
+
+    .nf-vd-card.is-disabled {
+      opacity: 0.38;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+    .nf-vd-card.is-disabled::after {
+      content: 'Incompatible';
+      position: absolute; top: 8px; right: 10px;
+      font-family: 'Cinzel', serif; font-size: 7px; font-weight: 700;
+      letter-spacing: 1.2px; text-transform: uppercase; color: var(--oxide);
+    }
+
+    .nf-vd-card-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; margin-bottom: 6px; }
+    .nf-vd-card-name { font-family: 'Cinzel', serif; font-size: 12px; font-weight: 700; color: var(--ink); }
+    .nf-vd-pts { font-family: 'Cinzel', serif; font-size: 13px; font-weight: 900; flex-shrink: 0; }
+    .nf-vd-card-id {
+      display: inline-block; margin: 0 0 8px;
+      padding: 3px 10px;
+      font-family: 'Cinzel', serif; font-size: 9px; font-weight: 700;
+      letter-spacing: 1.6px; text-transform: uppercase;
+      color: var(--plum3); background: rgba(123, 74, 184, 0.18);
+      border: 0.5px solid rgba(156, 107, 204, 0.45);
+    }
+    .nf-vd-card-desc { display: block; font-size: 11.5px; line-height: 1.55; color: var(--stone); }
+
+    .nf-vd-empty { padding: 16px; text-align: center; color: var(--mist); font-size: 12px; }
+
+    @media (max-width: 720px) {
+      .nf-vd-cols { grid-template-columns: 1fr; }
+      .nf-vd-list { max-height: none; }
+    }
+
+    /* ─── Creación deshabilitada ────────────────────────────────── */
+    .nf-disabled {
+      max-width: 560px;
+      margin: 40px auto;
+      padding: 48px 32px;
+      text-align: center;
+      background: var(--bg2);
+      border: 0.5px solid var(--border);
+      position: relative;
+      overflow: hidden;
+    }
+    .nf-disabled-kanji {
+      font-family: 'Zen Old Mincho', serif;
+      font-size: 120px; line-height: 1; color: var(--oxide);
+      opacity: 0.12; margin-bottom: -20px;
+    }
+    .nf-disabled-label {
+      font-family: 'Cinzel', serif; font-size: 9px; font-weight: 700;
+      letter-spacing: 3px; text-transform: uppercase; color: var(--oxide);
+      margin-bottom: 10px;
+    }
+    .nf-disabled-title {
+      margin: 0 0 14px;
+      font-family: 'Cinzel', serif; font-size: 22px; font-weight: 900;
+      letter-spacing: 1px; color: var(--ink);
+    }
+    .nf-disabled-text { margin: 0; font-size: 14px; line-height: 1.7; color: var(--stone); }
+
   </style>
 </head>
 
@@ -1188,6 +1336,7 @@
       </div>
     </div>
 
+    <if $sgPuedeCrear == 1 then>
     <!-- ── Progress strip ───────────────────────────────────────────── -->
     <div class="nf-progress">
       <div class="nf-progress-step">
@@ -1207,11 +1356,16 @@
       <div class="nf-progress-sep"></div>
       <div class="nf-progress-step">
         <span class="nf-progress-num">04</span>
-        <span class="nf-progress-label">Historia</span>
+        <span class="nf-progress-label">Virtudes</span>
       </div>
       <div class="nf-progress-sep"></div>
       <div class="nf-progress-step">
         <span class="nf-progress-num">05</span>
+        <span class="nf-progress-label">Historia</span>
+      </div>
+      <div class="nf-progress-sep"></div>
+      <div class="nf-progress-step">
+        <span class="nf-progress-num">06</span>
         <span class="nf-progress-label">Registro</span>
       </div>
     </div>
@@ -1235,7 +1389,7 @@
 
         <div class="nf-fields" style="margin-bottom: 20px;">
           <div class="nf-field">
-            <span class="nf-field-label">Nombre del personaje <span class="nf-required">*</span></span>
+            <span class="nf-field-label">Nombre <span class="nf-required">*</span></span>
             <input class="textbox" type="text" name="name" required placeholder="Uzumaki…">
           </div>
           <div class="nf-field">
@@ -1359,25 +1513,52 @@
           <textarea name="psi" class="nf-ta-large" minlength="400" required
             placeholder="¿Cómo es tu personaje? ¿Cómo actúa, piensa y siente?…"></textarea>
         </div>
+      </div>
 
-        <div class="nf-fields-wide">
-          <div class="nf-textarea-group" style="margin-bottom:0;">
-            <label class="nf-textarea-label">Virtudes</label>
-            <textarea name="virtudes" class="nf-ta-large"
-              placeholder="Cualidades destacables…"></textarea>
+      <!-- ── 04 · Virtudes y Defectos ──────────────────────────────── -->
+      <div class="nf-section" data-step="04">
+        <div class="nf-section-head">
+          <span class="nf-step-badge">04</span>
+          <span class="nf-step-name">Virtudes y Defectos</span>
+        </div>
+
+        <p class="nf-vd-intro">
+          Elige las virtudes y defectos de tu personaje. Las combinaciones incompatibles se bloquean solas.
+          El total de <strong>virtudes</strong> no puede superar al de <strong>defectos</strong>: puedes tomar más defectos que virtudes, pero no al revés.
+        </p>
+
+        <div class="nf-vd-balance" id="nf-vd-balance">
+          <div class="nf-vd-balance-item">
+            <span class="nf-vd-balance-label">Virtudes</span>
+            <span class="nf-vd-balance-val nf-vd-pts--v" id="nf-vd-vsum">+0</span>
           </div>
-          <div class="nf-textarea-group" style="margin-bottom:0;">
-            <label class="nf-textarea-label">Defectos</label>
-            <textarea name="defectos" class="nf-ta-large"
-              placeholder="Fallos y debilidades del personaje…"></textarea>
+          <div class="nf-vd-balance-item">
+            <span class="nf-vd-balance-label">Defectos</span>
+            <span class="nf-vd-balance-val nf-vd-pts--d" id="nf-vd-dsum">−0</span>
+          </div>
+          <div class="nf-vd-balance-item">
+            <span class="nf-vd-balance-label">Balance</span>
+            <span class="nf-vd-balance-val" id="nf-vd-net">0</span>
+          </div>
+          <div class="nf-vd-balance-warn" id="nf-vd-warn">Las virtudes superan a los defectos</div>
+        </div>
+
+        <div class="nf-vd-cols">
+          <div class="nf-vd-col nf-vd-col--v">
+            <div class="nf-vd-col-head nf-vd-col-head--v">Virtudes</div>
+            <div class="nf-vd-list">{$virtudesCards}</div>
+          </div>
+          <div class="nf-vd-col nf-vd-col--d">
+            <div class="nf-vd-col-head nf-vd-col-head--d">Defectos</div>
+            <div class="nf-vd-list">{$defectosCards}</div>
           </div>
         </div>
       </div>
 
-      <!-- ── 04 · Historia ─────────────────────────────────────────── -->
-      <div class="nf-section" data-step="04">
+      <!-- ── 05 · Historia ─────────────────────────────────────────── -->
+      <div class="nf-section" data-step="05">
         <div class="nf-section-head">
-          <span class="nf-step-badge">04</span>
+          <span class="nf-step-badge">05</span>
           <span class="nf-step-name">Historia</span>
         </div>
 
@@ -1398,10 +1579,10 @@
         </div>
       </div>
 
-      <!-- ── 05 · Registro ─────────────────────────────────────────── -->
-      <div class="nf-section" data-step="05">
+      <!-- ── 06 · Registro ─────────────────────────────────────────── -->
+      <div class="nf-section" data-step="06">
         <div class="nf-section-head">
-          <span class="nf-step-badge">05</span>
+          <span class="nf-step-badge">06</span>
           <span class="nf-step-name">Registro</span>
         </div>
 
@@ -1439,10 +1620,22 @@
       </div>
 
     </form>
+    <else>
+    <!-- ── Creación deshabilitada ─────────────────────────────────── -->
+    <div class="nf-disabled">
+      <div class="nf-disabled-kanji">封</div>
+      <div class="nf-disabled-label">Registro cerrado</div>
+      <h2 class="nf-disabled-title">Creación de fichas deshabilitada</h2>
+      <p class="nf-disabled-text">
+        El registro de nuevos personajes está temporalmente cerrado mientras el equipo de staff
+        prepara la próxima temporada. Vuelve a intentarlo más adelante.
+      </p>
+    </div>
+    </if>
   </div><!-- /#nf-page -->
 
   {$footer}
-  {$nueva_ficha_script}
+  <if $sgPuedeCrear == 1 then>{$nueva_ficha_script}</if>
 
   <script>
     (function() {
@@ -1518,10 +1711,68 @@
         sections.forEach(function(s) { observer.observe(s); });
       }
 
+      /* ── Virtudes y Defectos: incompatibilidades + balance ──────── */
+      function initVirtudesDefectos() {
+        var balance = document.getElementById('nf-vd-balance');
+        var cards = Array.prototype.slice.call(document.querySelectorAll('.nf-vd-card'));
+        if (!balance || !cards.length) return;
+
+        var vsumEl = document.getElementById('nf-vd-vsum');
+        var dsumEl = document.getElementById('nf-vd-dsum');
+        var netEl  = document.getElementById('nf-vd-net');
+        var submit = document.getElementById('guardar_ficha');
+
+        function refresh() {
+          var checked = cards.filter(function(c) { return c.querySelector('input').checked; });
+
+          /* Balance */
+          var vsum = 0, dsum = 0;
+          checked.forEach(function(c) {
+            var p = parseInt(c.getAttribute('data-pts'), 10) || 0;
+            if (p >= 0) vsum += p; else dsum += p;
+          });
+          var net = vsum + dsum;
+          vsumEl.textContent = '+' + vsum;
+          dsumEl.textContent = '−' + Math.abs(dsum);
+          netEl.textContent = (net > 0 ? '+' : '') + net;
+
+          /* Regla: las virtudes no pueden superar a los defectos (net <= 0) */
+          var invalid = net > 0;
+          balance.classList.toggle('is-invalid', invalid);
+          if (submit) {
+            submit.disabled = invalid;
+            submit.style.opacity = invalid ? '0.5' : '';
+            submit.style.pointerEvents = invalid ? 'none' : '';
+          }
+
+          /* Incompatibilidades: bloquea las tarjetas en conflicto con alguna marcada */
+          var blocked = {};
+          checked.forEach(function(c) {
+            (c.getAttribute('data-incompat') || '').split(',').forEach(function(v) {
+              v = v.trim();
+              if (v) blocked[v] = true;
+            });
+          });
+          cards.forEach(function(c) {
+            var input = c.querySelector('input');
+            var vid = c.getAttribute('data-vid');
+            var dis = !input.checked && !!blocked[vid];
+            c.classList.toggle('is-disabled', dis);
+            input.disabled = dis;
+          });
+        }
+
+        cards.forEach(function(c) {
+          c.querySelector('input').addEventListener('change', refresh);
+        });
+        refresh();
+      }
+
       /* ── Init ───────────────────────────────────────────────────── */
       function init() {
         initializeSelectors();
         initProgressSpy();
+        initVirtudesDefectos();
       }
 
       if (document.readyState === 'loading') {
