@@ -423,97 +423,47 @@ if ($ficha_existe == true && ($moderated == true || (is_mod($s_uid) || is_staff(
         $extra_var        = nl2br($ficha['extra']);
         $frase_var        = nl2br($ficha['frase']);
         $limite_nivel = $ficha['limite_nivel'];
-        $nivel = $ficha['nivel'];
+        $nivel = intval($ficha['nivel']);
+        $nivel_antes = $nivel;
         $puntos_estadistica = intval($ficha['puntos_estadistica']);
         $mejoras = intval($ficha['mejoras']);
 
-        if ($puntos_rol >= 9800 && $nivel == '19') {
-            $nivel = 20;
-            $puntos_estadistica += 15; $mejoras += 1;
-            $db->query("  UPDATE `mybb_sg_sg_fichas` SET `nivel`='$nivel',`puntos_estadistica`='$puntos_estadistica',`mejoras`='$mejoras' WHERE `fid`='$uid'; ");
+        // PR (puntos de rol) necesarios para avanzar del nivel indicado al siguiente.
+        $umbrales_nivel = array(
+            1 => 50,    2 => 150,   3 => 300,   4 => 500,   5 => 750,
+            6 => 1050,  7 => 1400,  8 => 1800,  9 => 2250,  10 => 2750,
+            11 => 3300, 12 => 3900, 13 => 4550, 14 => 5250, 15 => 6000,
+            16 => 6800, 17 => 7700, 18 => 8700, 19 => 9800,
+        );
 
-        } else if ($puntos_rol >= 8700 && $nivel == '18') {
-            $nivel = 19;
-            $puntos_estadistica += 15; $mejoras += 1;
-            $db->query("  UPDATE `mybb_sg_sg_fichas` SET `nivel`='$nivel',`puntos_estadistica`='$puntos_estadistica',`mejoras`='$mejoras' WHERE `fid`='$uid'; ");
+        // Sube todos los niveles a los que dé el PR acumulado (no solo uno por carga).
+        while (isset($umbrales_nivel[$nivel]) && $puntos_rol >= $umbrales_nivel[$nivel]) {
+            $nivel++;
+            $puntos_estadistica += 15; // +15 puntos de estadística por nivel
+            $mejoras += 1;             // +1 mejora por nivel
+        }
 
-        } else if ($puntos_rol >= 7700 && $nivel == '17') {
-            $nivel = 18;
-            $puntos_estadistica += 15; $mejoras += 1;
-            $db->query("  UPDATE `mybb_sg_sg_fichas` SET `nivel`='$nivel',`puntos_estadistica`='$puntos_estadistica',`mejoras`='$mejoras' WHERE `fid`='$uid'; ");
+        $niveles_ganados = $nivel - $nivel_antes;
+        if ($niveles_ganados > 0) {
+            // Crédito de rama gratis por nivel (nivel_rama_disponibles): DESACTIVADO
+            // temporalmente. Para reactivar: descomentar estas 3 líneas y volver a
+            // añadir  `arboles_progreso`='$prog_lvl_json'  al UPDATE de abajo.
+            // $prog_lvl = sg_progreso_parse(isset($ficha['arboles_progreso']) ? $ficha['arboles_progreso'] : '');
+            // $prog_lvl['nivel_rama_disponibles'] = (int) $prog_lvl['nivel_rama_disponibles'] + $niveles_ganados;
+            // $prog_lvl_json = $db->escape_string(json_encode($prog_lvl, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
 
-        } else if ($puntos_rol >= 6800 && $nivel == '16') {
-            $nivel = 17;
-            $puntos_estadistica += 15; $mejoras += 1;
-            $db->query("  UPDATE `mybb_sg_sg_fichas` SET `nivel`='$nivel',`puntos_estadistica`='$puntos_estadistica',`mejoras`='$mejoras' WHERE `fid`='$uid'; ");
-
-        } else if ($puntos_rol >= 6000 && $nivel == '15') {
-            $nivel = 16;
-            $puntos_estadistica += 15; $mejoras += 1;
-            $db->query("  UPDATE `mybb_sg_sg_fichas` SET `nivel`='$nivel',`puntos_estadistica`='$puntos_estadistica',`mejoras`='$mejoras' WHERE `fid`='$uid'; ");
-
-        } else if ($puntos_rol >= 5250 && $nivel == '14') {
-            $nivel = 15;
-            $puntos_estadistica += 15; $mejoras += 1;
-            $db->query("  UPDATE `mybb_sg_sg_fichas` SET `nivel`='$nivel',`puntos_estadistica`='$puntos_estadistica',`mejoras`='$mejoras' WHERE `fid`='$uid'; ");
-
-        } else if ($puntos_rol >= 4550 && $nivel == '13') {
-            $nivel = 14;
-            $puntos_estadistica += 15; $mejoras += 1;
-            $db->query("  UPDATE `mybb_sg_sg_fichas` SET `nivel`='$nivel',`puntos_estadistica`='$puntos_estadistica',`mejoras`='$mejoras' WHERE `fid`='$uid'; ");
-
-        } else if ($puntos_rol >= 3900 && $nivel == '12') {
-            $nivel = 13;
-            $puntos_estadistica += 15; $mejoras += 1;
-            $db->query("  UPDATE `mybb_sg_sg_fichas` SET `nivel`='$nivel',`puntos_estadistica`='$puntos_estadistica',`mejoras`='$mejoras' WHERE `fid`='$uid'; ");
-        } else if ($puntos_rol >= 3300 && $nivel == '11') {
-            $nivel = 12;
-            $puntos_estadistica += 15; $mejoras += 1;
-            $db->query("  UPDATE `mybb_sg_sg_fichas` SET `nivel`='$nivel',`puntos_estadistica`='$puntos_estadistica',`mejoras`='$mejoras' WHERE `fid`='$uid'; ");
-        } else if ($puntos_rol >= 2750 && $nivel == '10') {
-            $nivel = 11;
-            $puntos_estadistica += 15; $mejoras += 1;
-            $db->query("  UPDATE `mybb_sg_sg_fichas` SET `nivel`='$nivel',`puntos_estadistica`='$puntos_estadistica',`mejoras`='$mejoras' WHERE `fid`='$uid'; ");
-        } else if ($puntos_rol >= 2250 && $nivel == '9') {
-            $nivel = 10;
-            $puntos_estadistica += 15; $mejoras += 1;
-            $db->query("  UPDATE `mybb_sg_sg_fichas` SET `nivel`='$nivel',`puntos_estadistica`='$puntos_estadistica',`mejoras`='$mejoras' WHERE `fid`='$uid'; ");
-        } else if ($puntos_rol >= 1800 && $nivel == '8') {
-            $nivel = 9;
-            $puntos_estadistica += 15; $mejoras += 1;
-            $db->query("  UPDATE `mybb_sg_sg_fichas` SET `nivel`='$nivel',`puntos_estadistica`='$puntos_estadistica',`mejoras`='$mejoras' WHERE `fid`='$uid'; ");
-        } else if ($puntos_rol >= 1400 && $nivel == '7') {
-            $nivel = 8;
-            $puntos_estadistica += 15; $mejoras += 1;
-            $db->query("  UPDATE `mybb_sg_sg_fichas` SET `nivel`='$nivel',`puntos_estadistica`='$puntos_estadistica',`mejoras`='$mejoras' WHERE `fid`='$uid'; ");
-        } else if ($puntos_rol >= 1050 && $nivel == '6') {
-            $nivel = 7;
-            $puntos_estadistica += 15; $mejoras += 1;
-            $db->query("  UPDATE `mybb_sg_sg_fichas` SET `nivel`='$nivel',`puntos_estadistica`='$puntos_estadistica',`mejoras`='$mejoras' WHERE `fid`='$uid'; ");
-        } else if ($puntos_rol >= 750 && $nivel == '5') {
-            $nivel = 6;
-            $puntos_estadistica += 15; $mejoras += 1;
-            $db->query("  UPDATE `mybb_sg_sg_fichas` SET `nivel`='$nivel',`puntos_estadistica`='$puntos_estadistica',`mejoras`='$mejoras' WHERE `fid`='$uid'; ");
-        } else if ($puntos_rol >= 500 && $nivel == '4') {
-            $nivel = 5;
-            $puntos_estadistica += 15; $mejoras += 1;
-            $db->query("  UPDATE `mybb_sg_sg_fichas` SET `nivel`='$nivel',`puntos_estadistica`='$puntos_estadistica',`mejoras`='$mejoras' WHERE `fid`='$uid'; ");
-        } else if ($puntos_rol >= 300 && $nivel == '3') {
-            $nivel = 4;
-            $puntos_estadistica += 15; $mejoras += 1;
-            $db->query("  UPDATE `mybb_sg_sg_fichas` SET `nivel`='$nivel',`puntos_estadistica`='$puntos_estadistica',`mejoras`='$mejoras' WHERE `fid`='$uid'; ");
-        } else if ($puntos_rol >= 150 && $nivel == '2') {
-            $nivel = 3;
-            $puntos_estadistica += 15; $mejoras += 1;
-            $db->query("  UPDATE `mybb_sg_sg_fichas` SET `nivel`='$nivel',`puntos_estadistica`='$puntos_estadistica',`mejoras`='$mejoras' WHERE `fid`='$uid'; ");
-        } else if ($puntos_rol >= 50 && $nivel == '1') {
-            $nivel = 2;
-            $puntos_estadistica += 15; $mejoras += 1;
-            $db->query(" UPDATE `mybb_sg_sg_fichas` SET `nivel`='$nivel',`puntos_estadistica`='$puntos_estadistica',`mejoras`='$mejoras',`mejoras`='$mejoras' WHERE `fid`='$uid'; ");
+            // Un solo UPDATE con el resultado de la(s) subida(s) de nivel.
+            $db->query("
+                UPDATE `mybb_sg_sg_fichas`
+                SET `nivel`='$nivel',
+                    `puntos_estadistica`='$puntos_estadistica',
+                    `mejoras`='$mejoras'
+                WHERE `fid`='$uid'
+            ");
         }
 
 
-        
+
         eval('$vida = $v;');
         eval('$aguante = $a;');
         eval('$chakra = $c;');

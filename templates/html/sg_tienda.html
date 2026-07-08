@@ -169,6 +169,17 @@
     }
     .sg-cat-chip.is-active .sg-cat-chip-n { color: var(--plum3); background: rgba(123, 74, 184, 0.28); }
 
+    .sg-cat-intro {
+      margin: 0;
+      padding: 13px 24px;
+      background: var(--bg2);
+      border-bottom: 0.5px solid var(--border);
+      color: var(--stone);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+    .sg-cat-intro strong { color: var(--gold); font-weight: 700; }
+
     .sg-cat-body { padding: 22px 24px; }
 
     /* Mensaje de compra */
@@ -645,6 +656,8 @@
         <button class="sg-cat-viewbtn" id="sg-cat-viewbtn" type="button" onclick="sgToggleView()">Vista detalle</button>
         <input class="sg-cat-search" type="text" id="sg-cat-search" placeholder="Buscar objeto, tipo o efecto…" oninput="sgFilterCatalogo()">
       </div>
+
+      <p class="sg-cat-intro">Compra objetos con tus <strong>Ryos</strong>. Filtra por categoría o busca, elige la cantidad y confirma la compra; lo que adquieras se guarda en tu inventario. También puedes revender tus objetos desde ahí.</p>
 
       <div class="sg-cat-chips" id="sg-cat-chips">{$chipsHtml}</div>
 

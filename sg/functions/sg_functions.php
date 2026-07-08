@@ -513,9 +513,29 @@ function sg_dojo_costos($progreso) {
 
 // Nivel del personaje requerido para desbloquear un árbol (feature A).
 // 1º árbol -> nivel 1 (cuesta 15 Tobis); luego 2º->5, 3º->10, 4º->15, 5º->20.
+// El 6º (solo con Ninja Prodigio II) también requiere nivel 20 (tope del juego).
 function sg_dojo_nivel_requerido_arbol($desbloqueo_arboles) {
     $d = (int) $desbloqueo_arboles;
-    return $d <= 0 ? 1 : (5 * $d);
+    return $d <= 0 ? 1 : min(5 * $d, 20);
+}
+
+// Requisito elemental por CLAN (cid del clan principal). Antes de la ruleta normal,
+// ciertos clanes obligan a obtener un set de elementos naturales:
+//   'elegir' -> se eligen a dedo todos los del set (sin tirada).
+//   'ruleta' -> salen por tirada restringida SOLO a ese set.
+// En ambos, tras completar el set se pasa a la ruleta normal (pool completo).
+// Mismo coste/requisitos que la ruleta (1 slot + Tobis + nivel).
+function sg_clan_elementos() {
+    return array(
+        102 => array('modo' => 'ruleta', 'req' => array('doton', 'suiton')),          // Senju
+        106 => array('modo' => 'elegir', 'req' => array('katon')),                    // Uchiha
+        110 => array('modo' => 'elegir', 'req' => array('katon', 'fuuton', 'doton')), // Sarutobi
+        305 => array('modo' => 'elegir', 'req' => array('suiton')),                   // Hoshigaki
+        304 => array('modo' => 'elegir', 'req' => array('suiton')),                   // Hozuki
+        309 => array('modo' => 'elegir', 'req' => array('suiton')),                   // Funato
+        307 => array('modo' => 'elegir', 'req' => array('suiton', 'katon', 'doton')), // Terumi
+        301 => array('modo' => 'ruleta', 'req' => array('suiton', 'fuuton')),         // Yuki
+    );
 }
 
 /**
@@ -611,6 +631,22 @@ function sg_dojo_estado($db, $uid) {
     $fijos       = sg_arboles_fijos();
     $elementales = sg_arboles_elementales();
 
+    // Virtudes/defectos del usuario que afectan al Dojo (ver docs/virtudes_defectos.txt).
+    $virt = array();
+    $qv = $db->query("SELECT virtud_id FROM mybb_sg_sg_virtudes_usuarios WHERE uid='$uid'");
+    while ($rv = $db->fetch_array($qv)) { $virt[$rv['virtud_id']] = true; }
+    $sin_yin      = isset($virt['DINYIN']); // Incompatibilidad Yin: sin árbol Yin
+    $sin_yang     = isset($virt['DINYAN']); // Incompatibilidad Yang: sin árbol Yang
+    $sin_elemento = isset($virt['DINELE']); // Incompatibilidad Elemental: sin ruleta natural
+    $afinidad     = isset($virt['VAFIEL']); // Afinidad Elemental: elige el 1er elemento (sin tirada)
+    $prodigio1    = isset($virt['VPROD1']); // Ninja Prodigio I: +1 especialidad (una vez)
+    $prodigio2    = isset($virt['VPROD2']); // Ninja Prodigio II: 6º árbol
+
+    // Tope de árboles elementales/directos desbloqueables: 5 (6 con Ninja Prodigio II).
+    // El 6º solo llega tras elegir los 5 (desbloqueo_arboles == 5) y nivel 20.
+    $max_arboles  = $prodigio2 ? 6 : 5;
+    $tope_arboles = ((int) $progreso['desbloqueo_arboles'] >= $max_arboles);
+
     // Árboles que el personaje posee (posee la base del árbol).
     $poseidos = array();
     foreach ($catalogo as $arbol => $cat) {
@@ -635,6 +671,7 @@ function sg_dojo_estado($db, $uid) {
 
     // Detalle por árbol poseído.
     $arboles = array();
+    $prodigio1_over = false; // ¿algún árbol ya excede su cupo base de especialidades?
     foreach ($poseidos as $arbol) {
         $cat = $catalogo[$arbol];
         $ramas_cat = sg_ramas_de_arbol($cat);
@@ -682,14 +719,14 @@ function sg_dojo_estado($db, $uid) {
 
         // Especializaciones: cupo por nivel de árbol (3/6/9) menos lo aprendido.
         $cupo = min(intval($nivel_arbol / 3), 3);
-        $espec_elegibles = array();
-        if ($espec_aprendidas < $cupo) {
-            foreach ($espec_pool as $etid) {
-                if (!isset($owned[$etid])) {
-                    $espec_elegibles[] = $etid;
-                }
-            }
+        $espec_libres = array(); // del pool, aún no aprendidas
+        foreach ($espec_pool as $etid) {
+            if (!isset($owned[$etid])) { $espec_libres[] = $etid; }
         }
+        $espec_libres = array_values(array_unique($espec_libres));
+        $espec_elegibles = ($espec_aprendidas < $cupo) ? $espec_libres : array();
+        // Ninja Prodigio I ya usado si algún árbol excede su cupo base.
+        if ($espec_aprendidas > $cupo) { $prodigio1_over = true; }
 
         $arboles[$arbol] = array(
             'nivel_arbol' => $nivel_arbol,
@@ -697,7 +734,8 @@ function sg_dojo_estado($db, $uid) {
             'especializaciones' => array(
                 'cupo'       => $cupo,
                 'aprendidas' => $espec_aprendidas,
-                'elegibles'  => array_values(array_unique($espec_elegibles)),
+                'elegibles'  => $espec_elegibles,
+                'libres'     => $espec_libres,
             ),
         );
     }
@@ -707,7 +745,6 @@ function sg_dojo_estado($db, $uid) {
     // solo clan: 3 ramas y 3 especialidades en total (igual que un clan normal).
     // Solo aplica a híbridos; con un solo clan el comportamiento no cambia.
     $CLAN_RAMAS_MAX = 3;
-    $CLAN_ESPEC_MAX = 3;
     $clan_ramas_desbloqueadas = 0;
     $clan_espec_aprendidas    = 0;
     foreach ($clan_arboles as $arbol) {
@@ -716,6 +753,27 @@ function sg_dojo_estado($db, $uid) {
             if (!empty($r['desbloqueada'])) { $clan_ramas_desbloqueadas++; }
         }
         $clan_espec_aprendidas += (int) $arboles[$arbol]['especializaciones']['aprendidas'];
+    }
+
+    // ── Ninja Prodigio I: +1 especialidad, una sola vez ──
+    // "Usado" si algún árbol excede su cupo base, o (híbrido) si el pool de clan
+    // pasa de 3. Mientras esté disponible, sube en 1 el tope aplicable.
+    $prodigio1_usado = $prodigio1_over || ($es_hibrido && $clan_espec_aprendidas > 3);
+    $prodigio1_disponible = ($prodigio1 && !$prodigio1_usado);
+    $CLAN_ESPEC_MAX = 3 + (($es_hibrido && $prodigio1_disponible) ? 1 : 0);
+
+    // Bump del +1 en árboles NO-clan-híbrido que ya estén al máximo (cupo 3).
+    // (Los árboles de clan de un híbrido se manejan por el tope compartido.)
+    if ($prodigio1_disponible) {
+        foreach ($arboles as $arbol_p => $ainfo_p) {
+            if ($es_hibrido && in_array($arbol_p, $clan_arboles, true)) { continue; }
+            $ep =& $arboles[$arbol_p]['especializaciones'];
+            if ((int) $ep['cupo'] >= 3 && (int) $ep['aprendidas'] >= (int) $ep['cupo'] && !empty($ep['libres'])) {
+                $ep['cupo']      = (int) $ep['cupo'] + 1;
+                $ep['elegibles'] = $ep['libres'];
+            }
+            unset($ep);
+        }
     }
 
     if ($es_hibrido) {
@@ -744,36 +802,82 @@ function sg_dojo_estado($db, $uid) {
     }
 
     // Elementos de selección directa (yin/yang) adquiribles.
+    // Incompatibilidad Yin/Yang bloquea ese árbol; el tope de árboles también.
     $directos = array();
-    foreach (sg_arboles_directos() as $el) {
-        if (isset($catalogo[$el]) && !in_array($el, $poseidos, true)) {
-            $directos[] = $el;
+    if (!$tope_arboles) {
+        foreach (sg_arboles_directos() as $el) {
+            if ($el === 'yin' && $sin_yin) { continue; }
+            if ($el === 'yang' && $sin_yang) { continue; }
+            if (isset($catalogo[$el]) && !in_array($el, $poseidos, true)) {
+                $directos[] = $el;
+            }
         }
     }
 
-    // Elementos naturales aún bloqueados (pool de la ruleta).
+    // Elementos naturales aún bloqueados (pool de la ruleta) y cuántos ya posee.
     $naturales_bloqueados = array();
+    $naturales_poseidos   = 0;
     foreach (sg_arboles_naturales() as $el) {
-        if (isset($catalogo[$el]) && !in_array($el, $poseidos, true)) {
-            $naturales_bloqueados[] = $el;
+        if (!isset($catalogo[$el])) { continue; }
+        if (in_array($el, $poseidos, true)) { $naturales_poseidos++; }
+        else { $naturales_bloqueados[] = $el; }
+    }
+
+    // ── Requisito elemental por CLAN principal ──
+    // Mientras el set del clan no esté completo, la adquisición de elementos se
+    // restringe a ese set (por elección forzada o por ruleta restringida). Al
+    // completarlo se pasa a la ruleta normal (pool completo).
+    $clan_cid    = (int) (isset($ficha['clan']) ? $ficha['clan'] : 0);
+    $clanes_elem = sg_clan_elementos();
+    $clan_req    = isset($clanes_elem[$clan_cid]) ? $clanes_elem[$clan_cid] : null;
+
+    $elem_pool         = $naturales_bloqueados; // pool efectivo (elegir/tirar)
+    $forzar_eleccion   = false;                 // el clan obliga a elegir a dedo
+    $clan_fase_activa  = false;                 // el set del clan aún no está completo
+    if ($clan_req !== null) {
+        $completa = true;
+        $pend = array();
+        foreach ($clan_req['req'] as $e) {
+            if (!in_array($e, $poseidos, true)) { $completa = false; }
+            if (in_array($e, $naturales_bloqueados, true)) { $pend[] = $e; }
+        }
+        if (!$completa) {
+            $clan_fase_activa = true;
+            $elem_pool = $pend;
+            if ($clan_req['modo'] === 'elegir') { $forzar_eleccion = true; }
         }
     }
 
-    // ¿Cumple el requisito para desbloquear un árbol? (nivel + Tobis; siempre cuesta)
+    // ¿Cumple el requisito para desbloquear un árbol? (nivel + Tobis; respeta el tope)
     $nivel_req = sg_dojo_nivel_requerido_arbol($progreso['desbloqueo_arboles']);
-    $puede_desbloquear_arbol = ($nivel >= $nivel_req && $tobi >= $costos['arbol']);
+    $puede_desbloquear_arbol = (!$tope_arboles && $nivel >= $nivel_req && $tobi >= $costos['arbol']);
 
-    // Estado de la ruleta elemental.
+    // Condición base para obtener un elemento (por elección o por tirada).
+    $elem_base_ok = (!$sin_elemento && !$tope_arboles && $slot_elementales > 0 && count($elem_pool) > 0 && $puede_desbloquear_arbol);
+
+    // Razón cuando no se puede (Incompatibilidad Elemental la deshabilita).
     $ruleta_razon = null;
-    if (count($naturales_bloqueados) === 0) {
+    if ($sin_elemento) {
+        $ruleta_razon = 'Tienes Incompatibilidad Elemental: no puedes obtener elementos naturales.';
+    } else if (count($naturales_bloqueados) === 0) {
         $ruleta_razon = 'Ya desbloqueaste todos los elementos naturales.';
+    } else if ($tope_arboles) {
+        $ruleta_razon = 'Alcanzaste el máximo de árboles.';
     } else if ($slot_elementales <= 0) {
         $ruleta_razon = 'No te quedan slots elementales.';
     } else if (!$puede_desbloquear_arbol) {
         $ruleta_razon = 'Aún no cumples el requisito para desbloquear un árbol.';
     }
+
+    // Elegir sin tirada: el clan lo fuerza ('elegir'), o Afinidad Elemental para el 1º.
+    $puede_elegir = ($elem_base_ok && ($forzar_eleccion || ($afinidad && $naturales_poseidos === 0)));
+    // Tirada aleatoria: disponible salvo que el clan obligue a elegir.
+    $ruleta_disponible = ($elem_base_ok && !$forzar_eleccion);
     $ruleta = array(
-        'disponible'          => ($slot_elementales > 0 && count($naturales_bloqueados) > 0 && $puede_desbloquear_arbol),
+        'disponible'          => $ruleta_disponible,
+        'puede_elegir'        => $puede_elegir,
+        'pool'                => array_values($elem_pool),
+        'restringido'         => $clan_fase_activa,
         'slots'               => $slot_elementales,
         'naturales_restantes' => count($naturales_bloqueados),
         'pool_total'          => sg_arboles_naturales(),
@@ -812,6 +916,18 @@ function sg_dojo_estado($db, $uid) {
             'ramas_max'              => $CLAN_RAMAS_MAX,
             'espec_aprendidas'       => $clan_espec_aprendidas,
             'espec_max'              => $CLAN_ESPEC_MAX,
+        ),
+        // Efectos de virtudes/defectos en el Dojo (para avisos en la UI).
+        'restricciones' => array(
+            'sin_yin'               => $sin_yin,
+            'sin_yang'              => $sin_yang,
+            'sin_elemento'          => $sin_elemento,
+            'afinidad'              => $afinidad,
+            'prodigio1'             => $prodigio1,
+            'prodigio1_disponible'  => $prodigio1_disponible,
+            'prodigio2'             => $prodigio2,
+            'max_arboles'           => $max_arboles,
+            'arboles_desbloqueados' => (int) $progreso['desbloqueo_arboles'],
         ),
     );
 }
@@ -936,14 +1052,16 @@ function sg_dojo_aplicar_accion($db, $uid, $action, $params) {
 
             // ── (A2) Ruleta elemental (natural, aleatorio + 1 slot) ─
             case 'ruleta':
-                $slots = (int) $estado['slot_elementales'];
-                $pool  = $estado['naturales_bloqueados'];
-                if (empty($pool)) {
-                    $result = $err("Ya desbloqueaste todos los elementos naturales.");
+                // ruleta.disponible ya integra: Incompatibilidad Elemental, tope de
+                // árboles, slots, pool restante y requisito de nivel + Tobis.
+                if (empty($estado['ruleta']['disponible'])) {
+                    $result = $err(!empty($estado['ruleta']['razon']) ? $estado['ruleta']['razon'] : "La ruleta no está disponible.");
                     break;
                 }
-                if ($slots <= 0) {
-                    $result = $err("No te quedan slots elementales.");
+                $slots = (int) $estado['slot_elementales'];
+                $pool  = $estado['ruleta']['pool']; // restringido al set del clan si aplica
+                if (empty($pool)) {
+                    $result = $err("No hay elementos disponibles para la tirada.");
                     break;
                 }
                 $pago = sg_dojo_pagar_arbol($progreso, $tobi, $nivel, $costos);
@@ -967,6 +1085,36 @@ function sg_dojo_aplicar_accion($db, $uid, $action, $params) {
 
                 $result = $ok("¡La ruleta te otorgó el árbol " . ucfirst($elegido) . "!");
                 $result['extra'] = array('elemento' => $elegido);
+                break;
+
+            // ── (A3) Elegir elemento (Afinidad Elemental, sin tirada) ─
+            case 'elemento':
+                // puede_elegir ya integra: VAFIEL, que sea el 1er elemento natural,
+                // no tener Incompatibilidad Elemental, slots, tope y nivel + Tobis.
+                if (empty($estado['ruleta']['puede_elegir'])) {
+                    $result = $err("No puedes elegir tu elemento en este momento.");
+                    break;
+                }
+                if (!in_array($arbol, $estado['ruleta']['pool'], true)) {
+                    $result = $err("Ese elemento no está disponible.");
+                    break;
+                }
+                $base_tid = isset($catalogo[$arbol]['base']) ? $catalogo[$arbol]['base'] : null;
+                if ($base_tid === null) {
+                    $result = $err("Ese elemento no tiene técnica base configurada.");
+                    break;
+                }
+                $pago = sg_dojo_pagar_arbol($progreso, $tobi, $nivel, $costos);
+                if (!$pago['ok']) {
+                    $result = $err($pago['msg']);
+                    break;
+                }
+                $progreso = $pago['progreso'];
+                $tobi = $pago['tobi'];
+                $slots_nuevo = (int) $estado['slot_elementales'] - 1;
+                sg_dojo_aprender($db, $uid, $base_tid);
+                sg_dojo_guardar($db, $uid, $tobi, $progreso, $slots_nuevo);
+                $result = $ok("Elegiste el elemento " . ucfirst($arbol) . " por {$costos['arbol']} Tobis.");
                 break;
 
             // ── (B) Desbloquear una rama ────────────────────────────

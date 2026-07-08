@@ -22,9 +22,9 @@ $query_tecnicas_rama1 = $db->query(" SELECT * FROM mybb_sg_sg_tecnicas WHERE arb
 $query_tecnicas_rama2 = $db->query(" SELECT * FROM mybb_sg_sg_tecnicas WHERE arbol='$arbol' AND rama='Rama 2' ");
 $query_tecnicas_rama3 = $db->query(" SELECT * FROM mybb_sg_sg_tecnicas WHERE arbol='$arbol' AND rama='Rama 3' ");
 
-// while ($clan = $db->fetch_array($query_clan)) {
-//     eval('$clan_desc = "'.nl2br($clan['descripcion']).'";');
-// }
+while ($clan = $db->fetch_array($query_clan)) {
+    eval('$clan_desc = "'.nl2br($clan['descripcion']).'";');
+}
 
 $tecs_base = array();
 $tecs_rama1 = array();

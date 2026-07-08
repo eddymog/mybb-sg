@@ -117,20 +117,35 @@ $dojo_html .= "<div class=\"sg-dpanel-head\"><h2 class=\"sg-dpanel-title\">Árbo
 $dojo_html .= "<span class=\"sg-dtag\">".$estado['slot_elementales']." slots</span>";
 $dojo_html .= "</div>";
 
-// Ruleta (elementos naturales)
+// Elementos naturales: ruleta, o elección (Afinidad Elemental / requisito de clan).
 $dojo_html .= "<div class=\"sg-ruleta-cta\">";
-if ($ruleta['disponible']) {
+if (!empty($ruleta['puede_elegir'])) {
+    // Elección directa (sin tirada): forzada por el clan o por Afinidad Elemental.
+    $label = !empty($ruleta['restringido'])
+        ? "Requisito de clan · elige tu elemento"
+        : "Afinidad Elemental · elige tu primer elemento";
+    $dojo_html .= "<div class=\"sg-direct-label\">".$label." <em>· ".$costo_arbol_lbl." · 1 slot</em></div>";
+    $dojo_html .= "<div class=\"sg-dchips\">";
+    foreach ($ruleta['pool'] as $el) {
+        $dojo_html .= $form_accion('elemento', array('arbol' => $el), ucfirst($el), true);
+    }
+    $dojo_html .= "</div>";
+} else if ($ruleta['disponible']) {
     $dojo_html .= "<form method=\"post\" action=\"/sg/dojo.php\" class=\"sg-dform\">"
         . "<input type=\"hidden\" name=\"action\" value=\"ruleta\">"
         . "<button class=\"sg-dbtn sg-dbtn--big\" type=\"submit\">Desbloquea un árbol elemental <em>· ".$costo_arbol_lbl." · 1 slot</em></button>"
         . "</form>";
+    $pool_txt = array_map('ucfirst', $ruleta['pool']);
+    $nota = !empty($ruleta['restringido'])
+        ? "Requisito de clan · la tirada sale solo entre: ".implode(', ', $pool_txt)."."
+        : "Naturales restantes: ".(int) $ruleta['naturales_restantes']." · tirada al azar entre los bloqueados.";
+    $dojo_html .= "<div class=\"sg-dnote sg-dnote--soft\">".$esc($nota)."</div>";
 } else {
     $dojo_html .= "<button class=\"sg-dbtn sg-dbtn--off sg-dbtn--big\" type=\"button\" disabled>Desbloquea un árbol elemental</button>";
     if (!empty($ruleta['razon'])) {
         $dojo_html .= "<div class=\"sg-dnote\">".$esc($ruleta['razon'])."</div>";
     }
 }
-$dojo_html .= "<div class=\"sg-dnote sg-dnote--soft\">Naturales restantes: ".(int) $ruleta['naturales_restantes']." · tirada al azar entre los bloqueados.</div>";
 $dojo_html .= "</div>";
 
 // Selección directa (yin / yang)

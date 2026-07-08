@@ -48,6 +48,19 @@
     }
     .sg-vt-search:focus { outline: none; border-color: var(--plum3); }
 
+    .sg-vt-intro {
+      margin: 0;
+      padding: 13px 24px;
+      background: var(--bg2);
+      border-bottom: 0.5px solid var(--border);
+      color: var(--stone);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+    .sg-vt-intro strong { font-weight: 700; }
+    .sg-vt-intro .v { color: var(--green); }
+    .sg-vt-intro .d { color: var(--oxide); }
+
     /* Dos columnas */
     .sg-vt-grid {
       display: grid; grid-template-columns: 1fr 1fr; gap: 0;
@@ -151,6 +164,8 @@
         </div>
         <input class="sg-vt-search" type="text" id="sg-vt-search" placeholder="Buscar por nombre…" oninput="sgVtFilter()">
       </div>
+
+      <p class="sg-vt-intro">Referencia de todas las <strong class="v">virtudes</strong> y <strong class="d">defectos</strong> del foro. Las virtudes suman puntos y los defectos los restan; aquí ves el coste y el efecto de cada una. Usa el buscador para encontrar una en concreto.</p>
 
       <div class="sg-vt-grid">
         <section class="sg-vt-col sg-vt-col--v">
