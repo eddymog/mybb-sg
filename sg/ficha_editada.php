@@ -41,16 +41,9 @@ if (($habilidad || $habilidad == '0') && ($mejoras || $mejoras == '0') &&
         return $sum_stats;
     }
 
-    // Modificador segun el valor de la estadistica:
-    // 0-24 => 1, 25-49 => 2, 50-74 => 3, 75-99 => 4, 100+ => 5
-    function stat_modifier($stat) {
-        $stat = intval($stat);
-        if ($stat >= 100) return 5;
-        if ($stat >= 75)  return 4;
-        if ($stat >= 50)  return 3;
-        if ($stat >= 25)  return 2;
-        return 1;
-    }
+    // stat_modifier() vive ahora en sg/functions/sg_functions.php (global), para
+    // que el mismo criterio (base + pasivas) se use al mostrar la ficha, el
+    // postbit y el tag [personaje].
 
     $new_stats = sum_stats($fuerza, $destreza, $cchakra, $inteligencia, $salud, $velocidad, $tenketsu, $sigilo);
     $current_stats = sum_stats($ficha['fuerza'], $ficha['destreza'], $ficha['cchakra'], $ficha['inteligencia'], $ficha['salud'], $ficha['velocidad'], $ficha['tenketsu'], $ficha['sigilo']);

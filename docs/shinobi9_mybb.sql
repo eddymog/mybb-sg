@@ -1375,6 +1375,7 @@ CREATE TABLE `mybb_sg_sg_fichas` (
   `temporada_nacimiento` int(3) NOT NULL,
   `villa` varchar(20) CHARACTER SET utf8 COLLATE utf8_spanish_ci NOT NULL,
   `clan` varchar(20) CHARACTER SET utf8 COLLATE utf8_spanish_ci NOT NULL,
+  `clan2` varchar(20) CHARACTER SET utf8 COLLATE utf8_spanish_ci NOT NULL DEFAULT '',
   `slots` int(3) NOT NULL DEFAULT '7',
   `espe` text COLLATE utf8_unicode_ci NOT NULL,
   `espe_estilo` text COLLATE utf8_unicode_ci NOT NULL,
@@ -1432,6 +1433,15 @@ CREATE TABLE `mybb_sg_sg_fichas` (
   `velocidad` int(11) NOT NULL DEFAULT '9',
   `tenketsu` int(11) NOT NULL DEFAULT '9',
   `sigilo` int(11) NOT NULL DEFAULT '9',
+  `pas_fuerza` int(11) NOT NULL DEFAULT '0',
+  `pas_destreza` int(11) NOT NULL DEFAULT '0',
+  `pas_cchakra` int(11) NOT NULL DEFAULT '0',
+  `pas_inteligencia` int(11) NOT NULL DEFAULT '0',
+  `pas_salud` int(11) NOT NULL DEFAULT '0',
+  `pas_velocidad` int(11) NOT NULL DEFAULT '0',
+  `pas_tenketsu` int(11) NOT NULL DEFAULT '0',
+  `pas_sigilo` int(11) NOT NULL DEFAULT '0',
+  `puede_usar_dojo` tinyint(1) NOT NULL DEFAULT '0',
   `puntos_estadistica` int(11) NOT NULL DEFAULT '15',
   `mejoras` int(11) NOT NULL DEFAULT '1',
   `nivel` int(11) NOT NULL DEFAULT '1',
@@ -1593,36 +1603,33 @@ CREATE TABLE `mybb_sg_sg_misiones_usuarios` (
 --
 
 CREATE TABLE `mybb_sg_sg_npcs` (
-  `npc_id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT,
-  `codigo` varchar(60) COLLATE utf8_unicode_ci NOT NULL,
-  `nombre` varchar(80) COLLATE utf8_unicode_ci NOT NULL,
-  `clan_grupo` varchar(80) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
-  `afiliacion` varchar(60) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
-  `cargo` varchar(80) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
-  `frase` text COLLATE utf8_unicode_ci NOT NULL,
-  `edad` varchar(30) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
-  `descripcion` mediumtext COLLATE utf8_unicode_ci NOT NULL,
-  `imagen` varchar(255) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
-  `rango` varchar(40) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
-  `nivel` int(11) NOT NULL DEFAULT '1',
-  `fuerza` int(11) NOT NULL DEFAULT '0',
-  `destreza` int(11) NOT NULL DEFAULT '0',
-  `inteligencia` int(11) NOT NULL DEFAULT '0',
-  `cchakra` int(11) NOT NULL DEFAULT '0',
-  `mfuerza` int(11) NOT NULL DEFAULT '1',
-  `mdestreza` int(11) NOT NULL DEFAULT '1',
-  `minteligencia` int(11) NOT NULL DEFAULT '1',
-  `mcchakra` int(11) NOT NULL DEFAULT '1',
-  `vida` int(11) NOT NULL DEFAULT '180',
-  `chakra` int(11) NOT NULL DEFAULT '180',
-  `regchakra` int(11) NOT NULL DEFAULT '3',
-  `salud` int(11) NOT NULL DEFAULT '9',
-  `velocidad` int(11) NOT NULL DEFAULT '9',
-  `tenketsu` int(11) NOT NULL DEFAULT '9',
-  `sigilo` int(11) NOT NULL DEFAULT '9',
-  `tiempo_creacion` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`npc_id`),
-  UNIQUE KEY `codigo` (`codigo`)
+  `npc_id` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `nombre` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `apodo` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
+  `faccion` varchar(20) COLLATE utf8_unicode_ci NOT NULL,
+  `edad` varchar(30) COLLATE utf8_unicode_ci NOT NULL,
+  `temporada` varchar(255) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
+  `rango` varchar(30) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'D',
+  `fuerza` varchar(30) COLLATE utf8_unicode_ci NOT NULL DEFAULT '1',
+  `resistencia` varchar(30) COLLATE utf8_unicode_ci NOT NULL DEFAULT '1',
+  `velocidad` varchar(30) COLLATE utf8_unicode_ci NOT NULL DEFAULT '1',
+  `agilidad` varchar(30) COLLATE utf8_unicode_ci NOT NULL DEFAULT '1',
+  `destreza` varchar(30) COLLATE utf8_unicode_ci NOT NULL DEFAULT '1',
+  `presencia` varchar(30) COLLATE utf8_unicode_ci NOT NULL DEFAULT '1',
+  `inteligencia` varchar(30) COLLATE utf8_unicode_ci NOT NULL DEFAULT '1',
+  `vida` varchar(30) COLLATE utf8_unicode_ci NOT NULL DEFAULT '1',
+  `chakra` varchar(30) COLLATE utf8_unicode_ci NOT NULL DEFAULT '1',
+  `reg_chakra` varchar(30) COLLATE utf8_unicode_ci NOT NULL DEFAULT '1',
+  `apariencia` mediumtext COLLATE utf8_unicode_ci NOT NULL,
+  `personalidad` mediumtext COLLATE utf8_unicode_ci NOT NULL,
+  `historia1` mediumtext COLLATE utf8_unicode_ci NOT NULL,
+  `historia2` mediumtext COLLATE utf8_unicode_ci NOT NULL,
+  `historia3` mediumtext COLLATE utf8_unicode_ci NOT NULL,
+  `extra` text COLLATE utf8_unicode_ci NOT NULL,
+  `notas` text COLLATE utf8_unicode_ci NOT NULL,
+  `avatar1` varchar(255) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'https://cdn.discordapp.com/attachments/835254788756602941/1203405082956267620/AvatarOculto_One_Piece_Gaiden_Foro_Rol.png',
+  `avatar2` varchar(255) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'https://cdn.discordapp.com/attachments/835254788756602941/1203422974796103760/WantePerfilOculto_One_Piece_Gaiden_Foro_Rol.png',
+  `tiempo_creacion` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- --------------------------------------------------------
@@ -1642,9 +1649,7 @@ CREATE TABLE `mybb_sg_sg_objetos` (
   `coste` int(10) NOT NULL DEFAULT '99999',
   `inventario` int(4) NOT NULL DEFAULT '99',
   `imagen` text NOT NULL,
-  `efecto1` text NOT NULL,
-  `efecto2` text NOT NULL,
-  `efecto3` text NOT NULL,
+  `efecto` text NOT NULL,
   `en_tienda` tinyint(1) NOT NULL DEFAULT '1'
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 -- --------------------------------------------------------
@@ -1906,32 +1911,6 @@ CREATE TABLE `mybb_sg_sg_villas` (
   `img` varchar(1000) CHARACTER SET utf8 COLLATE utf8_spanish_ci NOT NULL,
   `activa` int(11) NOT NULL DEFAULT '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `mybb_sg_sg_virtudes`
---
-
-CREATE TABLE `mybb_sg_sg_virtudes` (
-  `virtud_id` varchar(30) COLLATE utf8_unicode_ci NOT NULL,
-  `nombre` varchar(50) COLLATE utf8_unicode_ci NOT NULL,
-  `puntos` int(5) NOT NULL,
-  `exclusivo` tinyint(1) NOT NULL DEFAULT '0',
-  `descripcion` text COLLATE utf8_unicode_ci NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `mybb_sg_sg_virtudes_usuarios`
---
-
-CREATE TABLE `mybb_sg_sg_virtudes_usuarios` (
-  `id` int(100) NOT NULL,
-  `virtud_id` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL,
-  `uid` int(3) NOT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 

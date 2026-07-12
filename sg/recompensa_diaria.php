@@ -22,13 +22,13 @@ $reload_js = "<script>window.location.href = window.location.href;</script>";
 $reload_script = '';
 $log_var = '';
 
-/* Admin (grupo 24) tiene al menos 1 post garantizado en la racha. */
+/* Grupos con al menos 1 post garantizado en la racha (staff/admin). */
 function tiene_min_post_garantizado() {
     global $db, $uid;
     $garantizado = false;
     $query = $db->query("
         SELECT uid FROM `mybb_sg_users`
-        WHERE uid='$uid' AND (usergroup = '24' OR additionalgroups = '24' OR additionalgroups LIKE '24,%' OR additionalgroups LIKE '%,24' OR additionalgroups LIKE '%,24,%')
+        WHERE uid='$uid' AND (additionalgroups LIKE '3%' OR additionalgroups LIKE '%,3' OR additionalgroups LIKE '%,3,%' OR additionalgroups LIKE '4%' OR additionalgroups LIKE '%,4' OR additionalgroups LIKE '%,4,%' OR usergroup = '3' OR usergroup = '4')
     ");
     while ($q = $db->fetch_array($query)) { $garantizado = true; }
     return $garantizado;
@@ -127,6 +127,27 @@ while ($q = $db->fetch_array($recompensas_temporada_query)) {
 /* La recompensa fue aceptada y ya es momento de reclamar */
 if ($recompensa_accepted == 'true' && $should_accept) {
 
+    // Candado por-usuario contra doble reclamo concurrente (varias pestañas con el
+    // botón disponible). El estado se RE-VALIDA con datos frescos DENTRO del lock:
+    // solo el primer request cobra; el resto encuentra la racha ya avanzada
+    // (tiempo actualizado) y no cobra. Mismo patrón que el Dojo.
+    $lock_name = "sg_recompensa_" . (int) $uid;
+    $got_lock = 0;
+    $rl = $db->query("SELECT GET_LOCK('$lock_name', 5) AS l");
+    while ($r = $db->fetch_array($rl)) { $got_lock = intval($r['l']); }
+
+    $puede_reclamar = false;
+    if ($got_lock === 1) {
+        $puede_reclamar = true; // sin fila previa = primer reclamo de la racha
+        $q_fresh = $db->query("SELECT tiempo, dia FROM mybb_sg_sg_recompensas_usuarios WHERE uid='$uid'");
+        while ($r = $db->fetch_array($q_fresh)) {
+            $days_count     = $r['dia'];           // usar el día FRESCO
+            $puede_reclamar = time() > $r['tiempo'];
+        }
+    }
+
+    if ($puede_reclamar) {
+
     $query_ficha = $db->query("SELECT * FROM mybb_sg_sg_fichas WHERE fid='$uid'");
     while ($f = $db->fetch_array($query_ficha)) { $f_var = $f; }
     $query_usuario = $db->query("SELECT * FROM mybb_sg_users WHERE uid='$uid'");
@@ -134,48 +155,53 @@ if ($recompensa_accepted == 'true' && $should_accept) {
 
     $nombre     = $f_var['nombre'];
     $ryos       = intval($f_var['ryos']);
+    $tobi       = intval($f_var['tobi']);
     $experiencia = floatval($u_var['newpoints']);
 
-    // NOTA: los Tobis están deshabilitados temporalmente como recompensa.
     $new_ryos = $ryos;
+    $new_tobi = $tobi;
     $new_exp  = $experiencia;
     $recompensa_items = '';
 
     if ($days_count == 0 && $recompensas_temporada_maxima < 40) {
-        $recompensa_items = '5 Experiencia';
-        $new_exp = $experiencia + 5;
+        $recompensa_items = '10 Experiencia';
+        $new_exp = $experiencia + 10;
     } else if ($days_count == 1 && $recompensas_temporada_maxima < 40) {
-        $recompensa_items = '50 Ryos';
-        $new_ryos = $ryos + 50;
-    } else if ($days_count == 2 && $recompensas_temporada_maxima < 40) {
-        $recompensa_items = '75 Ryos y 5 Experiencia';
-        $new_ryos = $ryos + 75;
-        $new_exp  = $experiencia + 5;
-    } else if ($days_count == 3 && $recompensas_temporada_maxima < 40) {
-        $recompensa_items = '100 Ryos y 10 Experiencia';
+        $recompensa_items = '100 Ryos';
         $new_ryos = $ryos + 100;
+    } else if ($days_count == 2 && $recompensas_temporada_maxima < 40) {
+        $recompensa_items = '1 Tobi';
+        $new_tobi = $tobi + 1;
+    } else if ($days_count == 3 && $recompensas_temporada_maxima < 40) {
+        $recompensa_items = '100 Ryos, 1 Tobi y 10 Experiencia';
+        $new_ryos = $ryos + 100;
+        $new_tobi = $tobi + 1;
         $new_exp  = $experiencia + 10;
     } else if ($days_count == 4 && $recompensas_temporada_maxima < 40) {
-        $recompensa_items = '150 Ryos y 10 Experiencia';
+        $recompensa_items = '150 Ryos, 1 Tobi y 15 Experiencia';
         $new_ryos = $ryos + 150;
-        $new_exp  = $experiencia + 10;
+        $new_tobi = $tobi + 1;
+        $new_exp  = $experiencia + 15;
     } else if ($days_count >= 5 && $recompensas_temporada_maxima < 40) {
-        $recompensa_items = '200 Ryos y 15 Experiencia';
+        $recompensa_items = '200 Ryos, 1 Tobi y 20 Experiencia';
         $new_ryos = $ryos + 200;
-        $new_exp  = $experiencia + 15;
+        $new_tobi = $tobi + 1;
+        $new_exp  = $experiencia + 20;
     } else if ($recompensas_temporada_maxima > 41 && (($recompensas_temporada_maxima + 1) % 5) == 0) {
-        $recompensa_items = '200 Ryos y 15 Experiencia';
-        $new_ryos = $ryos + 200;
-        $new_exp  = $experiencia + 15;
+        $recompensa_items = '800 Ryos, 4 Tobi y 50 Experiencia';
+        $new_ryos = $ryos + 800;
+        $new_tobi = $tobi + 4;
+        $new_exp  = $experiencia + 50;
     } else if ($recompensas_temporada_maxima >= 40) {
-        $recompensa_items = '150 Ryos y 10 Experiencia';
-        $new_ryos = $ryos + 150;
-        $new_exp  = $experiencia + 10;
+        $recompensa_items = '400 Ryos, 2 Tobi y 30 Experiencia';
+        $new_ryos = $ryos + 400;
+        $new_tobi = $tobi + 2;
+        $new_exp  = $experiencia + 30;
     }
 
-    $log = "Ryos: $ryos->$new_ryos & Exp: $experiencia->$new_exp";
+    $log = "Ryos: $ryos->$new_ryos & Tobi: $tobi->$new_tobi & Exp: $experiencia->$new_exp";
 
-    $db->query("UPDATE `mybb_sg_sg_fichas` SET ryos='$new_ryos' WHERE `fid`='$uid'");
+    $db->query("UPDATE `mybb_sg_sg_fichas` SET ryos='$new_ryos', tobi='$new_tobi' WHERE `fid`='$uid'");
     $db->query("UPDATE `mybb_sg_users` SET newpoints='$new_exp' WHERE `uid`='$uid'");
 
     $days_count = intval($days_count) + 1;
@@ -206,6 +232,12 @@ if ($recompensa_accepted == 'true' && $should_accept) {
 
     eval('$log_var = $complete_log;');
     eval('$reload_script = $reload_js;');
+
+    } // fin if ($puede_reclamar)
+
+    if ($got_lock === 1) {
+        $db->query("SELECT RELEASE_LOCK('$lock_name')");
+    }
 }
 
 /* ¿Existe la ficha y está aprobada? */
@@ -289,21 +321,21 @@ if ($ficha_existe == true && $moderated == true) {
     $recompensa_items = '';
 
     if ($days_count == 0 && $recompensas_temporada_maxima < 40) {
-        $recompensa_items = '5 Experiencia';
+        $recompensa_items = '10 Experiencia';
     } else if ($days_count == 1 && $recompensas_temporada_maxima < 40) {
-        $recompensa_items = '50 Ryos';
+        $recompensa_items = '100 Ryos';
     } else if ($days_count == 2 && $recompensas_temporada_maxima < 40) {
-        $recompensa_items = '75 Ryos y 5 Experiencia';
+        $recompensa_items = '1 Tobi';
     } else if ($days_count == 3 && $recompensas_temporada_maxima < 40) {
-        $recompensa_items = '100 Ryos y 10 Experiencia';
+        $recompensa_items = '100 Ryos, 1 Tobi y 10 Experiencia';
     } else if ($days_count == 4 && $recompensas_temporada_maxima < 40) {
-        $recompensa_items = '150 Ryos y 10 Experiencia';
+        $recompensa_items = '150 Ryos, 1 Tobi y 15 Experiencia';
     } else if ($days_count >= 5 && $recompensas_temporada_maxima < 40) {
-        $recompensa_items = '200 Ryos y 15 Experiencia';
+        $recompensa_items = '200 Ryos, 1 Tobi y 20 Experiencia';
     } else if ($recompensas_temporada_maxima > 41 && (($recompensas_temporada_maxima + 1) % 5) == 0) {
-        $recompensa_items = '200 Ryos y 15 Experiencia';
+        $recompensa_items = '800 Ryos, 4 Tobi y 50 Experiencia';
     } else if ($recompensas_temporada_maxima >= 40) {
-        $recompensa_items = '150 Ryos y 10 Experiencia';
+        $recompensa_items = '400 Ryos, 2 Tobi y 30 Experiencia';
     }
 
     // progreso de la racha de temporada hacia el hito 40 (donde las recompensas escalan)

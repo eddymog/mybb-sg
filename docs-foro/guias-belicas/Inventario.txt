@@ -96,16 +96,3 @@ Solo puede aplicarse uno de estos beneficios por ofensiva.
 Debido a la naturaleza de los materiales utilizados en su fabricación, las Chakura Tō son capaces de conducir chakra de manera excepcional. Por esta razón, numerosas técnicas especiales requieren el uso de una Chakura Tō para ser ejecutadas correctamente. De igual forma, ciertos clanes y habilidades poseen la capacidad de crear, modificar u obtener este tipo de armamento mediante sus propias técnicas.
 
 Fuera de las propiedades descritas anteriormente, una Chakura Tō se considera un arma común y corriente, conservando las mismas características, limitaciones y funcionamiento que cualquier otra arma de su categoría.
-
-
-=====================================================================
-[NOTA INTERNA — Descripción de imagen (referencia para IA, NO publicar)]
-Imagen — https://i.postimg.cc/VLZzPs1G/ad77P3H.png  (PLANTILLA de carta de arma — no es infografía, es el formato visual)
-Muestra el diseño de una "carta" de arma del inventario, con campos:
-- Cabecera: NOMBRE DEL ARMA, con dos insignias en las esquinas: MUNICIÓN (izq.) e INVENTARIO (der.), cada una con un valor.
-- Subtítulo: TIPO / TAMAÑO.
-- Ilustración central del arma.
-- Tres EFECTOS: Efecto 1 [CÓDIGO1], Efecto 2 [CÓDIGO2], Efecto 3 [CÓDIGO3], cada uno con su descripción.
-- DESCRIPCIÓN: texto libre sobre origen, características y utilidad del arma.
-Es la plantilla base que se rellena para cada arma (ver la carta de ejemplo "Shuriken" en la guía de Ejemplo de Combate).
-=====================================================================

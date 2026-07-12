@@ -61,27 +61,3 @@ Cada vez que un jugador sube de nivel, recibe las siguientes mejoras:
 [color=#ff4136]1 punto de mejora de cuerpo: [/color]Puede asignarse a Salud, Velocidad, Tenketsu o Sigilo. Estas estadísticas comienzan en 9 y pueden aumentar hasta un máximo de 20.
 
 [color=#ff4136]1 mejora gratuita en una rama de habilidades: [/color]Cada nivel permite mejorar una rama de habilidades sin costo. Otras mejoras deben comprarse con la moneda Tobi.
-
-
-=====================================================================
-[NOTA INTERNA — Descripción de infografías (referencia para IA, NO publicar)]
-
-Infografía 1 — https://i.imgur.com/N6l1jhP.png  "PROGRESIÓN · NIVELES Y EXPERIENCIA · resumen ultra corto"
-- Concepto central: progresas ganando EXP; subir de nivel mejora stats, cuerpo y habilidades; el sistema permite personalización total del crecimiento.
-- Identidad del sistema: nivel máximo 20; +15 stats por nivel; total al máximo 300 puntos; sin mínimos obligatorios (construcción libre).
-- Obtención de EXP: posts semanales hasta 100 EXP; rachas +5 por día (bonus acumulativo); misiones y combates según dificultad; pergaminos (recompensas aleatorias). Función: avance constante y recompensas por actividad.
-- Escalado de niveles: la EXP requerida aumenta por nivel; requiere planificar actividades; incentiva participación continua. Progresión progresiva y balanceada.
-- Recompensas por nivel: +15 puntos de stats; +1 punto de cuerpo (Salud/Velocidad/Tenketsu/Sigilo); +1 mejora gratis de habilidad. Crecimiento mecánico completo.
-- Sistema de cuerpo: los stats de cuerpo inician en 9 y su máximo es 20.
-- Resumen: Ganar EXP + Mejorar stats y cuerpo + Desbloquear poder progresivo.
-
-Infografía 2 — https://i.imgur.com/lhEWqxw.png  (tabla Nivel | Puntos de Stats obtenidos | Puntos acumulados)
-- Cada nivel otorga 15 puntos de stats. Acumulado: Nivel 1 = 15, sube de 15 en 15 hasta Nivel 20 = 300.
-
-Infografía 3 — https://i.imgur.com/B1EytzJ.png  (tabla Nivel | Experiencia para subir | Experiencia acumulada)
-- Niv 1: – / 0      | Niv 2: 50 / 50     | Niv 3: 100 / 150   | Niv 4: 150 / 300
-- Niv 5: 200 / 500  | Niv 6: 250 / 750   | Niv 7: 300 / 1050  | Niv 8: 350 / 1400
-- Niv 9: 400 / 1800 | Niv 10: 450 / 2250 | Niv 11: 500 / 2750 | Niv 12: 550 / 3300
-- Niv 13: 600 / 3900| Niv 14: 650 / 4550 | Niv 15: 700 / 5250 | Niv 16: 750 / 6000
-- Niv 17: 800 / 6800| Niv 18: 900 / 7700 | Niv 19: 1000 / 8700| Niv 20: 1100 / 9800
-=====================================================================

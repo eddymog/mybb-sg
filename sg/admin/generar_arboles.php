@@ -16,8 +16,11 @@
  *   }
  *
  * Uso:
- *   /sg/admin/generar_arboles.php            -> imprime el JSON
+ *   /sg/admin/generar_arboles.php            -> imprime el JSON (lee la BD, ignora caché)
  *   /sg/admin/generar_arboles.php?save=1     -> además lo guarda en docs/arboles_generado.json
+ *   /sg/admin/generar_arboles.php?rebuild=1  -> RECONSTRUYE el caché 'sg_arboles' del dojo
+ *                                               (úsalo si editaste técnicas por SQL y un
+ *                                                árbol/clan no aparece en el Dojo)
  */
 
 define("IN_MYBB", 1);
@@ -50,6 +53,14 @@ while ($r = $db->fetch_array($query_arboles)) {
 $out = array('arboles' => array());
 foreach ($arboles as $a) {
     $out['arboles'][$a] = sg_build_arbol($db, $a);
+}
+
+// Reconstruye el caché 'sg_arboles' que usa el Dojo (sg_dojo_estado). Necesario
+// cuando se agregan/editan técnicas por fuera del panel (p. ej. por SQL), porque
+// el Dojo lee del caché y no vería el árbol nuevo hasta reconstruirlo.
+if ($mybb->get_input('rebuild')) {
+    sg_rebuild_catalogo_arboles($db);
+    $out['cache_reconstruido'] = true;
 }
 
 $json = json_encode($out, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);

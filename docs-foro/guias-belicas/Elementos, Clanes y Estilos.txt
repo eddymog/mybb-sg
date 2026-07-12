@@ -166,21 +166,3 @@ Los estilos solo pueden obtenerse de dos maneras:
 [align=center][img=25x25]https://i.imgur.com/r8SokMx.png[/img][color=#e82a1f][size=xx-large] Límite de Clanes y Estilos [/size][/color][img=25x25]https://i.imgur.com/r8SokMx.png[/img][/align]
 
 Un usuario solo puede manejar un máximo de [color=#FF4136]dos clanes y/o estilos simultáneamente[/color]. Puede tener dos clanes, o dos estilos, o bien un clan y un estilo. Esta regla aplica para [color=#FF4136]todo tipo de combinaciones[/color], si por ejemplo, un usuario obtiene dos clanes a través de una virtud, entonces ese usuario no podrá aprender un nuevo estilo, así mismo, si alguien posee ya dos estilos y adquiere un ADN, por mucho que se implante, por ejemplo, un Sharingan de manera exitosa, su mente no será capaz de procesar dicha información y será un simple ojo, un Sharingan simplemente estético pero no funcional.
-
-
-=====================================================================
-[NOTA INTERNA — Descripción de infografía (referencia para IA, NO publicar)]
-Imagen — https://i.imgur.com/OLOYg6B.png  "SISTEMA ELEMENTAL · resumen ultra corto"
-- Concepto: los elementos son la base del estilo de combate; permiten jutsus elementales y combinaciones avanzadas. Incluye básicos + avanzados + Yin/Yang.
-- Slots elementales: máximo 5 slots. Elemento básico = 1 slot; Kekkei Genkai = 1 slot extra; Kekkei Tōta = 2 slots extra.
-- Elementos básicos: Katon, Suiton, Doton, Fuuton, Raiton. Se obtienen comprando árbol o por tirada aleatoria.
-- Avanzados: Kekkei Genkai (2 elementos): requiere 2 elementos base + 1 slot extra (ej. Hyōton = Agua + Viento). Kekkei Tōta (3 elementos): requiere 3 elementos base + 2 slots extra; muy raros y superiores.
-- Yin y Yang (NO usan slots): Yin (espiritual/mental): ilusiones, control mental, manipulación indirecta del cuerpo. Yang (físico/vital): curación, buffs físicos, transformación corporal.
-- Ventaja elemental (ciclo): Katon → Fuuton → Raiton → Doton → Suiton → Katon.
-- Reglas avanzadas: Kekkei Genkai tiene ventaja sobre sus elementos base; Kekkei Tōta es superior a básicos y genkai.
-- Bonus por ventaja: solo en choque de jutsus; daño extra [MCCKx10]; NO cuesta chakra; NO sube el nivel del jutsu.
-- Clanes: tienen afinidad/tendencia elemental, dan los primeros elementos y pueden dar acceso a Kekkei Genkai.
-- Estilos: pueden aprenderse; NO incluyen el jutsu base del clan; máximo 2 en total (clanes + estilos combinados).
-- Regla clave: más elementos ≠ mejor; la ventaja real está en cómo los combinas y cuándo los usas.
-- Resumen: Elementos = poder; Combinación = maestría; Decisión = victoria.
-=====================================================================

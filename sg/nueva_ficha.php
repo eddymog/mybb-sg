@@ -122,8 +122,10 @@ if ($name && $age && $season && $villa && $clan && $phi && $psi && $history && $
     // Progreso/economía del Dojo por defecto (ver docs/arboles_instruciones.txt).
     // El estado del árbol se DERIVA de tec_aprendidas; ya no se guarda un espejo
     // en la columna `arboles` (queda obsoleta).
+    // Las fichas nuevas ya quedan configuradas para el Dojo, así que arrancan con
+    // acceso (puede_usar_dojo=1). Las antiguas quedan en 0 hasta revisión de un mod.
     $progreso_json = $db->escape_string(json_encode(sg_progreso_defaults(), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
-    $db->query("UPDATE `mybb_sg_sg_fichas` SET `arboles_progreso`='$progreso_json' WHERE `fid`='$uid'");
+    $db->query("UPDATE `mybb_sg_sg_fichas` SET `arboles_progreso`='$progreso_json', `puede_usar_dojo`='1' WHERE `fid`='$uid'");
 
     eval("\$page = \"".$templates->get("sg_nueva_ficha_creada")."\";");
     output_page($page);

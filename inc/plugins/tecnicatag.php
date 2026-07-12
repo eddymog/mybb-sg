@@ -164,6 +164,8 @@ function tecnicatag_run(&$message)
 		if (!$thread_ficha) {
 			$message = preg_replace("#\[personaje=$tid\]#si","$personaje_message",$message);
 		} else {
+			// Pasivas: base + pas_* -> efectivas (mods/vida/chakra/reg recalculados)
+			sg_aplicar_pasivas($thread_ficha);
 			$nombre = $thread_ficha['nombre'];
 			$fuerza = $thread_ficha['fuerza'];
 			$destreza = $thread_ficha['destreza'];
@@ -231,42 +233,57 @@ function tecnicatag_run(&$message)
 			}
 
 			$nombre = $ficha['nombre'];
-			$fuerza = $ficha['fuerza'];
-			$destreza = $ficha['destreza'];
-			$cchakra = $ficha['cchakra'];
-			$inteligencia = $ficha['inteligencia'];
-			$salud = $ficha['salud'];
-			$velocidad = $ficha['velocidad'];
-			$tenketsu = $ficha['tenketsu'];
-			$sigilo = $ficha['sigilo'];
-			$mfuerza = $ficha['mfuerza'];
-			$mdestreza = $ficha['mdestreza'];
-			$mcchakra = $ficha['mcchakra'];
-			$minteligencia = $ficha['minteligencia'];
-			$vida = $ficha['vida'];
-			$chakra = $ficha['chakra'];
-			$regchakra = $ficha['tenketsu'] * 4;
 			$espe = $ficha['espe'];
 			$estilo = $ficha['espe_estilo'];
 			$maestria = $ficha['maestria'];
 			$maestria2 = $ficha['maestria_secundaria'];
 
+			// Estadisticas base (de la ficha) y sus pasivas invisibles.
+			$b_fuerza = $ficha['fuerza'];       $pas_fuerza       = sg_pasiva($ficha, 'fuerza');
+			$b_destreza = $ficha['destreza'];   $pas_destreza     = sg_pasiva($ficha, 'destreza');
+			$b_cchakra = $ficha['cchakra'];     $pas_cchakra      = sg_pasiva($ficha, 'cchakra');
+			$b_inteligencia = $ficha['inteligencia']; $pas_inteligencia = sg_pasiva($ficha, 'inteligencia');
+			$b_salud = $ficha['salud'];         $pas_salud        = sg_pasiva($ficha, 'salud');
+			$b_velocidad = $ficha['velocidad']; $pas_velocidad    = sg_pasiva($ficha, 'velocidad');
+			$b_tenketsu = $ficha['tenketsu'];   $pas_tenketsu     = sg_pasiva($ficha, 'tenketsu');
+			$b_sigilo = $ficha['sigilo'];       $pas_sigilo       = sg_pasiva($ficha, 'sigilo');
+
+			// Valores EFECTIVOS (base + pasiva) para mostrar y para los derivados.
+			$eff = sg_stats_efectivas($ficha);
+			$fuerza = $eff['fuerza'];       $mfuerza = $eff['mfuerza'];
+			$destreza = $eff['destreza'];   $mdestreza = $eff['mdestreza'];
+			$cchakra = $eff['cchakra'];     $mcchakra = $eff['mcchakra'];
+			$inteligencia = $eff['inteligencia']; $minteligencia = $eff['minteligencia'];
+			$salud = $eff['salud'];
+			$velocidad = $eff['velocidad'];
+			$tenketsu = $eff['tenketsu'];
+			$sigilo = $eff['sigilo'];
+			$vida = $eff['vida'];
+			$chakra = $eff['chakra'];
+			$regchakra = $eff['regchakra'];
+
 			if ($tid && $pid) {
+				// El snapshot congela BASE + pasivas (para no doblar el efecto al
+				// re-mostrar) y guarda vida/chakra/reg/mods efectivos ya calculados.
 				$db->query("
 					INSERT INTO `mybb_sg_sg_thread_personaje` (`tid`, `pid`, `uid`, `nombre`,
 						`vida`, `chakra`, `regchakra`,
 						`fuerza`, `destreza`, `cchakra`, `inteligencia`, `salud`, `velocidad`, `tenketsu`, `sigilo`,
+						`pas_fuerza`, `pas_destreza`, `pas_cchakra`, `pas_inteligencia`, `pas_salud`, `pas_velocidad`, `pas_tenketsu`, `pas_sigilo`,
 						`mfuerza`, `mdestreza`, `mcchakra`, `minteligencia`,
 						`espe`, `estilo`, `maestria`, `maestria2`)
 					VALUES ('$tid', '$pid', '$uid', '$nombre',
 						'$vida', '$chakra', '$regchakra',
-						'$fuerza', '$destreza', '$cchakra', '$inteligencia', '$salud', '$velocidad', '$tenketsu', '$sigilo',
+						'$b_fuerza', '$b_destreza', '$b_cchakra', '$b_inteligencia', '$b_salud', '$b_velocidad', '$b_tenketsu', '$b_sigilo',
+						'$pas_fuerza', '$pas_destreza', '$pas_cchakra', '$pas_inteligencia', '$pas_salud', '$pas_velocidad', '$pas_tenketsu', '$pas_sigilo',
 						'$mfuerza', '$mdestreza', '$mcchakra', '$minteligencia',
 						'$espe', '$estilo', '$maestria', '$maestria2');
 				");
 			}
 
 		} else {
+			// Pasivas: base + pas_* -> efectivas (mods/vida/chakra/reg recalculados)
+			sg_aplicar_pasivas($thread_ficha);
 			$nombre = $thread_ficha['nombre'];
 			$fuerza = $thread_ficha['fuerza'];
 			$destreza = $thread_ficha['destreza'];

@@ -10,8 +10,8 @@
 **Keywords:** washi · plum · rust · hanko · kanji · seal · fiber · cold parchment · ukiyo-e
 
 **Design principles:**
-- Maximum 2 fonts — never more
-- Rust red appears in exactly 3 places: title accent line, hanko seal, and navigation diamonds
+- Maximum 2 primary fonts; a 3rd font is allowed only for decorative Japanese glyphs
+- Rust red appears in exactly 3 places: title accent line, hanko seal, and Naruto-style spiral marks
 - 0.5px borders — never thicker except intentional 1.5px accents
 - White space as an active element, not emptiness
 - Decorative kanji always at opacity 0.04–0.08 — never prominent
@@ -23,34 +23,35 @@
 ### Fonts
 ```
 Display / Headings:  Cinzel (Google Fonts) → weights: 400, 700, 900
-Body / Lore:         Noto Serif JP (Google Fonts) → weights: 300, 400, 700
+Body / Lore:         Source Serif 4 (Google Fonts) → weights: 300, 400, 600, 700
+Decorative kanji:    Zen Old Mincho (Google Fonts) → weights: 400, 700
 ```
 
 Import with:
 ```html
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Noto+Serif+JP:wght@300;400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Source+Serif+4:wght@300;400;600;700&family=Zen+Old+Mincho:wght@400;700&display=swap" rel="stylesheet">
 ```
 
 ### Hierarchy
 
 | Element | Font | Size | Weight | Letter-spacing |
 |---|---|---|---|---|
-| Forum logo | Cinzel | 22px | 900 | 2px |
-| Logo subtitle | Cinzel | 9px | 400 | 5px |
-| Section titles | Cinzel | 14px | 900 | 2px |
-| Navigation items | Cinzel | 10px | 700 | 1.5px |
-| Tags / badges | Cinzel | 8px | 400 | 2px |
-| Card labels | Cinzel | 11px | 700 | 1px |
-| Card sublabels | Cinzel | 9px | 400 | 2px |
-| Metadata / dates | Cinzel | 9px | 400 | 1px |
-| News body text | Noto Serif JP | 11px | 300 | 0 |
-| Decorative vertical kanji | Noto Serif JP | 22px | 700 | 6px |
-| Watermark kanji in cards | Noto Serif JP | 54px | 700 | 0 |
-| Watermark kanji in nav | Noto Serif JP | 110px | 700 | 0 |
+| Forum logo | Cinzel | 26px | 900 | 2px |
+| Logo subtitle | Cinzel | 10px | 400 | 5px |
+| Section titles | Cinzel | 17px | 900 | 2px |
+| Navigation items | Cinzel | 12px | 700 | 1.5px |
+| Tags / badges | Cinzel | 10px | 400 | 2px |
+| Card labels | Cinzel | 13px | 700 | 1px |
+| Card sublabels | Cinzel | 11px | 400 | 2px |
+| Metadata / dates | Cinzel | 10px | 400 | 1px |
+| News body text | Source Serif 4 | 14px | 400 | 0 |
+| Decorative vertical kanji | Zen Old Mincho | 26px | 700 | 6px |
+| Watermark kanji in cards | Zen Old Mincho | 62px | 700 | 0 |
+| Watermark kanji in nav | Zen Old Mincho | 124px | 700 | 0 |
 
 ### Typography rules
 - `text-align: justify` on all body paragraphs
-- `line-height: 1.9` on news body text
+- `line-height: 1.85–1.95` on news body text
 - `text-transform: uppercase` on all Cinzel navigation text and tags
 - Vertical header kanji uses `writing-mode: vertical-rl`
 
@@ -73,7 +74,7 @@ Import with:
 | `--plum4` | `#9c6bcc` | Edit icons inside cards |
 | `--lilac` | `#c4a0e0` | Occasional decorative use |
 | `--lavender` | `#ede0fa` | Text on dark card backgrounds |
-| `--oxide` | `#7a2a10` | Rust accent — title line, seal, diamonds |
+| `--oxide` | `#7a2a10` | Rust accent — title line, seal, spiral marks |
 | `--oxide2` | `#a83a18` | Username in recent posts |
 | `--stone` | `#6a587a` | Secondary text, descriptions |
 | `--mist` | `#a898b8` | Metadata, dates, labels |
@@ -94,7 +95,7 @@ Import with:
 | `--plum3` | `#b890e0` | Text on dark backgrounds |
 | `--plum4` | `#d4b8f0` | Titles inside village cards |
 | `--dim` | `#4a3a6a` | Tool icons at rest |
-| `--oxide` | `#c0582a` | Rust accent — title line, seal, diamonds |
+| `--oxide` | `#c0582a` | Rust accent — title line, seal, spiral marks |
 | `--oxide2` | `#e07040` | Username in recent posts |
 | `--stone` | `#8a7a9a` | Secondary text, descriptions |
 | `--mist` | `#5a4a6a` | Metadata, dates, stats band text |
@@ -263,7 +264,7 @@ Recent posts (3-col grid, full body span)
   padding-top: 2px;
 }
 .kanji-col span {
-  font-family: 'Noto Serif JP', serif;
+  font-family: 'Zen Old Mincho', serif;
   font-size: 22px;
   font-weight: 700;
   color: var(--plum2);
@@ -292,7 +293,7 @@ Recent posts (3-col grid, full body span)
   justify-content: center;
   background: rgba(122,42,16,0.05); /* dark: rgba(192,88,42,0.08) */
 }
-.hanko span  { font-family: 'Noto Serif JP', serif; font-size: 14px; font-weight: 700; color: var(--oxide); }
+.hanko span  { font-family: 'Zen Old Mincho', serif; font-size: 14px; font-weight: 700; color: var(--oxide); }
 .hanko small { font-size: 8px; color: var(--oxide); letter-spacing: 1px; }
 ```
 
@@ -314,7 +315,7 @@ Recent posts (3-col grid, full body span)
   right: -12px;
   top: 50%;
   transform: translateY(-50%);
-  font-family: 'Noto Serif JP', serif;
+  font-family: 'Zen Old Mincho', serif;
   font-size: 110px;
   font-weight: 700;
   color: rgba(90,46,154,0.04); /* dark: rgba(123,74,184,0.05) */
@@ -336,7 +337,7 @@ Recent posts (3-col grid, full body span)
 
 .nav-item span {
   font-family: 'Cinzel', serif;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 700;
   letter-spacing: 1.5px;
   color: var(--plum2);
@@ -344,13 +345,12 @@ Recent posts (3-col grid, full body span)
 }
 .nav-item:hover span { color: var(--ink); }
 
-/* Navigation diamond — rust red accent */
-.nav-gem {
-  width: 5px;
-  height: 5px;
-  background: var(--oxide);
-  clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+/* Navigation spiral — rust red accent */
+.nav-spiral {
+  width: 9px;
+  height: 9px;
   flex-shrink: 0;
+  color: var(--oxide);
 }
 ```
 
@@ -459,7 +459,7 @@ Recent posts (3-col grid, full body span)
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: 'Noto Serif JP', serif;
+  font-family: 'Zen Old Mincho', serif;
   font-size: 54px;
   font-weight: 700;
   color: rgba(255,255,255,0.08);
@@ -635,7 +635,7 @@ The rust oxide accent is the most important visual accent and must appear in **e
 
 1. **Accent line above the title** — `width: 32px; height: 2px`
 2. **Hanko seal** — border and text of the logo circle
-3. **Navigation and recent card diamonds** — `clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)`
+3. **Navigation and recent card spiral marks** — small Naruto-style swirl indicators, ideally inline SVG or curved line motifs
 
 Never use oxide on: backgrounds, body text, primary buttons, or any role beyond these three.
 
@@ -680,7 +680,7 @@ The hanko seal can also be used as a watermark on section backgrounds:
   opacity: 0.03;
   position: absolute;
   font-size: 120px;
-  font-family: 'Noto Serif JP', serif;
+  font-family: 'Zen Old Mincho', serif;
   font-weight: 700;
   color: var(--oxide);
   pointer-events: none;
@@ -731,7 +731,7 @@ if (saved === 'dark') {
 
 ## 13. Final Notes
 
-- The `font-weight: 300` of Noto Serif JP is essential for long-form body readability — do not increase to 400 in paragraphs
+- The `font-weight: 300` of Source Serif 4 is ideal for long-form Latin body readability; use `400` only when contrast requires it
 - Never use `box-shadow` — fine 0.5px borders replace all visual elevation
 - Keep the `3px` gap between cards — it creates the ukiyo-e mosaic feel without separating elements too much
 - Decorative large kanji must never be readable at first glance — always at opacity ≤ 0.08

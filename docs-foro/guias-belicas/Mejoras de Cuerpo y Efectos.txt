@@ -274,17 +274,3 @@ Las entidades afectadas por una Alteración por Tamaño serán consideradas como
 
 [tecnica=gigante]
 [tecnica=diminuto]
-
-
-=====================================================================
-[NOTA INTERNA — Descripción de infografía (referencia para IA, NO publicar)]
-Imagen — https://i.imgur.com/WSdoyR7.png  "SISTEMA DE EFECTOS · resumen ultra corto"
-- Concepto: los efectos afectan las 4 stats de cuerpo (Salud, Velocidad, Tenketsu, Sigilo). Tipos: negativos (permanentes hasta tratarse) y temporales.
-- Métodos de aplicación: (1) Método de intensidad — Básico 1–14, Medio 15–22, Crítico 23+; define la fuerza del efecto; códigos tipo [efecto*=N]. (2) Método directo — aplica reducción directa (ej. [MDESx5] Velocidad), sin niveles ni tabla.
-- SALUD: Positivo = curación (Básico [SALx1], Media [SALx5], Crítica [SALx10]). Negativo (Sangrado): Básico -1, Medio -1/turno, Crítico acumulativo. Temporal (Infección): daño progresivo según acumulación.
-- VELOCIDAD: Positivo = movimiento (Velocidad /2 m/s, Salto /4 m). Negativo (Lesión): Básica -1, Media -3, Crítica -5. Temporal (Parálisis): reducción directa, inmóvil, puede romperse autolesionándose.
-- TENKETSU: Positivo = regenera chakra ([TENKETSU x4] por turno). Negativo (Bloqueo, método directo): reduce el flujo de chakra. Temporal (Restricción): Básico máx nivel 3, Medio máx nivel 2, Crítico fuerza nivel 1 / bloquea Tenketsu.
-- SIGILO: Positivo = sistema d20 (dado < sigilo = indetectable; dado > sigilo = detectable; máx efectivo 20). Negativo (Mareo): reduce sigilo directo; 0 = no puede mantenerse oculto. Temporal (Confusión): Básica -5, Media -7, Crítica -10; recupera +1 por turno.
-- Otros efectos: no afectan stats directamente, modifican acciones/efectos.
-- Regla clave: todo combate gira en bajar una stat a 0 antes que el rival.
-=====================================================================

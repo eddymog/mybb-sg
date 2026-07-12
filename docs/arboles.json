@@ -1,0 +1,8 @@
+{
+    "desbloqueo_arboles": 0, // veces que se ha gastado tobis para desbloquear un arbol (maximo 5 veces)
+    "desbloqueo_ramas": 0, // veces que se ha gastado tobis para desbloquear ramas nuevas
+    "desbloqueo_nivel_ramas": 0, // veces que se ha gastado tobis para desbloquear una subida de nivel a una rama existente
+    "arboles_disponibles": 1, // arboles disponibles para subir de nivel, 1 es por defecto al crear la ficha
+    "ramas_disponibles": 0, // ramas disponibles para subir de nivel
+    "nivel_rama_disponibles": 0 // capacidad para subir de nivel cualquier rama
+}

@@ -154,79 +154,40 @@
 	color: var(--mist);
 }
 
-/* Rejilla de 2 columnas de tarjetas de stat */
 .stats_table {
-	display: grid;
-	grid-template-columns: 1fr 1fr;
-	gap: 4px;
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
 	padding: 8px;
 }
 
-/* Sub-encabezado de grupo (Generales / Especiales): ocupa toda la fila */
-.stats_group {
-	grid-column: 1 / -1;
-	display: flex;
-	align-items: center;
-	gap: 6px;
-	margin-top: 4px;
-	font-family: 'Cinzel', serif;
-	font-size: 7px;
-	font-weight: 700;
-	letter-spacing: 2px;
-	text-transform: uppercase;
-	color: var(--mist);
-}
-
-.stats_group:first-child {
-	margin-top: 0;
-}
-
-.stats_group::after {
-	content: '';
-	flex: 1;
-	height: 0.5px;
-	background: var(--border);
-}
-
-/* Tarjeta: etiqueta arriba, valor abajo, con acento de aldea a la izquierda */
+/* Cada fila: etiqueta a la izquierda, valor a la derecha */
 .stat_row {
 	display: flex;
-	flex-direction: column;
-	gap: 1px;
-	padding: 5px 8px;
+	align-items: center;
+	justify-content: space-between;
+	gap: 10px;
+	height: 22px;
+	padding: 0 8px;
 	background: var(--bg2);
 	border: 0.5px solid var(--border);
-	border-left: 2px solid var(--villa, var(--oxide));
 }
 
 .stat_label {
 	font-family: 'Cinzel', serif;
-	font-size: 7px;
+	font-size: 8px;
 	font-weight: 700;
-	letter-spacing: 1px;
+	letter-spacing: 0.5px;
 	text-transform: uppercase;
-	color: var(--mist);
+	color: var(--stone);
 	white-space: nowrap;
-	overflow: hidden;
-	text-overflow: ellipsis;
 }
 
 .stat_val {
 	font-family: 'Source Serif 4', serif;
-	font-size: 15px;
+	font-size: 12px;
 	font-weight: 700;
-	line-height: 1.1;
 	color: var(--ink);
-}
-
-/* Modificador: superíndice pegado al valor */
-.stat_mod {
-	font-family: 'Cinzel', serif;
-	font-size: 8px;
-	font-weight: 700;
-	color: var(--villa, var(--plum3));
-	vertical-align: super;
-	margin-left: 1px;
 }
 
 /* Barras */

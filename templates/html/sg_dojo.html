@@ -244,6 +244,62 @@
       .sg-dojo-balances { margin-left: 0; width: 100%; }
       .sg-ramas { grid-template-columns: 1fr; }
     }
+
+    /* ── Guía "cómo funciona el dojo" ── */
+    .sg-guide { margin-bottom: 22px; border: 0.5px solid var(--border); border-left: 2px solid var(--oxide); background: var(--bg); }
+    .sg-guide__summary { list-style: none; cursor: pointer; display: flex; align-items: center; gap: 12px; padding: 14px 18px; user-select: none; }
+    .sg-guide__summary::-webkit-details-marker { display: none; }
+    .sg-guide__summary::before { content: '?'; flex-shrink: 0; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--oxide); border-radius: 50%; color: var(--oxide); font-family: 'Cinzel', serif; font-size: 12px; font-weight: 700; }
+    .sg-guide__title { font-family: 'Cinzel', serif; font-size: 12px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--ink); }
+    .sg-guide__hint { margin-left: auto; font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 1px; text-transform: uppercase; color: var(--mist); }
+    .sg-guide[open] .sg-guide__hint-open { display: none; }
+    .sg-guide:not([open]) .sg-guide__hint-close { display: none; }
+    .sg-guide__body { padding: 4px 18px 20px; border-top: 0.5px solid var(--border); }
+    .sg-guide-intro { font-size: 14px; line-height: 1.7; color: var(--stone); margin: 14px 0 4px; }
+    .sg-guide b { color: var(--plum3); font-weight: 700; }
+    .sg-guide-sub { display: flex; align-items: center; gap: 10px; margin: 20px 0 12px; }
+    .sg-guide-sub::before { content: ''; width: 3px; height: 13px; background: var(--oxide); flex-shrink: 0; }
+    .sg-guide-sub span { font-family: 'Cinzel', serif; font-size: 10px; font-weight: 700; letter-spacing: 1.6px; text-transform: uppercase; color: var(--plum3); }
+    .sg-guide-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    .sg-guide-card { border: 0.5px solid var(--border); background: var(--bg2); padding: 12px 14px; }
+    .sg-guide-card__head { display: flex; align-items: center; gap: 8px; margin-bottom: 7px; flex-wrap: wrap; }
+    .sg-guide-card__name { font-family: 'Cinzel', serif; font-size: 11px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; color: var(--ink); }
+    .sg-guide-tag { font-family: 'Cinzel', serif; font-size: 8px; letter-spacing: 1px; text-transform: uppercase; padding: 2px 7px; border: 0.5px solid var(--border-strong); color: var(--stone); white-space: nowrap; }
+    .sg-guide-tag--cost { color: var(--gold); border-color: rgba(192, 152, 64, 0.4); }
+    .sg-guide-tag--free { color: var(--green); border-color: rgba(79, 157, 105, 0.4); }
+    .sg-guide-card__desc { font-size: 13px; line-height: 1.6; color: var(--stone); margin: 0; }
+    .sg-guide-rules { margin: 0; padding-left: 0; list-style: none; display: grid; gap: 8px; }
+    .sg-guide-rules li { position: relative; padding-left: 20px; font-size: 13px; line-height: 1.55; color: var(--stone); }
+    .sg-guide-rules li::before { content: '\2715'; position: absolute; left: 0; top: 1px; color: var(--oxide); font-size: 11px; }
+    .sg-guide-rules--ok li::before { content: '\2713'; color: var(--green); }
+    .sg-guide-note { margin-top: 16px; padding-top: 12px; border-top: 0.5px solid var(--border); font-size: 12.5px; line-height: 1.6; color: var(--mist); }
+    @media (max-width: 640px) { .sg-guide-grid { grid-template-columns: 1fr; } }
+
+    /* ── Franja de progreso ── */
+    .sg-prog { margin-bottom: 22px; border: 0.5px solid var(--border); background: var(--bg); }
+    .sg-prog-head { display: flex; align-items: center; gap: 10px; padding: 14px 18px 0; }
+    .sg-prog-title { margin: 0; font-family: 'Cinzel', serif; font-size: 12px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--plum3); }
+    .sg-prog-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; padding: 12px 18px 16px; }
+    .sg-prog-card { border: 0.5px solid var(--border); background: var(--bg2); padding: 12px 13px; }
+    .sg-prog-k { font-family: 'Cinzel', serif; font-size: 8px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--mist); margin-bottom: 6px; }
+    .sg-prog-v { font-family: 'Cinzel', serif; font-size: 26px; font-weight: 900; line-height: 1; color: var(--ink); }
+    .sg-prog-v--free { color: var(--green); }
+    .sg-prog-sub { margin-top: 8px; font-size: 11px; line-height: 1.5; color: var(--stone); }
+    .sg-prog-sub b { color: var(--gold); font-weight: 700; }
+    @media (max-width: 640px) { .sg-prog-grid { grid-template-columns: repeat(2, 1fr); } }
+
+    /* ── Dojo bloqueado (sin permiso) ── */
+    .sg-locked { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 22px; padding: 14px 18px; border: 0.5px solid var(--gold); border-left: 3px solid var(--gold); background: rgba(192, 152, 64, 0.10); }
+    .sg-locked__i { font-size: 18px; line-height: 1.4; flex-shrink: 0; }
+    .sg-locked__txt { font-size: 13.5px; line-height: 1.6; color: var(--ink); }
+    .sg-locked__txt strong { display: block; margin-bottom: 3px; font-family: 'Cinzel', serif; font-size: 12px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; color: var(--gold); }
+
+    /* ── Vista de staff (impersonación, solo lectura) ── */
+    .sg-staffview { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 22px; padding: 14px 18px; border: 0.5px solid var(--plum2); border-left: 3px solid var(--plum2); background: rgba(123, 74, 184, 0.12); }
+    .sg-staffview__i { font-size: 18px; line-height: 1.4; flex-shrink: 0; }
+    .sg-staffview__txt { font-size: 13.5px; line-height: 1.6; color: var(--ink); }
+    .sg-staffview__txt strong { display: block; margin-bottom: 3px; font-family: 'Cinzel', serif; font-size: 12px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; color: var(--plum3); }
+    .sg-staffview__txt b { color: var(--plum3); }
   </style>
 </head>
 
@@ -265,6 +321,91 @@
       </div>
 
       <div class="sg-dojo-body">
+        <if $dojo_impersonando then>
+          <div class="sg-staffview">
+            <span class="sg-staffview__i" aria-hidden="true">👁️</span>
+            <div class="sg-staffview__txt">
+              <strong>Vista de staff · solo lectura</strong>
+              Estás viendo el Dojo de <b>{$ver_nombre}</b> (ficha #{$ver_uid}) tal como lo vería su dueño. Las acciones están deshabilitadas.
+            </div>
+          </div>
+        </if>
+
+        <if $dojo_bloqueado then>
+          <div class="sg-locked">
+            <span class="sg-locked__i" aria-hidden="true">🔒</span>
+            <div class="sg-locked__txt">
+              <strong>El Dojo no está operativo para tu ficha todavía</strong>
+              Un moderador debe revisar y habilitar tu ficha para el Dojo. Mientras tanto puedes ver cómo funciona y tu progreso, pero las acciones están deshabilitadas.
+            </div>
+          </div>
+        </if>
+
+        <details class="sg-guide">
+          <summary class="sg-guide__summary">
+            <span class="sg-guide__title">Cómo funciona el Dojo</span>
+            <span class="sg-guide__hint sg-guide__hint-open">Ver guía ▾</span>
+            <span class="sg-guide__hint sg-guide__hint-close">Ocultar ▴</span>
+          </summary>
+          <div class="sg-guide__body">
+            <p class="sg-guide-intro">En el Dojo gastas <b>Tobis</b> para desarrollar tus <b>árboles de técnicas</b>. Tu <b>Nivel</b> de personaje limita cuántos árboles puedes tener y cada acción se resuelve con un solo clic. Los <b>Slots elementales</b> se gastan únicamente al girar la ruleta de elementos.</p>
+
+            <div class="sg-guide-sub"><span>Tus acciones</span></div>
+            <div class="sg-guide-grid">
+              <div class="sg-guide-card">
+                <div class="sg-guide-card__head"><span class="sg-guide-card__name">Desbloquear árbol elemental</span><span class="sg-guide-tag sg-guide-tag--cost">15 → 25 → 35… Tobis</span></div>
+                <p class="sg-guide-card__desc"><b>Naturales</b> (Katon, Fuuton, Suiton, Doton, Raiton): salen por <b>ruleta al azar</b> y gastan <b>1 slot</b>. <b>Directos</b> (Yin/Yang): los eliges tú. Piden Nivel <b>1 / 5 / 10 / 15 / 20</b> según cuántos árboles lleves. Siempre cuestan Tobis.</p>
+              </div>
+              <div class="sg-guide-card">
+                <div class="sg-guide-card__head"><span class="sg-guide-card__name">Desbloquear rama</span><span class="sg-guide-tag sg-guide-tag--cost">10 → 15 → 20… Tobis</span></div>
+                <p class="sg-guide-card__desc">Abre una rama nueva de un árbol que ya poseas. Siempre cuesta Tobis. <b>Excepción:</b> en tu árbol de clan debes reclamar antes la rama de clan gratis.</p>
+              </div>
+              <div class="sg-guide-card">
+                <div class="sg-guide-card__head"><span class="sg-guide-card__name">Subir nivel de rama</span><span class="sg-guide-tag sg-guide-tag--cost">5 → 7 → 9… Tobis</span></div>
+                <p class="sg-guide-card__desc">Eliges <b>2 mejoras</b> de esa rama. Es <b>gratis si tienes crédito</b> de nivel; si no, cuesta Tobis. Cada rama tiene <b>6 mejoras = 3 niveles</b>.</p>
+              </div>
+              <div class="sg-guide-card">
+                <div class="sg-guide-card__head"><span class="sg-guide-card__name">Especializaciones</span><span class="sg-guide-tag sg-guide-tag--free">Gratis</span></div>
+                <p class="sg-guide-card__desc">Se desbloquean al subir el árbol a nivel <b>3, 6 y 9</b>. Tu cupo = nivel del árbol ÷ 3 (máx. 3). Eliges cuál aprender del catálogo del árbol.</p>
+              </div>
+            </div>
+
+            <div class="sg-guide-sub"><span>Cómo se cuentan los niveles</span></div>
+            <ul class="sg-guide-rules sg-guide-rules--ok">
+              <li><b>Nivel de una rama</b> = mejoras aprendidas ÷ 2 (de 0 a 3).</li>
+              <li><b>Nivel de un árbol</b> = suma de los niveles de sus 3 ramas (de 0 a 9).</li>
+              <li>Cuanto más sube el árbol, más especializaciones abres (en 3, 6 y 9).</li>
+            </ul>
+
+          </div>
+        </details>
+
+        <section class="sg-prog">
+          <div class="sg-prog-head"><span class="sg-prog-title">Progreso</span></div>
+          <div class="sg-prog-grid">
+            <div class="sg-prog-card">
+              <div class="sg-prog-k">Árboles</div>
+              <div class="sg-prog-v">{$tot_arboles}</div>
+              <div class="sg-prog-sub">{$prog_arboles_pag} comprados · próximo <b>{$prox_arbol_costo} Tobis · Nivel {$prox_arbol_nivel}</b></div>
+            </div>
+            <div class="sg-prog-card">
+              <div class="sg-prog-k">Ramas</div>
+              <div class="sg-prog-v">{$tot_ramas}</div>
+              <div class="sg-prog-sub">{$prog_ramas_pag} compradas · próxima <b>{$prox_rama_costo} Tobis</b></div>
+            </div>
+            <div class="sg-prog-card">
+              <div class="sg-prog-k">Niveles de rama</div>
+              <div class="sg-prog-v">{$tot_niveles}</div>
+              <div class="sg-prog-sub">{$prog_niv_pag} pagados · próximo <b>{$prox_nivel_label}</b></div>
+            </div>
+            <div class="sg-prog-card">
+              <div class="sg-prog-k">Mejoras gratis</div>
+              <div class="sg-prog-v{$cred_cls}">{$prog_cred_gratis}</div>
+              <div class="sg-prog-sub">niveles de rama que puedes subir gratis (se ganan al subir de nivel)</div>
+            </div>
+          </div>
+        </section>
+
         <if $msg != '' then><div class="sg-msg sg-msg--{$msg_tipo}">{$msg}</div></if>
         {$dojo_html}
       </div>

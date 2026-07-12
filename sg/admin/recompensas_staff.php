@@ -181,14 +181,9 @@ if ($accion === 'recompensa_mision' && $es_staff) {
                     INSERT INTO `mybb_sg_sg_audit_consola_mod` (`staff`, `username`, `razon`, `log`) VALUES
                     ('$user_db', '$user_db', '$razon_db', '$log_db')
                 ");
-
-                // Redirige (Post/Redirect/Get) para que refrescar no repita la recompensa
-                $msg = "Recompensa de rango $rango aplicada a ".count($detalle)." ficha(s).";
-                if (!empty($invalidos)) { $msg .= " Omitidas (sin ficha): ".implode(', ', $invalidos)."."; }
-                redirect($mybb->settings['bburl']."/sg/admin/recompensas_staff.php", $msg, "Recompensas aplicadas");
-                exit;
-            } else {
-                $errores[] = "No se pudo aplicar la recompensa (fichas no encontradas).";
+            }
+            if (!empty($invalidos)) {
+                $errores[] = "Sin ficha (omitidos): ".implode(', ', $invalidos).".";
             }
         }
     }
@@ -301,14 +296,9 @@ if ($accion === 'recompensa_semanal') {
                         INSERT INTO `mybb_sg_sg_audit_consola_mod` (`staff`, `username`, `razon`, `log`) VALUES
                         ('$user_db', '$user_db', '$razon_db', '$log_db')
                     ");
-
-                    // Redirige (Post/Redirect/Get) para que refrescar no repita el cobro
-                    $msg = "Cobro semanal (semana $semana) aplicado a ".count($detalle)." ficha(s).";
-                    if (!empty($invalidos)) { $msg .= " Omitidas (sin ficha): ".implode(', ', $invalidos)."."; }
-                    redirect($mybb->settings['bburl']."/sg/admin/recompensas_staff.php", $msg, "Cobro aplicado");
-                    exit;
-                } else {
-                    $errores[] = "No se pudo aplicar el cobro (fichas no encontradas).";
+                }
+                if (!empty($invalidos)) {
+                    $errores[] = "Sin ficha (omitidos): ".implode(', ', $invalidos).".";
                 }
             }
         }

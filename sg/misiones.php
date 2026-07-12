@@ -92,20 +92,24 @@ if ($mid) {
 }
 
 if ($mid3) {
+    $log = '';
     $tiempo_iniciado = '';
     $tiempo_finaliza = '';
-    $has_mision = false;
+
+    // Datos de la misión activa (para el registro), leídos antes de borrar.
     $query_user_mision = $db->query("SELECT * FROM mybb_sg_sg_misiones_usuarios WHERE uid='$uid'");
     while ($q = $db->fetch_array($query_user_mision)) {
         $tiempo_iniciado = $q['tiempo_iniciado'];
         $tiempo_finaliza = $q['tiempo_finaliza'];
-        $has_mision = true;
     }
 
-    if ($has_mision) {
-        $db->query("
-            DELETE FROM mybb_sg_sg_misiones_usuarios WHERE uid='$uid'
-        ");
+    // Candado ATÓMICO contra doble reclamo (múltiples pestañas abiertas con el
+    // botón disponible): el DELETE es la puerta. Solo el request que REALMENTE
+    // borra la fila (affected_rows > 0) otorga la recompensa; el resto no borra
+    // nada y no cobra. En MyISAM el DELETE toma lock de tabla, así que las
+    // peticiones concurrentes se serializan y solo una gana.
+    $db->query("DELETE FROM mybb_sg_sg_misiones_usuarios WHERE uid='$uid'");
+    if ($db->affected_rows() > 0) {
 
         $query_mision = $db->query("
             SELECT * FROM mybb_sg_sg_misiones_lista WHERE id='$mid3'

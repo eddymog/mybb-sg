@@ -85,22 +85,3 @@ Los cirujanos y médicos de élite han desarrollado técnicas de implantación d
 El Kage de cada aldea es elegido por méritos, reconocimiento y habilidades estratégicas, asegurando que solo los más capacitados ocupen el liderazgo. Bajo su mandato, se establecen consejos formados por representantes de clanes influyentes, quienes participan en la toma de decisiones políticas y militares.
 
 Las aldeas mantienen diplomacia entre sí, estableciendo tratados de paz, acuerdos comerciales y alianzas estratégicas. Las misiones ninja son el eje central de la economía política, funcionando como contratos de servicios que permiten a las aldeas mantener su estabilidad y prosperidad sin depender de poderes externos.[/spoiler]
-
-
-=====================================================================
-[NOTA INTERNA — Descripción de imágenes (referencia para IA, NO publicar)]
-
-Imagen 1 — https://i.postimg.cc/76Cn3n51/Konoha-Mapa.jpg  (MAPA de Konohagakure, leyenda 1–38)
-Aldea circular amurallada. Ubicaciones: 1 Puerta Principal, 2 Roca Hokage, 3 Edificio Kage, 4 Estadio, 5 Bosque Nara, 6 Piedra Conmemorativa, 7 Sector Aburame, 8 Complejo Akimichi, 9 Bosque Senju, 10 Cuarteles Inuzuka, 11 Cuarteles Nara, 12 Cuarteles Yamanaka, 13 Complejo Hyuga, 14 Distrito Uchiha, 15 Bosque de la Muerte, 16 Hospital, 17 Cuartel General ANBU, 18 Academia/Asignación de Misiones, 19 Residencia del Hokage, 20 Puesto de Ramen, 21 Estación de Seguridad Jōnin, 22 Archivos, 23 Aviario, 24 Cementerio, 25 Aguas Termales, 26 División de Inteligencia, 27 Biblioteca, 28 Tienda de Dango, 29 Tienda de Dulces, 30 Tienda de BBQ, 31 Río Naka, 32 Santuario Naka, 33 Sembei Uchiha, 34 Flores Yamanaka, 35 Centro Correccional, 36 Estación de Policía, 37 Cuarteles Sarutobi, 38 Campos de Entrenamiento. (Clanes de Konoha: Aburame, Akimichi, Senju, Inuzuka, Nara, Yamanaka, Hyuga, Uchiha, Sarutobi.)
-
-Imagen 2 — https://i.postimg.cc/cH8fg1zD/Kirigakure-Mapa.jpg  (MAPA de Kirigakure, leyenda 1–39)
-Aldea isleña ovalada dividida por el Canal Mizuchi (Distrito Comercial y Distrito de Clase Baja). Ubicaciones: 1 Residencia del Mizukage, 2 Cuartel General ANBU, 3 Cuartel Sensorial, 4 Cuartel de Intercomunicaciones, 5 Estaciones de Guardia Jōnin, 6 Academia de la Niebla, 7 Academia de Kenjutsu, 8 Gran Biblioteca, 9 Hospital Central, 10 Orfanato, 11 Gran Mercado, 12 Cementerio de la Marea Roja, 13 Plaza de la Fuente, 14 Puerto Shinobi Funato, 15 Astilleros Funato, 16 Lonja Hoshigaki, 17 Barrio Hoshigaki, 18 Complejo Yuki, 19 Archivo Glacial Yuki, 20 Centro Estratégico Heizu, 21 Atalaya de la Niebla Heizu, 22 Arena Ósea Kaguya, 23 Cuarteles Kaguya, 24 Termas Sagradas Terumi, 25 Templo del Vapor Terumi, 26 Canales Hōzuki, 27 Complejo Hōzuki, 28 Jardines Venenosos Kodon, 29 Laboratorio de Antídotos Kodon, 30 Aviario, 31 Refugios de Montaña, 32 Prisión de la Montaña, 33 Bestiario, 34 Jardines Botánicos, 35 Área de Entrenamiento Norte, 36 Área de Entrenamiento Sur, 37 Dársenas del Canal Mizuchi, 38 Torre del Vigía, 39 Memorial del Tsunami. (Clanes de Kiri: Funato, Hoshigaki, Yuki, Heizu, Kaguya, Terumi, Hōzuki, Kodon.)
-
-Imagen 3 — https://i.postimg.cc/d1Zs1vPn/image-4.png  (INFOGRAFÍA "KONOHA vs KIRIGAKURE · conflicto entre dos caminos")
-- El conflicto gira en torno a "los sellos" del chakra natural. Dos visiones opuestas:
-  · KONOHA = "Mantener los sellos" (controlar el desastre es mejor que arriesgarlo todo).
-  · KIRIGAKURE = "Romper los sellos" (arriesgarlo todo es mejor que seguir muriendo lentamente).
-- No es bien contra mal, sino supervivencia vs cambio; el conflicto se presenta como inevitable y sin una solución perfecta (si gana cualquiera de los dos, hay consecuencias).
-- Idea central: no luchan por poder, sino por decidir cómo termina (o se salva) el mundo.
-- (Nota: en el .txt esta imagen va rotulada como "Ambientación del Mundo Ninja - Época Actual", pero su contenido real es el resumen del conflicto Konoha/Kiri.)
-=====================================================================

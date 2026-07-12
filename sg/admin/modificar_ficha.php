@@ -45,7 +45,12 @@ if ($mybb->request_method === 'post' && $es_staff) {
         $campos_num   = array('ryos', 'bingo', 'edad', 'temporada_nacimiento', 'vida', 'chakra', 'regchakra',
                               'peso', 'altura', 'madara', 'tobi', 'rin', 'fuerza', 'destreza', 'cchakra', 'inteligencia',
                               'mfuerza', 'mdestreza', 'mcchakra', 'minteligencia', 'salud', 'velocidad', 'tenketsu',
-                              'sigilo', 'puntos_estadistica', 'nivel');
+                              'sigilo', 'puntos_estadistica', 'nivel',
+                              // Pasivas invisibles (solo staff): se suman a las base al mostrar/combatir
+                              'pas_fuerza', 'pas_destreza', 'pas_cchakra', 'pas_inteligencia',
+                              'pas_salud', 'pas_velocidad', 'pas_tenketsu', 'pas_sigilo',
+                              // Acceso al Dojo (0/1)
+                              'puede_usar_dojo');
 
         $sets = array();
         $cambios = array();
@@ -66,6 +71,29 @@ if ($mybb->request_method === 'post' && $es_staff) {
                 $sets[] = "`$campo`='$nuevo'";
                 $cambios[] = "$campo: ".$actual[$campo]." -> ".$nuevo;
             }
+        }
+
+        // Contadores del Dojo: viven dentro del JSON `arboles_progreso`. Se editan
+        // como enteros (clan_rama_usada solo 0/1; nada negativo) y se re-serializa
+        // solo si alguno cambió. Se registran en el mismo log de auditoría.
+        $prog_keys = array('desbloqueo_arboles', 'desbloqueo_ramas', 'desbloqueo_nivel_ramas', 'nivel_rama_disponibles', 'clan_rama_usada');
+        $prog_actual = sg_progreso_parse(isset($actual['arboles_progreso']) ? $actual['arboles_progreso'] : '');
+        $prog_nuevo  = $prog_actual;
+        $prog_cambio = false;
+        foreach ($prog_keys as $pk) {
+            if (!isset($_POST[$pk])) { continue; }
+            $nv = (int) $_POST[$pk];
+            if ($pk === 'clan_rama_usada') { $nv = $nv ? 1 : 0; }
+            if ($nv < 0) { $nv = 0; }
+            if ((int) $prog_actual[$pk] !== $nv) {
+                $prog_nuevo[$pk] = $nv;
+                $prog_cambio = true;
+                $cambios[] = "$pk: ".$prog_actual[$pk]." -> ".$nv;
+            }
+        }
+        if ($prog_cambio) {
+            $prog_json = $db->escape_string(json_encode($prog_nuevo, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+            $sets[] = "`arboles_progreso`='$prog_json'";
         }
 
         // Experiencia (PR) vive en mybb_sg_users.newpoints — se trata aparte
@@ -125,6 +153,13 @@ if ($es_staff) {
         $query_ficha = $db->query("SELECT * FROM mybb_sg_sg_fichas WHERE fid='$user_fid'");
         while ($f = $db->fetch_array($query_ficha)) {
             $ficha = $f;
+        }
+
+        // Los contadores del Dojo viven dentro del JSON arboles_progreso: los
+        // exponemos como claves planas para poder pintarlos/editarlos en el form.
+        if ($ficha) {
+            $prog = sg_progreso_parse(isset($ficha['arboles_progreso']) ? $ficha['arboles_progreso'] : '');
+            foreach ($prog as $pk => $pv) { $ficha[$pk] = (int) $pv; }
         }
 
         // La experiencia (PR) vive en mybb_sg_users.newpoints

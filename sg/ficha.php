@@ -109,6 +109,27 @@ if ($hay_foto_post) {
     }
 }
 
+// ── Edición inline de campos de trasfondo (dueño de la ficha o staff) ──
+// El formulario del modal envía sg_edit_campo + sg_edit_valor por POST y apunta
+// a ?uid=<fid de la ficha>. Se corre antes del SELECT de abajo para que el valor
+// nuevo se muestre de inmediato al re-renderizar.
+$campos_transfondo = array(
+    'historia'     => true,
+    'apariencia'   => true,
+    'personalidad' => true,
+    'frase'        => true,
+    'extra'        => true,
+);
+$sg_edit_campo = $mybb->get_input('sg_edit_campo');
+if ($sg_edit_campo !== '' && isset($campos_transfondo[$sg_edit_campo])) {
+    $target_fid   = intval($mybb->get_input('uid'));
+    $puede_editar = ($target_fid > 0 && $mybb->user['uid'] == $target_fid) || $g_is_staff;
+    if ($puede_editar && $target_fid > 0) {
+        $valor = $db->escape_string($mybb->get_input('sg_edit_valor'));
+        $db->query("UPDATE `mybb_sg_sg_fichas` SET `$sg_edit_campo`='$valor' WHERE `fid`='$target_fid'");
+    }
+}
+
 $is_owner = $mybb->user['uid'] == $mybb->get_input('uid');
 
 $ficha_existe = false;
@@ -128,7 +149,9 @@ while ($f = $db->fetch_array($query_ficha)) {
     $ficha_existe = true;
 }
 
-if ($ficha_existe == true && ($moderated == true || (is_mod($s_uid) || is_staff($s_uid)))) {
+// El dueño puede ver su propia ficha aunque esté en moderación (además de
+// staff/mods). Sigue editable solo el trasfondo; la aprobación es aparte.
+if ($ficha_existe == true && ($moderated == true || is_mod($s_uid) || is_staff($s_uid) || ($is_owner && intval($mybb->user['uid']) > 0))) {
     $query_usuario = $db->query("
         SELECT * FROM mybb_sg_users WHERE uid='$uid'
     ");
@@ -398,18 +421,18 @@ if ($ficha_existe == true && ($moderated == true || (is_mod($s_uid) || is_staff(
             $ckNivSum = 2;
         }
         
+        // Pasivas (invisibles): se suman a las estadisticas base para obtener las
+        // efectivas y recalcular modificadores, vida, chakra y reg. de chakra.
+        // Sobrescribe en $f: fuerza..sigilo, mfuerza..minteligencia, vida, chakra.
+        sg_aplicar_pasivas($f);
         eval('$ficha = $f;');
-        // $v = $f['str'] * 3 + $f['res'] * 4;
-        // $c = ($f['pres'] * 2) + ($f['inte'] * 2) + ($f['ctrl'] * 3) + $ckSum;
-        // $a = round(($f['agi'] * 1/2) + (($f['str'] + $f['spd']) * 3/2) + ($f['res'] * 2) + ($f['dex'] * 9/4)) + $agSum;
-        // $reg_a = round((($f['str'] + $f['str'] + $f['spd'] + $f['agi']) / 20) + 1 + $agNivSum);
-        // $reg_c = round((($f['pres'] + $f['inte'] + $f['ctrl']) / 20) + 1 + $ckNivSum);
 
-        $v = $f['str'] * 3 + $f['res'] * 4;
-        $c = round(($f['str'] * 1) + ($f['res'] * 0.5) + ($f['spd'] * 2) + ($f['agi'] * 0.5) + ($f['dex'] * 2) + ($f['pres'] * 2) + ($f['inte'] * 2) + ($f['ctrl'] * 2.5));
-        $a = 0;  
+        // Vida / Chakra / Reg. de chakra efectivos (ya incluyen las pasivas).
+        $v = intval($f['vida']);
+        $c = intval($f['chakra']);
+        $a = 0;
         $reg_a = 0;
-        $reg_c = $f['tenketsu'] * 4;
+        $reg_c = intval($f['tenketsu']) * 4;
         $suma_stats_var = $f['str'] + $f['res'] + $f['spd'] + $f['agi'] + $f['dex'] + $f['pres'] + $f['inte'] + $f['ctrl'];
         $sg_vida_bar = min(100, max(8, round(($f['vida'] / max($v, 1)) * 100)));
         $sg_chakra_bar = min(100, max(8, round(($f['chakra'] / max($c, 1)) * 100)));
@@ -436,8 +459,13 @@ if ($ficha_existe == true && ($moderated == true || (is_mod($s_uid) || is_staff(
             16 => 6800, 17 => 7700, 18 => 8700, 19 => 9800,
         );
 
+        // Subida de nivel automática BLOQUEADA. Mientras esté en false, la ficha
+        // NO sube de nivel sola aunque el PR alcance el umbral (ni otorga puntos,
+        // mejoras ni créditos de rama). Poner en true para reactivarla.
+        $sg_subida_nivel_activa = false;
+
         // Sube todos los niveles a los que dé el PR acumulado (no solo uno por carga).
-        while (isset($umbrales_nivel[$nivel]) && $puntos_rol >= $umbrales_nivel[$nivel]) {
+        while ($sg_subida_nivel_activa && isset($umbrales_nivel[$nivel]) && $puntos_rol >= $umbrales_nivel[$nivel]) {
             $nivel++;
             $puntos_estadistica += 15; // +15 puntos de estadística por nivel
             $mejoras += 1;             // +1 mejora por nivel
@@ -445,19 +473,17 @@ if ($ficha_existe == true && ($moderated == true || (is_mod($s_uid) || is_staff(
 
         $niveles_ganados = $nivel - $nivel_antes;
         if ($niveles_ganados > 0) {
-            // Crédito de rama gratis por nivel (nivel_rama_disponibles): DESACTIVADO
-            // temporalmente. Para reactivar: descomentar estas 3 líneas y volver a
-            // añadir  `arboles_progreso`='$prog_lvl_json'  al UPDATE de abajo.
-            // $prog_lvl = sg_progreso_parse(isset($ficha['arboles_progreso']) ? $ficha['arboles_progreso'] : '');
-            // $prog_lvl['nivel_rama_disponibles'] = (int) $prog_lvl['nivel_rama_disponibles'] + $niveles_ganados;
-            // $prog_lvl_json = $db->escape_string(json_encode($prog_lvl, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+            $prog_lvl = sg_progreso_parse(isset($ficha['arboles_progreso']) ? $ficha['arboles_progreso'] : '');
+            $prog_lvl['nivel_rama_disponibles'] = (int) $prog_lvl['nivel_rama_disponibles'] + $niveles_ganados;
+            $prog_lvl_json = $db->escape_string(json_encode($prog_lvl, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
 
             // Un solo UPDATE con el resultado de la(s) subida(s) de nivel.
             $db->query("
                 UPDATE `mybb_sg_sg_fichas`
                 SET `nivel`='$nivel',
                     `puntos_estadistica`='$puntos_estadistica',
-                    `mejoras`='$mejoras'
+                    `mejoras`='$mejoras',
+                    `arboles_progreso`='$prog_lvl_json'
                 WHERE `fid`='$uid'
             ");
         }
@@ -530,6 +556,24 @@ if ($ficha_existe == true && ($moderated == true || (is_mod($s_uid) || is_staff(
         eval('$frase = $frase_var;');
         eval('$sgVidaBar = $sg_vida_bar;');
         eval('$sgChakraBar = $sg_chakra_bar;');
+
+        // Edición inline del trasfondo: quién puede editar + valores crudos
+        // (sin nl2br ni escape) para precargar el textarea del modal.
+        $sg_puede_editar = ((($is_owner && intval($mybb->user['uid']) > 0) || $g_is_staff) ? 1 : 0);
+        // Aviso de ficha pendiente de aprobación (solo para el dueño)
+        $sg_en_moderacion = ((!$aprobada && $is_owner && intval($mybb->user['uid']) > 0) ? 1 : 0);
+        eval('$sgEnModeracion = $sg_en_moderacion;');
+        $sg_raw_historia     = htmlspecialchars($ficha['historia'], ENT_QUOTES);
+        $sg_raw_apariencia   = htmlspecialchars($ficha['apariencia'], ENT_QUOTES);
+        $sg_raw_personalidad = htmlspecialchars($ficha['personalidad'], ENT_QUOTES);
+        $sg_raw_frase        = htmlspecialchars($ficha['frase'], ENT_QUOTES);
+        $sg_raw_extra        = htmlspecialchars($ficha['extra'], ENT_QUOTES);
+        eval('$sgPuedeEditar = $sg_puede_editar;');
+        eval('$sgRawHistoria = $sg_raw_historia;');
+        eval('$sgRawApariencia = $sg_raw_apariencia;');
+        eval('$sgRawPersonalidad = $sg_raw_personalidad;');
+        eval('$sgRawFrase = $sg_raw_frase;');
+        eval('$sgRawExtra = $sg_raw_extra;');
 
         // Aviso al dueño: puntos de estadística / mejoras sin asignar
         $sg_puntos_aviso = 0;

@@ -66,15 +66,22 @@ function build_postbit($post, $post_type=0)
 		$post['has_personaje_tag'] = true;
 		$post['personaje_tag'] = $q;
 	}
+	// Pasivas: base + pas_* -> efectivas (mods/vida/chakra recalculados) para el postbit
+	if ($post['has_personaje_tag']) {
+		sg_aplicar_pasivas($post['personaje_tag']);
+	}
 
 	$query_ficha = $db->query("
 		SELECT * FROM mybb_sg_sg_fichas WHERE fid='$user_fid'
 	");
 	while ($f = $db->fetch_array($query_ficha)) {
-		$post['has_ficha'] = true;		
+		$post['has_ficha'] = true;
 		$post['ficha'] = $f;
 		$clan = $f['clan'];
 		$sumaStats = $f['str'] + $f['res'] + $f['spd'] + $f['agi'] + $f['dex'] + $f['pres'] + $f['inte'] + $f['ctrl'];
+	}
+	if ($post['has_ficha']) {
+		sg_aplicar_pasivas($post['ficha']);
 	}
 
 	$query_clan = $db->query(" SELECT * FROM mybb_sg_sg_clanes WHERE cid='$clan' ");

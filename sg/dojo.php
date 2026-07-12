@@ -17,12 +17,38 @@ global $templates, $mybb, $db;
 require_once "./../global.php";
 require_once "./functions/sg_functions.php";
 
-$uid = intval($mybb->user['uid']);
+$s_uid    = intval($mybb->user['uid']);            // usuario real logueado
+$es_staff = (is_staff($s_uid) || is_mod($s_uid));  // permisos de staff
+
+// Vista de staff: con ?uid=X un moderador puede VER el Dojo de otra ficha, tal
+// como lo vería su dueño. Es SOLO LECTURA (las acciones no se procesan). Un
+// no-staff que pase ?uid simplemente ve su propio Dojo.
+$ver_uid      = intval($mybb->get_input('uid'));
+$impersonando = ($es_staff && $ver_uid > 0 && $ver_uid !== $s_uid);
+$uid          = $impersonando ? $ver_uid : $s_uid;
+
+$ver_nombre = '';
+if ($impersonando) {
+    $q_vn = $db->query("SELECT nombre FROM mybb_sg_sg_fichas WHERE fid='$uid'");
+    while ($r = $db->fetch_array($q_vn)) { $ver_nombre = $r['nombre']; }
+}
 
 if (!does_ficha_exist($uid)) {
     eval("\$page = \"".$templates->get("sg_ficha_no_existe")."\";");
     output_page($page);
     exit;
+}
+
+// ── Acceso al Dojo ────────────────────────────────────────────
+// La ficha necesita `puede_usar_dojo` = 1 para operar el Dojo. Las fichas
+// antiguas arrancan en 0 y un moderador las habilita a mano; las nuevas se crean
+// ya con 1. Fail-open si la columna aún no existe (antes de correr el ALTER).
+$puede_usar_dojo = 1;
+$q_pud = $db->query("SHOW COLUMNS FROM mybb_sg_sg_fichas LIKE 'puede_usar_dojo'");
+if ($db->num_rows($q_pud) > 0) {
+    $puede_usar_dojo = 0;
+    $q_pd = $db->query("SELECT puede_usar_dojo FROM mybb_sg_sg_fichas WHERE fid='$uid'");
+    while ($r = $db->fetch_array($q_pd)) { $puede_usar_dojo = (int) $r['puede_usar_dojo']; }
 }
 
 // ── Procesa la acción (POST) ──────────────────────────────────
@@ -31,6 +57,18 @@ if (!does_ficha_exist($uid)) {
 // importa sobre todo para la ruleta, que sí puede repetirse de verdad
 // si el mismo POST se reenvía con slots/Tobis suficientes).
 $action = isset($_POST['action']) ? trim($_POST['action']) : '';
+// Vista de staff (?uid): solo lectura, ninguna acción se procesa.
+if ($action !== '' && $impersonando) {
+    $texto = 'Vista de staff en solo lectura: no puedes operar el Dojo de otra ficha.';
+    header("Location: dojo.php?uid=" . $uid . "&resultado=error&texto=" . urlencode($texto));
+    exit;
+}
+// Sin permiso de Dojo: ninguna acción se procesa (defensa aunque se fuerce el POST).
+if ($action !== '' && $uid > 0 && !$puede_usar_dojo) {
+    $texto = 'El Dojo aún no está operativo para tu ficha. Un moderador debe habilitarlo.';
+    header("Location: dojo.php?resultado=error&texto=" . urlencode($texto));
+    exit;
+}
 if ($action !== '' && $uid > 0) {
     $params = array(
         'arbol'   => isset($_POST['arbol']) ? $_POST['arbol'] : '',
@@ -64,6 +102,33 @@ $prog   = $estado['progreso'];
 $costos = $estado['costos'];
 $tobi   = (int) $estado['tobi'];
 $nivel  = (int) $estado['nivel'];
+
+// ── Progreso para la franja superior ──────────────────────────
+// "Ambos": total REAL que posee (derivado de $estado['arboles']) como número
+// grande + contador de veces PAGADAS (desbloqueo_*, lo que escala el precio)
+// como dato secundario, junto al coste de la próxima acción de cada tipo.
+$prog_arboles_pag = (int) $prog['desbloqueo_arboles'];
+$prog_ramas_pag   = (int) $prog['desbloqueo_ramas'];
+$prog_niv_pag     = (int) $prog['desbloqueo_nivel_ramas'];
+$prog_cred_gratis = (int) $prog['nivel_rama_disponibles'];
+
+$tot_arboles = count($estado['arboles']);
+$tot_ramas   = 0;
+$tot_niveles = 0;
+foreach ($estado['arboles'] as $ainfo_p) {
+    $tot_niveles += (int) $ainfo_p['nivel_arbol'];      // nivel de árbol = suma de sus ramas
+    foreach ($ainfo_p['ramas'] as $r_p) {
+        if (!empty($r_p['desbloqueada'])) { $tot_ramas++; }
+    }
+}
+
+$prox_arbol_nivel = sg_dojo_nivel_requerido_arbol($prog['desbloqueo_arboles']);
+$prox_arbol_costo = (int) $costos['arbol'];
+$prox_rama_costo  = (int) $costos['rama'];
+$prox_nivel_costo = (int) $costos['nivel'];
+// Subir nivel es gratis mientras haya crédito (nivel_rama_disponibles > 0).
+$prox_nivel_label = $prog_cred_gratis > 0 ? 'gratis (tienes crédito)' : ($prox_nivel_costo . ' Tobis');
+$cred_cls = $prog_cred_gratis > 0 ? ' sg-prog-v--free' : '';
 
 // Nombres de técnicas para mostrar (un solo query).
 $tids_needed = array();
@@ -282,6 +347,14 @@ foreach ($estado['arboles'] as $arbol => $ainfo) {
 
 $tobi_label = number_format($tobi, 0, ',', '.');
 $nivel_label = $nivel;
+
+// Dojo bloqueado: se muestra la alerta y se ocultan los paneles interactivos
+// (la guía y la franja de progreso siguen visibles como consulta).
+$dojo_bloqueado = $puede_usar_dojo ? 0 : 1;
+if ($dojo_bloqueado) { $dojo_html = ''; }
+
+// Vista de staff (solo lectura): bandera para la alerta del template.
+$dojo_impersonando = $impersonando ? 1 : 0;
 
 eval("\$page = \"".$templates->get("sg_dojo")."\";");
 output_page($page);

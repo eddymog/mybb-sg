@@ -1251,34 +1251,21 @@ div.error ul { margin-left: 24px; }
 a.button:link,
 a.button:visited,
 a.button:active {
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
-	height: 32px;
-	padding: 0 20px;
-	margin: 2px 0 6px;
-	background: var(--plum);
-	color: var(--lavender);
-	font-family: 'Cinzel', serif;
-	font-size: 8px;
-	font-weight: 700;
-	letter-spacing: 2px;
-	text-transform: uppercase;
-	border-radius: 0;
-	transition: background 0.15s;
+	background: #00bcd4;
+	display: inline-block;
+	color: #fff;
+	margin: 2px 0px 6px;
+	font-size: 13px;
+	padding: 8px 23px 8px 21px;
+	border-radius: 2px;
 }
 
-a.button:hover {
-	background: var(--plum2);
-	color: var(--lavender);
-	text-decoration: none;
-}
+a.button:hover { background: #2c82c9;}
 
 a.button.small_button {
-	height: 26px;
-	padding: 0 12px;
-	font-size: 8px;
-	border-radius: 0;
+	font-size: 13px;
+	padding: 5px 10px;
+	border-radius: 2px;
 }
 
 a.button span { 

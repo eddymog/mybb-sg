@@ -40,13 +40,13 @@
 /* Group colors (theme-independent) */
 :root {
     --staff-group-color:      #346971;
-    --konoha-group-color:     #4e7424;
+    --konoha-group-color:     #b72626;
     --kiri-group-color:       #679bd1;
     --iwa-group-color:        #965000;
     --kumo-group-color:       #cdad2f;
     --suna-group-color:       #e9843a;
     --renegados-group-color:  #834763;
-    --nsa-group-color:        #b72626;
+    --nsa-group-color:        #4e7424;
     --narradores-group-color: #4758bf;
     --npcs-group-color:       #615c5d;
 }

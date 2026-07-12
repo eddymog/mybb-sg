@@ -55,6 +55,59 @@ function calculate_reg_chakra($str, $res, $spd, $agi, $dex, $pres, $inte, $ctrl)
     return round(((($str + $res + $spd + $agi + $dex + $pres + $inte + $ctrl) * 2)) / 40) + 1;
 }
 
+// Modificador segun el valor (efectivo) de la estadistica:
+// 0-24 => 1, 25-49 => 2, 50-74 => 3, 75-99 => 4, 100+ => 5
+function stat_modifier($stat) {
+    $stat = intval($stat);
+    if ($stat >= 100) return 5;
+    if ($stat >= 75)  return 4;
+    if ($stat >= 50)  return 3;
+    if ($stat >= 25)  return 2;
+    return 1;
+}
+
+// ── Estadisticas pasivas ──────────────────────────────────────────────
+// Las columnas pas_* (pas_fuerza, pas_destreza, pas_cchakra, pas_inteligencia,
+// pas_salud, pas_velocidad, pas_tenketsu, pas_sigilo) son bonificadores
+// INVISIBLES que SOLO modifica el staff o un proceso automatico. Se suman a las
+// estadisticas base para el calculo real de modificadores, vida, chakra y
+// regeneracion de chakra. Los usuarios nunca las editan.
+function sg_stat_keys() {
+    return array('fuerza','destreza','cchakra','inteligencia','salud','velocidad','tenketsu','sigilo');
+}
+
+function sg_pasiva($row, $key) {
+    $pk = 'pas_' . $key;
+    return isset($row[$pk]) ? intval($row[$pk]) : 0;
+}
+
+// Devuelve un array con las estadisticas EFECTIVAS (base + pasiva), los
+// modificadores recalculados y vida/chakra/regchakra recalculados a partir de
+// dichas efectivas. No modifica $row.
+function sg_stats_efectivas($row) {
+    $e = array();
+    foreach (sg_stat_keys() as $k) {
+        $e[$k] = intval(isset($row[$k]) ? $row[$k] : 0) + sg_pasiva($row, $k);
+    }
+    $e['mfuerza']       = stat_modifier($e['fuerza']);
+    $e['mdestreza']     = stat_modifier($e['destreza']);
+    $e['mcchakra']      = stat_modifier($e['cchakra']);
+    $e['minteligencia'] = stat_modifier($e['inteligencia']);
+    $e['vida']      = calculate_vida2($e['fuerza'], $e['destreza'], $e['cchakra'], $e['inteligencia'], $e['salud'], $e['velocidad'], $e['tenketsu'], $e['sigilo']);
+    $e['chakra']    = calculate_chakra2($e['fuerza'], $e['destreza'], $e['cchakra'], $e['inteligencia'], $e['salud'], $e['velocidad'], $e['tenketsu'], $e['sigilo']);
+    $e['regchakra'] = $e['tenketsu'] * 4;
+    return $e;
+}
+
+// Sobrescribe IN-PLACE los campos de visualizacion de una fila (ficha o snapshot
+// mybb_sg_sg_thread_personaje) con los valores efectivos. Idempotente: no vuelve
+// a sumar las pasivas si ya se aplicaron sobre la misma fila.
+function sg_aplicar_pasivas(&$row) {
+    if (!is_array($row) || !empty($row['_pasivas_aplicadas'])) { return; }
+    foreach (sg_stats_efectivas($row) as $k => $v) { $row[$k] = $v; }
+    $row['_pasivas_aplicadas'] = 1;
+}
+
 // function select_queries_with_id($table_name, $field, $value) {
 //     global $db;
 
@@ -589,7 +642,9 @@ function sg_owned_tecnicas($db, $uid) {
     $owned = array();
     $query = $db->query("SELECT tid FROM mybb_sg_sg_tec_aprendidas WHERE uid='$uid'");
     while ($r = $db->fetch_array($query)) {
-        $owned[$r['tid']] = true;
+        // Clave en MAYÚSCULAS: el cruce con el catálogo es insensible a mayúsculas
+        // (los tid se teclean a mano y a veces varían: "SARU101B" vs "Saru101B").
+        $owned[strtoupper($r['tid'])] = true;
     }
     return $owned;
 }
@@ -651,7 +706,7 @@ function sg_dojo_estado($db, $uid) {
     $poseidos = array();
     foreach ($catalogo as $arbol => $cat) {
         $base = isset($cat['base']) ? $cat['base'] : null;
-        if ($base !== null && isset($owned[$base])) {
+        if ($base !== null && isset($owned[strtoupper($base)])) {
             $poseidos[] = $arbol;
         }
     }
@@ -683,13 +738,13 @@ function sg_dojo_estado($db, $uid) {
 
         foreach ($ramas_cat as $rama => $rinfo) {
             $rama_base = isset($rinfo['base']) ? $rinfo['base'] : '';
-            $desbloqueada = ($rama_base !== '' && $rama_base !== null && isset($owned[$rama_base]));
+            $desbloqueada = ($rama_base !== '' && $rama_base !== null && isset($owned[strtoupper($rama_base)]));
 
             $mejoras_cat   = isset($rinfo['mejoras']) ? $rinfo['mejoras'] : array();
             $mejoras_libres = array();
             $mejoras_owned  = 0;
             foreach ($mejoras_cat as $mtid) {
-                if (isset($owned[$mtid])) {
+                if (isset($owned[strtoupper($mtid)])) {
                     $mejoras_owned++;
                 } else {
                     $mejoras_libres[] = $mtid;
@@ -702,7 +757,7 @@ function sg_dojo_estado($db, $uid) {
             $espec_cat = isset($rinfo['especialidades']) ? $rinfo['especialidades'] : array();
             foreach ($espec_cat as $etid) {
                 $espec_pool[] = $etid;
-                if (isset($owned[$etid])) {
+                if (isset($owned[strtoupper($etid)])) {
                     $espec_aprendidas++;
                 }
             }
@@ -721,7 +776,7 @@ function sg_dojo_estado($db, $uid) {
         $cupo = min(intval($nivel_arbol / 3), 3);
         $espec_libres = array(); // del pool, aún no aprendidas
         foreach ($espec_pool as $etid) {
-            if (!isset($owned[$etid])) { $espec_libres[] = $etid; }
+            if (!isset($owned[strtoupper($etid)])) { $espec_libres[] = $etid; }
         }
         $espec_libres = array_values(array_unique($espec_libres));
         $espec_elegibles = ($espec_aprendidas < $cupo) ? $espec_libres : array();
@@ -866,7 +921,13 @@ function sg_dojo_estado($db, $uid) {
     } else if ($slot_elementales <= 0) {
         $ruleta_razon = 'No te quedan slots elementales.';
     } else if (!$puede_desbloquear_arbol) {
-        $ruleta_razon = 'Aún no cumples el requisito para desbloquear un árbol.';
+        // Detalla QUÉ falta (nivel y/o Tobis) usando los valores ya calculados.
+        $faltan = array();
+        if ($nivel < $nivel_req) { $faltan[] = 'Nivel ' . $nivel_req . ' (tienes ' . (int) $nivel . ')'; }
+        if ($tobi < $costos['arbol']) { $faltan[] = $costos['arbol'] . ' Tobis (tienes ' . (int) $tobi . ')'; }
+        $ruleta_razon = !empty($faltan)
+            ? 'Para desbloquear tu próximo árbol necesitas ' . implode(' y ', $faltan) . '.'
+            : 'Aún no cumples el requisito para desbloquear un árbol.';
     }
 
     // Elegir sin tirada: el clan lo fuerza ('elegir'), o Afinidad Elemental para el 1º.

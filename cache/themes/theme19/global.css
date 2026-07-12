@@ -608,21 +608,26 @@ select {
 
 button,
 input.button {
-	padding: 6px 15px 6px 12px;
+	padding: 0 16px;
+	height: 32px;
 	cursor: pointer;
-	font-family: inherit;
-	font-size: 13px;
-	background: #3498db;
-	border: 0 !important;
-	outline: 0 !important;
-	color: #fff;
-	border-radius: 2px !important;
+	font-family: 'Cinzel', serif;
+	font-size: 8px;
+	font-weight: 700;
+	letter-spacing: 2px;
+	text-transform: uppercase;
+	background: var(--plum);
+	color: var(--lavender);
+	border: none !important;
+	border-radius: 0 !important;
+	outline: none !important;
+	transition: background 0.15s;
 }
 
 button:hover,
-input.button:hover { 
-/* 	border-color: #bbb;  */
-/* 	background: #2c82c9; */
+input.button:hover {
+	background: var(--plum2);
+	color: var(--lavender);
 }
 
 form {
@@ -955,46 +960,64 @@ div.error p em {
 
 div.error ul { margin-left: 24px; }
 
-/*
 .pagination {
-	font-size: 11px;
-	padding-top: 14px;
-	margin-bottom: 14px; 
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 3px;
+	margin-top: 5px;
 }
-*/
 
 .tfoot .pagination,
 .tcat .pagination { padding-top: 0; }
 
-.pagination .pages { font-weight: 500; }
+.pagination .pages {
+	font-family: 'Cinzel', serif;
+	font-size: 8px;
+	font-weight: 700;
+	letter-spacing: 1.5px;
+	text-transform: uppercase;
+	color: var(--mist);
+	margin-right: 6px;
+}
 
 .pagination .pagination_current,
 .pagination a {
-	padding: 5px 9px;
-	margin-bottom: 3px; 
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-width: 30px;
+	height: 30px;
+	padding: 0 10px;
+	box-sizing: border-box;
+	font-family: 'Cinzel', serif;
+	font-size: 9px;
+	font-weight: 700;
+	letter-spacing: 1px;
+	text-transform: uppercase;
 }
 
 .pagination a {
-	background: #858B8F;
-	color: white;
+	background: var(--bg3);
+	border: 0.5px solid var(--border);
+	color: var(--stone);
+	transition: background 0.15s, border-color 0.15s, color 0.15s;
 }
 
-.pagination a:link { color: #888 !important; }
-.pagination a:link:hover { color: #fff !important; }
+.pagination a:link { color: var(--stone) !important; }
+
+.pagination a:hover,
+.pagination a:link:hover {
+	background: var(--bg2);
+	border-color: var(--plum3);
+	color: var(--ink) !important;
+	text-decoration: none;
+}
 
 .pagination .pagination_current {
-	background: #6492A0;
-	border: none;
-	font-weight: 800; 
-	color: #fff;
-	border-radius: 2px;
-}
-
-.pagination a:hover {
-	background: #0072bc;
-	color: #fff;
-	border-color: #0072bc;
-	text-decoration: none; 
+	background: var(--plum);
+	border: 0.5px solid var(--plum);
+	color: var(--lavender);
 }
 
 .pagination .go_page img { margin-bottom: -4px; }
@@ -1228,21 +1251,34 @@ div.error ul { margin-left: 24px; }
 a.button:link,
 a.button:visited,
 a.button:active {
-	background: #00bcd4;
-	display: inline-block;
-	color: #fff;
-	margin: 2px 0px 6px;
-	font-size: 13px;
-	padding: 8px 23px 8px 21px;
-	border-radius: 2px;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	height: 32px;
+	padding: 0 20px;
+	margin: 2px 0 6px;
+	background: var(--plum);
+	color: var(--lavender);
+	font-family: 'Cinzel', serif;
+	font-size: 8px;
+	font-weight: 700;
+	letter-spacing: 2px;
+	text-transform: uppercase;
+	border-radius: 0;
+	transition: background 0.15s;
 }
 
-a.button:hover { background: #2c82c9;}
+a.button:hover {
+	background: var(--plum2);
+	color: var(--lavender);
+	text-decoration: none;
+}
 
 a.button.small_button {
-	font-size: 13px;
-	padding: 5px 10px;
-	border-radius: 2px;
+	height: 26px;
+	padding: 0 12px;
+	font-size: 8px;
+	border-radius: 0;
 }
 
 a.button span { 

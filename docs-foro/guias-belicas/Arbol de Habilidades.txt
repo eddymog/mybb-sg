@@ -78,26 +78,3 @@ Cada Árbol de Habilidad representa un aspecto importante del desarrollo del nin
 Estos árboles desbloqueados no contemplan los árboles gratuitos que el usuario obtiene desde el momento que crea su ficha. O sea, no contempla ninguno de las tres ramas aprendidas en la academia ninja: [color=#FF4136]Taijutsu, Defensa, Bukijutsu y Resistencia[/color]. Tampoco contempla la adquisición del [color=#FF4136]árbol de Clan[/color] que se entrega por linaje.
 
 Estos árboles que el usuario puede desbloquear son para usarse tanto en los árboles elementales como en las técnicas libres que el usuario pueda aprender. Además, también son los espacios donde el usuario podrá colocar sus árboles de habilidades únicas que haya creado o adquirido.
-
-
-=====================================================================
-[NOTA INTERNA — Descripción de imágenes (referencia para IA, NO publicar)]
-
-Imagen 1 — https://i.imgur.com/3sMo3uu.png  "ÁRBOLES DE HABILIDAD · resumen ultra corto"
-- Concepto: 1 Árbol = 1 Jutsu Base + 3 Ramas. Cada rama tiene: 1 jutsu base de rama, 6 mejoras y 3 especialidades. Un árbol representa un estilo de combate o una herencia.
-- Estructura: Jutsu Base (núcleo, define el estilo) → Jutsu Base de Rama (habilita la rama y sus mejoras) → Mejoras (efectos directos: daño, rango, etc.; se combinan para potenciar jutsus) → Especialidades (modificadores avanzados; cambian reglas, costos y funcionamiento).
-- Nivel de jutsu: nivel = base + mejoras; MÁXIMO 5 por jutsu (siempre, sin excepción). Obliga a elegir entre Daño / Utilidad / Efectos.
-- Progresión de ramas: empiezas con jutsu base + 1 rama activa; otras ramas se compran con Tobis; cada rama sube máx 3 niveles, y cada nivel deja elegir 2 mejoras.
-- Especialidades: se desbloquean cada 3 niveles totales; máximo 3; requieren 9 niveles totales del árbol.
-- Chakra: cada mejora sube el costo; la mala gestión te deja sin recursos.
-- Límite de árboles por nivel: Nv1=1, Nv5=2, Nv10=3, Nv15=4, Nv20=5. NO incluye: Academia (Taijutsu, Defensa, Bukijutsu) ni el árbol de Clan.
-- Regla clave: ningún jutsu puede superar el nivel 5 sin importar cuántas mejoras tengas.
-
-Imagen 2 — https://i.imgur.com/XP9DErr.png  (tabla de COSTOS en Tobis)
-- Desbloqueo de Árbol: 15 Tobis base, +10 por cada árbol ya desbloqueado (Árbol 1=15T, 2=25T, 3=35T...).
-- Desbloqueo de Nueva Rama: 10 Tobis base, +5 por cada rama desbloqueada en cualquier árbol (Rama 1=10T, 2=15T, 3=20T...).
-- Subida de Nivel de Rama (1 nivel): 5 Tobis base, +2 por cada nivel ya desbloqueado entre todas las ramas (Nivel 1=5T, 2=7T, 3=9T...).
-
-Imagen 3 — https://i.imgur.com/uLlSxrv.png  (DIAGRAMA del árbol)
-- Jutsu Base → 3 ramas (Jutsu Base Rama 1/2/3). Cada rama: Mejora 1–6 + Especialidad 1–3.
-=====================================================================

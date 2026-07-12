@@ -98,6 +98,10 @@
     .mf-divider { height: 0.5px; background: var(--border); margin: 22px 0; }
     .mf-audit { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 
+    .mf-section__desc { margin: -4px 0 14px; padding: 10px 12px; border-left: 2px solid var(--oxide); background: var(--bg3); font-size: 12px; line-height: 1.6; color: var(--stone); }
+    .mf-section__desc b { color: var(--plum3); }
+    .mf-help { margin-top: 5px; font-size: 11px; line-height: 1.5; color: var(--mist); }
+
     @media (max-width: 700px) {
       .mf-grid, .mf-grid--2, .mf-audit { grid-template-columns: 1fr 1fr; }
     }
@@ -303,6 +307,21 @@
               </div>
             </div>
 
+            <!-- Pasivas (invisibles: solo staff / procesos automaticos) -->
+            <div class="mf-section">
+              <div class="mf-section__head"><span class="mf-section__title">Pasivas (ocultas)</span></div>
+              <div class="mf-grid">
+                <div class="mf-field"><label class="mf-label">P. Fuerza</label><input type="number" name="pas_fuerza" value="{$ficha['pas_fuerza']}"></div>
+                <div class="mf-field"><label class="mf-label">P. Destreza</label><input type="number" name="pas_destreza" value="{$ficha['pas_destreza']}"></div>
+                <div class="mf-field"><label class="mf-label">P. Ctrl. Chakra</label><input type="number" name="pas_cchakra" value="{$ficha['pas_cchakra']}"></div>
+                <div class="mf-field"><label class="mf-label">P. Inteligencia</label><input type="number" name="pas_inteligencia" value="{$ficha['pas_inteligencia']}"></div>
+                <div class="mf-field"><label class="mf-label">P. Salud</label><input type="number" name="pas_salud" value="{$ficha['pas_salud']}"></div>
+                <div class="mf-field"><label class="mf-label">P. Velocidad</label><input type="number" name="pas_velocidad" value="{$ficha['pas_velocidad']}"></div>
+                <div class="mf-field"><label class="mf-label">P. Tenketsu</label><input type="number" name="pas_tenketsu" value="{$ficha['pas_tenketsu']}"></div>
+                <div class="mf-field"><label class="mf-label">P. Sigilo</label><input type="number" name="pas_sigilo" value="{$ficha['pas_sigilo']}"></div>
+              </div>
+            </div>
+
             <!-- Combate -->
             <div class="mf-section">
               <div class="mf-section__head"><span class="mf-section__title">Combate</span></div>
@@ -310,6 +329,50 @@
                 <div class="mf-field"><label class="mf-label">Vida</label><input type="number" name="vida" value="{$ficha['vida']}"></div>
                 <div class="mf-field"><label class="mf-label">Chakra</label><input type="number" name="chakra" value="{$ficha['chakra']}"></div>
                 <div class="mf-field"><label class="mf-label">Reg. Chakra</label><input type="number" name="regchakra" value="{$ficha['regchakra']}"></div>
+              </div>
+            </div>
+
+            <!-- Progreso del Dojo (JSON arboles_progreso) -->
+            <div class="mf-section">
+              <div class="mf-section__head"><span class="mf-section__title">Progreso del Dojo (árboles)</span></div>
+              <div class="mf-section__desc">Contadores internos del sistema de árboles. Controlan <b>precios y requisitos</b> del Dojo — <b>no</b> las técnicas que el personaje ya posee (eso se edita en «Modificar técnicas»). Subir un contador encarece la siguiente compra de ese tipo; bajarlo la abarata.</div>
+              <div class="mf-field mf-field--wide" style="margin-bottom:16px;">
+                <label class="mf-label">Acceso al Dojo · puede_usar_dojo</label>
+                <select name="puede_usar_dojo">
+                  <option value="0" <if $ficha['puede_usar_dojo'] == '0' then>selected</if>>0 — Bloqueado (ve la página con alerta, no puede operar)</option>
+                  <option value="1" <if $ficha['puede_usar_dojo'] == '1' then>selected</if>>1 — Habilitado (puede usar el Dojo)</option>
+                </select>
+                <div class="mf-help">Permite a la ficha operar el Dojo. Las fichas antiguas arrancan en 0 y hay que habilitarlas a mano tras revisar que estén bien configuradas; las nuevas ya se crean con 1. Con 0, el jugador ve el Dojo pero con una alerta y sin acciones.</div>
+              </div>
+              <div class="mf-grid--2" style="display:grid; gap:14px;">
+                <div class="mf-field">
+                  <label class="mf-label">Árboles pagados</label>
+                  <input type="number" name="desbloqueo_arboles" min="0" value="{$ficha['desbloqueo_arboles']}">
+                  <div class="mf-help">Veces que ha pagado por un árbol. Cada +1 sube el coste del próximo árbol (15 → 25 → 35…) y el Nivel requerido (1 / 5 / 10 / 15 / 20). No cuenta los árboles iniciales de la ficha.</div>
+                </div>
+                <div class="mf-field">
+                  <label class="mf-label">Ramas pagadas</label>
+                  <input type="number" name="desbloqueo_ramas" min="0" value="{$ficha['desbloqueo_ramas']}">
+                  <div class="mf-help">Veces que ha pagado por una rama. Cada +1 sube el coste de la próxima rama (10 → 15 → 20…). No incluye la rama de clan gratis.</div>
+                </div>
+                <div class="mf-field">
+                  <label class="mf-label">Niveles de rama pagados</label>
+                  <input type="number" name="desbloqueo_nivel_ramas" min="0" value="{$ficha['desbloqueo_nivel_ramas']}">
+                  <div class="mf-help">Veces que ha pagado por subir el nivel de una rama. Cada +1 sube el coste de la próxima subida (5 → 7 → 9…).</div>
+                </div>
+                <div class="mf-field">
+                  <label class="mf-label">Subidas gratis disponibles</label>
+                  <input type="number" name="nivel_rama_disponibles" min="0" value="{$ficha['nivel_rama_disponibles']}">
+                  <div class="mf-help">Créditos para subir nivel de rama sin gastar Tobis. Con más de 0, la próxima subida es gratis y resta 1 por uso. Úsalo para regalar mejoras.</div>
+                </div>
+                <div class="mf-field">
+                  <label class="mf-label">Rama de clan gratis</label>
+                  <select name="clan_rama_usada">
+                    <option value="0" <if $ficha['clan_rama_usada'] == '0' then>selected</if>>0 — No usada (aún puede reclamarla)</option>
+                    <option value="1" <if $ficha['clan_rama_usada'] == '1' then>selected</if>>1 — Ya usada</option>
+                  </select>
+                  <div class="mf-help">Si el personaje ya reclamó su rama de clan gratuita. Mientras sea 0 no puede comprar ramas de su árbol de clan con Tobis (debe reclamar antes la gratis). Ponlo en 0 para devolvérsela.</div>
+                </div>
               </div>
             </div>
 

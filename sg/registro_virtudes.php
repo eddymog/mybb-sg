@@ -34,13 +34,8 @@ function sg_vt_card($r)
         ? "<span class=\"sg-vt-badge sg-vt-badge--excl\">Exclusivo</span>"
         : '';
 
-    $icon = $es_virtud
-        ? "<span class=\"sg-vt-icon sg-vt-icon--v\" title=\"Virtud\"><svg viewBox=\"0 0 12 12\" fill=\"currentColor\"><path d=\"M6 1.5 11 10.5 1 10.5Z\"/></svg></span>"
-        : "<span class=\"sg-vt-icon sg-vt-icon--d\" title=\"Defecto\"><svg viewBox=\"0 0 12 12\" fill=\"currentColor\"><path d=\"M6 10.5 1 1.5 11 1.5Z\"/></svg></span>";
-
     return "<article class=\"sg-vt-item\" data-name=\"$data_nm\">"
         . "<div class=\"sg-vt-head\">"
-        . $icon
         . "<h3 class=\"sg-vt-name\">$nombre</h3>"
         . "<span class=\"sg-vt-cost $costo_cls\">$costo_lbl</span>"
         . "</div>"

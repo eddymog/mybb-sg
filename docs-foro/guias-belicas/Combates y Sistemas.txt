@@ -127,24 +127,3 @@ Solo cuentan combates completos (victoria, derrota o empate). En caso de empate:
 [*]Coordina con tu oponente si hay dudas. Resolver cosas hablando ayuda a mantener una buena experiencia para ambos.
 [*]Pásalo bien, es lo más importante a la hora del Rol.
 [/list]
-
-
-=====================================================================
-[NOTA INTERNA — Descripción de infografía (referencia para IA, NO publicar)]
-Imagen — https://i.imgur.com/xggrqDA.png  "SISTEMA DE COMBATE · resumen ultra corto" (13 bloques)
-- Concepto: combate = turnos + lógica + stats; el sistema es automático, tú solo decides acciones.
-1. Turnos: 1 acción por turno; esperas respuesta; tras 48h sin responder te pueden saltar.
-2. Sistema de segundos (solo en conflictos): cuerpo a cuerpo 1s, distancia 2s; se usa solo si hay disputa de simultaneidad.
-3. Manos y sellos: todo jutsu requiere 2 manos; si pierdes una, cambia lo que puedes hacer.
-4. Impacto de jutsus: si impacta, el efecto se aplica sí o sí; importan stats del atacante + efecto del jutsu; "narrativa ≠ resultado".
-5. Muerte: se puede evitar si el personaje puede moverse; muerte válida si está inmovilizado o inconsciente.
-6. Sistema defensivo: Esquivar = DES+INT; Bloquear = FUE+CCK; Choque Ninjutsu = CCK+INT; Choque de armas = FUE+DES.
-7. Jutsus y niveles: máximo nivel 5; eliges el nivel al usarlo (bajo = eficiencia, alto = impacto).
-8. Cooldown: todos los jutsus 1 turno; los jutsus mantenidos no tienen cooldown mientras están activos.
-9. Stats fijas: se fijan al inicio y no cambian durante el combate; código [*personaje].
-10. Aplicación de efectos: automática si impacta; calculada con stats del usuario.
-11. Reglas clave: puedes moverte mientras ejecutas jutsus; puedes combinar acciones; tú calculas tus propios efectos.
-12. Recompensas: EXP (participar +10, ganar +15, perder +5) y Tobis (participar +10, ganar +20, perder +5); bonus por vencer a rivales más fuertes.
-13. Claves estratégicas: no gastes todo el chakra; no siempre uses nivel 5; leer bien las habilidades = ventaja; adaptarse.
-- Regla clave: gana quien administra mejor los recursos, no quien pega más fuerte primero.
-=====================================================================

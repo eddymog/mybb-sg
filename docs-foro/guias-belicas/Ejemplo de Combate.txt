@@ -153,14 +153,3 @@ Okay... si me sorprendiste. Tu dado salió 1, ni con toda la reducción del mund
 [tecnica=DEFE001R][tecnica=DEFE101E][tecnica=DEFE103E]
 
 Luego de eso, me desplazaré fuera de tu rango de visión y me esconderé de ti. Felicidades, te faltó muy poco. Si tan solo Sasuke o Sakura te hubiesen ayudado, esta seria otra historia.[/spoiler]
-
-
-=====================================================================
-[NOTA INTERNA — Descripción de imágenes (referencia para IA, NO publicar)]
-
-Imagen 1 — https://i.imgur.com/FHG7iBg.png  (CARTA de arma de ejemplo, formato del inventario)
-Ejemplo lleno de la plantilla de arma: "SHURIKEN". Munición 5 (esquina izq.), Inventario 1 (esquina der.), tipo "Arrojadiza / Chico", ilustración del shuriken, sus efectos con íconos y una descripción (alcance, daño, uso). Sirve como muestra del formato de carta de arma descrito en la guía de Inventario.
-
-Imagen 2 — https://preview.redd.it/im-having-this-404-error-and-idk-why-v0-zg0r0v2va7fe1.jpeg  (LINK ROTO)
-Esta URL NO es una imagen válida: devuelve un documento HTML (error 404 de reddit). Parece un placeholder pegado por error. Conviene reemplazarla por la imagen correcta o eliminarla del documento.
-=====================================================================

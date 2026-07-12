@@ -717,6 +717,38 @@
     .fx-inv-meta-k { font-family: 'Cinzel', serif; font-size: 9px; font-weight: 700; letter-spacing: 1.4px; text-transform: uppercase; color: var(--mist); }
     .fx-inv-meta-v { font-size: 14px; color: var(--ink); text-align: right; }
     body.fx-inv-modal-open { overflow: hidden; }
+
+    /* ── Edición inline de trasfondo (dueño / staff) ── */
+    .fx-editable { cursor: pointer; border-radius: 12px; transition: box-shadow .18s ease, background .18s ease; }
+    .fx-editable:hover { box-shadow: inset 0 0 0 1px var(--accent-soft), 0 8px 20px rgba(0,0,0,.18); }
+    .fx-edit-tag { flex-shrink: 0; white-space: nowrap; font-family: 'Cinzel', serif; font-size: 9px; font-weight: 700; letter-spacing: 1.4px; text-transform: uppercase; color: var(--accent-2); opacity: 0; transition: opacity .18s ease; }
+    .fx-editable:hover .fx-edit-tag { opacity: 1; }
+
+    .fx-edit-modal { display: none; position: fixed; inset: 0; z-index: 1000; background: rgba(8,6,12,.72); backdrop-filter: blur(4px); }
+    .fx-edit-modal.is-open { display: grid; place-items: center; padding: 16px; }
+    .fx-edit-modal__dialog { width: min(680px, calc(100vw - 24px)); overflow: hidden; border: 1px solid var(--border-strong); border-radius: 14px; background: var(--panel); box-shadow: 0 28px 60px rgba(0,0,0,.45); }
+    .fx-edit-modal__head { display: flex; align-items: center; justify-content: space-between; min-height: 52px; padding: 0 16px; border-bottom: 1px solid var(--border); background: var(--bg2); }
+    .fx-edit-modal__head h3 { margin: 0; font-family: 'Cinzel', serif; font-size: 12px; font-weight: 700; letter-spacing: 1.8px; text-transform: uppercase; color: var(--ink); }
+    .fx-edit-modal__close { border: 0; background: transparent; color: var(--stone); font-size: 24px; line-height: 1; cursor: pointer; }
+    .fx-edit-modal__body { display: grid; gap: 12px; padding: 16px; margin: 0; }
+    .fx-edit-modal__body textarea { width: 100%; min-height: 280px; padding: 14px; border: 1px solid var(--border); border-radius: 10px; background: var(--paper); color: var(--paper-ink); font-family: 'Noto Serif JP', serif; font-size: 14px; line-height: 1.7; resize: vertical; box-sizing: border-box; }
+    .fx-edit-modal__actions { display: flex; justify-content: flex-end; gap: 10px; }
+    .fx-edit-btn { display: inline-flex; align-items: center; min-height: 40px; padding: 0 18px; border: 1px solid var(--border); border-radius: 10px; background: var(--card); color: var(--ink); font-family: 'Cinzel', serif; font-size: 9px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; cursor: pointer; transition: border-color .18s ease, transform .18s ease; }
+    .fx-edit-btn:hover { transform: translateY(-1px); border-color: var(--accent); }
+    .fx-edit-btn--primary { border-color: var(--accent); background: linear-gradient(180deg, var(--accent-soft), transparent), var(--card); }
+
+    /* Aviso de ficha en moderación (solo dueño) */
+    .fx-modnotice {
+      display: flex; align-items: flex-start; gap: 12px;
+      margin-bottom: 14px; padding: 13px 18px;
+      border: 1px solid #d9b35c; background: rgba(217, 179, 92, 0.1);
+    }
+    .fx-modnotice__i { font-size: 18px; line-height: 1.5; flex-shrink: 0; }
+    .fx-modnotice__txt { font-family: 'Noto Serif JP', serif; font-size: 13.5px; line-height: 1.6; color: var(--ink); }
+    .fx-modnotice__txt strong {
+      display: block; margin-bottom: 2px; font-family: 'Cinzel', serif; font-size: 12px;
+      font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: #e6c877;
+    }
   </style>
 </head>
 
@@ -726,6 +758,15 @@
   <main class="fx">
     <div class="fx-shell">
 
+      <if $sgEnModeracion then>
+        <div class="fx-modnotice">
+          <span class="fx-modnotice__i" aria-hidden="true">⏳</span>
+          <div class="fx-modnotice__txt">
+            <strong>Tu ficha está en moderación</strong>
+            Puedes visualizarla mientras el staff la revisa. Además puedes editar tu trasfondo —biografía, apariencia, personalidad, frase y extras— desde la pestaña Trasfondo.
+          </div>
+        </div>
+      </if>
 
       <!-- ═══ HERO ═══ -->
       <section class="fx-hero">
@@ -1025,8 +1066,8 @@
               <div class="fx-photo__cap"></div>
             </div>
 
-            <div class="fx-bio">
-              <div class="fx-bio-head"><span class="fx-card__title">Biografía</span></div>
+            <div class="fx-bio<if $sgPuedeEditar then> fx-editable</if>" <if $sgPuedeEditar then>onclick="sgFieldEdit(event,'historia','Biografía')" title="Pulsa para editar"</if>>
+              <div class="fx-bio-head"><span class="fx-card__title">Biografía</span><if $sgPuedeEditar then><span class="fx-edit-tag">✎ Editar</span></if></div>
               <if $sgHistoriaLarga then>
                 <input type="checkbox" id="fx-bio-toggle" class="fx-bio-toggle-input">
                 <div class="fx-bio-content fx-bio-content--clamped">
@@ -1044,27 +1085,27 @@
             <div class="fx-clear"></div>
 
             <div class="fx-stack">
-              <div class="fx-card">
-                <div class="fx-card__head"><span class="fx-card__title">Apariencia</span></div>
+              <div class="fx-card<if $sgPuedeEditar then> fx-editable</if>" <if $sgPuedeEditar then>onclick="sgFieldEdit(event,'apariencia','Apariencia')" title="Pulsa para editar"</if>>
+                <div class="fx-card__head"><span class="fx-card__title">Apariencia</span><if $sgPuedeEditar then><span class="fx-edit-tag">✎ Editar</span></if></div>
                 <div class="fx-card__body"><div class="fx-prose">{$apariencia}</div></div>
               </div>
 
-              <div class="fx-card">
-                <div class="fx-card__head"><span class="fx-card__title">Personalidad</span></div>
+              <div class="fx-card<if $sgPuedeEditar then> fx-editable</if>" <if $sgPuedeEditar then>onclick="sgFieldEdit(event,'personalidad','Personalidad')" title="Pulsa para editar"</if>>
+                <div class="fx-card__head"><span class="fx-card__title">Personalidad</span><if $sgPuedeEditar then><span class="fx-edit-tag">✎ Editar</span></if></div>
                 <div class="fx-card__body"><div class="fx-prose">{$personalidad}</div></div>
               </div>
 
               <div class="fx-traits">
-                <div class="fx-card">
-                  <div class="fx-card__head"><span class="fx-card__title">Frase</span></div>
+                <div class="fx-card<if $sgPuedeEditar then> fx-editable</if>" <if $sgPuedeEditar then>onclick="sgFieldEdit(event,'frase','Frase')" title="Pulsa para editar"</if>>
+                  <div class="fx-card__head"><span class="fx-card__title">Frase</span><if $sgPuedeEditar then><span class="fx-edit-tag">✎ Editar</span></if></div>
                   <div class="fx-card__body">
                     <div class="fx-prose">
                       <if $frase then><p class="fx-prose--lead">{$frase}</p></if>
                     </div>
                   </div>
                 </div>
-                <div class="fx-card">
-                  <div class="fx-card__head"><span class="fx-card__title">Extras</span></div>
+                <div class="fx-card<if $sgPuedeEditar then> fx-editable</if>" <if $sgPuedeEditar then>onclick="sgFieldEdit(event,'extra','Extras')" title="Pulsa para editar"</if>>
+                  <div class="fx-card__head"><span class="fx-card__title">Extras</span><if $sgPuedeEditar then><span class="fx-edit-tag">✎ Editar</span></if></div>
                   <div class="fx-card__body">
                     <div class="fx-prose">
                       <if $extra then><p>{$extra}</p></if>
@@ -1116,6 +1157,33 @@
   </div>
 
   <div id="fx-radar-tip" class="fx-radar-tip" aria-hidden="true"></div>
+
+  <if $sgPuedeEditar then>
+  <div id="fx-edit-store" hidden>
+    <textarea data-campo="historia">{$sgRawHistoria}</textarea>
+    <textarea data-campo="apariencia">{$sgRawApariencia}</textarea>
+    <textarea data-campo="personalidad">{$sgRawPersonalidad}</textarea>
+    <textarea data-campo="frase">{$sgRawFrase}</textarea>
+    <textarea data-campo="extra">{$sgRawExtra}</textarea>
+  </div>
+
+  <div id="fx-edit-modal" class="fx-edit-modal" aria-hidden="true">
+    <div class="fx-edit-modal__dialog">
+      <div class="fx-edit-modal__head">
+        <h3 id="fx-edit-modal-title">Editar</h3>
+        <button type="button" class="fx-edit-modal__close" onclick="sgCloseEditModal()">×</button>
+      </div>
+      <form class="fx-edit-modal__body" method="post" action="{$mybb->settings['bburl']}/sg/ficha.php?uid={$ficha['fid']}">
+        <input type="hidden" name="sg_edit_campo" id="fx-edit-campo" value="">
+        <textarea name="sg_edit_valor" id="fx-edit-valor" rows="14" placeholder="Escribe aquí..."></textarea>
+        <div class="fx-edit-modal__actions">
+          <button type="button" class="fx-edit-btn" onclick="sgCloseEditModal()">Cancelar</button>
+          <button type="submit" class="fx-edit-btn fx-edit-btn--primary">Guardar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  </if>
 
   {$footer}
 
@@ -1208,6 +1276,54 @@
     window.addEventListener('click', function(event) {
       var modal = document.getElementById('sg-profile-modal');
       if (event.target === modal) { closeProfileAssetModal(); }
+      var editModal = document.getElementById('fx-edit-modal');
+      if (editModal && event.target === editModal) { sgCloseEditModal(); }
+    });
+
+    // ── Edición inline de trasfondo (dueño o staff) ──
+    var sgEditLabels = {
+      historia: 'Biografía', apariencia: 'Apariencia',
+      personalidad: 'Personalidad', frase: 'Frase', extra: 'Extras'
+    };
+
+    // Abre el modal salvo que el click nazca en un elemento interactivo
+    // (enlaces del texto, el botón "Leer más", inputs, etc.).
+    function sgFieldEdit(ev, campo, label) {
+      var node = ev.target;
+      while (node && node !== ev.currentTarget) {
+        var tag = node.tagName;
+        if (tag === 'A' || tag === 'BUTTON' || tag === 'LABEL' || tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') { return; }
+        node = node.parentNode;
+      }
+      sgOpenEditModal(campo, label);
+    }
+
+    function sgOpenEditModal(campo, label) {
+      var modal = document.getElementById('fx-edit-modal');
+      if (!modal) { return; }
+      var title = document.getElementById('fx-edit-modal-title');
+      var campoInput = document.getElementById('fx-edit-campo');
+      var valor = document.getElementById('fx-edit-valor');
+      var src = document.querySelector('#fx-edit-store textarea[data-campo="' + campo + '"]');
+
+      campoInput.value = campo;
+      title.textContent = 'Editar ' + (label || sgEditLabels[campo] || '');
+      valor.value = src ? src.value : '';
+
+      modal.classList.add('is-open');
+      modal.setAttribute('aria-hidden', 'false');
+      valor.focus();
+    }
+
+    function sgCloseEditModal() {
+      var modal = document.getElementById('fx-edit-modal');
+      if (!modal) { return; }
+      modal.classList.remove('is-open');
+      modal.setAttribute('aria-hidden', 'true');
+    }
+
+    window.addEventListener('keydown', function(event) {
+      if (event.key === 'Escape') { sgCloseEditModal(); }
     });
 
     function sgWeekCountdown() {
