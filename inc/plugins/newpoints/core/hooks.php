@@ -287,24 +287,35 @@ elseif (NP_HOOKS == 2)
 		
 		if ($mybb->input['action'] != "do_newreply" || $post['savedraft'])
 			return;
-		
-		if($data->post_insert_data['visible'] != 1)
+
+		// Un post publicado desde un borrador llega por la rama UPDATE de MyBB
+		// (insert_post() con $draft_check=true): ese camino solo llena
+		// post_update_data, no post_insert_data. Se revisa el que exista para
+		// saber la visibilidad real del post.
+		$visible = isset($data->post_insert_data['visible'])
+			? $data->post_insert_data['visible']
+			: (isset($data->post_update_data['visible']) ? $data->post_update_data['visible'] : null);
+
+		if($visible != 1)
 		{
 			// If it's not visible, then we may have moderation (drafts are already considered above so it doesn't matter here)
 			return;
 		}
-		
+
 		if (!$mybb->user['uid'])
 			return;
-		
+
 		if ($mybb->settings['newpoints_main_enabled'] != 1)
 			return;
-			
+
 		if ($mybb->settings['newpoints_income_newpost'] == 0)
 			return;
-		
+
 		// check forum rules
-		$forumrules = newpoints_getrules('forum', $data->post_insert_data['fid']);
+		// $post['fid'] (viene del form en newreply.php) en vez de
+		// post_insert_data['fid'], que por lo mismo de arriba queda vacío en
+		// el camino de publicar un borrador.
+		$forumrules = newpoints_getrules('forum', $post['fid']);
 		if (!$forumrules)
 			$forumrules['rate'] = 1; // no rule set so default income rate is 1
 		

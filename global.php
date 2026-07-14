@@ -508,6 +508,28 @@ $plugins->run_hooks('global_intermediate');
 
 require_once MYBB_ROOT.'sg/functions/sg_functions.php';
 
+// Banner rotativo del header (gestionado por staff en gestionar_banners.php).
+// Si no hay banners activos, $g_banner_rotativo queda null y header.html usa
+// el banner estático de siempre como respaldo (no rompe si la tabla está vacía
+// o aún no se corrió el ALTER que la crea).
+$g_banner_rotativo = null;
+$g_banner_rotativo_imagen_esc = '';
+$g_banner_rotativo_titulo_esc = '';
+$g_banner_rotativo_slot = 0;
+$g_banner_rotativo_duracion = 300;
+$g_banner_rotativo_json = '[]';
+$q_bn_tabla = $db->query("SHOW TABLES LIKE 'mybb_sg_sg_banners'");
+if ($db->num_rows($q_bn_tabla) > 0) {
+    $sg_banner_rot = sg_banner_rotativo($db, $g_banner_rotativo_duracion);
+    $g_banner_rotativo = $sg_banner_rot['actual'];
+    $g_banner_rotativo_slot = $sg_banner_rot['slot'];
+    $g_banner_rotativo_json = json_encode($sg_banner_rot['banners']); // sin JSON_UNESCAPED_SLASHES: el escape de "/" evita romper el </script> si un título lo contuviera
+    if ($g_banner_rotativo) {
+        $g_banner_rotativo_imagen_esc = htmlspecialchars($g_banner_rotativo['imagen'], ENT_QUOTES);
+        $g_banner_rotativo_titulo_esc = htmlspecialchars($g_banner_rotativo['titulo'], ENT_QUOTES);
+    }
+}
+
 $g_ultimos_post = '';
 $g_ultimos_post_rol = '';
 $g_ultimos_post_off = '';

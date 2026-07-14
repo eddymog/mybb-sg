@@ -298,11 +298,13 @@ foreach ($estado['arboles'] as $arbol => $ainfo) {
         } else if (!empty($r['desbloqueable'])) {
             $dojo_html .= "<span class=\"sg-rama-lvl sg-rama-lvl--lock\">Bloqueada</span></div>";
             $dojo_html .= "<div class=\"sg-rama-actions\">";
-            // Mientras no se use la rama de clan gratis, ese árbol NO se puede
-            // pagar con Tobis: primero hay que elegir la rama gratis.
+            // Mientras haya una rama gratis pendiente en el árbol (clan o la 1ª
+            // de un elemental comprado), NO se ofrece la compra con Tobis:
+            // primero hay que elegir la rama gratis.
             $clan_pendiente = ($es_clan && (int) $prog['clan_rama_usada'] === 0);
+            $gratis_pendiente = !empty($ainfo['rama_gratis_disponible']);
             $hidden = array('arbol' => $arbol, 'rama' => $rama);
-            if (!$clan_pendiente) {
+            if (!$clan_pendiente && !$gratis_pendiente) {
                 if ($tobi >= $costos['rama']) {
                     $dojo_html .= $form_accion('rama', $hidden, "Desbloquear · ".$costos['rama']." Tobis", true);
                 } else {
@@ -312,6 +314,10 @@ foreach ($estado['arboles'] as $arbol => $ainfo) {
             // Rama de clan gratis (una vez). Sirve para cualquiera de los árboles de clan.
             if ($es_clan && $clan_libre) {
                 $dojo_html .= $form_accion('rama_clan', array('arbol' => $arbol, 'rama' => $rama), "Rama de clan · gratis", true, 'free');
+            }
+            // Rama gratis del árbol elemental comprado (1 por árbol, elige cuál).
+            if (!empty($ainfo['rama_gratis_disponible'])) {
+                $dojo_html .= $form_accion('rama_gratis', array('arbol' => $arbol, 'rama' => $rama), "Rama gratis", true, 'free');
             }
             $dojo_html .= "</div>";
         }

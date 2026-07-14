@@ -1,0 +1,222 @@
+<html>
+
+<head>
+  <title>Banners — Staff</title>
+  {$headerinclude}
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Source+Serif+4:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <style>
+    #bn-page { max-width: 900px; margin: 24px auto 60px; color: var(--ink); font-family: 'Source Serif 4', serif; text-align: left; }
+
+    .bn-panel { border: 0.5px solid var(--border); background: var(--bg2); overflow: hidden; }
+    .bn-panel__head { position: relative; padding: 20px 24px 18px; background: var(--bg3); border-bottom: 0.5px solid var(--border); }
+    .bn-panel__head::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--oxide); }
+    .bn-eyebrow { display: block; font-family: 'Cinzel', serif; font-size: 8px; font-weight: 700; letter-spacing: 2.4px; text-transform: uppercase; color: var(--mist); margin-bottom: 6px; }
+    .bn-title { margin: 0; font-family: 'Cinzel', serif; font-size: 17px; font-weight: 900; letter-spacing: 1.5px; text-transform: uppercase; color: var(--ink); }
+
+    .bn-body { padding: 22px 24px; }
+
+    .bn-meta { display: flex; flex-wrap: wrap; gap: 26px; margin-bottom: 22px; padding: 12px 16px; border: 0.5px solid var(--border); background: var(--bg3); }
+    .bn-stat { display: flex; flex-direction: column; gap: 2px; }
+    .bn-stat__k { font-family: 'Cinzel', serif; font-size: 8px; letter-spacing: 1.6px; text-transform: uppercase; color: var(--mist); }
+    .bn-stat__v { font-family: 'Cinzel', serif; font-size: 18px; font-weight: 900; color: var(--ink); }
+
+    .bn-section { margin-bottom: 24px; }
+    .bn-section:last-child { margin-bottom: 0; }
+    .bn-section__head { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+    .bn-section__head::before { content: ''; width: 3px; height: 13px; background: var(--oxide); flex-shrink: 0; }
+    .bn-section__head::after { content: ''; flex: 1; height: 0.5px; background: var(--border); }
+    .bn-section__title { font-family: 'Cinzel', serif; font-size: 10px; font-weight: 900; letter-spacing: 1.8px; text-transform: uppercase; color: var(--ink); }
+
+    .bn-field { display: flex; flex-direction: column; gap: 5px; margin-bottom: 14px; }
+    .bn-label { font-family: 'Cinzel', serif; font-size: 8px; font-weight: 700; letter-spacing: 1.4px; text-transform: uppercase; color: var(--mist); }
+    .bn-row { display: grid; grid-template-columns: 2fr 1fr; gap: 14px; }
+
+    #bn-page input[type="text"] {
+      width: 100%; box-sizing: border-box; padding: 9px 11px;
+      background: var(--bg3); border: none;
+      border-bottom: 1.5px solid var(--border); border-left: 1.5px solid var(--border);
+      color: var(--ink); font-family: 'Source Serif 4', serif; font-size: 13px;
+      outline: none; transition: border-color 0.15s, background 0.15s;
+    }
+    #bn-page input:focus { border-bottom-color: var(--plum3); border-left-color: var(--plum3); background: var(--bg2); }
+
+    .bn-hint { margin: -6px 0 14px; font-size: 11.5px; line-height: 1.6; color: var(--mist); }
+    .bn-hint a { color: var(--plum2); }
+
+    .bn-actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+    .bn-btn { display: inline-flex; align-items: center; justify-content: center; font-family: 'Cinzel', serif; font-size: 9px; font-weight: 900; letter-spacing: 2.5px; text-transform: uppercase; color: var(--lavender); background: var(--plum); border: none; padding: 0 24px; height: 40px; cursor: pointer; transition: background 0.15s, transform 0.12s; text-decoration: none; }
+    .bn-btn:hover { background: var(--plum2); transform: translateY(-1px); }
+    .bn-btn--ghost { background: transparent; color: var(--plum2); border: 0.5px solid var(--border); height: 32px; padding: 0 14px; font-size: 8px; }
+    .bn-btn--ghost:hover { background: var(--bg3); color: var(--ink); }
+    .bn-btn--danger { background: transparent; color: var(--oxide2, #e07040); border: 0.5px solid var(--oxide); height: 32px; padding: 0 14px; font-size: 8px; }
+    .bn-btn--danger:hover { background: var(--oxide); color: #fff; }
+
+    .bn-list { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    .bn-card { display: flex; flex-direction: column; border: 0.5px solid var(--border); border-top: 1.5px solid var(--plum3); background: var(--bg2); overflow: hidden; transition: opacity 0.15s ease, border-color 0.15s ease; }
+    .bn-card.is-inactive { opacity: 0.5; border-top-color: var(--mist); }
+    .bn-card__thumb { width: 100%; height: 90px; background: var(--bg3); overflow: hidden; }
+    .bn-card__thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .bn-card__body { padding: 10px 12px 4px; }
+    .bn-card__title { font-family: 'Cinzel', serif; font-size: 12px; font-weight: 700; color: var(--ink); line-height: 1.35; }
+    .bn-card__title em { color: var(--mist); font-style: italic; font-weight: 400; }
+    .bn-card__meta { margin-top: 4px; font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 1px; text-transform: uppercase; color: var(--mist); }
+    .bn-card.is-inactive .bn-card__status { color: var(--mist); }
+    .bn-card:not(.is-inactive) .bn-card__status { color: var(--green); }
+    .bn-card__actions { display: flex; gap: 8px; padding: 10px 12px 12px; margin-top: auto; }
+    .bn-empty { grid-column: 1 / -1; padding: 26px; text-align: center; color: var(--mist); border: 0.5px dashed var(--border); font-size: 14px; }
+
+    .bn-toast { position: fixed; left: 50%; bottom: 26px; transform: translateX(-50%) translateY(20px); min-width: 220px; max-width: 90vw; padding: 12px 18px; background: var(--bg2); border: 0.5px solid var(--border); border-left: 3px solid var(--plum); color: var(--ink); font-family: 'Source Serif 4', serif; font-size: 13px; opacity: 0; visibility: hidden; transition: opacity 0.2s, transform 0.2s, visibility 0.2s; z-index: 9999; }
+    .bn-toast.is-show { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0); }
+    .bn-toast.is-error { border-left-color: var(--oxide); }
+
+    @media (max-width: 640px) {
+      .bn-list { grid-template-columns: 1fr; }
+      .bn-row { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+
+<body>
+  {$header}
+
+  <div id="bn-page">
+    <div class="bn-panel">
+      <div class="bn-panel__head">
+        <span class="bn-eyebrow">Consola Staff · Header del foro</span>
+        <h1 class="bn-title">Banners rotativos</h1>
+      </div>
+
+      <div class="bn-body">
+
+        <div class="bn-meta">
+          <div class="bn-stat"><span class="bn-stat__k">Total</span><span class="bn-stat__v" id="bn-total">{$bnTotal}</span></div>
+          <div class="bn-stat"><span class="bn-stat__k">Activos (en rotación)</span><span class="bn-stat__v" id="bn-activos">{$bnActivos}</span></div>
+        </div>
+
+        <div class="bn-section">
+          <div class="bn-section__head"><span class="bn-section__title">Nuevo banner</span></div>
+          <form id="bn-form-nuevo">
+            <div class="bn-row">
+              <div class="bn-field">
+                <label class="bn-label" for="bn-imagen">URL de la imagen</label>
+                <input type="text" id="bn-imagen" name="imagen" placeholder="https://…/banner.jpg" required maxlength="255">
+              </div>
+              <div class="bn-field">
+                <label class="bn-label" for="bn-titulo">Título (opcional)</label>
+                <input type="text" id="bn-titulo" name="titulo" placeholder="Descripción breve" maxlength="150">
+              </div>
+            </div>
+            <div class="bn-hint">Sube la imagen primero en <a href="/sg/admin/subir_imagenes.php">Subir Imágenes</a> (se optimiza sola) y pega aquí la URL que te da.</div>
+            <div class="bn-actions">
+              <button class="bn-btn" type="submit">Agregar banner</button>
+            </div>
+          </form>
+        </div>
+
+        <div class="bn-section">
+          <div class="bn-section__head"><span class="bn-section__title">Banners existentes</span></div>
+          <div class="bn-list" id="bn-list">{$bnListHtml}</div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <div id="bn-toast" class="bn-toast" role="status" aria-live="polite"></div>
+
+  {$footer}
+</body>
+
+<script>
+  var bnPostKey = '{$bnPostKey}';
+
+  function bnEscape(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+
+  function bnToast(msg, ok) {
+    var el = document.getElementById('bn-toast'); if (!el) { return; }
+    el.textContent = msg;
+    el.className = 'bn-toast is-show' + (ok ? '' : ' is-error');
+    clearTimeout(el._t);
+    el._t = setTimeout(function () { el.className = 'bn-toast' + (ok ? '' : ' is-error'); }, 2600);
+  }
+
+  function bnAjax(params, cb) {
+    var body = 'ajax=1&my_post_key=' + encodeURIComponent(bnPostKey);
+    for (var k in params) { if (params.hasOwnProperty(k)) { body += '&' + k + '=' + encodeURIComponent(params[k]); } }
+    fetch(window.location.pathname, {
+      method: 'POST', credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' },
+      body: body
+    }).then(function (r) { return r.json(); }).then(cb).catch(function () {
+      cb({ ok: false, mensaje: 'Error de red. Inténtalo de nuevo.' });
+    });
+  }
+
+  function bnSyncMeta(r) {
+    if (typeof r.total !== 'undefined') { var t = document.getElementById('bn-total'); if (t) { t.textContent = r.total; } }
+    if (typeof r.activos !== 'undefined') { var a = document.getElementById('bn-activos'); if (a) { a.textContent = r.activos; } }
+  }
+
+  function bnEnsureEmpty() {
+    var list = document.getElementById('bn-list'); if (!list) { return; }
+    if (!list.querySelector('.bn-card') && !list.querySelector('.bn-empty')) {
+      var d = document.createElement('div'); d.className = 'bn-empty';
+      d.textContent = 'Aún no hay banners agregados.'; list.appendChild(d);
+    }
+  }
+
+  function bnToggle(ev, id) {
+    if (ev) { ev.stopPropagation(); }
+    bnAjax({ accion: 'toggle', id: id }, function (r) {
+      if (!r.ok) { bnToast(r.mensaje || 'No se pudo cambiar el estado.', false); return; }
+      bnToast(r.mensaje, true);
+      var card = document.querySelector('.bn-card[data-id="' + id + '"]');
+      if (card) {
+        card.classList.toggle('is-inactive', !r.activo);
+        var status = card.querySelector('.bn-card__status');
+        if (status) { status.textContent = r.activo ? 'Activo' : 'Inactivo'; }
+        var btn = card.querySelector('.bn-btn--ghost');
+        if (btn) { btn.textContent = r.activo ? 'Desactivar' : 'Activar'; }
+      }
+      bnSyncMeta(r);
+    });
+  }
+
+  function bnEliminar(ev, id) {
+    if (ev) { ev.stopPropagation(); }
+    if (!confirm('¿Eliminar el banner #' + id + '? Esta acción no se puede deshacer.')) { return; }
+    bnAjax({ accion: 'eliminar', id: id }, function (r) {
+      if (!r.ok) { bnToast(r.mensaje || 'No se pudo eliminar.', false); return; }
+      bnToast(r.mensaje, true);
+      var card = document.querySelector('.bn-card[data-id="' + id + '"]');
+      if (card) { card.parentNode.removeChild(card); }
+      bnSyncMeta(r); bnEnsureEmpty();
+    });
+  }
+
+  (function () {
+    var form = document.getElementById('bn-form-nuevo');
+    if (!form) { return; }
+    form.addEventListener('submit', function (ev) {
+      ev.preventDefault();
+      var imagen = document.getElementById('bn-imagen').value.trim();
+      var titulo = document.getElementById('bn-titulo').value.trim();
+      if (!imagen) { bnToast('La URL de la imagen es obligatoria.', false); return; }
+      bnAjax({ accion: 'agregar', imagen: imagen, titulo: titulo }, function (r) {
+        if (!r.ok) { bnToast(r.mensaje || 'No se pudo agregar.', false); return; }
+        bnToast(r.mensaje, true);
+        var list = document.getElementById('bn-list');
+        if (list) {
+          var empty = list.querySelector('.bn-empty'); if (empty) { empty.parentNode.removeChild(empty); }
+          var tmp = document.createElement('div'); tmp.innerHTML = r.card_html;
+          list.insertBefore(tmp.firstChild, list.firstChild);
+        }
+        document.getElementById('bn-imagen').value = '';
+        document.getElementById('bn-titulo').value = '';
+        bnSyncMeta(r);
+      });
+    });
+  })();
+</script>
+
+</html>

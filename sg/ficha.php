@@ -462,7 +462,7 @@ if ($ficha_existe == true && ($moderated == true || is_mod($s_uid) || is_staff($
         // Subida de nivel automática BLOQUEADA. Mientras esté en false, la ficha
         // NO sube de nivel sola aunque el PR alcance el umbral (ni otorga puntos,
         // mejoras ni créditos de rama). Poner en true para reactivarla.
-        $sg_subida_nivel_activa = false;
+        $sg_subida_nivel_activa = true;
 
         // Sube todos los niveles a los que dé el PR acumulado (no solo uno por carga).
         while ($sg_subida_nivel_activa && isset($umbrales_nivel[$nivel]) && $puntos_rol >= $umbrales_nivel[$nivel]) {

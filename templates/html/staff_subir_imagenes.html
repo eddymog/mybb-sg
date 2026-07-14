@@ -212,6 +212,22 @@
       .sg-upload { flex-direction: column; align-items: stretch; }
       .sg-btn { width: 100%; }
     }
+
+    /* Aviso de PNG pesado (aparece al elegir un .png) */
+    .sg-png-warn {
+      display: none;
+      margin-bottom: 14px;
+      padding: 12px 14px;
+      border: 0.5px solid var(--border-strong);
+      border-left-width: 2px;
+      border-left-color: var(--oxide);
+      background: rgba(192, 88, 42, 0.12);
+      font-size: 13px;
+      line-height: 1.6;
+      color: var(--ink);
+    }
+    .sg-png-warn.is-visible { display: block; }
+    .sg-png-warn strong { color: var(--oxide); }
   </style>
 </head>
 
@@ -235,8 +251,13 @@
 
         <div class="sg-section-label">Nueva imagen</div>
         <form method="post" action="/sg/admin/subir_imagenes.php" enctype="multipart/form-data" name="subir_imagen" id="subir_imagen">
+          <div class="sg-png-warn" id="sg-png-warn">
+            <strong>CUIDADO:</strong> Subir imágenes PNG son muy pesadas para el foro y puede hacer que los usuarios tarden en verlas.
+            Sube PNG solo si es extremadamente necesario e idealmente solo si necesitamos tener transparencia.
+            De resto, es preferible usar <strong>.jpg</strong> o <strong>.webp</strong>.
+          </div>
           <div class="sg-upload">
-            <input class="sg-file" type="file" name="imagen" id="imagen" accept=".jpg,.jpeg,.png,.gif,.webp,image/*" required>
+            <input class="sg-file" type="file" name="imagen" id="imagen" accept=".jpg,.jpeg,.png,.gif,.webp,image/*" required onchange="sgAvisoPng(this)">
             <button class="sg-btn" type="submit">Subir imagen</button>
           </div>
           <ul class="sg-rules">
@@ -246,6 +267,15 @@
             <li>El nombre se normaliza (minúsculas; espacios y símbolos pasan a <em>-</em>).</li>
           </ul>
         </form>
+
+        <script>
+          function sgAvisoPng(input) {
+            var warn = document.getElementById('sg-png-warn');
+            if (!warn) { return; }
+            var nombre = (input.files && input.files[0]) ? input.files[0].name.toLowerCase() : '';
+            warn.classList.toggle('is-visible', nombre.slice(-4) === '.png');
+          }
+        </script>
 
         <div class="sg-gal-wrap">
           <div class="sg-section-label">Imágenes subidas</div>

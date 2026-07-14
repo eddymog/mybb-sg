@@ -394,6 +394,84 @@
     color: rgba(255,255,255,0.78);
   }
 
+  /* Chips de contexto (año / rango de días de la temporada) */
+  .sg-index-season__row {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 2px 0 14px;
+  }
+
+  .sg-index-season__chip {
+    display: inline-flex;
+    align-items: center;
+    padding: 5px 12px;
+    border: 0.5px solid rgba(255,255,255,0.22);
+    border-radius: 999px;
+    background: rgba(255,255,255,0.08);
+    font-family: 'Cinzel', serif;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.3px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.85);
+    white-space: nowrap;
+  }
+
+  /* Fecha límite de rol: discreta, como una línea de meta más, con una
+     barrita fina de referencia (día límite / total de días de temporada). */
+  .sg-index-limit {
+    position: relative;
+    z-index: 1;
+  }
+
+  .sg-index-limit__head {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    font-family: 'Source Serif 4', serif;
+    font-size: 12.5px;
+    line-height: 1.6;
+    color: rgba(255,255,255,0.62);
+  }
+
+  .sg-index-limit__value {
+    font-weight: 700;
+    color: rgba(255,255,255,0.85);
+  }
+
+  .sg-index-limit__bar {
+    position: relative;
+    height: 3px;
+    width: 120px;
+    max-width: 100%;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.14);
+    overflow: visible;
+    margin: 6px 0 0;
+  }
+
+  .sg-index-limit__fill {
+    position: absolute;
+    inset: 0;
+    width: var(--fill, 50%);
+    border-radius: 999px;
+    background: rgba(240, 201, 136, 0.55);
+  }
+
+  .sg-index-limit__marker {
+    position: absolute;
+    top: -1.5px;
+    left: var(--fill, 50%);
+    transform: translateX(-50%);
+    width: 1.5px;
+    height: 6px;
+    background: rgba(255,255,255,0.55);
+    border-radius: 1px;
+  }
+
   .sg-index-stat-copy {
     display: flex;
     flex-direction: column;
@@ -892,7 +970,24 @@
             <div class="sg-index-season__copy">
               <div class="sg-index-season__eyebrow">Calendario Shinobi</div>
               <div class="sg-index-season__title">Verano</div>
-              <div class="sg-index-season__meta">~30 de Junio<br>Año 150</div>
+
+              <div class="sg-index-season__row">
+                <span class="sg-index-season__chip">Año 150</span>
+                <span class="sg-index-season__chip">Días 1–90</span>
+              </div>
+
+              <!-- Al cambiar de temporada, actualiza 2 cosas:
+                   1) "45" y "90" en el texto (día límite / total de días).
+                   2) --fill: (día límite / total de días) × 100%. Hoy 45/90 = 50%. -->
+              <div class="sg-index-limit">
+                <div class="sg-index-limit__head">
+                  Fecha límite de rol: <span class="sg-index-limit__value">día 45</span> de 90
+                </div>
+                <div class="sg-index-limit__bar" style="--fill:50%;">
+                  <div class="sg-index-limit__fill"></div>
+                  <div class="sg-index-limit__marker"></div>
+                </div>
+              </div>
             </div>
           </article>
 

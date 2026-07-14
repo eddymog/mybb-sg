@@ -78,6 +78,7 @@ function toggleTheme() {
             <ul class="sg-nav-dropdown">
 		      <if $g_uid != 0 then><li><a href="{$mybb->settings['bburl']}/sg/recompensa_diaria.php" id="recompensas">Recompensa Diaria</a></li></if>
 			  <li><a href="{$mybb->settings['bburl']}/sg/mapa_mundo.php">Mapa del Mundo</a></li>
+			  <li><a href="{$mybb->settings['bburl']}/sg/registro_virtudes.php">Virtudes y Defectos</a></li>
 			  <li><a href="{$mybb->settings['bburl']}/sg/objetos.php">Objetos</a></li>
               <li><a href="{$mybb->settings['bburl']}/sg/calculadora.php">Calc. de Estadísticas</a></li>
               <li><a href="{$mybb->settings['bburl']}/sg/censo.php">Censo y Estadísticas</a></li>
@@ -91,7 +92,9 @@ function toggleTheme() {
               <span class="sg-nav-caret">▾</span>
             </a>
             <ul class="sg-nav-dropdown">
+			  <li><a href="{$mybb->settings['bburl']}/sg/dojo.php">Dojo</a></li>
               <li><a href="{$mybb->settings['bburl']}/sg/misiones.php" id="misiones">Misiones</a></li>
+			  <li><a href="{$mybb->settings['bburl']}/sg/tienda.php">Tienda</a></li>
             </ul>
           </li>
      	  </if>
@@ -192,7 +195,11 @@ function toggleTheme() {
   <div class="hrDivider"></div>
 
   <!-- Banner wrapper with identity overlay -->
-  <div style="position: relative; width: 100%; overflow: hidden;">
+  <!-- Sin overflow:hidden aquí: #logo (dentro) ya tiene el suyo propio para
+       recortar el barrido kunai; este overflow extra estaba recortando
+       también el chakra glow (su box-shadow se desborda un poco de #logo,
+       y este contenedor lo cortaba antes de que el navegador lo pintara). -->
+  <div style="position: relative; width: 100%;">
 
     <!-- Banner image -->
     <a href="https://shinobigaiden.net/index.php" style="display: block; line-height: 0;">
@@ -208,7 +215,11 @@ function toggleTheme() {
         <elseif $g_is_banner_nami then>
           <!-- nami banners disabled -->
         <else />
-          <img src="/images/banners/sg_banner1.jpg">
+          <if $g_banner_rotativo then>
+            <img id="sg-banner-rotativo" src="{$g_banner_rotativo_imagen_esc}" alt="{$g_banner_rotativo_titulo_esc}">
+          <else />
+            <img src="/images/banners/sg_banner1.jpg">
+          </if>
         </if>
       </div>
     </a>
@@ -220,26 +231,15 @@ function toggleTheme() {
       <div style="display: flex; align-items: flex-end; justify-content: space-between;">
 
         <!-- Left: hanko + title block -->
-        <div style="display: flex; align-items: flex-end; gap: 16px;">
+        <div style="display: flex; align-items: flex-end; gap: 16px; position: relative; top: -13px;">
 
           <!-- Hanko seal -->
           <div style="width: 48px; height: 48px; border: 1.5px solid var(--oxide); border-radius: 50%;
                       display: flex; flex-direction: column; align-items: center; justify-content: center;
-                      background: rgba(192,88,42,0.10); flex-shrink: 0;">
+                      background: rgba(192,88,42,0.10); flex-shrink: 0; ">
             <span style="font-family: 'Source Serif 4', serif; font-size: 16px; font-weight: 700; color: var(--oxide); line-height: 1;">忍</span>
             <small style="font-family: 'Cinzel', serif; font-size: 7px; letter-spacing: 1.7px; color: var(--oxide); text-transform: uppercase; line-height: 1.5;">SG</small>
           </div>
-
-          <!-- Title block -->
-          <div>
-            <div style="width: 32px; height: 2px; background: var(--oxide); margin-bottom: 6px;"></div>
-            <div style="font-family: 'Cinzel', serif; font-size: 28px; font-weight: 900; letter-spacing: 2.4px;
-                        color: #e8dff8; text-transform: uppercase; line-height: 1;
-                        text-shadow: 0 2px 12px rgba(0,0,0,0.9);">Shinobi Gaiden</div>
-            <div style="font-family: 'Cinzel', serif; font-size: 10px; font-weight: 400; letter-spacing: 5.6px;
-                        color: rgba(232,223,248,0.52); text-transform: uppercase; margin-top: 6px;">Foro Rol · Universo Naruto</div>
-          </div>
-        </div>
 
         <!-- Right: logged-in user greeting -->
         <if $mybb->user['uid'] != '0' then>
@@ -427,6 +427,57 @@ function toggleTheme() {
     if (btn) btn.textContent = saved === 'light' ? '☾' : '☀';
   })();
 </script>
+
+<script>
+  (function() {
+    // Hue-rotate aleatorio (1-360deg) por hover: la CSS lee --sg-hue vía
+    // var() en #logo y .temporada_index (sg_global.css). Un nuevo mouseenter
+    // siempre recalcula el valor, así cada pasada de mouse es distinta.
+    function sgHueAleatorio(el) {
+      el.addEventListener('mouseenter', function() {
+        var deg = Math.floor(Math.random() * 360) + 1; // 1–360
+        el.style.setProperty('--sg-hue', deg + 'deg');
+      });
+    }
+    var sgLogo = document.getElementById('logo');
+    if (sgLogo) { sgHueAleatorio(sgLogo); }
+    document.querySelectorAll('.temporada_index').forEach(sgHueAleatorio);
+  })();
+</script>
+
+<if $g_banner_rotativo then>
+<script>
+  (function() {
+    // Rotación en vivo del banner del header: el servidor ya calculó el banner
+    // "correcto" para esta ventana de 5 min (sg_banner_rotativo() en
+    // sg_functions.php); este script solo avanza al siguiente en el navegador
+    // sin recargar la página, para quien se queda en la misma página un rato.
+    var sgBanners = {$g_banner_rotativo_json};
+    var sgSlot = {$g_banner_rotativo_slot};
+    var sgDuracionMs = {$g_banner_rotativo_duracion} * 1000;
+    var sgImg = document.getElementById('sg-banner-rotativo');
+    if (!sgImg || sgBanners.length < 2) { return; } // 1 solo banner: nada que rotar
+
+    // opacity 0.3s primero en la lista: gana para esa propiedad específica
+    // (fundido rápido al rotar banner); "all 1s ease-out" cubre el resto
+    // (transform/filter del hover en sg_global.css) para que no se corten.
+    sgImg.style.transition = 'opacity 0.3s, all 1s ease-out';
+
+    function sgSiguienteBanner() {
+      sgSlot = (sgSlot + 1) % sgBanners.length;
+      var b = sgBanners[sgSlot];
+      sgImg.style.opacity = '0';
+      setTimeout(function() {
+        sgImg.src = b.imagen;
+        sgImg.alt = b.titulo || '';
+        sgImg.style.opacity = '1';
+      }, 300);
+    }
+
+    setInterval(sgSiguienteBanner, sgDuracionMs);
+  })();
+</script>
+</if>
 
 <!-- ═══════════════════════════════════════════════════════════════
      CONTENT AREA

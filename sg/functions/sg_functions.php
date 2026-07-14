@@ -1,5 +1,146 @@
 <?php
 
+// Redimensiona/recomprime UNA imagen en el disco (JPEG/PNG/WebP) usando GD.
+// No agranda: si ya es más angosta que $max_ancho, solo recomprime con $calidad.
+// No toca GIF (podría ser animado; GD solo conserva el primer frame).
+// Reemplaza el archivo original SOLO si el resultado pesa menos.
+// Devuelve: array('ok'=>bool, 'motivo'=>string, 'bytes_antes','bytes_despues','ancho_antes','ancho_despues')
+function sg_optimizar_imagen_archivo($ruta_fs, $max_ancho = 1200, $calidad = 78) {
+    $r = array(
+        'ok' => false, 'motivo' => '',
+        'bytes_antes' => 0, 'bytes_despues' => 0,
+        'ancho_antes' => 0, 'ancho_despues' => 0,
+    );
+
+    if (!is_file($ruta_fs)) {
+        $r['motivo'] = 'Archivo no encontrado.';
+        return $r;
+    }
+    $r['bytes_antes'] = filesize($ruta_fs);
+
+    $info = @getimagesize($ruta_fs);
+    if ($info === false) {
+        $r['motivo'] = 'No es una imagen válida.';
+        return $r;
+    }
+    list($ancho, $alto, $tipo) = $info;
+    $r['ancho_antes'] = $ancho;
+
+    switch ($tipo) {
+        case IMAGETYPE_JPEG:
+            $src = @imagecreatefromjpeg($ruta_fs);
+            break;
+        case IMAGETYPE_PNG:
+            $src = @imagecreatefrompng($ruta_fs);
+            break;
+        case IMAGETYPE_WEBP:
+            if (!function_exists('imagecreatefromwebp')) {
+                $r['motivo'] = 'El servidor no tiene soporte WebP en GD.';
+                return $r;
+            }
+            $src = @imagecreatefromwebp($ruta_fs);
+            break;
+        default:
+            $r['motivo'] = 'Formato no soportado (solo JPEG/PNG/WebP; los GIF no se tocan).';
+            return $r;
+    }
+    if (!$src) {
+        $r['motivo'] = 'No se pudo leer la imagen (¿archivo corrupto?).';
+        return $r;
+    }
+
+    // Nunca agranda: si ya es más angosta que el máximo, se mantiene el ancho.
+    $ancho_nuevo = $ancho;
+    $alto_nuevo  = $alto;
+    if ($ancho > $max_ancho) {
+        $ancho_nuevo = $max_ancho;
+        $alto_nuevo  = (int) round($alto * ($max_ancho / $ancho));
+    }
+
+    $dst = imagecreatetruecolor($ancho_nuevo, $alto_nuevo);
+
+    // Conserva transparencia en PNG/WebP.
+    if ($tipo === IMAGETYPE_PNG || $tipo === IMAGETYPE_WEBP) {
+        imagealphablending($dst, false);
+        imagesavealpha($dst, true);
+        $transparente = imagecolorallocatealpha($dst, 0, 0, 0, 127);
+        imagefilledrectangle($dst, 0, 0, $ancho_nuevo, $alto_nuevo, $transparente);
+    }
+
+    imagecopyresampled($dst, $src, 0, 0, 0, 0, $ancho_nuevo, $alto_nuevo, $ancho, $alto);
+    // imagedestroy() es un no-op desde PHP 8.0 (y deprecated desde 8.5); solo hace
+    // falta en versiones más viejas donde sí libera memoria explícitamente.
+    if (PHP_VERSION_ID < 80000) { imagedestroy($src); }
+
+    $tmp = $ruta_fs . '.tmp' . uniqid();
+    $guardado = false;
+    switch ($tipo) {
+        case IMAGETYPE_JPEG:
+            $guardado = imagejpeg($dst, $tmp, $calidad);
+            break;
+        case IMAGETYPE_PNG:
+            // PNG es SIN PÉRDIDA: su parámetro 0-9 es solo esfuerzo de compresión,
+            // no "calidad" visual (no hay tal trade-off). Nivel 9 siempre da el
+            // archivo más chico posible con el MISMO resultado visual, así que se
+            // usa siempre el máximo (el parámetro $calidad no aplica a PNG).
+            $guardado = imagepng($dst, $tmp, 9);
+            break;
+        case IMAGETYPE_WEBP:
+            $guardado = imagewebp($dst, $tmp, $calidad);
+            break;
+    }
+    if (PHP_VERSION_ID < 80000) { imagedestroy($dst); }
+
+    if (!$guardado || !is_file($tmp)) {
+        @unlink($tmp);
+        $r['motivo'] = 'No se pudo guardar la versión optimizada.';
+        return $r;
+    }
+
+    $bytes_nuevo = filesize($tmp);
+
+    // Si la "optimizada" no pesa menos (raro, pasa con imágenes ya muy comprimidas),
+    // se descarta y se deja la original intacta.
+    if ($bytes_nuevo >= $r['bytes_antes']) {
+        @unlink($tmp);
+        $r['ok'] = true;
+        $r['motivo'] = 'Ya estaba optimizada; se mantuvo el archivo original.';
+        $r['bytes_despues'] = $r['bytes_antes'];
+        $r['ancho_despues'] = $ancho;
+        return $r;
+    }
+
+    if (!@rename($tmp, $ruta_fs)) {
+        @unlink($tmp);
+        $r['motivo'] = 'No se pudo reemplazar el archivo original (revisa permisos).';
+        return $r;
+    }
+    @chmod($ruta_fs, 0644);
+
+    $r['ok'] = true;
+    $r['bytes_despues'] = $bytes_nuevo;
+    $r['ancho_despues'] = $ancho_nuevo;
+    return $r;
+}
+
+// Banners rotativos del header (mybb_sg_sg_banners). Rotación DETERMINISTA por
+// reloj: todos los visitantes ven el mismo banner dentro de la misma ventana de
+// $duracion segundos, sin cron ni proceso en segundo plano — solo se deriva de
+// TIME_NOW. El JS del header avanza al siguiente en vivo cada $duracion.
+function sg_banner_rotativo($db, $duracion = 300) {
+    $banners = array();
+    $q = $db->query("SELECT id, imagen, titulo FROM mybb_sg_sg_banners WHERE activo=1 ORDER BY orden ASC, id ASC");
+    while ($r = $db->fetch_array($q)) { $banners[] = $r; }
+
+    $total = count($banners);
+    if ($total === 0) {
+        return array('banners' => array(), 'slot' => 0, 'actual' => null);
+    }
+
+    $slot = (int) floor(TIME_NOW / $duracion) % $total;
+    return array('banners' => $banners, 'slot' => $slot, 'actual' => $banners[$slot]);
+}
+
 function does_ficha_exist($uid) {
     global $db;
     $ficha = select_one_query_with_id('mybb_sg_sg_fichas', 'fid', $uid);
@@ -783,8 +924,24 @@ function sg_dojo_estado($db, $uid) {
         // Ninja Prodigio I ya usado si algún árbol excede su cupo base.
         if ($espec_aprendidas > $cupo) { $prodigio1_over = true; }
 
+        // Rama gratis por árbol comprado: cada árbol ELEMENTAL (naturales + directos)
+        // regala su PRIMERA rama. Solo disponible si aún no tiene NINGUNA rama
+        // desbloqueada; en cuanto se desbloquea una (gratis o con Tobis) deja de
+        // aplicar, y no sube el costo de ramas. Los fijos ya vienen con sus ramas.
+        $rama_gratis_disponible = false;
+        if (in_array($arbol, $elementales, true)) {
+            $ramas_desbloqueadas = 0;
+            $tiene_desbloqueable = false;
+            foreach ($ramas_out as $r) {
+                if (!empty($r['desbloqueada']))  { $ramas_desbloqueadas++; }
+                if (!empty($r['desbloqueable'])) { $tiene_desbloqueable = true; }
+            }
+            $rama_gratis_disponible = ($ramas_desbloqueadas === 0 && $tiene_desbloqueable);
+        }
+
         $arboles[$arbol] = array(
             'nivel_arbol' => $nivel_arbol,
+            'rama_gratis_disponible' => $rama_gratis_disponible,
             'ramas'       => $ramas_out,
             'especializaciones' => array(
                 'cupo'       => $cupo,
@@ -1277,6 +1434,25 @@ function sg_dojo_aplicar_accion($db, $uid, $action, $params) {
                 sg_dojo_aprender($db, $uid, $rinfo['base']);
                 sg_dojo_guardar($db, $uid, $tobi, $progreso);
                 $result = $ok("Aprendiste una rama de tu clan (gratis).");
+                break;
+
+            // ── Rama gratis por árbol elemental comprado (1 por árbol) ──
+            case 'rama_gratis':
+                $ainfo = isset($estado['arboles'][$arbol]) ? $estado['arboles'][$arbol] : null;
+                if ($ainfo === null || empty($ainfo['rama_gratis_disponible'])) {
+                    $result = $err("No tienes una rama gratis disponible en ese árbol.");
+                    break;
+                }
+                $rinfo = isset($ainfo['ramas'][$rama]) ? $ainfo['ramas'][$rama] : null;
+                if ($rinfo === null || empty($rinfo['desbloqueable'])) {
+                    $result = $err("Esa rama no está disponible.");
+                    break;
+                }
+                // Es tu primera rama del árbol: gratis, sin Tobis y sin subir
+                // desbloqueo_ramas. El estado "ya usada" se deriva solo (al quedar
+                // 1 rama desbloqueada, deja de ofrecerse).
+                sg_dojo_aprender($db, $uid, $rinfo['base']);
+                $result = $ok("Elegiste una rama gratis en " . ucfirst($arbol) . ".");
                 break;
 
             default:

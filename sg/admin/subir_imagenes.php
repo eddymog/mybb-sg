@@ -74,7 +74,18 @@ if ($es_staff && $_SERVER['REQUEST_METHOD'] === 'POST') {
             } else if (move_uploaded_file($file['tmp_name'], $target)) {
                 @chmod($target, 0644);
                 $url_subida = $uploads_url . $nombre;
-                $mensaje = "Imagen subida correctamente como \"$nombre\".";
+
+                // Auto-optimiza (redimensiona + recomprime) para que las imágenes
+                // nunca lleguen pesadas al foro. Si falla (formato no soportado,
+                // GIF, etc.) la subida igual se da por buena con el archivo tal cual.
+                $opt = sg_optimizar_imagen_archivo($target, 1200, 78);
+                if ($opt['ok'] && $opt['bytes_despues'] < $opt['bytes_antes']) {
+                    $ahorro_pct = round((1 - ($opt['bytes_despues'] / $opt['bytes_antes'])) * 100);
+                    $mensaje = "Imagen subida y optimizada como \"$nombre\" ("
+                        . round($opt['bytes_antes'] / 1024) . " KB → " . round($opt['bytes_despues'] / 1024) . " KB, -$ahorro_pct%).";
+                } else {
+                    $mensaje = "Imagen subida correctamente como \"$nombre\".";
+                }
                 $mensaje_tipo = 'ok';
             } else {
                 $mensaje = 'No se pudo guardar la imagen. Revisa los permisos de la carpeta de subidas.';
