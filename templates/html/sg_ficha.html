@@ -162,7 +162,8 @@
     #fx-dossier:checked ~ .fx-tabs .fx-tab[for="fx-dossier"],
     #fx-inventario:checked ~ .fx-tabs .fx-tab[for="fx-inventario"],
     #fx-tecnicas:checked ~ .fx-tabs .fx-tab[for="fx-tecnicas"],
-    #fx-perfil:checked ~ .fx-tabs .fx-tab[for="fx-perfil"] {
+    #fx-perfil:checked ~ .fx-tabs .fx-tab[for="fx-perfil"],
+    #fx-stats:checked ~ .fx-tabs .fx-tab[for="fx-stats"] {
       color: var(--ink); background: var(--card);
       border-color: var(--border); border-bottom-color: var(--card);
       margin-bottom: -0.5px;
@@ -170,13 +171,15 @@
     #fx-dossier:checked ~ .fx-tabs .fx-tab[for="fx-dossier"] .fx-tab__gem,
     #fx-inventario:checked ~ .fx-tabs .fx-tab[for="fx-inventario"] .fx-tab__gem,
     #fx-tecnicas:checked ~ .fx-tabs .fx-tab[for="fx-tecnicas"] .fx-tab__gem,
-    #fx-perfil:checked ~ .fx-tabs .fx-tab[for="fx-perfil"] .fx-tab__gem { opacity: 1; }
+    #fx-perfil:checked ~ .fx-tabs .fx-tab[for="fx-perfil"] .fx-tab__gem,
+    #fx-stats:checked ~ .fx-tabs .fx-tab[for="fx-stats"] .fx-tab__gem { opacity: 1; }
 
     .fx-radio:focus-visible ~ .fx-tabs .fx-tab { outline: none; }
     #fx-dossier:focus-visible ~ .fx-tabs .fx-tab[for="fx-dossier"],
     #fx-inventario:focus-visible ~ .fx-tabs .fx-tab[for="fx-inventario"],
     #fx-tecnicas:focus-visible ~ .fx-tabs .fx-tab[for="fx-tecnicas"],
-    #fx-perfil:focus-visible ~ .fx-tabs .fx-tab[for="fx-perfil"] { outline: 2px solid var(--accent); outline-offset: -2px; }
+    #fx-perfil:focus-visible ~ .fx-tabs .fx-tab[for="fx-perfil"],
+    #fx-stats:focus-visible ~ .fx-tabs .fx-tab[for="fx-stats"] { outline: 2px solid var(--accent); outline-offset: -2px; }
 
     /* ── PANELES ──────────────────────────────────────── */
     .fx-panels {
@@ -202,14 +205,16 @@
     #fx-dossier:checked ~ .fx-panels .fx-panel--dossier,
     #fx-inventario:checked ~ .fx-panels .fx-panel--inventario,
     #fx-tecnicas:checked ~ .fx-panels .fx-panel--tecnicas,
-    #fx-perfil:checked ~ .fx-panels .fx-panel--perfil { display: block; animation: fxPageIn .4s cubic-bezier(.2,.7,.3,1) both; }
+    #fx-perfil:checked ~ .fx-panels .fx-panel--perfil,
+    #fx-stats:checked ~ .fx-panels .fx-panel--stats { display: block; animation: fxPageIn .4s cubic-bezier(.2,.7,.3,1) both; }
     /* Page-flip: la hoja entra girando desde el lomo (izquierda) */
     @keyframes fxPageIn { from { opacity: 0; transform: rotateY(-7deg) translateX(-10px); transform-origin: left center; } to { opacity: 1; transform: none; } }
     @media (prefers-reduced-motion: reduce) {
       #fx-dossier:checked ~ .fx-panels .fx-panel--dossier,
       #fx-inventario:checked ~ .fx-panels .fx-panel--inventario,
       #fx-tecnicas:checked ~ .fx-panels .fx-panel--tecnicas,
-      #fx-perfil:checked ~ .fx-panels .fx-panel--perfil { animation: none; }
+      #fx-perfil:checked ~ .fx-panels .fx-panel--perfil,
+      #fx-stats:checked ~ .fx-panels .fx-panel--stats { animation: none; }
     }
 
     /* Kanji watermark por pestaña */
@@ -222,6 +227,7 @@
     .fx-panel--tecnicas::before { content: '術'; }
     .fx-panel--perfil::before  { content: '魂'; }
     .fx-panel--inventario::before { content: '蔵'; }
+    .fx-panel--stats::before { content: '暦'; }
 
     /* Folio (número de página) por pestaña */
     .fx-panel::after {
@@ -232,6 +238,7 @@
     .fx-panel--perfil::after   { content: 'Folio ii'; }
     .fx-panel--tecnicas::after { content: 'Folio iii'; }
     .fx-panel--inventario::after { content: 'Folio iv'; }
+    .fx-panel--stats::after { content: 'Folio v'; }
 
     .fx-layout { position: relative; z-index: 1; display: grid; grid-template-columns: 260px 1fr; gap: 26px; align-items: start; }
     @media (max-width: 760px){ .fx-layout { grid-template-columns: 1fr; } }
@@ -795,12 +802,14 @@
       <input class="fx-radio" type="radio" name="fxtab" id="fx-inventario">
       <input class="fx-radio" type="radio" name="fxtab" id="fx-tecnicas">
       <input class="fx-radio" type="radio" name="fxtab" id="fx-perfil">
+      <input class="fx-radio" type="radio" name="fxtab" id="fx-stats">
 
       <nav class="fx-tabs" role="tablist" aria-label="Secciones de la ficha">
         <label class="fx-tab" for="fx-dossier"><span class="fx-tab__gem"></span>Expediente</label>
         <label class="fx-tab" for="fx-perfil"><span class="fx-tab__gem"></span>Trasfondo</label>
         <label class="fx-tab" for="fx-tecnicas"><span class="fx-tab__gem"></span>Técnicas</label>
         <label class="fx-tab" for="fx-inventario"><span class="fx-tab__gem"></span>Inventario</label>
+        <label class="fx-tab" for="fx-stats"><span class="fx-tab__gem"></span>Estadísticas</label>
       </nav>
 
       <div class="fx-panels">
@@ -1028,6 +1037,9 @@
                             <span class="sg-profile-techniques-toolbar__eyebrow">Biblioteca</span>
                             <strong id="sg-profile-technique-count">0 técnicas</strong>
                           </div>
+                          <button type="button" id="sg-parse-toggle-ficha" class="sg-profile-filter-toggle" onclick="sgFichaToggleParsedMode()">
+                            Ver valores reales
+                          </button>
                           <button type="button" id="sg-profile-filter-toggle" class="sg-profile-filter-toggle" onclick="sgFichaToggleTechniqueFilters()">
                             Filtro
                           </button>
@@ -1112,6 +1124,43 @@
                     </div>
                     <if $ficha['fisico_de_pj'] then><div class="fx-origin">Origen físico del personaje: {$ficha['fisico_de_pj']}</div></if>
                   </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ── ESTADÍSTICAS ── -->
+        <section class="fx-panel fx-panel--stats" role="tabpanel">
+          <div class="fx-stack">
+            <div class="fx-card">
+              <div class="fx-card__head"><span class="fx-card__title">Misiones jugadas</span></div>
+              <div class="fx-card__body">
+                <div class="fx-data">
+                  <div class="fx-row"><span class="fx-row__k">Total</span><span class="fx-row__v">{$sgStatsJugadasTotal}</span></div>
+                  {$sgStatsJugadasHtml}
+                </div>
+              </div>
+            </div>
+
+            <div class="fx-card">
+              <div class="fx-card__head"><span class="fx-card__title">Misiones narradas</span></div>
+              <div class="fx-card__body">
+                <div class="fx-data">
+                  <div class="fx-row"><span class="fx-row__k">Total</span><span class="fx-row__v">{$sgStatsNarradasTotal}</span></div>
+                  {$sgStatsNarradasHtml}
+                </div>
+              </div>
+            </div>
+
+            <div class="fx-card">
+              <div class="fx-card__head"><span class="fx-card__title">Combate 1v1</span></div>
+              <div class="fx-card__body">
+                <div class="fx-data">
+                  <div class="fx-row"><span class="fx-row__k">Total</span><span class="fx-row__v">{$sgCombate1v1Total}</span></div>
+                  <div class="fx-row"><span class="fx-row__k">Victorias</span><span class="fx-row__v">{$sgCombate1v1Ganador}</span></div>
+                  <div class="fx-row"><span class="fx-row__k">Empates</span><span class="fx-row__v">{$sgCombate1v1Empate}</span></div>
+                  <div class="fx-row"><span class="fx-row__k">Derrotas</span><span class="fx-row__v">{$sgCombate1v1Perdedor}</span></div>
                 </div>
               </div>
             </div>

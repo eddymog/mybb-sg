@@ -1,0 +1,26 @@
+En tecnicas_lista.php, las tecnicas que tienen el campo "efecto", tienen descripciones del tipo: 
+
+[CCKx1] de Resistencia
+[MCCKx1] de Rango extra por cada Punto de Visión sobre si mismo.
+[MCCKx3] de Destreza
+[MCCKx1] de Daño, [MCCKx1] de Rango por Punto de Visión
+[MDESx5] de Rango Extra
+
+Estas descripciones tienen cosas en corchetes, [], que mapean a las estadisticas del usuario, que estan en la tabla de sg_fichas.
+
+Por ejemplo, estos codigos parsean a:
+
+[CCKx<Numero>] = control de chakra
+[MCCKx<Numero>] = modificador de control de chakra
+[DESx<Numero>] = destreza
+[MDESx<Numero>] = modificador de destreza
+[FUEx<Numero>] = fuerza
+[MFUEx<Numero>] = modificador de fuerza
+[INTx<Numero>] = inteligencia
+[MINTx<Numero>] = modificador de inteligencia
+
+Instrucciones:
+
+Necesito que en esta pagina haya un boton de toggle, en el que los usuarios puedan ver el campo de efectos tal cual como sale de la base de datos, pero que tambien al apretar el toggle tengan la opcion de parsear los codigos a las estadisticas que estan en la ficha de los usuarios.
+
+Crea un documento de como implementarias este cambio.

@@ -1,0 +1,576 @@
+================================================================================
+ TOGGLE "VER VALORES REALES" EN tecnicas_lista.php — Especificación de diseño
+================================================================================
+Basado en docs/tecnicas_instrucciones.txt. Este documento describe CÓMO
+implementar el toggle (aún no implementado). Antes de programar, confirmar
+las decisiones marcadas [A CONFIRMAR] en la §9.
+
+
+--------------------------------------------------------------------------------
+0. RESUMEN
+--------------------------------------------------------------------------------
+Las técnicas con campo "efecto" (tabla mybb_sg_sg_tecnicas) contienen códigos
+entre corchetes tipo `[CCKx1]`, `[MCCKx3]`, `[DESx5]` que representan una
+estadística de la ficha multiplicada por un número, ej.:
+
+  "[CCKx1] de Resistencia"                                  -> stat CCK × 1
+  "[MCCKx1] de Rango extra por cada Punto de Visión..."      -> modif. CCK × 1
+  "[MCCKx3] de Destreza"                                     -> modif. CCK × 3
+  "[MDESx5] de Rango Extra"                                  -> modif. DES × 5
+
+Se pide un botón que alterne entre:
+  - RAW (por defecto, como hoy): el texto tal cual sale de la BD, con los
+    corchetes visibles.
+  - PARSEADO: los corchetes sustituidos por el valor numérico calculado con
+    las estadísticas de la ficha del usuario que está viendo la página.
+
+
+--------------------------------------------------------------------------------
+1. HALLAZGO PREVIO (investigado antes de diseñar esto)
+--------------------------------------------------------------------------------
+Se revisó todo el repo (sg_functions.php, inc/plugins/tecnicatag.php, grep
+global) para confirmar que este parser NO existe ya en ninguna forma — es
+100% funcionalidad nueva, no hay riesgo de duplicar lógica.
+
+Sí existe un precedente arquitectónico reutilizable: el tag `[personaje]` /
+`[personaje=ID]` de inc/plugins/tecnicatag.php ya resuelve una ficha y llama a
+`sg_aplicar_pasivas()` / `sg_stats_efectivas()` para mostrar sus estadísticas
+EFECTIVAS (base + pasiva) en un post. El nuevo parser debe seguir el mismo
+principio: NO leer las columnas `mfuerza`/`mdestreza`/`mcchakra`/`minteligencia`
+crudas de la ficha, sino recalcular el modificador vía `sg_stats_efectivas()`,
+que aplica primero las pasivas (columnas `pas_*`, invisibles, solo staff) y
+LUEGO calcula el modificador con `stat_modifier()`:
+
+    function stat_modifier($stat) {           // ya existe, sg_functions.php:201
+        if ($stat >= 100) return 5;
+        if ($stat >= 75)  return 4;
+        if ($stat >= 50)  return 3;
+        if ($stat >= 25)  return 2;
+        return 1;
+    }
+
+Motivo: las columnas `mfuerza` etc. guardadas en `mybb_sg_sg_fichas` pueden
+quedar desactualizadas si el staff cambia una pasiva (`pas_fuerza`, etc.) sin
+que nadie recalcule esas columnas. `sg_stats_efectivas()` siempre da el valor
+correcto vigente. Usar la misma fuente que ya usa `[personaje]` garantiza que
+el número que ve el usuario en tecnicas_lista.php coincide con el que vería en
+un post con `[personaje]`.
+
+
+--------------------------------------------------------------------------------
+2. MAPEO DE CÓDIGOS
+--------------------------------------------------------------------------------
+Formato del código: `[` + (M opcional) + ABREV + OPERADOR + 2º OPERANDO + `]`
+  ABREV sin M   -> estadística BASE efectiva (de sg_stats_efectivas)
+  ABREV con M   -> MODIFICADOR de esa estadística (1-5, de sg_stats_efectivas)
+  OPERADOR      -> x (multiplicar) | + (sumar) | - (restar) | / (dividir)
+  2º OPERANDO   -> un NÚMERO fijo, O (M opcional) + ABREV de OTRA estadística
+                   (ej. [MDES+MINT]: mdestreza + minteligencia)
+
+  CCK  -> cchakra          MCCK -> mcchakra (modificador de cchakra)
+  DES  -> destreza         MDES -> mdestreza (modificador de destreza)
+  FUE  -> fuerza           MFUE -> mfuerza (modificador de fuerza)
+  INT  -> inteligencia     MINT -> minteligencia (modificador de inteligencia)
+
+Ejemplos con número: [CCKx1] (cchakra × 1), [MDES-10] (mdestreza − 10),
+[CCK/10] (cchakra ÷ 10), [INT+10] (inteligencia + 10).
+
+Ejemplos con dos estadísticas: [MDES+MINT] (mdestreza + minteligencia),
+[MCCK+MINT] (mcchakra + minteligencia), [DES-CCK], [MCCK/MDES], [FUExDES].
+
+Valor final = stat_efectiva[columna1] OPERADOR (NÚMERO o stat_efectiva[columna2]).
+División por cero se trata como 0 (no se lanza error ni se rompe el render).
+El código corto que se muestra junto al número refleja el 2º operando: con
+número se muestra solo el código del primero (ej. "16 (CCK)"), con otra
+estadística se muestran ambos códigos y el operador (ej. "12 (MDES+MINT)") —
+porque ahí SÍ hace falta saber qué dos stats se combinaron.
+
+Nota: `sg_stat_keys()` (ya existente) solo cubre las 4 estadísticas
+"generales" con modificador (fuerza/destreza/cchakra/inteligencia); las
+"especiales" (salud/velocidad/tenketsu/sigilo) no tienen modificador y NO
+están en el alcance de esta feature (no aparecen en los ejemplos del pedido).
+
+
+--------------------------------------------------------------------------------
+3. NUEVA FUNCIÓN — sg_functions.php
+--------------------------------------------------------------------------------
+Ubicación: junto a sg_stat_keys() / sg_pasiva() / sg_stats_efectivas() (mismo
+bloque "Estadisticas pasivas").
+
+    // Códigos [CCKx<N>] / [MCCKx<N>] / [MDES-<N>] / [CCK/<N>] / [INT+<N>] /
+    // [MDES+MINT] (dos estadísticas) en el campo "efecto" de una técnica.
+    // $stats_ef = salida de sg_stats_efectivas() (o null si no hay ficha ->
+    // no se reemplaza nada, se devuelve el código tal cual).
+    function sg_parsear_codigos_stats($texto, $stats_ef) {
+        if ($texto === null || $texto === '') { return $texto; }
+
+        $map_base = array('CCK' => 'cchakra', 'DES' => 'destreza', 'FUE' => 'fuerza', 'INT' => 'inteligencia');
+        $map_mod  = array('CCK' => 'mcchakra', 'DES' => 'mdestreza', 'FUE' => 'mfuerza', 'INT' => 'minteligencia');
+        $nombres  = array('CCK' => 'Control de Chakra', 'DES' => 'Destreza', 'FUE' => 'Fuerza', 'INT' => 'Inteligencia');
+        $simbolos = array('x' => '×', '+' => '+', '-' => '−', '/' => '÷');
+
+        // El 2º operando puede ser un número (grupo 4) o OTRA estadística (grupos 5-6).
+        return preg_replace_callback(
+            '#\[(M?)(CCK|DES|FUE|INT)([x+\-/])(?:(-?\d+(?:\.\d+)?)|(M?)(CCK|DES|FUE|INT))\]#i',
+            function ($m) use ($map_base, $map_mod, $nombres, $simbolos, $stats_ef) {
+                $es_mod1 = (strtoupper($m[1]) === 'M');
+                $abrev1  = strtoupper($m[2]);
+                $op      = $m[3];
+                $col1    = $es_mod1 ? $map_mod[$abrev1] : $map_base[$abrev1];
+
+                if ($stats_ef === null || !isset($stats_ef[$col1])) {
+                    return $m[0]; // sin ficha: deja el código tal cual, no rompe nada
+                }
+
+                $base1 = $stats_ef[$col1];
+                $codigo1 = ($es_mod1 ? 'M' : '') . $abrev1;
+                $etiqueta1 = $nombres[$abrev1] . ($es_mod1 ? ' (modificador)' : '');
+                $simbolo = isset($simbolos[$op]) ? $simbolos[$op] : $op;
+
+                $es_stat2 = isset($m[6]) && $m[6] !== '';
+
+                if ($es_stat2) {
+                    $es_mod2 = (strtoupper($m[5]) === 'M');
+                    $abrev2  = strtoupper($m[6]);
+                    $col2    = $es_mod2 ? $map_mod[$abrev2] : $map_base[$abrev2];
+                    if (!isset($stats_ef[$col2])) { return $m[0]; }
+
+                    $base2 = $stats_ef[$col2];
+                    $codigo_corto = $codigo1 . $op . (($es_mod2 ? 'M' : '') . $abrev2);
+                    $etiqueta = $etiqueta1 . ' ' . $simbolo . ' ' . $nombres[$abrev2] . ($es_mod2 ? ' (modificador)' : '');
+                } else {
+                    $base2 = floatval($m[4]);
+                    $codigo_corto = $codigo1; // con número, el código corto NO repite el número
+                    $etiqueta = $etiqueta1 . ' ' . $simbolo . ' ' . $m[4];
+                }
+
+                switch ($op) {
+                    case '+': $valor = $base1 + $base2; break;
+                    case '-': $valor = $base1 - $base2; break;
+                    case '/': $valor = ($base2 != 0) ? ($base1 / $base2) : 0; break;
+                    default:  $valor = $base1 * $base2; break; // 'x'
+                }
+
+                // Enteros sin decimales; no enteros con 1 decimal y coma (ej. 1/2 -> "0,5").
+                $valor_fmt = (floor($valor) == $valor) ? (string) intval($valor) : number_format($valor, 1, ',', '');
+
+                return '<span class="sg-tec-parsed" title="' . htmlspecialchars($etiqueta, ENT_QUOTES) . '">' . $valor_fmt . ' (' . $codigo_corto . ')</span>';
+            },
+            $texto
+        );
+    }
+
+Notas de la implementación:
+- Un solo regex combinado con preg_replace_callback (no el patrón
+  while(preg_match) + preg_replace estático que usa tecnicatag.php — ahí no
+  hace falta porque cada reemplazo es fijo; aquí el valor es dinámico por
+  match, así que el callback es más simple y más seguro).
+- Case-insensitive (`i`) por si algún staff escribe "cckx1" en vez de "CCKx1".
+- Acepta enteros y decimales, y signo negativo en el número (defensivo).
+- Cuatro operadores soportados: x/+/-/÷; división por cero -> 0 en vez de
+  error o de romper el resto del texto.
+- El 2º operando acepta número FIJO o UNA SEGUNDA estadística (con o sin M),
+  ej. [MDES+MINT], [MCCK/MDES] — mismo regex, misma función, sin duplicar
+  lógica: el grupo 4 (número) o los grupos 5-6 (2ª stat) son mutuamente
+  excluyentes en la alternancia `(?:...|...)`.
+- Formato del resultado: enteros se muestran sin decimales; los no enteros se
+  redondean a 1 decimal con COMA (locale es), ej. 1/2 -> "0,5", 8/3 -> "2,7".
+- Código corto mostrado junto al número: con número fijo solo se repite el
+  código del primer operando (ej. "16 (CCK)"); con dos estadísticas se
+  muestran ambas + el operador (ej. "12 (MDES+MINT)"), porque ahí ambas
+  aportan al resultado y omitir una sería confuso.
+- Si `$stats_ef` es null (viewer sin ficha), el código se deja intacto en vez
+  de mostrar un valor engañoso (ej. "0" que no significa "no tienes esa
+  estadística" sino "no se pudo calcular"). Ver §7.
+- Probado con: [CCKx1], [MCCKx3], [MDESx5], [MDES-10], [CCK/10], [INT+10],
+  [MDES+MINT], [MCCK+MINT], [DES-CCK], [MCCK/MDES], [FUExDES], división por
+  cero, y varios códigos mixtos en una misma línea — todos correctos, sin
+  regresión en los casos anteriores.
+
+
+--------------------------------------------------------------------------------
+4. CAMBIOS EN sg/tecnicas_lista.php
+--------------------------------------------------------------------------------
+Hoy el script no sabe quién visita la página. Hay que:
+
+1. Obtener el uid del visitante: $viewer_uid = $mybb->user['uid'];
+2. Buscar su ficha:
+     $viewer_ficha = ($viewer_uid > 0)
+         ? select_one_query_with_id('mybb_sg_sg_fichas', 'fid', $viewer_uid)
+         : null;
+3. Si existe, calcular estadísticas efectivas:
+     $viewer_stats_ef = $viewer_ficha ? sg_stats_efectivas($viewer_ficha) : null;
+   (sg_stats_efectivas() es de solo lectura — no usar sg_aplicar_pasivas()
+   aquí, que muta el array; no necesitamos mutar nada persistente.)
+4. Al construir cada array de técnica (en los 4 while() que llenan
+   $tecs_base / $tecs_rama1 / $tecs_rama2 / $tecs_rama3), añadir un campo
+   nuevo ANTES de meterlo en el array:
+     $tec['efecto_parsed'] = sg_parsear_codigos_stats($tec['efecto'], $viewer_stats_ef);
+   (Se hace en los 4 bucles: el de $tecs_base y los 3 de rama1/rama2/rama3.)
+5. $tecs_base_json / $tecs_rama1_json / etc. ya incluirán "efecto_parsed"
+   automáticamente al hacer json_encode() (no hay que tocar esa parte).
+6. Exponer al template si el viewer tiene ficha, para habilitar/deshabilitar
+   el toggle:
+     eval('$sgViewerTieneFicha = '.($viewer_ficha ? '1' : '0').';');
+
+
+--------------------------------------------------------------------------------
+5. CAMBIOS EN templates/html/sg_tecnicas_show3.html
+--------------------------------------------------------------------------------
+5.1 Botón (junto al de "Expandir todo", mismo .sg-tree-toolbar o uno propio):
+
+    <if $sgViewerTieneFicha then>
+      <button type="button" id="sg-parse-toggle" class="sg-tree-toggle-btn"
+              onclick="sgToggleParsedMode()">Ver valores reales</button>
+    <else>
+      <button type="button" class="sg-tree-toggle-btn" disabled
+              title="Inicia sesión con una ficha para ver tus valores reales">Ver valores reales</button>
+    </if>
+
+5.2 Cada técnica ya se identifica por tecnica.tid (usado hoy para el enlace
+    de staff). Al crear la tarjeta, dar al contenedor del efecto un
+    data-tid, y NO decidir ahí mismo qué texto mostrar — guardar ambas
+    versiones en un mapa global y decidir en el toggle:
+
+    // en sgCreateTechniqueCard(tecnica):
+    sgEffectsByTid[tecnica.tid] = { raw: effectText, parsed: tecnica.efecto_parsed || effectText };
+    ...
+    '<div class="sg-technique__text sg-tec-effect" data-tid="' + tecnica.tid + '">' + effectText + '</div>'
+
+5.3 Toggle SIN re-renderizar el árbol completo (para no perder qué spoilers
+    están abiertos/cerrados — sgRenderTree() reconstruye todo desde cero y
+    resetearía el expand/collapse de cada técnica). Persiste el modo elegido
+    en localStorage (clave "sg_tec_parsed_mode"), pero SIEMPRE arranca la
+    primera carga de la página en RAW si no hay nada guardado todavía:
+
+    var sgEffectsByTid = {};
+    var sgParsedMode = (localStorage.getItem('sg_tec_parsed_mode') === '1');
+
+    function sgAplicarModoEfectos() {
+      var els = document.querySelectorAll('.sg-tec-effect');
+      for (var i = 0; i < els.length; i++) {
+        var tid = els[i].getAttribute('data-tid');
+        var entry = sgEffectsByTid[tid];
+        if (!entry) { continue; }
+        els[i].innerHTML = sgParsedMode ? entry.parsed : entry.raw;
+      }
+      var btn = document.getElementById('sg-parse-toggle');
+      if (btn) { btn.textContent = sgParsedMode ? 'Ver códigos originales' : 'Ver valores reales'; }
+    }
+
+    function sgToggleParsedMode() {
+      sgParsedMode = !sgParsedMode;
+      try { localStorage.setItem('sg_tec_parsed_mode', sgParsedMode ? '1' : '0'); } catch (e) {}
+      sgAplicarModoEfectos();
+    }
+
+    // Al terminar sgRenderTree() (window 'load'), llamar sgAplicarModoEfectos()
+    // una vez para que, si el usuario ya tenía "parseado" guardado de una
+    // visita anterior, el árbol recién construido respete esa preferencia
+    // desde el primer render (en vez de arrancar siempre en RAW visualmente
+    // y tener que togglear dos veces).
+
+5.4 CSS para el valor parseado (para que se note que es "calculado", no texto
+    plano):
+
+    .sg-tec-parsed {
+      color: var(--sg-page-oxide); font-weight: 700; border-bottom: 1px dotted var(--sg-page-oxide);
+      cursor: help;
+    }
+
+    (el atributo title="" del span ya generado en PHP hace de tooltip nativo
+    del navegador con la fórmula, ej. "Control de Chakra × 1")
+
+
+--------------------------------------------------------------------------------
+6. FLUJO COMPLETO (recapitulando)
+--------------------------------------------------------------------------------
+1. Visitante entra a tecnicas_lista.php?arbol=X.
+2. PHP calcula sus stats efectivas (si tiene ficha) y, por cada técnica,
+   pre-calcula efecto_parsed además del efecto crudo. Ambos viajan en el JSON
+   ya existente (tecs_base_json, etc.) — sin request adicional.
+3. El JS renderiza el árbol como hoy, mostrando efecto (crudo) por defecto, y
+   además rellena sgEffectsByTid[tid] = {raw, parsed} por cada técnica.
+4. Al pulsar el botón, sgToggleParsedMode() recorre solo los nodos
+   .sg-tec-effect visibles en el DOM y cambia su innerHTML — sin tocar el
+   estado de expandido/colapsado de nada.
+
+
+--------------------------------------------------------------------------------
+7. CASOS BORDE
+--------------------------------------------------------------------------------
+- Visitante sin sesión o sin ficha: el botón se deshabilita con tooltip
+  explicativo (§9, opción por defecto). efecto_parsed = efecto (sin cambios,
+  ya que sg_parsear_codigos_stats devuelve el texto intacto si $stats_ef es
+  null), así que aunque el toggle se forzara iría a un "parseado" idéntico al
+  crudo — no rompe nada, solo no aporta valor sin ficha.
+- Técnica sin campo "efecto" (ya hoy cae a 'No tiene efecto adicional
+  especificado.'): no contiene corchetes, el regex no encuentra nada, se
+  devuelve igual.
+- Varios códigos en la misma línea (ej. "[MCCKx1] de Daño, [MCCKx1] de Rango
+  por Punto de Visión"): preg_replace_callback ya resuelve múltiples matches
+  no solapados en una sola pasada, sin bucles adicionales.
+- Mayúsc/minúsc mixta en el código: regex con flag /i, cubierto.
+- tid ausente/duplicado: no debería ocurrir (tid es PK de
+  mybb_sg_sg_tecnicas), pero si `tecnica.tid` viniera vacío el data-tid
+  quedaría "" y esa técnica simplemente no se actualizaría al togglear
+  (degradación segura, no rompe el resto).
+
+
+--------------------------------------------------------------------------------
+8. SEGURIDAD / CALIDAD
+--------------------------------------------------------------------------------
+- El campo "efecto" ya se inyecta hoy sin escapar en innerHTML (riesgo
+  preexistente, contenido solo editable por staff vía panel de técnicas — no
+  se agrava ni se corrige aquí, está fuera de alcance de este pedido).
+- El HTML que añade el parser (<span class="sg-tec-parsed" title="...">) se
+  construye enteramente en PHP con valores propios (nombres fijos del mapa +
+  número), y el único dato semi-externo que entra en un atributo
+  (la etiqueta) se pasa por htmlspecialchars(...,ENT_QUOTES) — no hay
+  inyección nueva introducida por esta función.
+
+
+--------------------------------------------------------------------------------
+9. DECISIONES — CONFIRMADAS
+--------------------------------------------------------------------------------
+(1) Estadísticas: base + pasivas -> sg_stats_efectivas().                [OK]
+(2) Siempre la ficha del usuario que ve la página (nunca otro personaje). [OK]
+(3) Sin ficha -> botón deshabilitado (§5.1).                             [OK]
+(4) El valor incluye el nombre corto de la estadística junto al número,
+    ej. "16 (CCK)" / "9 (MCCK)" (§3, actualizado).                       [OK]
+(5) Arranca en RAW la primera vez; el modo elegido se guarda en
+    localStorage y se respeta en visitas siguientes (§5.3, actualizado). [OK]
+
+
+--------------------------------------------------------------------------------
+10. ARCHIVOS A TOCAR
+--------------------------------------------------------------------------------
+  EDITA  sg/functions/sg_functions.php        -> sg_parsear_codigos_stats()
+  EDITA  sg/tecnicas_lista.php                -> obtener ficha del viewer,
+                                                  stats efectivas, efecto_parsed
+                                                  por técnica, flag de ficha
+  EDITA  templates/html/sg_tecnicas_show3.html -> botón, CSS .sg-tec-parsed,
+                                                  mapa sgEffectsByTid, JS toggle
+  SIN ALTER de BD: no hace falta ninguna columna ni tabla nueva.
+
+
+================================================================================
+ EXTENSIÓN — mismo parser en ficha.php y en [tecnica=TID] (tecnicatag.php)
+================================================================================
+Pedido: aplicar sg_parsear_codigos_stats() (ya implementado, §3) también:
+  (A) en la pestaña "Técnicas" de ficha.php, y
+  (B) en el tag [tecnica=TID] que se usa dentro de los posts del foro
+      (inc/plugins/tecnicatag.php).
+
+No requiere ninguna función nueva — sg_parsear_codigos_stats() ya sirve para
+ambos casos. Lo que cambia en cada lugar es SOLO "de quién son las
+estadísticas" y "si hay o no un toggle". Investigado leyendo el código real
+de los 3 archivos involucrados antes de diseñar esto (sin modificar nada).
+
+
+--------------------------------------------------------------------------------
+11.1 DIFERENCIA CLAVE ENTRE LOS 3 LUGARES: "¿DE QUIÉN SON LAS STATS?"
+--------------------------------------------------------------------------------
+  tecnicas_lista.php (ya implementado) -> ficha del VISITANTE de la página.
+  ficha.php (nuevo)                    -> ficha del PERSONAJE QUE SE VE
+                                           (no del visitante — las técnicas
+                                           listadas ahí son SUYAS, su efecto
+                                           debe reflejar SU poder).
+  [tecnica=TID] en un post (nuevo)     -> ficha del AUTOR DEL POST donde
+                                           aparece el tag (igual que ya hace
+                                           el tag [personaje] hoy — NO la
+                                           ficha de quien está leyendo el post).
+
+Ninguno de los 3 casos usa la misma fuente de "stats", y es intencional: cada
+uno responde "el efecto de la técnica, para el personaje al que corresponde
+en ese contexto".
+
+
+--------------------------------------------------------------------------------
+11.2 CASO A — ficha.php (pestaña "Técnicas")
+--------------------------------------------------------------------------------
+Hallazgos (sg/ficha.php:652-674):
+
+    $query_tec_aprendidas = $db->query("
+        SELECT * FROM `mybb_sg_sg_tecnicas`
+        INNER JOIN `mybb_sg_sg_tec_aprendidas`
+        ON `mybb_sg_sg_tecnicas`.`tid`=`mybb_sg_sg_tec_aprendidas`.`tid`
+        WHERE `mybb_sg_sg_tec_aprendidas`.`uid`='$uid'
+    ");
+    $tec_aprendidas = array();
+    while ($tec_aprendida = $db->fetch_array($query_tec_aprendidas)) {
+        $tec_aprendida['descripcion'] = nl2br($tec_aprendida['descripcion']);
+        $key = trim($tec_aprendida['arbol']);
+        if ($key === '') { $key = 'Sin árbol'; }
+        if (!$tec_aprendidas[$key]) { $tec_aprendidas[$key] = array(); }
+        array_push($tec_aprendidas[$key], $tec_aprendida);
+    }
+    $tec_aprendidas_json = json_encode($tec_aprendidas);
+    eval('$tec_aprendidas = "'.addslashes($tec_aprendidas_json).'";');
+    ...
+    eval("\$ficha_script = \"".$templates->get("sg_ficha_script")."\";");
+
+Trae `efecto` y `tid` (SELECT *), agrupado por árbol, embebido como JSON en
+`var sgFichaTecAprendidas = {$tec_aprendidas};` (templates/html/sg_ficha_script.html:2).
+El JS (`sgFichaCreateTechniqueCard`, sg_ficha_script.html:40-90) inyecta
+`tecnica.efecto` crudo en innerHTML — mismo patrón que tenía
+tecnicas_lista.php antes de esta feature. No existe hoy ningún toggle
+raw/parsed en esta vista (solo el spoiler individual abrir/cerrar por técnica).
+
+DATO IMPORTANTE: antes de llegar a este bloque, sg/ficha.php ya ejecuta (línea
+~460, dentro del while que procesa la ficha):
+
+    sg_aplicar_pasivas($f);      // muta $f in-place: fuerza..sigilo, mfuerza..minteligencia
+    eval('$ficha = $f;');
+
+Es decir, cuando se llega al bloque de técnicas (línea 652+), **`$ficha` YA
+ES el equivalente de sg_stats_efectivas()** — no hace falta volver a
+calcularlo. Se puede pasar `$ficha` directo como segundo argumento.
+
+CAMBIOS:
+  1. sg/ficha.php, dentro del while (~línea 662), antes de array_push:
+       $tec_aprendida['efecto_parsed'] = sg_parsear_codigos_stats($tec_aprendida['efecto'], $ficha);
+  2. templates/html/sg_ficha_script.html: portar el mismo patrón de
+     tecnicas_show3.html (con prefijo "sgFicha" para no colisionar
+     namespaces si ambos scripts llegaran a convivir en la misma página):
+       var sgFichaEffectsByTid = {};
+       var sgFichaParsedMode = false;
+       try { sgFichaParsedMode = (localStorage.getItem('sg_tec_parsed_mode') === '1'); } catch (e) {}
+     (mismo nombre de clave localStorage que tecnicas_lista.php -> ver
+     decisión (2) en §11.4: la preferencia se comparte en todo el sitio.)
+     En sgFichaCreateTechniqueCard: guardar
+       sgFichaEffectsByTid[tecnica.tid] = { raw: effectText, parsed: tecnica.efecto_parsed || effectText };
+     y usar `class="... sg-tec-effect" data-tid="..."` en el div de efecto,
+     igual que en tecnicas_show3.html.
+     Añadir sgFichaAplicarModoEfectos()/sgFichaToggleParsedMode() (idénticas
+     a las de tecnicas_show3.html salvo el prefijo) y llamarlas tras
+     renderizar las técnicas.
+  3. Botón: en templates/html/sg_ficha_script.html ya existe una toolbar de
+     técnicas (sg-profile-techniques-toolbar, con el botón "Filtro" ->
+     sg-profile-filter-toggle). Añadir ahí un botón más, "Ver valores
+     reales" -> onclick="sgFichaToggleParsedMode()". A diferencia de
+     tecnicas_lista.php, aquí el botón SIEMPRE va habilitado: la página es
+     la ficha de un personaje que por definición existe y tiene stats.
+
+
+--------------------------------------------------------------------------------
+11.3 CASO B — [tecnica=TID] en inc/plugins/tecnicatag.php
+--------------------------------------------------------------------------------
+Hallazgos (líneas 656-780, dentro de `tecnicatag_run`, hook `parse_message_end`):
+
+    $query_tecnica = $db->query("SELECT * FROM mybb_sg_sg_tecnicas WHERE tid='".$tec_tid."'");
+    ...
+    $effect_text = $tecnica['efecto'] ? nl2br($tecnica['efecto']) : 'No tiene efecto adicional especificado.';
+    ...
+    // luego se inserta crudo en un heredoc HTML tipo spoiler:
+    // <div class="sg-technique__text{$effect_muted}">{$effect_text}</div>
+
+`efecto` sí viene incluido (SELECT *) y hoy solo recibe `nl2br`, sin escapar
+ni parsear. El bloque YA usa `$post['uid']` (línea 677, para el check de "¿el
+autor tiene la técnica aprendida?"), o sea que el dato para resolver la ficha
+del autor ya está a mano, solo falta usarlo para cargar stats.
+
+El tag `[personaje]` (sin argumento) YA resuelve esto para el autor del post,
+con esta lógica exacta (líneas 207-233), que hay que REPLICAR para
+`[tecnica]` (no reinventar):
+
+    $uid = $post['uid'];
+    $tid = $post['tid'];
+    // 1) Prioridad: snapshot congelado del personaje en ESE tema (por si
+    //    cambió de stats después de haber posteado ahí)
+    $query_personaje = $db->query("SELECT * FROM mybb_sg_sg_thread_personaje WHERE tid='$tid' AND uid='$uid'");
+    while ($q = $db->fetch_array($query_personaje)) { $thread_ficha = $q; }
+    if (!$thread_ficha) {
+        // 2) Si no hay snapshot: ficha viva actual
+        $query_ficha = $db->query("SELECT * FROM mybb_sg_sg_fichas WHERE fid='$uid'");
+        while ($q = $db->fetch_array($query_ficha)) { $ficha = $q; }
+        $eff = sg_stats_efectivas($ficha);
+        ...
+    }
+    // (la rama del snapshot usa sg_aplicar_pasivas($thread_ficha) sobre el snapshot)
+
+CAMBIOS (dentro del bloque de [tecnica=TID], antes de construir $effect_text):
+  1. Resolver $stats_ef del autor del post reutilizando ESTA MISMA lógica
+     (snapshot de thread_personaje si existe, si no ficha viva + sg_stats_efectivas()).
+     [Mejora de mantenibilidad opcional: extraer esto a una función
+     sg_resolver_stats_autor_post($post) en sg_functions.php, ya que
+     [personaje] y [tecnica] necesitarían el MISMO bloque de ~25 líneas —
+     ver decisión (6) en §11.4.]
+  2. $effect_text = $tecnica['efecto']
+       ? nl2br(sg_parsear_codigos_stats($tecnica['efecto'], $stats_ef))
+       : 'No tiene efecto adicional especificado.';
+     (el orden nl2br(parsear(...)) es seguro: los códigos [CCKx1] no
+     contienen saltos de línea, así que nl2br no puede "cortar" un <span>
+     ya generado por el parser.)
+
+SIN TOGGLE aquí: un post del foro es contenido que muchos usuarios distintos
+leen sin ninguna preferencia individual con sentido — a diferencia de
+tecnicas_lista.php/ficha.php (páginas interactivas de una sola persona a la
+vez), aquí lo natural es mostrar SIEMPRE la versión parseada directamente,
+sin corchetes crudos visibles y sin botón. Quien lee el post quiere saber el
+efecto real del personaje que lo escribió, no depurar el código fuente.
+(Confirmar en §11.4 (5) — si se prefiriera un toggle por instancia del tag,
+es técnicamente posible pero bastante más complejo para el beneficio que da.)
+
+Nota: `parse_message_end` corre en cada visualización del post (no se
+hornea un valor fijo al momento de postear), así que si el autor sube de
+nivel después, el valor mostrado se actualiza solo — mismo comportamiento
+que ya tiene hoy [personaje].
+
+
+--------------------------------------------------------------------------------
+11.4 DECISIONES — CONFIRMADAS E IMPLEMENTADAS
+--------------------------------------------------------------------------------
+(1) ficha.php usa $ficha directamente (ya trae pasivas aplicadas).      [OK]
+(2) El botón de ficha.php comparte la clave de localStorage
+    "sg_tec_parsed_mode" con tecnicas_lista.php (preferencia única
+    para todo el sitio).                                                [OK]
+(3) [tecnica=TID] usa la ficha del AUTOR DEL POST (patrón de
+    [personaje]), no la del visitante que lee.                          [OK]
+(4) [tecnica=TID] replica la prioridad "snapshot de
+    mybb_sg_sg_thread_personaje si existe, si no ficha viva" — igual
+    que ya hace [personaje].                                            [OK]
+(5) [tecnica=TID] muestra SIEMPRE parseado, sin toggle (contenido
+    estático leído por muchos usuarios distintos).                      [OK]
+(6) Se extrajo sg_resolver_stats_autor_post($post) en sg_functions.php,
+    de SOLO LECTURA (a diferencia de [personaje], no crea el snapshot
+    si falta — esa sigue siendo su responsabilidad exclusiva). Se usa
+    en [tecnica=TID]. NO se refactorizó [personaje] para usarla: su
+    lógica actual tiene un efecto secundario (INSERT del snapshot la
+    primera vez) más complejo que lo que necesita este helper, y
+    tocar código de producción que ya funciona por una limpieza de
+    DRY no justificaba el riesgo — se dejó intacto.
+
+Nota sobre disponibilidad de sg_functions.php en tecnicatag.php: se
+confirmó que NO es un problema — el archivo YA usa hoy
+sg_aplicar_pasivas()/sg_pasiva()/sg_stats_efectivas() (todas definidas
+en sg_functions.php) dentro del tag [personaje], que funciona en
+producción. sg_functions.php se carga en global.php:509, y el hook
+parse_message_end (el que dispara tecnicatag.php) solo se dispara
+después, al parsear un post en showthread.php/forumdisplay.php — mucho
+después de que global.php terminó de cargar. sg_parsear_codigos_stats()
+y sg_resolver_stats_autor_post() están disponibles exactamente igual.
+
+
+--------------------------------------------------------------------------------
+11.5 ARCHIVOS TOCADOS (extensión) — IMPLEMENTADO
+--------------------------------------------------------------------------------
+  EDITADO  sg/functions/sg_functions.php     -> sg_resolver_stats_autor_post($post)
+  EDITADO  sg/ficha.php                      -> efecto_parsed en el while
+                                                de tec_aprendidas (~línea 662),
+                                                usando $ficha directamente
+  EDITADO  templates/html/sg_ficha_script.html -> sgFichaEffectsByTid,
+                                                sgFichaParsedMode (localStorage
+                                                compartido), sgFichaAplicarModoEfectos(),
+                                                sgFichaToggleParsedMode()
+  EDITADO  templates/html/sg_ficha.html      -> botón "Ver valores reales" en
+                                                la toolbar de técnicas
+  EDITADO  inc/plugins/tecnicatag.php        -> [tecnica=TID] parsea siempre
+                                                con las stats del autor del post
+  SIN ALTER de BD.
+
+Probado offline (mock de $db): sin snapshot -> ficha viva; con snapshot
+congelado -> valores del snapshot (incluye recálculo de modificador por
+tier); uid sin ficha -> null, el código se deja intacto. Los 3 casos dieron
+el resultado esperado.
+================================================================================

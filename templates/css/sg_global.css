@@ -2285,3 +2285,17 @@ span.toggle-container {
     background: var(--bg3);
     color: var(--plum3);
 }
+
+
+/* ----------------------------------------------------------
+   28. TÉCNICAS — VALOR PARSEADO ([CCKx1]/[MDES-10]/etc.)
+   Global a propósito: lo usan tecnicas_lista.php, ficha.php y los
+   posts del foro (tag [tecnica=TID] en inc/plugins/tecnicatag.php).
+   ---------------------------------------------------------- */
+
+.sg-tec-parsed {
+    color: var(--oxide);
+    font-weight: 700;
+    border-bottom: 1px dotted var(--oxide);
+    cursor: help;
+}

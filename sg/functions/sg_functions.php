@@ -249,6 +249,112 @@ function sg_aplicar_pasivas(&$row) {
     $row['_pasivas_aplicadas'] = 1;
 }
 
+// Códigos [CCKx<N>] / [MCCKx<N>] / [DESx<N>] / [FUEx<N>] / [INTx<N>] en el
+// campo "efecto" de una técnica (tecnicas_lista.php). $stats_ef = salida de
+// sg_stats_efectivas() (o null si el viewer no tiene ficha -> se deja el
+// código intacto en vez de un valor engañoso).
+function sg_parsear_codigos_stats($texto, $stats_ef) {
+    if ($texto === null || $texto === '') { return $texto; }
+
+    $map_base = array('CCK' => 'cchakra', 'DES' => 'destreza', 'FUE' => 'fuerza', 'INT' => 'inteligencia');
+    $map_mod  = array('CCK' => 'mcchakra', 'DES' => 'mdestreza', 'FUE' => 'mfuerza', 'INT' => 'minteligencia');
+    $nombres  = array('CCK' => 'Control de Chakra', 'DES' => 'Destreza', 'FUE' => 'Fuerza', 'INT' => 'Inteligencia');
+    $simbolos = array('x' => '×', '+' => '+', '-' => '−', '/' => '÷');
+
+    // El 2º operando puede ser un número (grupo 4) o OTRA estadística
+    // (grupos 5-6, ej. [MDES+MINT]).
+    return preg_replace_callback(
+        '#\[(M?)(CCK|DES|FUE|INT)([x+\-/])(?:(-?\d+(?:\.\d+)?)|(M?)(CCK|DES|FUE|INT))\]#i',
+        function ($m) use ($map_base, $map_mod, $nombres, $simbolos, $stats_ef) {
+            $es_mod1 = (strtoupper($m[1]) === 'M');
+            $abrev1  = strtoupper($m[2]);
+            $op      = $m[3];
+            $col1    = $es_mod1 ? $map_mod[$abrev1] : $map_base[$abrev1];
+
+            if ($stats_ef === null || !isset($stats_ef[$col1])) {
+                return $m[0]; // sin ficha: deja el código tal cual
+            }
+
+            $base1 = $stats_ef[$col1];
+            $codigo1 = ($es_mod1 ? 'M' : '') . $abrev1;
+            $etiqueta1 = $nombres[$abrev1] . ($es_mod1 ? ' (modificador)' : '');
+            $simbolo = isset($simbolos[$op]) ? $simbolos[$op] : $op;
+
+            $es_stat2 = isset($m[6]) && $m[6] !== '';
+
+            if ($es_stat2) {
+                $es_mod2 = (strtoupper($m[5]) === 'M');
+                $abrev2  = strtoupper($m[6]);
+                $col2    = $es_mod2 ? $map_mod[$abrev2] : $map_base[$abrev2];
+
+                if (!isset($stats_ef[$col2])) {
+                    return $m[0];
+                }
+
+                $base2 = $stats_ef[$col2];
+                $codigo_corto = $codigo1 . $op . (($es_mod2 ? 'M' : '') . $abrev2);
+                $etiqueta = $etiqueta1 . ' ' . $simbolo . ' ' . $nombres[$abrev2] . ($es_mod2 ? ' (modificador)' : '');
+            } else {
+                $base2 = floatval($m[4]);
+                $codigo_corto = $codigo1;
+                $etiqueta = $etiqueta1 . ' ' . $simbolo . ' ' . $m[4];
+            }
+
+            switch ($op) {
+                case '+': $valor = $base1 + $base2; break;
+                case '-': $valor = $base1 - $base2; break;
+                case '/': $valor = ($base2 != 0) ? ($base1 / $base2) : 0; break;
+                default:  $valor = $base1 * $base2; break; // 'x'
+            }
+
+            // Enteros sin decimales; no enteros con 1 decimal y coma (ej. 1/2 -> "0,5").
+            $valor_fmt = (floor($valor) == $valor) ? (string) intval($valor) : number_format($valor, 1, ',', '');
+
+            return '<span class="sg-tec-parsed" title="' . htmlspecialchars($etiqueta, ENT_QUOTES) . '">' . $valor_fmt . ' (' . $codigo_corto . ')</span>';
+        },
+        $texto
+    );
+}
+
+// Resuelve las estadísticas EFECTIVAS (base + pasivas) del AUTOR de un post,
+// para tags/parsers que necesitan las stats de quien ESCRIBIÓ el post (no del
+// visitante que lo lee). Prioriza el snapshot congelado del personaje en ese
+// tema (mybb_sg_sg_thread_personaje) si existe -- mismo criterio que ya usa
+// el tag [personaje] en inc/plugins/tecnicatag.php -- y si no, cae a la
+// ficha viva actual (mybb_sg_sg_fichas).
+//
+// A propósito, es de SOLO LECTURA: a diferencia de [personaje], NO crea un
+// snapshot si no existe (esa responsabilidad de "congelar" el personaje al
+// primer post en el hilo sigue siendo exclusiva del tag [personaje]; este
+// helper solo lee lo que ya haya, para no duplicar ese efecto secundario en
+// cada lugar que necesite consultar stats).
+//
+// $post: array con al menos 'uid' y 'tid' (ej. la variable global $post de
+// MyBB dentro de un hook de parseo de mensajes). Devuelve el array de stats
+// efectivas, o null si no se pudo resolver ninguna ficha.
+function sg_resolver_stats_autor_post($post) {
+    global $db;
+    $uid = isset($post['uid']) ? intval($post['uid']) : 0;
+    $tid = isset($post['tid']) ? intval($post['tid']) : 0;
+    if ($uid <= 0) { return null; }
+
+    $thread_ficha = null;
+    if ($tid > 0) {
+        $q = $db->query("SELECT * FROM mybb_sg_sg_thread_personaje WHERE tid='$tid' AND uid='$uid'");
+        while ($r = $db->fetch_array($q)) { $thread_ficha = $r; }
+    }
+
+    if ($thread_ficha) {
+        sg_aplicar_pasivas($thread_ficha); // idempotente, mismo patrón que [personaje]
+        return $thread_ficha;
+    }
+
+    $ficha = select_one_query_with_id('mybb_sg_sg_fichas', 'fid', $uid);
+    if (!$ficha) { return null; }
+
+    return sg_stats_efectivas($ficha);
+}
+
 // function select_queries_with_id($table_name, $field, $value) {
 //     global $db;
 
@@ -1463,4 +1569,406 @@ function sg_dojo_aplicar_accion($db, $uid, $action, $params) {
 
     $db->query("SELECT RELEASE_LOCK('$lock_name')");
     return $result;
+}
+
+// ============================================================================
+// Recompensas de misión (sg/admin/recompensas_mision.php)
+// Fuente de verdad ÚNICA de las tablas T1..T6 — ver docs/recompensas_instrucciones.txt.
+// Se serializa a JSON para la vista previa en el cliente, y el propio servidor
+// la usa para RECALCULAR los montos al confirmar (nunca confía en el POST).
+// ============================================================================
+
+// 'combate' no tiene rango (la recompensa depende del nivel de cada
+// combatiente, no del rango de una misión) — rangos vacío a propósito; el
+// front y sg/admin/recompensas_mision.php ocultan ese selector para este tipo.
+function sg_mision_tipos() {
+    return array(
+        'autonarrada' => array('label' => 'Misión Autonarrada', 'rangos' => array('E', 'D', 'C')),
+        'normal'      => array('label' => 'Misión Normal',      'rangos' => array('E', 'D', 'C', 'B', 'A', 'A+', 'S')),
+        'guerra'      => array('label' => 'Misión de Guerra',   'rangos' => array('B', 'A', 'A+', 'S')),
+        'trama'       => array('label' => 'Trama Oficial',      'rangos' => array('E', 'D', 'C', 'B', 'A', 'A+', 'S')),
+        'evento'      => array('label' => 'Evento',             'rangos' => array('E', 'D', 'C', 'B', 'A', 'A+', 'S')),
+        'side'        => array('label' => 'Side Quest',         'rangos' => array('E', 'D', 'C', 'B', 'A', 'A+', 'S')),
+        'combate'     => array('label' => 'Combate',            'rangos' => array()),
+    );
+}
+
+function sg_mision_pergaminos() {
+    return array('E' => 'PERG001', 'D' => 'PERG002', 'C' => 'PERG003', 'B' => 'PERG004', 'A' => 'PERG005', 'A+' => 'PERG006', 'S' => 'PERG007');
+}
+
+function sg_mision_pergamino_objeto($rango) {
+    $map = sg_mision_pergaminos();
+    return isset($map[$rango]) ? $map[$rango] : null;
+}
+
+function sg_mision_tablas() {
+    return array(
+        // T1 — Participante (cualquier tipo). Nunca da pergamino.
+        'T1' => array(
+            'E'  => array('ryos' => 250,  'tobi' => 2,  'exp' => 50,  'posts_min' => 3),
+            'D'  => array('ryos' => 500,  'tobi' => 5,  'exp' => 70,  'posts_min' => 4),
+            'C'  => array('ryos' => 1000, 'tobi' => 10, 'exp' => 90,  'posts_min' => 5),
+            'B'  => array('ryos' => 2000, 'tobi' => 20, 'exp' => 110, 'posts_min' => 6),
+            'A'  => array('ryos' => 3000, 'tobi' => 30, 'exp' => 130, 'posts_min' => 8),
+            'A+' => array('ryos' => 4000, 'tobi' => 45, 'exp' => 150, 'posts_min' => 10),
+            'S'  => array('ryos' => 5000, 'tobi' => 60, 'exp' => 200, 'posts_min' => 12),
+        ),
+        // T2 — Narrador no oficial (solo Misión Normal). Sin tobis. Pergamino recortado.
+        'T2' => array(
+            'E'  => array('ryos' => 250,  'tobi' => 0, 'exp' => 35,  'perg_rango' => 'E'),
+            'D'  => array('ryos' => 500,  'tobi' => 0, 'exp' => 50,  'perg_rango' => 'E'),
+            'C'  => array('ryos' => 1000, 'tobi' => 0, 'exp' => 65,  'perg_rango' => 'D'),
+            'B'  => array('ryos' => 2000, 'tobi' => 0, 'exp' => 80,  'perg_rango' => 'D'),
+            'A'  => array('ryos' => 3000, 'tobi' => 0, 'exp' => 90,  'perg_rango' => 'C'),
+            'A+' => array('ryos' => 4000, 'tobi' => 0, 'exp' => 105, 'perg_rango' => 'C'),
+            'S'  => array('ryos' => 5000, 'tobi' => 0, 'exp' => 140, 'perg_rango' => 'B'),
+        ),
+        // T3 — Narrador oficial de Misión Normal. Sin tobis. Pergamino del mismo rango.
+        'T3' => array(
+            'E'  => array('ryos' => 500,  'tobi' => 0, 'exp' => 35,  'perg_rango' => 'E'),
+            'D'  => array('ryos' => 750,  'tobi' => 0, 'exp' => 50,  'perg_rango' => 'D'),
+            'C'  => array('ryos' => 1500, 'tobi' => 0, 'exp' => 65,  'perg_rango' => 'C'),
+            'B'  => array('ryos' => 2500, 'tobi' => 0, 'exp' => 80,  'perg_rango' => 'B'),
+            'A'  => array('ryos' => 3500, 'tobi' => 0, 'exp' => 90,  'perg_rango' => 'A'),
+            'A+' => array('ryos' => 4500, 'tobi' => 0, 'exp' => 105, 'perg_rango' => 'A+'),
+            'S'  => array('ryos' => 5500, 'tobi' => 0, 'exp' => 140, 'perg_rango' => 'S'),
+        ),
+        // T4 — Narrador de Misión de Guerra (oficial o no; solo rango B+). Pergamino del mismo rango.
+        'T4' => array(
+            'B'  => array('ryos' => 3000, 'tobi' => 20, 'exp' => 100, 'perg_rango' => 'B'),
+            'A'  => array('ryos' => 4000, 'tobi' => 30, 'exp' => 120, 'perg_rango' => 'A'),
+            'A+' => array('ryos' => 5000, 'tobi' => 50, 'exp' => 130, 'perg_rango' => 'A+'),
+            'S'  => array('ryos' => 6000, 'tobi' => 80, 'exp' => 160, 'perg_rango' => 'S'),
+        ),
+        // T6 — Autonarrada (solo E/D/C, un único recipiente). Sin pergamino.
+        'T6' => array(
+            'E' => array('ryos' => 250,  'tobi' => 2,  'exp' => 50),
+            'D' => array('ryos' => 500,  'tobi' => 5,  'exp' => 70),
+            'C' => array('ryos' => 1000, 'tobi' => 10, 'exp' => 90),
+        ),
+        // T5 — Narrador de Trama Oficial / Evento / Side Quest (oficial o no).
+        // Recompensa PLANA: no depende del rango de la misión. Sin pergamino.
+        'T5' => array('ryos' => 2500, 'tobi' => 20, 'exp' => 100),
+    );
+}
+
+/**
+ * Resuelve la recompensa base (sin aplicar %) para un rol dentro de un tipo/rango
+ * de misión. $rol: 'participante' | 'narrador' | 'autor'. $oficial solo importa
+ * cuando $tipo === 'normal' (T2 vs T3); en Guerra el narrador siempre usa T4 y en
+ * Trama/Evento/Side siempre usa la recompensa plana T5 (no depende del rango),
+ * sea oficial o no.
+ * Devuelve array('ryos','tobi','exp','pergamino') o false si la combinación no es válida.
+ */
+function sg_recompensa_mision($rol, $tipo, $rango, $oficial = false) {
+    $tablas = sg_mision_tablas();
+    $tipos  = sg_mision_tipos();
+    if (!isset($tipos[$tipo]) || !in_array($rango, $tipos[$tipo]['rangos'], true)) {
+        return false;
+    }
+
+    if ($rol === 'participante') {
+        if (!isset($tablas['T1'][$rango])) { return false; }
+        $t = $tablas['T1'][$rango];
+        return array('ryos' => $t['ryos'], 'tobi' => $t['tobi'], 'exp' => $t['exp'], 'pergamino' => null);
+    }
+
+    if ($rol === 'autor') {
+        if ($tipo !== 'autonarrada' || !isset($tablas['T6'][$rango])) { return false; }
+        $t = $tablas['T6'][$rango];
+        return array('ryos' => $t['ryos'], 'tobi' => $t['tobi'], 'exp' => $t['exp'], 'pergamino' => null);
+    }
+
+    if ($rol === 'narrador') {
+        if ($tipo === 'autonarrada') { return false; }
+
+        if ($tipo === 'guerra') {
+            if (!isset($tablas['T4'][$rango])) { return false; }
+            $t = $tablas['T4'][$rango];
+        } else if ($tipo === 'normal') {
+            $tabla = $oficial ? 'T3' : 'T2';
+            if (!isset($tablas[$tabla][$rango])) { return false; }
+            $t = $tablas[$tabla][$rango];
+        } else { // trama, evento, side: recompensa plana T5, oficial o no
+            $t = $tablas['T5'];
+        }
+
+        $pergamino = isset($t['perg_rango']) ? sg_mision_pergamino_objeto($t['perg_rango']) : null;
+        return array('ryos' => $t['ryos'], 'tobi' => $t['tobi'], 'exp' => $t['exp'], 'pergamino' => $pergamino);
+    }
+
+    return false;
+}
+
+// ============================================================================
+// Recompensas de COMBATE (1 vs 1). Modelo distinto al de misiones: no hay
+// rango, rol, % ni pergamino — solo el resultado (ganador/perdedor/empate) y
+// un bonus si se derrota a alguien de nivel más alto. Los combates deben ser
+// completos (nunca parciales), por eso no hay escalado por %.
+// ============================================================================
+
+/**
+ * $resultado: 'ganador' | 'perdedor' | 'empate'. $nivel_propio/$nivel_oponente:
+ * nivel de ficha (mybb_sg_sg_fichas.nivel) de cada combatiente. El bonus de
+ * nivel SOLO aplica al ganador, y solo si el oponente derrotado tenía más
+ * nivel (la diferencia nunca resta puntos).
+ * Devuelve array('exp','tobi') o false si el resultado no es válido.
+ */
+function sg_recompensa_combate($resultado, $nivel_propio, $nivel_oponente) {
+    $dif = max(0, intval($nivel_oponente) - intval($nivel_propio));
+
+    if ($resultado === 'empate') {
+        return array('exp' => 10, 'tobi' => 10); // solo participación
+    }
+    if ($resultado === 'ganador') {
+        return array('exp' => 10 + 15 + $dif, 'tobi' => 10 + 20 + (2 * $dif));
+    }
+    if ($resultado === 'perdedor') {
+        return array('exp' => 10 + 5, 'tobi' => 10 + 5); // sin bonus de nivel
+    }
+    return false;
+}
+
+// Entrega +1 de un objeto al inventario de un usuario (upsert). Mismo patrón
+// que el helper comentado de recompensa_diaria.php.
+function sg_inventario_dar_objeto($uid, $objeto_id) {
+    global $db;
+    $uid = intval($uid);
+    $objeto_id_db = $db->escape_string($objeto_id);
+
+    $cantidad_actual = 0;
+    $tiene = false;
+    $q = $db->query("SELECT cantidad FROM `mybb_sg_sg_inventario` WHERE uid='$uid' AND objeto_id='$objeto_id_db'");
+    while ($r = $db->fetch_array($q)) { $tiene = true; $cantidad_actual = intval($r['cantidad']); }
+
+    if ($tiene) {
+        $cantidad_nueva = $cantidad_actual + 1;
+        $db->query("UPDATE `mybb_sg_sg_inventario` SET cantidad='$cantidad_nueva' WHERE objeto_id='$objeto_id_db' AND uid='$uid'");
+        return $cantidad_nueva;
+    }
+
+    $db->query("INSERT INTO `mybb_sg_sg_inventario` (objeto_id, uid, cantidad) VALUES ('$objeto_id_db', '$uid', '1')");
+    return 1;
+}
+
+// ============================================================================
+// Historial de misiones (metadata de referencia, pestaña "Estadísticas" de la
+// ficha). Se llena desde sg/admin/recompensas_mision.php al confirmar una
+// recompensa — una fila por recipiente. No es auditoría (eso sigue viviendo
+// en mybb_sg_sg_audit_consola_mod); esta tabla es estructurada para poder
+// agregar/contar por rango de forma eficiente.
+// ============================================================================
+
+function sg_mision_rangos_orden() {
+    return array('E', 'D', 'C', 'B', 'A', 'A+', 'S');
+}
+
+function sg_historial_mision_registrar($tid, $uid, $rol, $tipo, $rango, $oficial = false) {
+    global $db;
+    $tid    = intval($tid);
+    $uid    = intval($uid);
+    $rol_db = $db->escape_string($rol);
+    $tipo_db = $db->escape_string($tipo);
+    $rango_db = $db->escape_string($rango);
+    $oficial_db = $oficial ? 1 : 0;
+
+    $db->query("
+        INSERT INTO `mybb_sg_sg_historial_misiones` (`tid`, `uid`, `rol`, `tipo`, `rango`, `oficial`) VALUES
+        ('$tid', '$uid', '$rol_db', '$tipo_db', '$rango_db', '$oficial_db')
+    ");
+}
+
+/**
+ * Estadísticas de misiones de un usuario para mostrar en su ficha: cuántas ha
+ * jugado (participante + autor de autonarrada) y cuántas ha narrado, ambas
+ * desglosadas por rango (solo rangos con al menos 1 registro) y con su total.
+ */
+function sg_historial_mision_stats($uid) {
+    global $db;
+    $uid = intval($uid);
+    $orden = sg_mision_rangos_orden();
+
+    $jugadas  = array();
+    $narradas = array();
+
+    $q = $db->query("
+        SELECT rango, COUNT(*) AS c FROM `mybb_sg_sg_historial_misiones`
+        WHERE uid='$uid' AND rol IN ('participante', 'autor')
+        GROUP BY rango
+    ");
+    while ($r = $db->fetch_array($q)) { $jugadas[$r['rango']] = intval($r['c']); }
+
+    $q = $db->query("
+        SELECT rango, COUNT(*) AS c FROM `mybb_sg_sg_historial_misiones`
+        WHERE uid='$uid' AND rol = 'narrador'
+        GROUP BY rango
+    ");
+    while ($r = $db->fetch_array($q)) { $narradas[$r['rango']] = intval($r['c']); }
+
+    // Reordenar según el orden canónico de rangos (E..S) en vez del orden de la BD.
+    $jugadas_ord = array();
+    $narradas_ord = array();
+    foreach ($orden as $r) {
+        if (isset($jugadas[$r]))  { $jugadas_ord[$r] = $jugadas[$r]; }
+        if (isset($narradas[$r])) { $narradas_ord[$r] = $narradas[$r]; }
+    }
+
+    return array(
+        'jugadas'        => $jugadas_ord,
+        'jugadas_total'  => array_sum($jugadas_ord),
+        'narradas'       => $narradas_ord,
+        'narradas_total' => array_sum($narradas_ord),
+    );
+}
+
+// ============================================================================
+// Historial de combates 1v1 (metadata de referencia, pestaña "Estadísticas" de
+// la ficha). Se llena desde sg/admin/recompensas_mision.php al confirmar una
+// recompensa de combate — una fila por combatiente. `modo` identifica la
+// variante ('combate_1v1' hoy; deja espacio para otras en el futuro sin
+// cambiar el esquema). No es auditoría (eso sigue en
+// mybb_sg_sg_audit_consola_mod); esta tabla es para poder contar
+// victorias/empates/derrotas de forma eficiente.
+// ============================================================================
+
+function sg_historial_combate_registrar($tid, $uid, $modo, $resultado, $nivel_propio, $nivel_oponente) {
+    global $db;
+    $tid = intval($tid);
+    $uid = intval($uid);
+    $modo_db = $db->escape_string($modo);
+    $resultado_db = $db->escape_string($resultado);
+    $nivel_propio = intval($nivel_propio);
+    $nivel_oponente = intval($nivel_oponente);
+
+    $db->query("
+        INSERT INTO `mybb_sg_sg_historial_combates` (`tid`, `uid`, `modo`, `resultado`, `nivel_propio`, `nivel_oponente`) VALUES
+        ('$tid', '$uid', '$modo_db', '$resultado_db', '$nivel_propio', '$nivel_oponente')
+    ");
+}
+
+/**
+ * Cuenta victorias/empates/derrotas de un usuario para un modo de combate
+ * dado (por defecto 'combate_1v1'). Devuelve
+ * array('ganador','perdedor','empate','total').
+ */
+function sg_historial_combate_stats($uid, $modo = 'combate_1v1') {
+    global $db;
+    $uid = intval($uid);
+    $modo_db = $db->escape_string($modo);
+
+    $counts = array('ganador' => 0, 'perdedor' => 0, 'empate' => 0);
+    $q = $db->query("
+        SELECT resultado, COUNT(*) AS c FROM `mybb_sg_sg_historial_combates`
+        WHERE uid='$uid' AND modo='$modo_db'
+        GROUP BY resultado
+    ");
+    while ($r = $db->fetch_array($q)) {
+        if (isset($counts[$r['resultado']])) { $counts[$r['resultado']] = intval($r['c']); }
+    }
+    $counts['total'] = $counts['ganador'] + $counts['perdedor'] + $counts['empate'];
+    return $counts;
+}
+
+// ============================================================================
+// Post automático de recompensas (sg/admin/recompensas_mision.php). Al
+// confirmar, se publica una respuesta en el propio tema, en BBCode, firmada
+// por el UID 2 (Masashi Kishimoto), resumiendo lo que recibió cada persona.
+// ============================================================================
+
+define('SG_RECOMPENSAS_AUTOR_UID', 2);
+
+/**
+ * Arma el mensaje en BBCode. $aplicados: lista de arrays con
+ * uid,nombre,rol,oficial,pct,ryos,tobi,exp,pergamino (mismas claves que
+ * construye recompensas_mision.php al aplicar). Debe generar EXACTAMENTE el
+ * mismo texto que su espejo en JS (rmGenerarBBCode) para que la vista previa
+ * coincida con lo que realmente se publica.
+ */
+function sg_post_recompensas_bbcode($tid, $subject, $tipo, $rango, $aplicados) {
+    $tipos = sg_mision_tipos();
+    $tipo_label = isset($tipos[$tipo]) ? $tipos[$tipo]['label'] : $tipo;
+    $rol_labels = array('participante' => 'Participante', 'narrador' => 'Narrador', 'autor' => 'Autor');
+
+    $lineas = array();
+    foreach ($aplicados as $a) {
+        $rol_txt = isset($rol_labels[$a['rol']]) ? $rol_labels[$a['rol']] : $a['rol'];
+        if ($a['rol'] === 'narrador' && $tipo === 'normal') {
+            $rol_txt .= !empty($a['oficial']) ? ' Oficial' : ' No Oficial';
+        }
+        $perg_txt = !empty($a['pergamino']) ? ", Pergamino {$a['pergamino']}" : '';
+        $lineas[] = "[*][b]{$a['nombre']}[/b] — $rol_txt ({$a['pct']}%): {$a['ryos']} Ryos, {$a['tobi']} Tobis, {$a['exp']} Exp$perg_txt";
+    }
+    $lista = implode("\n", $lineas);
+
+    return "[align=center][size=4][b]¡Recompensas de Misión Entregadas![/b][/size][/align]\n"
+         . "[hr]\n"
+         . "[b]Tema:[/b] $subject (TID $tid)\n"
+         . "[b]Tipo:[/b] $tipo_label · [b]Rango:[/b] $rango\n\n"
+         . "[list]\n$lista\n[/list]\n"
+         . "[hr]\n"
+         . "[b]¡Felicidades a todos los shinobi involucrados en esta misión! Que sigan forjando su leyenda.[/b]";
+}
+
+/**
+ * Igual que sg_post_recompensas_bbcode() pero para combates: sin rango/tipo,
+ * el rol de cada aplicado es su resultado ('ganador'|'perdedor'|'empate').
+ */
+function sg_post_combate_bbcode($tid, $subject, $aplicados) {
+    $result_labels = array('ganador' => 'Ganador', 'perdedor' => 'Perdedor', 'empate' => 'Empate');
+
+    $lineas = array();
+    foreach ($aplicados as $a) {
+        $result_txt = isset($result_labels[$a['rol']]) ? $result_labels[$a['rol']] : $a['rol'];
+        $lineas[] = "[*][b]{$a['nombre']}[/b] — $result_txt: {$a['tobi']} Tobis, {$a['exp']} Exp";
+    }
+    $lista = implode("\n", $lineas);
+
+    return "[align=center][size=4][b]¡Resultado del Combate![/b][/size][/align]\n"
+         . "[hr]\n"
+         . "[b]Tema:[/b] $subject (TID $tid)\n\n"
+         . "[list]\n$lista\n[/list]\n"
+         . "[hr]\n"
+         . "[b]¡Buen combate a ambos! Que sigan puliendo su técnica ninja.[/b]";
+}
+
+/**
+ * Publica $mensaje como respuesta del tema $tid, firmado por
+ * SG_RECOMPENSAS_AUTOR_UID. Usa el PostDataHandler nativo de MyBB (igual que
+ * newreply.php) para que repliquen contadores, último post del foro/tema, etc.
+ * admin_override=true salta el chequeo de flood (es un post automatizado).
+ * Devuelve array('ok'=>bool, 'pid'=>int|null, 'error'=>string).
+ */
+function sg_publicar_post_recompensas($tid, $fid, $mensaje) {
+    $autor = select_one_query_with_id('mybb_sg_users', 'uid', SG_RECOMPENSAS_AUTOR_UID);
+    if (!$autor) {
+        return array('ok' => false, 'pid' => null, 'error' => 'No existe el usuario narrador de recompensas (UID ' . SG_RECOMPENSAS_AUTOR_UID . ').');
+    }
+
+    require_once MYBB_ROOT . 'inc/datahandlers/post.php';
+    $posthandler = new PostDataHandler('insert');
+    $posthandler->admin_override = true;
+
+    $post = array(
+        'tid'       => intval($tid),
+        'replyto'   => 0,
+        'fid'       => intval($fid),
+        'subject'   => '',
+        'icon'      => -1,
+        'uid'       => SG_RECOMPENSAS_AUTOR_UID,
+        'username'  => $autor['username'],
+        'message'   => $mensaje,
+        'ipaddress' => my_inet_pton(get_ip()),
+        'posthash'  => md5(uniqid('', true)),
+        'savedraft' => 0,
+        'options'   => array('signature' => 0, 'subscriptionmethod' => 0, 'disablesmilies' => 0),
+    );
+    $posthandler->set_data($post);
+
+    if (!$posthandler->validate_post()) {
+        return array('ok' => false, 'pid' => null, 'error' => implode(' ', $posthandler->get_friendly_errors()));
+    }
+
+    $post_info = $posthandler->insert_post();
+    return array('ok' => true, 'pid' => isset($post_info['pid']) ? $post_info['pid'] : null, 'error' => '');
 }

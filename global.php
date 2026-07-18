@@ -600,7 +600,8 @@ $g_is_staff = false;
 $g_tiene_ficha = false;
 $g_ficha = null;
 $g_user = null;
-$banner_sabias_que = rand(1, 3);
+// $banner_sabias_que = rand(1, 3);
+$banner_sabias_que = 1;
 $g_sabiasque = null;
 $g_sabiasque_query = $db->query(" SELECT * FROM mybb_sg_sg_sabiasque WHERE tipo='$banner_sabias_que' ORDER BY RAND() LIMIT 1");
 while ($q = $db->fetch_array($g_sabiasque_query)) { $g_sabiasque = $q; }

@@ -1,0 +1,87 @@
+Instrucciones:
+Necesito crear otra pagina de /admin que sea para entregar recompensas a usuarios y a narradores del foro.
+Basicamente, es una pagina donde un miembro del Staff entra para entregar las recompensas a un conjunto de usuarios y tambien al narrador (excepto si es una mision autonarrada).
+El usuario pone el ID de un tema (TID), de ahi puede sacar el nombre de los usuarios y tambien la cuenta del narrador, y puede decidir a quien asignarse las recompensas.
+
+Ademas, puede decidir dar recompensa en un % dependiendo de la cantidad de rondas que duro la mision. (Esto puede tambien decidirlo el moderador y se da asi la recompensa en proporcion).
+Por ejemplo, una mision que tiene narrador, quizas un usuario no completo o el narraodr no completo y se tiene que dar la recompensa incompleta, la pagina deberia tambien permitir esto.
+
+Pergamino Rango E se refiere al objeto PERG001
+Pergamino Rango D se refiere al objeto PERG002
+Pergamino Rango C se refiere al objeto PERG003
+Pergamino Rango B se refiere al objeto PERG004
+Pergamino Rango A se refiere al objeto PERG005
+Pergamino Rango A+ se refiere al objeto PERG006
+Pergamino Rango S se refiere al objeto PERG007
+
+
+
+Recompensas para Usuarios No Narradores Oficiales
+
+Misiones Normales:
+Rango E: 250 Ryos, 35 de Exp y un Pergamino Rango E.
+Rango D: 500 Ryos, 50 de Exp y un Pergamino Rango E.
+Rango C: 1,000 Ryos, 65 de Exp y un Pergamino Rango D.
+Rango B: 2,000 Ryos, 80 de Exp y un Pergamino Rango D
+Rango A: 3,000 Ryos, 90 de Exp y un Pergamino Rango C.
+Rango A+: 4,000 Ryos, 105 de Exp y un Pergamino Rango C.
+Rango S: 5,000 Ryos, 140 de Exp y un Pergamino Rango B.
+
+
+Recompensas para Narradores Oficiales
+
+Misiones Normales:
+Rango E: 500 Ryos, 35 de Exp y un Pergamino Rango E.
+Rango D: 750 Ryos, 50 de Exp y un Pergamino Rango D.
+Rango C: 1,500 Ryos, 65 de Exp y un Pergamino Rango C.
+Rango B: 2,500 Ryos, 80 de Exp y un Pergamino Rango B.
+Rango A: 3,500 Ryos, 90 de Exp y un Pergamino Rango A.
+Rango A+: 4,500 Ryos, 105 de Exp y un Pergamino Rango A+
+Rango S: 5,500 Ryos, 140 de Exp y un Pergamino Rango S.
+
+Misiones de Guerra:
+Rango B: 3,000 Ryos, 20 Tobis, 100 de Exp y un Pergamino Rango B.
+Rango A: 4,000 Ryos, 30 Tobis, 120 de Exp y un Pergamino Rango A.
+Rango A+: 5,000 Ryos, 50 Tobis, 130 de Exp y un Pergamino Rango A+.
+Rango S: 6,000 Ryos, 80 Tobis, 160 de Exp y un Pergamino Rango S.
+
+Tramas Oficiales:
+2,500 Ryos, 20 Tobis y 100 de Exp.
+
+Eventos:
+2,500 Ryos, 20 Tobis y 100 de Exp.
+
+Side Quest:
+2,500 Ryos, 20 Tobis y 100 de Exp.
+
+
+
+Recompensas para usuarios:
+
+Sistema de Misiones
+
+Las misiones son una parte fundamental del desarrollo dentro del mundo ninja. A través de ellas, los personajes pueden obtener recompensas, reconocimiento y, en algunos casos, notoriedad. Existen diferentes tipos de misiones, cada una con sus propias reglas y riesgos. Además, el sistema de invasiones permite a los jugadores irrumpir en misiones de guerra, generando enfrentamientos dinámicos y estratégicos.
+
+
+Misiones Normales :
+Estas misiones pueden abarcar cualquier tipo de actividad, desde rescatar un gato hasta ayudar a una anciana. Pueden ser de cualquier rango y no están subdivididas en categorías. Las acciones dentro de estas misiones difícilmente repercutirán en la obtención de Bingo, salvo que el usuario incurra en un crimen de guerra.
+
+Recompensas por Rango:
+
+Rango E (Nivel 1): 250 Ryos, 2 Tobis, 50 de Exp, 3 Posts mínimos
+Rango D (Nivel 4): 500 Ryos, 5 Tobis, 70 de Exp, 4 Posts mínimos
+Rango C (Nivel 7): 1000 Ryos, 10 Tobis, 90 de Exp, 5 Posts mínimos
+Rango B (Nivel 10): 2000 Ryos, 20 Tobis, 110 de Exp, 6 Posts mínimos
+Rango A (Nivel 13): 3000 Ryos, 30 Tobis, 130 de Exp, 8 Posts mínimos
+Rango A+ (Nivel 14): 4000 Ryos, 45 Tobis, 150 de Exp, 10 Posts mínimos
+Rango S (Nivel 17): 5000 Ryos, 60 Tobis, 200 de Exp, 12 Posts mínimos
+
+Misiones Autonarradas:
+
+Las misiones autonarradas funcionan de la misma manera que las misiones normales, con la diferencia de que son narradas por el propio usuario en un único post. Estas misiones permiten desarrollar historias personales sin afectar el mundo ninja en general, ya que su impacto se limita exclusivamente al personaje que las realiza.
+
+Al igual que en otras misiones, pueden abarcar cualquier tipo de actividad, desde tareas sencillas hasta desafíos más complejos, dependiendo del rango, solo deberá cumplir con el mínimo de palabras por tema.
+
+Rango E: Desbloqueado desde nivel 1. Mínimo 500 palabras.
+Rango D: Desbloqueado desde nivel 5. Mínimo 750 palabras.
+Rango C: Desbloqueado desde nivel 10. Mínimo 1000 palabras.

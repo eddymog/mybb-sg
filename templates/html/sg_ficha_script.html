@@ -1,6 +1,13 @@
 <script>
 var sgFichaTecAprendidas = {$tec_aprendidas};
 
+// Toggle "Ver valores reales": el PHP ya calculó tecnica.efecto_parsed (con
+// las stats efectivas de ESTE personaje). Misma clave de localStorage que
+// tecnicas_lista.php -> la preferencia se comparte en todo el sitio.
+var sgFichaEffectsByTid = {};
+var sgFichaParsedMode = false;
+try { sgFichaParsedMode = (localStorage.getItem('sg_tec_parsed_mode') === '1'); } catch (e) {}
+
 function sgFichaEscapeHtml(value) {
   if (value === null || value === undefined) {
     return '';
@@ -41,7 +48,13 @@ function sgFichaCreateTechniqueCard(tecnica) {
   var badges = [];
   var description = tecnica.descripcion ? tecnica.descripcion : 'Sin descripción disponible.';
   var effectText = tecnica.efecto ? tecnica.efecto : 'No tiene efecto adicional especificado.';
+  var effectParsedText = tecnica.efecto ? (tecnica.efecto_parsed || tecnica.efecto) : effectText;
   var costText = tecnica.coste ? tecnica.coste : 'Sin coste indicado';
+
+  if (tecnica.tid) {
+    sgFichaEffectsByTid[tecnica.tid] = { raw: effectText, parsed: effectParsedText };
+  }
+  var effectShown = sgFichaParsedMode ? effectParsedText : effectText;
 
   if (tecnica.rango) {
     badges.push(sgFichaCreateTechniqueBadge('', 'Rango ' + tecnica.rango, true));
@@ -83,7 +96,7 @@ function sgFichaCreateTechniqueCard(tecnica) {
     +       '</div>'
     +       '<div class="sg-technique__section sg-technique__section--effect">'
     +         '<div class="sg-technique__section-label">Efecto</div>'
-    +         '<div class="sg-technique__text' + (tecnica.efecto ? '' : ' sg-technique__text--muted') + '">' + effectText + '</div>'
+    +         '<div class="sg-technique__text sg-tec-effect' + (tecnica.efecto ? '' : ' sg-technique__text--muted') + '" data-tid="' + (tecnica.tid || '') + '">' + effectShown + '</div>'
     +       '</div>'
     +     '</div>'
     +   '</div>'
@@ -268,6 +281,34 @@ function sgFichaApplyTechniqueFilters() {
   sgFichaUpdateTechniqueCount(visibleCount);
 }
 
+// Aplica sgFichaParsedMode a todos los efectos ya renderizados y sincroniza
+// el texto del botón. No re-renderiza nada, así no se pierde qué spoilers
+// de técnica estaban abiertos/cerrados.
+function sgFichaAplicarModoEfectos() {
+  var els = document.querySelectorAll('.sg-tec-effect');
+  var i = 0;
+
+  for (i = 0; i < els.length; i++) {
+    var tid = els[i].getAttribute('data-tid');
+    var entry = sgFichaEffectsByTid[tid];
+    if (!entry) {
+      continue;
+    }
+    els[i].innerHTML = sgFichaParsedMode ? entry.parsed : entry.raw;
+  }
+
+  var btn = document.getElementById('sg-parse-toggle-ficha');
+  if (btn) {
+    btn.textContent = sgFichaParsedMode ? 'Ver códigos originales' : 'Ver valores reales';
+  }
+}
+
+function sgFichaToggleParsedMode() {
+  sgFichaParsedMode = !sgFichaParsedMode;
+  try { localStorage.setItem('sg_tec_parsed_mode', sgFichaParsedMode ? '1' : '0'); } catch (e) {}
+  sgFichaAplicarModoEfectos();
+}
+
 function sgFichaRenderPrivateTechniques() {
   var container = document.getElementById('sg-profile-techniques');
   var keys = Object.keys(sgFichaTecAprendidas || {});
@@ -294,7 +335,10 @@ function sgFichaRenderPrivateTechniques() {
   sgFichaApplyTechniqueFilters();
 }
 
-window.addEventListener('load', sgFichaRenderPrivateTechniques);
+window.addEventListener('load', function () {
+  sgFichaRenderPrivateTechniques();
+  sgFichaAplicarModoEfectos();
+});
 
 /* ── Inventario: filtros, búsqueda, vista y modal ── */
 function fxInvImgFallback(img) {

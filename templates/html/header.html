@@ -271,31 +271,6 @@ function toggleTheme() {
 
 
 <!-- ═══════════════════════════════════════════════════════════════
-     ANNOUNCEMENT STRIP
-     ═══════════════════════════════════════════════════════════════ -->
-<div style="max-width: 1100px; width: 100%; margin: auto; background: var(--bg2); border-bottom: 0.5px solid var(--border);
-            padding: 10px 24px; box-sizing: border-box; display: flex; align-items: center; gap: 16px;">
-  <!-- Section-head oxide bar -->
-  <div style="width: 3px; height: 32px; background: var(--oxide); flex-shrink: 0;"></div>
-  <!-- Text content -->
-  <div style="flex: 1; min-width: 0;">
-    <div style="font-family: 'Cinzel', serif; font-size: 12px; font-weight: 700; letter-spacing: 2.2px;
-                text-transform: uppercase; color: var(--plum2); margin-bottom: 4px;">¡Shinobi Gaiden está en Reset!</div>
-    <div style="font-family: 'Source Serif 4', serif; font-size: 13px; font-weight: 400; color: var(--stone); line-height: 1.75;
-                white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-      Nos preparamos para una gran reapertura con nuevas mecánicas y sorpresas —
-      <a href="https://discord.com/invite/UMBSGnWmwt" style="color: var(--plum3);">únete a nuestro Discord</a> y prepárate para el regreso.
-    </div>
-  </div>
-  <!-- Right label -->
-  <div style="font-family: 'Cinzel', serif; font-size: 8px; letter-spacing: 2.2px; text-transform: uppercase;
-              color: var(--mist); flex-shrink: 0; text-align: right; line-height: 1.9;">
-    Shinobi Gaiden<br>Donde las leyendas renacen
-  </div>
-</div>
-
-
-<!-- ═══════════════════════════════════════════════════════════════
      STAFF ADMIN BAND (staff only)
      ═══════════════════════════════════════════════════════════════ -->
 <if $g_is_staff then>
@@ -317,88 +292,33 @@ function toggleTheme() {
 
 
 <!-- ═══════════════════════════════════════════════════════════════
-     SABÍAS QUE — staff / specific user only
+     SABÍAS QUE — staff / specific user only (tarjeta compacta)
      ═══════════════════════════════════════════════════════════════ -->
-<if $current_page != "index.php" && $current_page != "ficha.php" && ($g_is_staff || $mybb->user['uid'] == '501') then>
-<div style="position: relative; max-width: 1100px; width: 100%; margin: 0 auto; box-sizing: border-box;">
-  <div style="position: relative; overflow: hidden; background: var(--bg2); border-top: 0.5px solid var(--border); border-bottom: 0.5px solid var(--border); min-height: 180px;">
-    
-    <!-- Washi fiber overlay -->
-    <div style="position: absolute; inset: 0; pointer-events: none; opacity: 1;
-                background-image:
-                  repeating-linear-gradient(14deg, transparent 0, transparent 24px, var(--fiber) 24px, var(--fiber) 25px),
-                  repeating-linear-gradient(84deg, transparent 0, transparent 36px, var(--fiber) 36px, var(--fiber) 37px),
-                  repeating-linear-gradient(152deg, transparent 0, transparent 19px, var(--fiber) 19px, var(--fiber) 19.5px);"></div>
+<!-- if current_page != "index.php" then -->
+<div style="max-width: 1100px; width: 100%; margin: 0 auto; box-sizing: border-box;">
+  <div style="display: flex; align-items: center; gap: 14px; background: var(--bg2);
+              border-top: 0.5px solid var(--border); border-bottom: 0.5px solid var(--border);
+              padding: 12px 24px;">
 
-    <!-- Corner color washes -->
-    <div style="position: absolute; inset: 0; pointer-events: none;
-                background:
-                  radial-gradient(ellipse at 100% 0%, rgba(90,46,154,0.07) 0%, transparent 58%),
-                  radial-gradient(ellipse at 0% 100%, rgba(122,42,16,0.05) 0%, transparent 42%);"></div>
-
-    <!-- Watermark kanji -->
-    <div style="position: absolute; left: 18px; top: 16px; pointer-events: none;
-                font-family: 'Source Serif 4', serif; font-size: 92px; font-weight: 700; line-height: 1;
-                color: var(--plum); opacity: 0.055;">聞</div>
-
-    <!-- Main content -->
-    <div style="position: relative; z-index: 1; display: flex; align-items: stretch; gap: 26px; padding: 24px 26px 22px;">
-      
-      <!-- Left rail -->
-      <div style="width: 82px; flex-shrink: 0; display: flex; flex-direction: column; align-items: center; justify-content: space-between;">
-        <div style="width: 54px; height: 54px; border: 1.5px solid var(--oxide); border-radius: 50%;
-                    display: flex; flex-direction: column; align-items: center; justify-content: center;
-                    background: rgba(192,88,42,0.10);">
-          <span style="font-family: 'Source Serif 4', serif; font-size: 16px; font-weight: 700; line-height: 1; color: var(--oxide);">知</span>
-          <small style="font-family: 'Cinzel', serif; font-size: 7px; letter-spacing: 1.7px; text-transform: uppercase; line-height: 1.4; color: var(--oxide);">nota</small>
-        </div>
-        <div style="font-family: 'Source Serif 4', serif; font-size: 21px; font-weight: 700; letter-spacing: 7px;
-                    writing-mode: vertical-rl; color: rgba(61,31,110,0.34);">噂録</div>
-      </div>
-
-      <!-- Center column -->
-      <div style="flex: 1; min-width: 0; padding-top: 6px;">
-        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
-          <div style="width: 42px; height: 1.5px; background: var(--oxide); flex-shrink: 0;"></div>
-          <div style="font-family: 'Cinzel', serif; font-size: 10px; font-weight: 700; letter-spacing: 2.2px;
-                      text-transform: uppercase; color: var(--mist);">Apunte del encabezado</div>
-        </div>
-
-        <div style="font-family: 'Cinzel', serif; font-size: 19px; font-weight: 900; letter-spacing: 2.2px;
-                    text-transform: uppercase; color: var(--plum); margin-bottom: 12px; line-height: 1.3;">
-          <if $banner_sabias_que == '1' then>¿Sabías que…?</if>
-          <if $banner_sabias_que == '2' then>Hay rumores sobre…</if>
-          <if $banner_sabias_que == '3' then>En este foro…</if>
-        </div>
-
-        <div style="max-width: 760px; font-family: 'Source Serif 4', serif; font-size: 14px; font-weight: 400; line-height: 1.95;
-                    color: var(--ink); text-align: justify; position: relative;">
-          <span>{$g_sabiasque['texto']}</span>
-        </div>
-      </div>
-
-      <!-- Right aside -->
-      <div style="width: 182px; flex-shrink: 0; align-self: center; border-left: 0.5px solid var(--border);
-                  padding-left: 20px; display: flex; flex-direction: column; justify-content: center;">
-        <div style="font-family: 'Cinzel', serif; font-size: 10px; font-weight: 700; letter-spacing: 2.2px;
-                    text-transform: uppercase; color: var(--mist); margin-bottom: 10px;">Marca de archivo</div>
-        <div style="font-family: 'Cinzel', serif; font-size: 13px; font-weight: 700; letter-spacing: 1.1px;
-                    text-transform: uppercase; color: var(--oxide2); line-height: 1.8; margin-bottom: 12px;">
-          <if $banner_sabias_que == '1' then>Crónica shinobi</if>
-          <if $banner_sabias_que == '2' then>Rumores de la villa</if>
-          <if $banner_sabias_que == '3' then>Nota del foro</if>
-        </div>
-        <div style="width: 100%; height: 0.5px; background: var(--border); margin-bottom: 12px;"></div>
-        <div style="font-family: 'Source Serif 4', serif; font-size: 11px; font-weight: 400; line-height: 1.85;
-                    color: var(--stone); text-align: left;">
-          Archivo breve del mundo shinobi y sus pequeños ecos.
-        </div>
-      </div>
-
+    <div style="flex-shrink: 0; width: 38px; height: 38px; border: 1.5px solid var(--oxide); border-radius: 50%;
+                display: flex; align-items: center; justify-content: center;
+                background: rgba(192,88,42,0.10);">
+      <span style="font-family: 'Source Serif 4', serif; font-size: 14px; font-weight: 700; line-height: 1; color: var(--oxide);">知</span>
     </div>
+
+    <div style="min-width: 0; flex: 1;">
+      <span style="font-family: 'Cinzel', serif; font-size: 10px; font-weight: 900; letter-spacing: 1.6px;
+                  text-transform: uppercase; color: var(--plum); white-space: nowrap; margin-right: 8px;">
+        <if $banner_sabias_que == '1' then>¿Sabías que…</if>
+        <!-- if $banner_sabias_que == '2' then>Hay rumores sobre…/if -->
+        <!-- if $banner_sabias_que == '3' then>En este foro…/if -->
+      </span><span style="font-family: 'Source Serif 4', serif; font-size: 13px; line-height: 1.6; color: var(--ink);
+                  display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; overflow: hidden;">{$g_sabiasque['texto']}</span>
+    </div>
+
   </div>
 </div>
-</if>
+<!-- /if -->
 
 
 <!-- ═══════════════════════════════════════════════════════════════

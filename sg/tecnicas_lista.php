@@ -16,6 +16,14 @@ global $templates;
 
 $arbol = $mybb->get_input('arbol');
 
+// Estadísticas efectivas (base + pasivas) del visitante, para parsear los
+// códigos [CCKx<N>]/[MCCKx<N>]/etc. del campo "efecto" de cada técnica.
+// Ver docs/tecnicas_toggle_instrucciones.txt.
+$viewer_uid = (int) $mybb->user['uid'];
+$viewer_ficha = ($viewer_uid > 0) ? select_one_query_with_id('mybb_sg_sg_fichas', 'fid', $viewer_uid) : null;
+$viewer_stats_ef = $viewer_ficha ? sg_stats_efectivas($viewer_ficha) : null;
+eval('$sgViewerTieneFicha = '.($viewer_ficha ? '1' : '0').';');
+
 $query_clan = $db->query(" SELECT * FROM mybb_sg_sg_clanes WHERE nombreClan='$arbol' ");
 $query_tecnicas_base = $db->query(" SELECT * FROM mybb_sg_sg_tecnicas WHERE arbol='$arbol' AND rama='Base' ");
 $query_tecnicas_rama1 = $db->query(" SELECT * FROM mybb_sg_sg_tecnicas WHERE arbol='$arbol' AND rama='Rama 1' ");
@@ -32,6 +40,7 @@ $tecs_rama2 = array();
 $tecs_rama3 = array();
 
 while ($tec = $db->fetch_array($query_tecnicas_base)) {
+    $tec['efecto_parsed'] = sg_parsear_codigos_stats($tec['efecto'], $viewer_stats_ef);
     array_push($tecs_base, $tec);
 }
 
@@ -45,6 +54,7 @@ while ($tec = $db->fetch_array($query_tecnicas_rama1)) {
     if (!$tecs_rama1[$key]) {
         $tecs_rama1[$key] = array();
     }
+    $tec['efecto_parsed'] = sg_parsear_codigos_stats($tec['efecto'], $viewer_stats_ef);
     array_push($tecs_rama1[$key], $tec);
 }
 
@@ -56,6 +66,7 @@ while ($tec = $db->fetch_array($query_tecnicas_rama2)) {
     if (!$tecs_rama2[$key]) {
         $tecs_rama2[$key] = array();
     }
+    $tec['efecto_parsed'] = sg_parsear_codigos_stats($tec['efecto'], $viewer_stats_ef);
     array_push($tecs_rama2[$key], $tec);
 }
 
@@ -67,6 +78,7 @@ while ($tec = $db->fetch_array($query_tecnicas_rama3)) {
     if (!$tecs_rama3[$key]) {
         $tecs_rama3[$key] = array();
     }
+    $tec['efecto_parsed'] = sg_parsear_codigos_stats($tec['efecto'], $viewer_stats_ef);
     array_push($tecs_rama3[$key], $tec);
 }
 

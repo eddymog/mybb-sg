@@ -1,0 +1,355 @@
+================================================================================
+ RECOMPENSAS DE MISIÓN — Especificación de implementación
+================================================================================
+Página nueva de staff para entregar recompensas de misión a los participantes de
+un tema (TID) y a su(s) narrador(es). Basado en docs/recompensas.txt +
+aclaraciones del cliente (chat). Este documento es la fuente de verdad.
+
+Archivo destino:   sg/admin/recompensas_mision.php   (NO reusar sg/recompensas_op.php)
+Template:          staff_recompensas_mision.html
+Enlace:            consola de mods (staff_consola_mod.html)
+
+
+--------------------------------------------------------------------------------
+0. RESUMEN
+--------------------------------------------------------------------------------
+Al abrir la página, el staff ya ve: (a) un selector de TIPO de misión y (b) un
+campo para el TID. Tras elegir tipo + TID y "cargar", aparece una sección con:
+  - Selector de RANGO de la misión (opciones según el tipo).
+  - La lista de participantes detectados en el tema.
+Por cada persona el staff elige su ROL (participante / narrador no oficial /
+narrador oficial / excluir) y un % de recompensa; a los narradores además puede
+marcar si entrega el pergamino. Revisa la vista previa y CONFIRMA: se suman
+ryos/tobis/exp a cada ficha, se entregan pergaminos, y se registra en auditoría.
+
+
+--------------------------------------------------------------------------------
+1. CONCEPTO CLAVE: EL ROL DECIDE LA TABLA (no el usergroup)
+--------------------------------------------------------------------------------
+"Narrador oficial" NO se deriva del usergroup: lo decide el moderador en cada
+entrega. En un tema hay dos clases de recompensa:
+
+  A) PARTICIPANTE (jugó con su personaje)   -> Tabla PARTICIPANTE (T1)
+  B) NARRADOR del tema (narró la historia)  -> tabla de narrador según tipo/rol
+
+Reglas:
+  - TODOS los participantes reciben la tabla PARTICIPANTE (T1) según rango.
+  - Puede haber MÁS DE UN narrador (p. ej. si uno se fue y otro lo reemplazó).
+  - La distinción "oficial / no oficial" SOLO cambia la recompensa en MISIONES
+    NORMALES (T2 vs T3). En Guerra/Trama/Evento/Side el narrador recibe la misma
+    recompensa sea oficial o no (ver §3).
+  - En AUTONARRADAS no hay narrador aparte: el autor recibe la tabla T6.
+  - El staff puede asignarse a sí mismo cualquier rol (basta con que su uid
+    aparezca: auto-detectado por postear, o agregado a mano).
+
+
+--------------------------------------------------------------------------------
+2. TABLAS DE RECOMPENSA (referencia exacta)
+--------------------------------------------------------------------------------
+FUENTE DE VERDAD ÚNICA [Mejoras #1/#2]: estas tablas (T1..T6) se definen UNA sola
+vez en PHP — un helper sg_recompensa_mision($rol, $tipo, $rango) en
+sg_functions.php que devuelve {ryos, tobis, exp, pergamino}. Ese helper es la
+única autoridad:
+  - VISTA PREVIA: las tablas se serializan a JSON y se inyectan en la página, así
+    el JS muestra exactamente los mismos números (sin re-teclear valores en el JS).
+  - APLICAR: el servidor SIEMPRE recalcula desde el helper; nunca usa montos
+    enviados por el cliente (ver §8).
+Cambiar una recompensa = editar solo ese helper.
+
+Pergaminos (objeto_id en mybb_sg_sg_objetos):
+  Pergamino E = PERG001   Pergamino D = PERG002   Pergamino C = PERG003
+  Pergamino B = PERG004   Pergamino A = PERG005   Pergamino A+ = PERG006
+  Pergamino S = PERG007
+
+--- (T1) PARTICIPANTE  [cualquier tipo de misión] -------------------------------
+Nunca da pergamino. "Posts mínimos" es solo referencia (ver §4).
+  Rango  Ryos   Tobis  Exp   PostsMin  NivelRef
+  E      250    2      50    3         1
+  D      500    5      70    4         4
+  C      1000   10     90    5         7
+  B      2000   20     110   6         10
+  A      3000   30     130   8         13
+  A+     4000   45     150   10        14
+  S      5000   60     200   12        17
+
+--- (T2) NARRADOR NO OFICIAL — Misiones Normales --------------------------------
+Sin Tobis. Pergamino "recortado" (no siempre coincide con el rango).
+  Rango  Ryos   Exp   Pergamino
+  E      250    35    PERG001 (E)
+  D      500    50    PERG001 (E)
+  C      1000   65    PERG002 (D)
+  B      2000   80    PERG002 (D)
+  A      3000   90    PERG003 (C)
+  A+     4000   105   PERG003 (C)
+  S      5000   140   PERG004 (B)
+
+--- (T3) NARRADOR OFICIAL — Misiones Normales -----------------------------------
+Sin Tobis. Pergamino del MISMO rango de la misión.
+  Rango  Ryos   Exp   Pergamino
+  E      500    35    PERG001 (E)
+  D      750    50    PERG002 (D)
+  C      1500   65    PERG003 (C)
+  B      2500   80    PERG004 (B)
+  A      3500   90    PERG005 (A)
+  A+     4500   105   PERG006 (A+)
+  S      5500   140   PERG007 (S)
+
+--- (T4) NARRADOR (oficial o no) — Misiones de Guerra  [solo rango B+] -----------
+Con Tobis y pergamino.
+  Rango  Ryos   Tobis  Exp   Pergamino
+  B      3000   20     100   PERG004 (B)
+  A      4000   30     120   PERG005 (A)
+  A+     5000   50     130   PERG006 (A+)
+  S      6000   80     160   PERG007 (S)
+
+--- (T6) AUTONARRADA  [solo rango E/D/C] ----------------------------------------
+El autor narra y juega su propia misión. Sin pergamino. Sin narrador aparte.
+  Rango  Ryos   Tobis  Exp   NivelRef
+  E      250    2      50    1
+  D      500    5      70    4
+  C      1000   10     90    7
+
+--- (T5) NARRADOR (oficial o no) — Trama Oficial / Evento / Side Quest ----------
+Recompensa PLANA: NO depende del rango de la misión (el rango solo se elige por
+los participantes, tabla T1). Sin pergamino.
+  Ryos   Tobis  Exp
+  2500   20     100
+
+
+--------------------------------------------------------------------------------
+3. MATRIZ ROL × TIPO (qué tabla aplica) + RANGOS VÁLIDOS
+--------------------------------------------------------------------------------
+  TIPO \ ROL        Participante   Narrador no oficial   Narrador oficial
+  Normal            T1             T2                    T3
+  Guerra            T1             T4                    T4
+  Trama Oficial     T1             T5 (plana)            T5 (plana)
+  Evento            T1             T5 (plana)            T5 (plana)
+  Side Quest        T1             T5 (plana)            T5 (plana)
+  Autonarrada       T6 (autor)     —                     —
+
+La oficialidad SOLO cambia el resultado en "Normal" (T2 vs T3). En Guerra el
+narrador recibe T4 sea oficial o no; en Trama/Evento/Side recibe la recompensa
+PLANA T5 sea oficial o no (no depende del rango elegido). Por eso, en la UI el
+sub-selector "oficial / no oficial" SOLO aparece cuando el tipo es Normal; para
+el resto de tipos el rol es simplemente "Narrador" (sin sub-opción, porque no
+cambia nada). [Mejora #5]
+
+Rangos que ofrece el selector según el TIPO:
+  Misión Autonarrada .......... E, D, C
+  Misión Normal ............... E, D, C, B, A, A+, S
+  Misión de Guerra ............ B, A, A+, S          (T4 solo existe desde B)
+  Trama Oficial / Evento /
+     Side Quest ............... E, D, C, B, A, A+, S  (rango solo afecta a T1;
+                                                        el narrador siempre T5)
+
+
+--------------------------------------------------------------------------------
+4. % DE RECOMPENSA Y PERGAMINO
+--------------------------------------------------------------------------------
+- El % es POR PERSONA y ESCALONADO (no libre). Opciones:
+      100%  80%  60%  40%  20%  0%
+  Aplica tanto a participantes como a narradores. Default 100%.
+  Caso de uso: un jugador no completó pero el narrador sí -> se le baja el % solo
+  a ese jugador.
+- El % aplica a Ryos, Tobis y Exp:  valor_final = round(valor_tabla * pct / 100).
+- PERGAMINO (solo narradores de Normal/Guerra): es un TOGGLE MANUAL e
+  INDEPENDIENTE del %. El staff marca "dar pergamino" por cada narrador; si está
+  marcado se entrega el pergamino que le corresponde (según su tabla T2/T3/T4 al
+  rango de la misión). Los participantes (T1) nunca reciben pergamino, así que no
+  muestran ese toggle. Los narradores de Trama/Evento/Side (T5) TAMPOCO reciben
+  pergamino (T5 no lo contempla): el toggle no se muestra para esos tipos.
+- "Posts mínimos" (T1) es referencia: la página MUESTRA los posts de cada
+  participante vs el mínimo del rango, como ayuda para decidir el %. No se aplica
+  automáticamente.
+
+
+--------------------------------------------------------------------------------
+5. DATOS QUE SE PERSISTEN (columnas existentes)
+--------------------------------------------------------------------------------
+- Ryos  -> mybb_sg_sg_fichas.ryos   (int)   UPDATE ... SET ryos = ryos + n
+- Tobis -> mybb_sg_sg_fichas.tobi   (int)   UPDATE ... SET tobi = tobi + n
+- Exp   -> mybb_sg_users.newpoints  (float) UPDATE ... SET newpoints = newpoints + n
+- Pergamino -> mybb_sg_sg_inventario (upsert; patrón de recompensa_diaria.php):
+      si existe (uid,objeto_id): cantidad = cantidad + 1
+      si no:                     INSERT (objeto_id, uid, cantidad=1)
+
+ryos/tobis/pergamino requieren FICHA (van indexados por fid = uid). La exp
+(newpoints) la tiene cualquier usuario. Un recipiente SIN ficha se marca inválido
+y NO recibe nada (§10). (En la práctica esto casi nunca ocurre.)
+
+
+--------------------------------------------------------------------------------
+6. FLUJO DE LA PÁGINA (UX)
+--------------------------------------------------------------------------------
+Paso 1 — VISIBLE DESDE EL INICIO:
+     - Selector TIPO: Misión Autonarrada / Misión Normal / Misión de Guerra /
+       Trama Oficial / Evento / Side Quest.
+     - Campo TID + botón "Cargar tema".
+   (Al elegir el tipo, el JS ajusta qué rangos se ofrecerán en el paso 2.)
+
+Paso 2 — TRAS CARGAR (aparece una sección nueva):
+     - Asunto del tema + enlace. Aviso si ese TID ya fue recompensado antes (§9).
+     - Selector RANGO de la misión (opciones según el tipo, §3).
+     - Control rápido "Poner a todos los participantes en __%" (evita ajustar fila
+       por fila en misiones con muchos jugadores). [Mejora #8]
+     - LISTA DE PARTICIPANTES (auto-detectados del TID). Por cada uid:
+         * Nombre de personaje (ficha) + username + uid.
+         * Nº de posts en el tema (y el mínimo del rango como referencia).
+         * Selector ROL: Participante | Narrador | Excluir (no recibe). Cuando el
+           rol es Narrador Y el tipo es Normal, aparece el sub-selector
+           "oficial / no oficial" (en otros tipos no, porque no cambia nada,
+           §3). [Mejora #5]
+         * Selector %: 100/80/60/40/20/0.
+         * Si el rol es Narrador: checkbox "Dar pergamino".
+         * Vista previa en vivo (calculada con la tabla JSON inyectada = mismos
+           números que aplicará el servidor, §2).
+     - Se resalta/sugiere al CREADOR del tema como probable narrador (sigue siendo
+       elección manual del staff). [Mejora #8]
+     - "Agregar por UID": incluir a alguien que no posteó (narrador desde otra
+       cuenta, el propio staff, etc.).
+     - Autonarrada: se espera 1 solo recipiente (el autor, tabla T6, sin narrador
+       ni pergamino); la UI puede simplificar a un único recipiente.
+
+Paso 3 — Confirmar:
+     - Resumen por recipiente: "Fulano recibirá X ryos, Y exp, Z tobis,
+       [pergamino]".
+     - TOTAL AGREGADO de la tanda (suma de ryos/exp/tobis y nº de pergaminos),
+       para cazar errores de un vistazo antes de aplicar. [Mejora #6]
+     - Botón CONFIRMAR (POST con my_post_key). El POST lleva SOLO tid/tipo/rango +
+       por persona (uid, rol, %, dar_pergamino); el servidor recalcula los montos
+       (§8). Aplica todo en una pasada, registra en auditoría (§9) y muestra el
+       resultado (éxitos / errores por fila).
+
+
+--------------------------------------------------------------------------------
+7. EXTRAER PARTICIPANTES DEL TID (consultas)
+--------------------------------------------------------------------------------
+Tema:
+  SELECT tid, subject, uid AS starter_uid, fid
+  FROM mybb_sg_threads WHERE tid = '$tid';
+
+Participantes + nº de posts (solo posts visibles):
+  SELECT p.uid, u.username, COUNT(*) AS posts
+  FROM mybb_sg_posts p
+  INNER JOIN mybb_sg_users u ON u.uid = p.uid
+  WHERE p.tid = '$tid' AND p.visible = 1
+  GROUP BY p.uid, u.username
+  ORDER BY posts DESC;
+
+Nombre de personaje / validación de ficha (por cada uid):
+  SELECT nombre FROM mybb_sg_sg_fichas WHERE fid = '$uid';
+  (sin fila -> sin ficha -> recipiente inválido, §10)
+
+
+--------------------------------------------------------------------------------
+8. APLICAR RECOMPENSA (por recipiente, en la confirmación)
+--------------------------------------------------------------------------------
+SEGURIDAD [Mejoras #1/#2]: el POST de confirmación trae SOLO tid, tipo, rango y,
+por persona, (uid, rol, %, dar_pergamino). El servidor NUNCA usa montos enviados
+por el cliente: recalcula ryos/tobis/exp desde sg_recompensa_mision() (§2). Así un
+POST manipulado no puede regalar cantidades arbitrarias.
+
+CONCURRENCIA [Mejora #3]: todo el bloque se ejecuta dentro de un GET_LOCK por TID
+(§9) para serializar entregas simultáneas.
+
+Para cada fila válida con rol != excluir:
+  1. Resolver tabla según (rol, tipo)   ->  §3.
+  2. Tomar ryos/tobis/exp del helper al RANGO elegido (fuente de verdad, §2).
+  3. Aplicar %:  ryos = round(ryos * pct/100); igual tobis y exp.
+  4. UPDATE mybb_sg_sg_fichas SET ryos = ryos + $ryos, tobi = tobi + $tobis
+       WHERE fid = '$uid';
+     UPDATE mybb_sg_users SET newpoints = newpoints + $exp WHERE uid = '$uid';
+  5. Pergamino: si es narrador Y su checkbox "dar pergamino" está marcado ->
+     upsert +1 del objeto que le corresponde (según su tabla al rango).
+  6. Acumular al detalle para la auditoría.
+
+
+--------------------------------------------------------------------------------
+9. AUDITORÍA, CONCURRENCIA Y PREVENCIÓN DE DOBLE-PAGO
+--------------------------------------------------------------------------------
+- Registro: tabla EXISTENTE mybb_sg_sg_audit_consola_mod (una fila por tanda
+  confirmada), con la razón etiquetada usando un DELIMITADOR para poder buscar sin
+  falsos positivos (que "TID:1" no matchee "TID:10"): [Mejora #3]
+      razon = "[Recompensa de Misión] TID:N|"
+      log   = staff + tipo + rango + desglose por recipiente, con antes→después
+              por recurso (ej. "Fulano ryos: 1200->1800, exp: 40->75"). [Mejora #6]
+  (mismo patrón que recompensas_staff.php / misiones.php; NO se crea tabla nueva.)
+- Aviso de doble-pago: al cargar un TID, consultar
+      ... WHERE razon LIKE '%[Recompensa de Misión] TID:N|%'
+  y si hay match, AVISAR con fecha/staff. No se bloquea duro (override consciente).
+- Concurrencia [Mejora #3]: el confirmar/aplicar se envuelve en
+      SELECT GET_LOCK('recompensa_tid_N', 5)  ...aplicar...  RELEASE_LOCK(...)
+  (mismo patrón que dojo.php / recompensa_diaria.php) para que dos staff no
+  procesen el mismo TID en paralelo y dupliquen la entrega.
+
+
+--------------------------------------------------------------------------------
+10. VALIDACIONES / CASOS BORDE
+--------------------------------------------------------------------------------
+- Permisos: solo staff (is_mod($uid) || is_staff($uid)); si no, template
+  sin_permisos (patrón de recompensas_staff.php).
+- CSRF: la confirmación es POST con my_post_key + verify_post_check.
+- Recipiente sin ficha -> inválido, no recibe nada, avisar en la lista.
+- Tipo Guerra: el selector de rango solo ofrece B/A/A+/S (T4 no existe por debajo
+  de B). Participantes T1 igual reciben con ese rango.
+- Tipo Autonarrada: rango solo E/D/C; 1 solo recipiente (el autor); sin narrador.
+- % siempre uno de {100,80,60,40,20,0}.
+- Puede haber varios narradores (no se bloquea): cada uno recibe su tabla y su
+  pergamino (si se marca).
+- Confirmar-luego-aplicar: el POST final lleva SOLO datos de intención (tid, tipo,
+  rango, y por persona uid/rol/%/dar_pergamino). El servidor recalcula los montos
+  (§8) — jamás confía en cantidades enviadas por el cliente. [Mejoras #1/#2]
+
+
+--------------------------------------------------------------------------------
+11. ARCHIVOS A CREAR / TOCAR
+--------------------------------------------------------------------------------
+  NUEVO  sg/admin/recompensas_mision.php               (lógica completa)
+  NUEVO  templates/html/staff_recompensas_mision.html  (UI + JS de vista previa)
+  EDITA  templates/html/staff_consola_mod.html         (enlace en "Herramientas")
+  EDITA  sg/functions/sg_functions.php  -> helper sg_recompensa_mision($rol,
+              $tipo, $rango) = FUENTE DE VERDAD de las tablas T1..T6 (lo usa la
+              vista previa vía JSON y la aplicación autoritativa del servidor),
+              + helper de upsert de inventario. [Mejoras #1/#2]
+  SIN ALTER de BD: se usa mybb_sg_sg_audit_consola_mod (existente).
+
+  Referencias de patrón:
+   - recompensas_staff.php  -> confirmación + aplicar ryos/tobi/exp + audit.
+   - recompensa_diaria.php  -> upsert de objeto en inventario.
+   - ficha_objetos.php      -> alta de objeto a una ficha.
+
+
+--------------------------------------------------------------------------------
+12. DECISIONES YA CONFIRMADAS (cerradas)
+--------------------------------------------------------------------------------
+(1) Rango ÚNICO por tema (no por persona).                              [OK]
+(2) Guerra/Trama/Evento/Side: el narrador gana esa recompensa sea
+    oficial o no (la oficialidad solo importa en Normal).               [OK]
+(3) Recipiente sin ficha = se omite por completo.                       [OK]
+(4) Autonarrada = 1 solo recipiente (el autor).                         [OK]
+(5) Auditoría en mybb_sg_sg_audit_consola_mod (sin tabla nueva).        [OK]
+(6) Trama/Evento/Side usan la tabla PLANA T5 (2,500 Ryos / 20 Tobis / 100 Exp,
+    sin pergamino, no depende del rango) — revertido a como estaba en el
+    documento original (recompensas.txt), tras probar brevemente T3 por rango
+    y decidir volver atrás.                                             [OK]
+(7) % escalonado 100/80/60/40/20/0; pergamino = toggle manual del
+    narrador, independiente del %.                                      [OK]
+
+--- Mejoras de diseño incorporadas -------------------------------------------
+(8) Seguridad: el servidor recalcula los montos; el cliente nunca los
+    envía. Tablas T1..T6 (+T5 plana) en un único helper PHP (JSON para
+    la preview).                                                       [#1/#2]
+(9) Doble-pago: aviso con delimitador "TID:N|" + GET_LOCK por TID al
+    aplicar. Sin tabla nueva.                                          [#3]
+(10) UI: el sub-selector oficial/no-oficial solo aparece en tipo Normal. [#5]
+(11) Confirmación con TOTAL agregado; auditoría con antes→después.       [#6]
+(12) Conveniencias: "poner a todos en X%" y sugerir al creador del tema
+     como probable narrador.                                            [#8]
+
+--- Historial de misiones (metadata de referencia) ---------------------------
+(13) Tabla nueva mybb_sg_sg_historial_misiones (tid,uid,rol,tipo,rango,
+     oficial,tiempo) — distinta de la auditoría: sirve para agregar/contar
+     por rango. Se llena en recompensas_mision.php al confirmar (una fila
+     por recipiente aplicado). Se muestra en una nueva pestaña "Estadísticas"
+     de la ficha (misiones jugadas y narradas, por rango, con totales).
+================================================================================

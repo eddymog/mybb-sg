@@ -715,7 +715,11 @@ function tecnicatag_run(&$message)
 
 			$badges_html = $badges !== '' ? '<div class="sg-technique__badges">'.$badges.'</div>' : '';
 			$description = $tecnica['descripcion'] ? nl2br($tecnica['descripcion']) : 'Sin descripción disponible.';
-			$effect_text = $tecnica['efecto'] ? nl2br($tecnica['efecto']) : 'No tiene efecto adicional especificado.';
+			// Códigos [CCKx1]/[MDES-10]/etc. del efecto se muestran SIEMPRE ya
+			// parseados (sin toggle: un post lo leen muchos usuarios distintos),
+			// usando las stats del AUTOR del post (no de quien lee).
+			$stats_ef_autor = sg_resolver_stats_autor_post($post);
+			$effect_text = $tecnica['efecto'] ? nl2br(sg_parsear_codigos_stats($tecnica['efecto'], $stats_ef_autor)) : 'No tiene efecto adicional especificado.';
 			$cost_text   = $tecnica['coste'] ? $tecnica['coste'] : 'Sin coste indicado';
 			$effect_muted = $tecnica['efecto'] ? '' : ' sg-technique__text--muted';
 

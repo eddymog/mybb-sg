@@ -106,14 +106,21 @@
     }
     .sg-dbtn--off em { color: var(--mist); opacity: 0.8; }
     .sg-dbtn:disabled { opacity: 0.45; cursor: not-allowed; }
+    .sg-dbtn--outline {
+      background: transparent; border: 0.5px solid var(--border-strong); color: var(--stone);
+    }
+    .sg-dbtn--outline:hover { border-color: var(--plum2); color: var(--ink); background: rgba(123, 74, 184, 0.08); }
 
     .sg-dnote { margin: 6px 0 0; color: var(--mist); font-size: 13px; }
+
+    .sg-tree-toolbar { display: flex; justify-content: flex-end; margin-bottom: 12px; }
 
     /* Árbol */
     .sg-tree { margin-bottom: 18px; border: 0.5px solid var(--border); background: var(--bg); }
     .sg-tree-head {
       display: flex; align-items: center; gap: 12px; padding: 14px 18px;
       background: var(--bg3); border-bottom: 0.5px solid var(--border);
+      cursor: pointer; user-select: none;
     }
     .sg-tree-titles { display: flex; flex-direction: column; gap: 2px; }
     .sg-tree-eyebrow {
@@ -128,6 +135,12 @@
       margin-left: auto; font-family: 'Cinzel', serif; font-size: 11px; font-weight: 700;
       letter-spacing: 1px; color: var(--gold);
     }
+    .sg-tree-caret {
+      flex-shrink: 0; font-size: 11px; color: var(--stone); transition: transform 0.2s ease;
+    }
+    .sg-tree.is-collapsed .sg-tree-caret { transform: rotate(-90deg); }
+    .sg-tree.is-collapsed .sg-tree-head { border-bottom: none; }
+    .sg-tree.is-collapsed .sg-tree-body { display: none; }
 
     .sg-ramas {
       display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
@@ -407,6 +420,11 @@
         </section>
 
         <if $msg != '' then><div class="sg-msg sg-msg--{$msg_tipo}">{$msg}</div></if>
+        <if $tot_arboles > 0 then>
+        <div class="sg-tree-toolbar">
+          <button type="button" class="sg-dbtn sg-dbtn--outline" id="sg-tree-toggle-all" onclick="sgToggleAllTrees()">Expandir todo</button>
+        </div>
+        </if>
         {$dojo_html}
       </div>
     </div>
@@ -427,6 +445,30 @@
   {$footer}
 
   <script>
+    // Colapsa/expande un árbol individual al hacer clic en su cabecera.
+    function sgToggleTree(head) {
+      var tree = head.closest('.sg-tree');
+      if (!tree) { return; }
+      tree.classList.toggle('is-collapsed');
+    }
+
+    // Colapsa/expande TODOS los árboles de una sola vez.
+    var sgTreesExpanded = false;
+
+    function sgToggleAllTrees() {
+      var trees = document.querySelectorAll('.sg-tree');
+      var btn = document.getElementById('sg-tree-toggle-all');
+      sgTreesExpanded = !sgTreesExpanded;
+
+      for (var i = 0; i < trees.length; i++) {
+        trees[i].classList.toggle('is-collapsed', !sgTreesExpanded);
+      }
+
+      if (btn) {
+        btn.textContent = sgTreesExpanded ? 'Colapsar todo' : 'Expandir todo';
+      }
+    }
+
     function sgDojoMejoras(box) {
       var checks = box.querySelectorAll('input[type=checkbox]');
       var n = 0;

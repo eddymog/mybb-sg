@@ -72,6 +72,20 @@ function nf_vd_card($r, $incompat_map)
         . "</label>";
 }
 
+// Desglose por rango (jugadas o narradas) para la pestaña "Estadísticas".
+function fx_stats_rows_html($breakdown)
+{
+    if (empty($breakdown)) {
+        return "<div class=\"fx-row\"><span class=\"fx-row__k\">Sin registros</span><span class=\"fx-row__v\">—</span></div>";
+    }
+    $html = '';
+    foreach ($breakdown as $rango => $cantidad) {
+        $rango_esc = htmlspecialchars($rango, ENT_QUOTES);
+        $html .= "<div class=\"fx-row\"><span class=\"fx-row__k\">Rango $rango_esc</span><span class=\"fx-row__v\">$cantidad</span></div>";
+    }
+    return $html;
+}
+
 $uid = $mybb->get_input('uid');
 $action = $mybb->get_input('action');
 $module = $mybb->get_input('module'); 
@@ -177,6 +191,25 @@ if ($ficha_existe == true && ($moderated == true || is_mod($s_uid) || is_staff($
     eval('$sgPostnum = $sg_postnum;');
     eval('$sgThreadnum = $sg_threadnum;');
     eval('$sgRegdateFmt = $sg_regdate_fmt;');
+
+    // Estadísticas de misiones (pestaña "Estadísticas") — metadata de referencia
+    // que llena sg/admin/recompensas_mision.php al confirmar cada recompensa.
+    $sg_stats = sg_historial_mision_stats($uid);
+    $sg_stats_jugadas_html  = fx_stats_rows_html($sg_stats['jugadas']);
+    $sg_stats_narradas_html = fx_stats_rows_html($sg_stats['narradas']);
+    $sg_stats_jugadas_total  = $sg_stats['jugadas_total'];
+    $sg_stats_narradas_total = $sg_stats['narradas_total'];
+    eval('$sgStatsJugadasHtml = $sg_stats_jugadas_html;');
+    eval('$sgStatsNarradasHtml = $sg_stats_narradas_html;');
+    eval('$sgStatsJugadasTotal = $sg_stats_jugadas_total;');
+    eval('$sgStatsNarradasTotal = $sg_stats_narradas_total;');
+
+    // Contador Combate 1v1 (victorias/empates/derrotas) — misma pestaña.
+    $sg_combate_1v1 = sg_historial_combate_stats($uid, 'combate_1v1');
+    eval('$sgCombate1v1Ganador = $sg_combate_1v1[\'ganador\'];');
+    eval('$sgCombate1v1Perdedor = $sg_combate_1v1[\'perdedor\'];');
+    eval('$sgCombate1v1Empate = $sg_combate_1v1[\'empate\'];');
+    eval('$sgCombate1v1Total = $sg_combate_1v1[\'total\'];');
 
     // Semana actual (mismo epoch que newpoints) y timestamp de cierre para el contador
     $sg_exp_epoch  = 1721620800;
@@ -628,6 +661,9 @@ if ($ficha_existe == true && ($moderated == true || is_mod($s_uid) || is_staff($
     
     while ($tec_aprendida = $db->fetch_array($query_tec_aprendidas)) {
         $tec_aprendida['descripcion'] = nl2br($tec_aprendida['descripcion']);
+        // $ficha ya trae las pasivas aplicadas (sg_aplicar_pasivas más arriba),
+        // así que ya son las estadísticas EFECTIVAS de este personaje.
+        $tec_aprendida['efecto_parsed'] = sg_parsear_codigos_stats($tec_aprendida['efecto'], $ficha);
         $key = trim($tec_aprendida['arbol']);
         if ($key === '') { $key = 'Sin árbol'; }
 

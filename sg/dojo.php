@@ -246,13 +246,15 @@ foreach ($estado['arboles'] as $arbol => $ainfo) {
     $es_clan = in_array($arbol, $clan_arboles, true);
     $nivel_arbol = (int) $ainfo['nivel_arbol'];
 
-    $dojo_html .= "<section class=\"sg-tree\">";
-    $dojo_html .= "<div class=\"sg-tree-head\">";
+    $dojo_html .= "<section class=\"sg-tree is-collapsed\">";
+    $dojo_html .= "<div class=\"sg-tree-head\" onclick=\"sgToggleTree(this)\">";
     $eyebrow = "Árbol" . ($es_clan ? ($es_hibrido ? " · Clan (híbrido)" : " · Clan") : "");
     $dojo_html .= "<div class=\"sg-tree-titles\"><span class=\"sg-tree-eyebrow\">".$eyebrow."</span>";
     $dojo_html .= "<h2 class=\"sg-tree-name\">".ucfirst($esc($arbol))."</h2></div>";
     $dojo_html .= "<span class=\"sg-tree-lvl\">Nivel ".$nivel_arbol." / 9</span>";
+    $dojo_html .= "<span class=\"sg-tree-caret\">▾</span>";
     $dojo_html .= "</div>";
+    $dojo_html .= "<div class=\"sg-tree-body\">";
 
     // En híbrido, los dos árboles de clan comparten el tope de 3 ramas y 3 especialidades.
     if ($es_clan && $es_hibrido) {
@@ -348,6 +350,7 @@ foreach ($estado['arboles'] as $arbol => $ainfo) {
         $dojo_html .= "</div>";
     }
 
+    $dojo_html .= "</div>"; // .sg-tree-body
     $dojo_html .= "</section>"; // .sg-tree
 }
 
