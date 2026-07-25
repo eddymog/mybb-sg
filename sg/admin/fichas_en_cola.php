@@ -65,10 +65,14 @@ if ($action == 'aprobar' && $fid && $villa) {
             $usergroup = '2'; // registered
     }
 
-    $db->query(" 
-        UPDATE `mybb_sg_sg_fichas` SET `moderated`='$username' WHERE moderated='no_moderacion' AND fid='$fid'
-    ");
-    $db->query(" 
+    // Solo aprobar si sigue pendiente (preserva el guard WHERE moderated='no_moderacion').
+    $mod_actual = null;
+    $qm = $db->query("SELECT moderated FROM `mybb_sg_sg_fichas` WHERE fid='$fid'");
+    while ($rm = $db->fetch_array($qm)) { $mod_actual = $rm['moderated']; }
+    if ($mod_actual === 'no_moderacion') {
+        sg_ficha_set_campo($fid, 'moderated', $username, 'staff', SG_ORIGEN_APROBACION, 'Aprobación de ficha');
+    }
+    $db->query("
         UPDATE `mybb_sg_users` SET `usergroup`='$usergroup' WHERE uid=$fid;
     ");
     eval('$reload_script = $reload_js;');

@@ -79,6 +79,7 @@ function toggleTheme() {
 		      <if $g_uid != 0 then><li><a href="{$mybb->settings['bburl']}/sg/recompensa_diaria.php" id="recompensas">Recompensa Diaria</a></li></if>
 			  <li><a href="{$mybb->settings['bburl']}/sg/mapa_mundo.php">Mapa del Mundo</a></li>
 			  <li><a href="{$mybb->settings['bburl']}/sg/registro_virtudes.php">Virtudes y Defectos</a></li>
+			  <li><a href="{$mybb->settings['bburl']}/sg/registro_personajes.php">Registro de Personajes</a></li>
 			  <li><a href="{$mybb->settings['bburl']}/sg/objetos.php">Objetos</a></li>
               <li><a href="{$mybb->settings['bburl']}/sg/calculadora.php">Calc. de Estadísticas</a></li>
               <li><a href="{$mybb->settings['bburl']}/sg/censo.php">Censo y Estadísticas</a></li>
@@ -95,6 +96,7 @@ function toggleTheme() {
 			  <li><a href="{$mybb->settings['bburl']}/sg/dojo.php">Dojo</a></li>
               <li><a href="{$mybb->settings['bburl']}/sg/misiones.php" id="misiones">Misiones</a></li>
 			  <li><a href="{$mybb->settings['bburl']}/sg/tienda.php">Tienda</a></li>
+			  <li><a href="{$mybb->settings['bburl']}/sg/pergaminos.php">Pergaminos</a></li>
             </ul>
           </li>
      	  </if>
@@ -294,7 +296,7 @@ function toggleTheme() {
 <!-- ═══════════════════════════════════════════════════════════════
      SABÍAS QUE — staff / specific user only (tarjeta compacta)
      ═══════════════════════════════════════════════════════════════ -->
-<!-- if current_page != "index.php" then -->
+<if $current_page != "index.php" then>
 <div style="max-width: 1100px; width: 100%; margin: 0 auto; box-sizing: border-box;">
   <div style="display: flex; align-items: center; gap: 14px; background: var(--bg2);
               border-top: 0.5px solid var(--border); border-bottom: 0.5px solid var(--border);
@@ -318,7 +320,7 @@ function toggleTheme() {
 
   </div>
 </div>
-<!-- /if -->
+</if>
 
 
 <!-- ═══════════════════════════════════════════════════════════════

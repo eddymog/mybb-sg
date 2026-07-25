@@ -1037,6 +1037,10 @@ if($mybb->input['action'] == "newreply" || $mybb->input['action'] == "editdraft"
 				WHERE u.uid='".$mybb->user['uid']."'
 			");
 			$post = $db->fetch_array($query);
+			// SG: preservar el tid para que tecnicatag_run() encuentre el
+			// snapshot de stats fijado del tema (mybb_sg_sg_thread_personaje)
+			// en vez de caer a las stats en vivo de la ficha.
+			$post['tid'] = $mybb->get_input('tid', MyBB::INPUT_INT);
 			$post['username'] = $username;
 			if($mybb->user['uid'])
 			{

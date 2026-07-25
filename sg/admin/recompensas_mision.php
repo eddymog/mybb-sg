@@ -227,8 +227,9 @@ if ($is_ajax) {
                             $exp_old  = $usuario ? floatval($usuario['newpoints']) : 0;
                             $exp_new  = $exp_old + $base['exp'];
 
-                            $db->query("UPDATE `mybb_sg_sg_fichas` SET `tobi`='$tobi_new' WHERE `fid`='{$p['uid']}'");
-                            $db->query("UPDATE `mybb_sg_users` SET `newpoints`='$exp_new' WHERE `uid`='{$p['uid']}'");
+                            $grupo = uniqid();
+                            sg_ficha_set_campo($p['uid'], 'tobi', $tobi_new, 'staff', SG_ORIGEN_RECOMPENSA_MISION, 'Recompensa combate 1v1', $grupo);
+                            sg_usuario_set_campo($p['uid'], 'newpoints', $exp_new, 'staff', SG_ORIGEN_RECOMPENSA_MISION, 'Recompensa combate 1v1', $grupo);
 
                             // Historial de combates (metadata de referencia para el
                             // contador Combate 1v1 en la pestaña "Estadísticas" de la ficha).
@@ -345,17 +346,21 @@ if ($is_ajax) {
                 $tobi_new = $tobi_old + $tobi_add;
                 $exp_new  = $exp_old + $exp_add;
 
-                if ($ryos_add > 0 || $tobi_add > 0) {
-                    $db->query("UPDATE `mybb_sg_sg_fichas` SET `ryos`='$ryos_new', `tobi`='$tobi_new' WHERE `fid`='$fuid'");
+                $grupo = uniqid();
+                if ($ryos_add > 0) {
+                    sg_ficha_set_campo($fuid, 'ryos', $ryos_new, 'staff', SG_ORIGEN_RECOMPENSA_MISION, 'Recompensa de misión', $grupo);
+                }
+                if ($tobi_add > 0) {
+                    sg_ficha_set_campo($fuid, 'tobi', $tobi_new, 'staff', SG_ORIGEN_RECOMPENSA_MISION, 'Recompensa de misión', $grupo);
                 }
                 if ($exp_add > 0) {
-                    $db->query("UPDATE `mybb_sg_users` SET `newpoints`='$exp_new' WHERE `uid`='$fuid'");
+                    sg_usuario_set_campo($fuid, 'newpoints', $exp_new, 'staff', SG_ORIGEN_RECOMPENSA_MISION, 'Recompensa de misión', $grupo);
                 }
 
                 $perg_txt = '';
                 $dio_pergamino = false;
                 if ($rol === 'narrador' && $quiere_perg && $base['pergamino']) {
-                    sg_inventario_dar_objeto($fuid, $base['pergamino']);
+                    sg_inventario_dar_objeto($fuid, $base['pergamino'], 'staff', SG_ORIGEN_RECOMPENSA_MISION, 'Pergamino de misión', $grupo);
                     $perg_txt = ", pergamino {$base['pergamino']}";
                     $dio_pergamino = true;
                 }

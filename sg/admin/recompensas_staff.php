@@ -164,8 +164,10 @@ if ($accion === 'recompensa_mision' && $es_staff) {
                 $tobi_new = $tobi_old + $p['tobi'];
                 $exp_new  = $exp_old + $p['exp'];
 
-                $db->query("UPDATE `mybb_sg_sg_fichas` SET `ryos`='$ryos_new', `tobi`='$tobi_new' WHERE `fid`='$fid'");
-                $db->query("UPDATE `mybb_sg_users` SET `newpoints`='$exp_new' WHERE `uid`='$fid'");
+                $grupo = uniqid();
+                sg_ficha_set_campo($fid, 'ryos', $ryos_new, 'staff', SG_ORIGEN_RECOMPENSA_STAFF, $razon_reco, $grupo);
+                sg_ficha_set_campo($fid, 'tobi', $tobi_new, 'staff', SG_ORIGEN_RECOMPENSA_STAFF, $razon_reco, $grupo);
+                sg_usuario_set_campo($fid, 'newpoints', $exp_new, 'staff', SG_ORIGEN_RECOMPENSA_STAFF, $razon_reco, $grupo);
 
                 $detalle[] = "UID $fid ($nombre): ryos $ryos_old->$ryos_new (+{$p['ryos']}), "
                            . "tobi $tobi_old->$tobi_new (+{$p['tobi']}), "
@@ -262,18 +264,20 @@ if ($accion === 'recompensa_semanal') {
                     $exp_gan = 100 - $S;   // diferencia como experiencia
                     $rin_gan = $S;         // lo acumulado se convierte en rins
 
+                    $grupo = uniqid();
+
                     // Experiencia (newpoints)
                     $exp_old = $usuario ? floatval($usuario['newpoints']) : 0;
                     $exp_new = $exp_old + $exp_gan;
                     if ($exp_gan > 0) {
-                        $db->query("UPDATE `mybb_sg_users` SET `newpoints`='$exp_new' WHERE `uid`='$fid'");
+                        sg_usuario_set_campo($fid, 'newpoints', $exp_new, 'staff', SG_ORIGEN_RECOMPENSA_STAFF, 'Cobro semanal (diferencia)', $grupo);
                     }
 
                     // Rins
                     $rin_old = intval($ficha['rin']);
                     $rin_new = $rin_old + $rin_gan;
                     if ($rin_gan > 0) {
-                        $db->query("UPDATE `mybb_sg_sg_fichas` SET `rin`='$rin_new' WHERE `fid`='$fid'");
+                        sg_ficha_set_campo($fid, 'rin', $rin_new, 'staff', SG_ORIGEN_RECOMPENSA_STAFF, 'Cobro semanal (diferencia)', $grupo);
                     }
 
                     // La semana queda saldada (tope 100)

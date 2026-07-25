@@ -1,0 +1,31 @@
+Necesito crear una pagina que se llame pergaminos.php en la carpeta de /sg.
+
+Basicamente, es una pagina que averigua si tienes los objetos:
+PERG001, PERG002, PERG003, PERG004, PERG005, PERG006 y PERG007
+
+De tenerlos, te muestra que tienes estos objetos.
+
+Debe ser una pagina llamativa, porque es como uno de esos gachas de videojuegos, en el que apuestas y te dan un premio.
+
+Basicamente, te muestra si tienes alguno de los pergaminos (o todos los que tengas).
+
+Al hacer click en el boton "Abrir Pergamino" o algo asi, debajo de cada pergamino, te sale una ventana de confirmacion, y de darle aceptar, te deberia salir una ruleta o algo asi para sacar un premio de la lista de pergaminos.
+
+Por ejemplo, digamos que uno de los premios de pergaminos son:
+
+PERG001:
+30% que salga 100 Ryos
+10% de ganar 200 Ryos
+10% de ganar 100 Rins
+10% de ganar 50 Madara
+7% de ganar 30 Tobi
+3% de ganar un PERG002
+5% de ganar el objeto de ID CHAKRAM
+20% de ganar 20 Tobi
+5% de ganar un JACKPOT, lo cual implica que ganas 5 premios dentro del pergamino al random
+
+Ademas, deberia haber una pagina de herramienta en /sg/admin en el que puedas modificar el % de probabilidad de que gane un premio y que puedas elegir que premio puedas obtener, y se puede decidir entre ryos, rins, madaras, tobis u objetos y el Staff puede decidirlo.
+
+Instrucciones:
+- Lee el documento este, y creame un document .md con tu interpretacion de lo que he escrito aqui, de como lo implementarias y tambien sugerencias uqe podrias hacerme.
+

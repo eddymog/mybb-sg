@@ -137,13 +137,12 @@ if ($mid3) {
         // $new_ph = intval($old_ph) + intval($m_var['expt']);
         $new_ryos = intval($old_ryos) + intval($m_var['ryos']);
         $new_pr = floatval($old_pr) + (floatval($m_var['coste']));
-        $db->query(" 
-            UPDATE `mybb_sg_sg_fichas` SET `ryos`='".$new_ryos."' WHERE `fid`='".$uid."';
-        ");
-        $db->query(" 
-            UPDATE `mybb_sg_users` SET `newpoints`='".$new_pr."' WHERE `uid`='".$uid."';
-        ");
-        $db->query(" 
+
+        $grupo = uniqid();
+        sg_ficha_set_campo($uid, 'ryos', $new_ryos, 'usuario', SG_ORIGEN_MISION_ENTRENAMIENTO, 'Misión de entrenamiento completada', $grupo);
+        sg_usuario_set_campo($uid, 'newpoints', $new_pr, 'usuario', SG_ORIGEN_MISION_ENTRENAMIENTO, 'Misión de entrenamiento completada', $grupo);
+
+        $db->query("
             INSERT INTO `mybb_sg_sg_audit_misiones` (`fid`, `nombre`, `mid`, `puntos_habilidad`, `ryos`, `pr`, `tiempo_iniciado`, `tiempo_finaliza`) VALUES 
             ('".$uid."', '$nombre', '".$mid3."', 'x->x', '$old_ryos->".$new_ryos."', '$old_pr->".$new_pr."', '$tiempo_iniciado', '$tiempo_finaliza');
         ");

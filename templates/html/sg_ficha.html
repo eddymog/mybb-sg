@@ -163,7 +163,8 @@
     #fx-inventario:checked ~ .fx-tabs .fx-tab[for="fx-inventario"],
     #fx-tecnicas:checked ~ .fx-tabs .fx-tab[for="fx-tecnicas"],
     #fx-perfil:checked ~ .fx-tabs .fx-tab[for="fx-perfil"],
-    #fx-stats:checked ~ .fx-tabs .fx-tab[for="fx-stats"] {
+    #fx-stats:checked ~ .fx-tabs .fx-tab[for="fx-stats"],
+    #fx-historial:checked ~ .fx-tabs .fx-tab[for="fx-historial"] {
       color: var(--ink); background: var(--card);
       border-color: var(--border); border-bottom-color: var(--card);
       margin-bottom: -0.5px;
@@ -172,14 +173,16 @@
     #fx-inventario:checked ~ .fx-tabs .fx-tab[for="fx-inventario"] .fx-tab__gem,
     #fx-tecnicas:checked ~ .fx-tabs .fx-tab[for="fx-tecnicas"] .fx-tab__gem,
     #fx-perfil:checked ~ .fx-tabs .fx-tab[for="fx-perfil"] .fx-tab__gem,
-    #fx-stats:checked ~ .fx-tabs .fx-tab[for="fx-stats"] .fx-tab__gem { opacity: 1; }
+    #fx-stats:checked ~ .fx-tabs .fx-tab[for="fx-stats"] .fx-tab__gem,
+    #fx-historial:checked ~ .fx-tabs .fx-tab[for="fx-historial"] .fx-tab__gem { opacity: 1; }
 
     .fx-radio:focus-visible ~ .fx-tabs .fx-tab { outline: none; }
     #fx-dossier:focus-visible ~ .fx-tabs .fx-tab[for="fx-dossier"],
     #fx-inventario:focus-visible ~ .fx-tabs .fx-tab[for="fx-inventario"],
     #fx-tecnicas:focus-visible ~ .fx-tabs .fx-tab[for="fx-tecnicas"],
     #fx-perfil:focus-visible ~ .fx-tabs .fx-tab[for="fx-perfil"],
-    #fx-stats:focus-visible ~ .fx-tabs .fx-tab[for="fx-stats"] { outline: 2px solid var(--accent); outline-offset: -2px; }
+    #fx-stats:focus-visible ~ .fx-tabs .fx-tab[for="fx-stats"],
+    #fx-historial:focus-visible ~ .fx-tabs .fx-tab[for="fx-historial"] { outline: 2px solid var(--accent); outline-offset: -2px; }
 
     /* ── PANELES ──────────────────────────────────────── */
     .fx-panels {
@@ -206,7 +209,8 @@
     #fx-inventario:checked ~ .fx-panels .fx-panel--inventario,
     #fx-tecnicas:checked ~ .fx-panels .fx-panel--tecnicas,
     #fx-perfil:checked ~ .fx-panels .fx-panel--perfil,
-    #fx-stats:checked ~ .fx-panels .fx-panel--stats { display: block; animation: fxPageIn .4s cubic-bezier(.2,.7,.3,1) both; }
+    #fx-stats:checked ~ .fx-panels .fx-panel--stats,
+    #fx-historial:checked ~ .fx-panels .fx-panel--historial { display: block; animation: fxPageIn .4s cubic-bezier(.2,.7,.3,1) both; }
     /* Page-flip: la hoja entra girando desde el lomo (izquierda) */
     @keyframes fxPageIn { from { opacity: 0; transform: rotateY(-7deg) translateX(-10px); transform-origin: left center; } to { opacity: 1; transform: none; } }
     @media (prefers-reduced-motion: reduce) {
@@ -214,7 +218,8 @@
       #fx-inventario:checked ~ .fx-panels .fx-panel--inventario,
       #fx-tecnicas:checked ~ .fx-panels .fx-panel--tecnicas,
       #fx-perfil:checked ~ .fx-panels .fx-panel--perfil,
-      #fx-stats:checked ~ .fx-panels .fx-panel--stats { animation: none; }
+      #fx-stats:checked ~ .fx-panels .fx-panel--stats,
+      #fx-historial:checked ~ .fx-panels .fx-panel--historial { animation: none; }
     }
 
     /* Kanji watermark por pestaña */
@@ -228,6 +233,7 @@
     .fx-panel--perfil::before  { content: '魂'; }
     .fx-panel--inventario::before { content: '蔵'; }
     .fx-panel--stats::before { content: '暦'; }
+    .fx-panel--historial::before { content: '録'; }
 
     /* Folio (número de página) por pestaña */
     .fx-panel::after {
@@ -239,6 +245,7 @@
     .fx-panel--tecnicas::after { content: 'Folio iii'; }
     .fx-panel--inventario::after { content: 'Folio iv'; }
     .fx-panel--stats::after { content: 'Folio v'; }
+    .fx-panel--historial::after { content: 'Folio vi'; }
 
     .fx-layout { position: relative; z-index: 1; display: grid; grid-template-columns: 260px 1fr; gap: 26px; align-items: start; }
     @media (max-width: 760px){ .fx-layout { grid-template-columns: 1fr; } }
@@ -378,7 +385,7 @@
     .fx-row--action:hover .fx-row__go { opacity: 1; transform: translate(1px, -1px); }
 
     /* Recursos como celdas */
-    .fx-res { display: grid; grid-template-columns: repeat(2,1fr); gap: 10px; }
+    .fx-res { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; }
     .fx-res__cell { text-align: center; border: 0.5px solid var(--border); padding: 12px 6px; background: var(--card2); }
     .fx-res__v { font-family: 'Cinzel', serif; font-weight: 700; font-size: 20px; color: var(--accent); font-variant-numeric: tabular-nums; }
     .fx-res__k { font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--mist); margin-top: 2px; }
@@ -756,6 +763,97 @@
       display: block; margin-bottom: 2px; font-family: 'Cinzel', serif; font-size: 12px;
       font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: #e6c877;
     }
+
+    /* ── Historial ── */
+    .fx-hist { position: relative; z-index: 1; }
+    .fx-hist-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; }
+    .fx-hist-eyebrow { font-family: 'Cinzel', serif; font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--mist); }
+    .fx-hist-filters { display: flex; gap: 6px; }
+    .fx-hist-fbtn {
+      padding: 5px 12px; background: var(--bg2); border: 1px solid var(--border); color: var(--stone);
+      font-family: 'Cinzel', serif; font-size: 9px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
+      cursor: pointer; transition: color .15s, border-color .15s, background .15s;
+    }
+    .fx-hist-fbtn:hover { color: var(--ink); }
+    .fx-hist-fbtn.is-active { color: var(--ink); border-color: var(--accent); background: var(--card); }
+
+    .fx-hist-feed { display: flex; flex-direction: column; gap: 10px; }
+    .fx-hist-event {
+      border: 0.5px solid var(--border); border-left: 2px solid var(--border);
+      background: var(--card); padding: 12px 14px;
+    }
+    .fx-hist-event[data-tipo="staff"] { border-left-color: var(--accent); }
+    .fx-hist-event__head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 8px; }
+    .fx-hist-event__date { font-family: 'Cinzel', serif; font-size: 11px; letter-spacing: 0.5px; color: var(--stone); }
+    .fx-hist-badge {
+      display: inline-flex; align-items: center; padding: 2px 7px;
+      font-family: 'Cinzel', serif; font-size: 8px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
+      border: 0.5px solid var(--border);
+    }
+    .fx-hist-badge--staff { color: var(--accent); border-color: var(--accent); }
+    .fx-hist-badge--usuario { color: var(--mist); }
+    .fx-hist-event__origen { font-family: 'Noto Serif JP', serif; font-size: 12.5px; font-weight: 600; color: var(--ink); }
+    .fx-hist-event__link { margin-left: auto; font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 1px; text-transform: uppercase; color: var(--accent); text-decoration: none; }
+    .fx-hist-event__link:hover { text-decoration: underline; }
+
+    .fx-hist-changes { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
+    .fx-hist-change { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; font-size: 13px; }
+    .fx-hist-change__k { font-family: 'Cinzel', serif; font-size: 10px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; color: var(--mist); }
+    .fx-hist-change__k--pos { color: #4f9d69; }
+    .fx-hist-change__k--neg { color: #b5544b; }
+    .fx-hist-change__v { color: var(--ink); }
+    .fx-hist-delta { font-family: 'Cinzel', serif; font-size: 11px; font-weight: 700; }
+    .fx-hist-delta--pos { color: #4f9d69; }
+    .fx-hist-delta--neg { color: #b5544b; }
+
+    /* Campos de trasfondo (Biografía, Apariencia, etc.): bloques Antes/Después
+       apilados, cada uno colapsable si es largo (mismo patrón que .fx-bio-*). */
+    .fx-hist-change--texto { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; }
+    .fx-hist-text-block { width: 100%; margin-top: 2px; }
+    .fx-hist-text-label {
+      display: block; margin-bottom: 3px; font-family: 'Cinzel', serif; font-size: 8px; font-weight: 700;
+      letter-spacing: 1.2px; text-transform: uppercase; color: var(--stone);
+    }
+    .fx-hist-text { font-family: 'Noto Serif JP', serif; font-size: 13px; line-height: 1.6; color: var(--ink); white-space: pre-wrap; word-break: break-word; }
+    .fx-hist-text-empty { font-size: 13px; font-style: italic; color: var(--mist); }
+    .fx-hist-text-toggle-input { position: absolute; width: 1px; height: 1px; opacity: 0; overflow: hidden; }
+    .fx-hist-text--clamped { max-height: 96px; overflow: hidden; position: relative; }
+    .fx-hist-text--clamped::after {
+      content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 32px;
+      background: linear-gradient(180deg, transparent, var(--card)); pointer-events: none;
+    }
+    .fx-hist-text-toggle-input:checked ~ .fx-hist-text--clamped { max-height: none; }
+    .fx-hist-text-toggle-input:checked ~ .fx-hist-text--clamped::after { display: none; }
+    .fx-hist-text-more {
+      display: inline-flex; margin-top: 6px; cursor: pointer;
+      font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 1px; text-transform: uppercase; color: var(--accent);
+    }
+    .fx-hist-text-more:hover { text-decoration: underline; }
+    .fx-hist-text-more__less { display: none; }
+    .fx-hist-text-toggle-input:checked ~ .fx-hist-text-more .fx-hist-text-more__more { display: none; }
+    .fx-hist-text-toggle-input:checked ~ .fx-hist-text-more .fx-hist-text-more__less { display: inline; }
+
+    .fx-hist-noresults { display: none; padding: 24px 16px; text-align: center; color: var(--mist); font-size: 13px; border: 0.5px dashed var(--border); }
+    .fx-hist-noresults.is-show { display: block; }
+
+    .fx-hist-select {
+      height: 28px; padding: 0 8px; background: var(--bg2); border: 1px solid var(--border); color: var(--stone);
+      font-family: 'Cinzel', serif; font-size: 9px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase;
+      cursor: pointer;
+    }
+    .fx-hist-select:focus { outline: none; border-color: var(--accent); color: var(--ink); }
+
+    .fx-hist-pagination { display: flex; align-items: center; justify-content: center; gap: 12px; margin-top: 14px; }
+    .fx-hist-pagination:empty { display: none; }
+    .fx-hist-pbtn {
+      display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px;
+      background: var(--bg2); border: 1px solid var(--border); color: var(--ink);
+      font-family: 'Cinzel', serif; font-size: 14px; cursor: pointer; transition: border-color .15s, color .15s;
+    }
+    .fx-hist-pbtn:hover { border-color: var(--accent); color: var(--accent); }
+    .fx-hist-pbtn:disabled { opacity: 0.35; cursor: not-allowed; }
+    .fx-hist-pbtn:disabled:hover { border-color: var(--border); color: var(--ink); }
+    .fx-hist-pinfo { font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 1px; color: var(--stone); }
   </style>
 </head>
 
@@ -803,6 +901,7 @@
       <input class="fx-radio" type="radio" name="fxtab" id="fx-tecnicas">
       <input class="fx-radio" type="radio" name="fxtab" id="fx-perfil">
       <input class="fx-radio" type="radio" name="fxtab" id="fx-stats">
+      <input class="fx-radio" type="radio" name="fxtab" id="fx-historial">
 
       <nav class="fx-tabs" role="tablist" aria-label="Secciones de la ficha">
         <label class="fx-tab" for="fx-dossier"><span class="fx-tab__gem"></span>Expediente</label>
@@ -810,6 +909,7 @@
         <label class="fx-tab" for="fx-tecnicas"><span class="fx-tab__gem"></span>Técnicas</label>
         <label class="fx-tab" for="fx-inventario"><span class="fx-tab__gem"></span>Inventario</label>
         <label class="fx-tab" for="fx-stats"><span class="fx-tab__gem"></span>Estadísticas</label>
+        <label class="fx-tab" for="fx-historial"><span class="fx-tab__gem"></span>Historial</label>
       </nav>
 
       <div class="fx-panels">
@@ -851,6 +951,7 @@
                     <div class="fx-res__cell"><div class="fx-res__v">{$ficha['rin']}</div><div class="fx-res__k">Rins</div></div>
                     <div class="fx-res__cell"><div class="fx-res__v">{$ficha['tobi']}</div><div class="fx-res__k">Tobis</div></div>
                     <div class="fx-res__cell"><div class="fx-res__v" id="fx-inv-ryos">{$ficha['ryos']}</div><div class="fx-res__k">Ryos</div></div>
+                    <div class="fx-res__cell"><div class="fx-res__v">{$ficha['madara']}</div><div class="fx-res__k">Madara</div></div>
                     <div class="fx-res__cell"><div class="fx-res__v">{$sgBingoShow}</div><div class="fx-res__k">Bingo</div></div>
                   </div>
                 </div>
@@ -1167,6 +1268,35 @@
           </div>
         </section>
 
+        <!-- ── HISTORIAL ── -->
+        <section class="fx-panel fx-panel--historial" role="tabpanel">
+          <if $sgHistorialCount != 0 then>
+            <div class="fx-hist">
+              <div class="fx-hist-head">
+                <span class="fx-hist-eyebrow">Historial de cambios</span>
+                <div class="fx-hist-filters" id="fx-hist-filters">
+                  <button type="button" class="fx-hist-fbtn is-active" data-filter="all" onclick="fxHistSetTipo(this,'all')">Todos</button>
+                  <button type="button" class="fx-hist-fbtn" data-filter="staff" onclick="fxHistSetTipo(this,'staff')">Staff</button>
+                  <button type="button" class="fx-hist-fbtn" data-filter="usuario" onclick="fxHistSetTipo(this,'usuario')">Usuario</button>
+                  <select class="fx-hist-select" id="fx-hist-origen" onchange="fxHistSetOrigen(this)">
+                    <option value="all">Todos los orígenes</option>
+                    {$sgHistorialOrigenesHtml}
+                  </select>
+                </div>
+              </div>
+              <div class="fx-hist-feed" id="fx-hist-feed">{$sgHistorialHtml}</div>
+              <div class="fx-hist-noresults" id="fx-hist-noresults">No hay cambios que coincidan con el filtro.</div>
+              <div class="fx-hist-pagination" id="fx-hist-pagination"></div>
+            </div>
+          <else>
+            <div class="fx-inv-empty">
+              <div class="fx-inv-empty__k" aria-hidden="true">録</div>
+              <div class="fx-inv-empty__t">Historial</div>
+              <p class="fx-inv-empty__p">Todavía no hay cambios registrados para este personaje.</p>
+            </div>
+          </if>
+        </section>
+
       </div>
 
       <if $g_is_staff then>
@@ -1237,6 +1367,82 @@
   {$footer}
 
   <script>
+    // Historial: filtros (tipo Staff/Usuario + origen) y paginación client-side
+    // sobre los eventos ya renderizados en servidor.
+    var fxHistState = { tipo: 'all', origen: 'all', page: 1, perPage: 15 };
+
+    function fxHistSetTipo(btn, t) {
+      var cont = document.getElementById('fx-hist-filters');
+      if (cont) {
+        var botones = cont.getElementsByClassName('fx-hist-fbtn');
+        for (var i = 0; i < botones.length; i++) { botones[i].classList.remove('is-active'); }
+      }
+      if (btn) { btn.classList.add('is-active'); }
+      fxHistState.tipo = t;
+      fxHistState.page = 1;
+      fxHistApply();
+    }
+
+    function fxHistSetOrigen(sel) {
+      fxHistState.origen = sel ? sel.value : 'all';
+      fxHistState.page = 1;
+      fxHistApply();
+    }
+
+    function fxHistGoPage(n) {
+      fxHistState.page = n;
+      fxHistApply();
+      var feed = document.getElementById('fx-hist-feed');
+      if (feed && feed.scrollIntoView) { feed.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+    }
+
+    function fxHistApply() {
+      var feed = document.getElementById('fx-hist-feed');
+      if (!feed) { return; }
+      var eventos = feed.getElementsByClassName('fx-hist-event');
+
+      // 1) Qué eventos pasan los filtros
+      var coinciden = [];
+      for (var i = 0; i < eventos.length; i++) {
+        var e = eventos[i];
+        var okTipo = (fxHistState.tipo === 'all') || (e.getAttribute('data-tipo') === fxHistState.tipo);
+        var okOrig = (fxHistState.origen === 'all') || (e.getAttribute('data-origen') === fxHistState.origen);
+        if (okTipo && okOrig) { coinciden.push(e); } else { e.style.display = 'none'; }
+      }
+
+      // 2) Paginar los que coinciden
+      var total = coinciden.length;
+      var totalPaginas = Math.max(1, Math.ceil(total / fxHistState.perPage));
+      if (fxHistState.page > totalPaginas) { fxHistState.page = totalPaginas; }
+      if (fxHistState.page < 1) { fxHistState.page = 1; }
+      var inicio = (fxHistState.page - 1) * fxHistState.perPage;
+      var fin = inicio + fxHistState.perPage;
+      for (var j = 0; j < coinciden.length; j++) {
+        coinciden[j].style.display = (j >= inicio && j < fin) ? '' : 'none';
+      }
+
+      var nores = document.getElementById('fx-hist-noresults');
+      if (nores) { nores.classList.toggle('is-show', total === 0); }
+
+      fxHistRenderPagination(total, totalPaginas);
+    }
+
+    function fxHistRenderPagination(total, totalPaginas) {
+      var cont = document.getElementById('fx-hist-pagination');
+      if (!cont) { return; }
+      if (total <= fxHistState.perPage) { cont.innerHTML = ''; return; }
+      var desde = (fxHistState.page - 1) * fxHistState.perPage + 1;
+      var hasta = Math.min(fxHistState.page * fxHistState.perPage, total);
+      var html = '';
+      html += '<button type="button" class="fx-hist-pbtn"' + (fxHistState.page <= 1 ? ' disabled' : '') + ' onclick="fxHistGoPage(' + (fxHistState.page - 1) + ')">&lsaquo;</button>';
+      html += '<span class="fx-hist-pinfo">' + desde + '&ndash;' + hasta + ' de ' + total + '</span>';
+      html += '<button type="button" class="fx-hist-pbtn"' + (fxHistState.page >= totalPaginas ? ' disabled' : '') + ' onclick="fxHistGoPage(' + (fxHistState.page + 1) + ')">&rsaquo;</button>';
+      cont.innerHTML = html;
+    }
+
+    // Inicializa la paginación al cargar (primera página).
+    if (document.getElementById('fx-hist-feed')) { fxHistApply(); }
+
     var sgProfileState = { currentAsset: '' };
 
     var sgAssetCopy = {

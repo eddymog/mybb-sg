@@ -43,50 +43,33 @@ if ($staff && $razon && $ficha_id && (is_mod($uid) || is_staff($uid))) {
         $u_var = $u;
     }
 
-    $ryos_query = "";
-    $pr_query = "";
-    $ph_query = "";
-    $pe_query = "";
-    $rep_query = "";
+    $grupo = uniqid();
     $log = "Cambios de atributos para ficha de UID: $ficha_id (" . $f_var['nombre'] . "):\n";
 
+    // ryos/ph/pe/reputacion son InnoDB; newpoints (PR) es MyISAM. Se enlazan por
+    // $grupo pero sin transacción (ver caveat MyISAM en docs/instrucciones_cambios.md).
     if ($ryos != $f_var['ryos']) {
-        $ryos_query = "ryos='$ryos' ";
         $log .= "-- De ".$f_var['ryos']." a $ryos ryos.\n";
-        $db->query(" 
-            UPDATE `mybb_sg_sg_fichas` SET $ryos_query WHERE `fid`='$ficha_id';
-        ");
+        sg_ficha_set_campo($ficha_id, 'ryos', $ryos, 'staff', SG_ORIGEN_ATRIBUTOS, $razon, $grupo);
     }
     if ($puntos_habilidad != $f_var['puntos_habilidad']) {
-        $ph_query = "puntos_habilidad='$puntos_habilidad'";
         $log .= "-- De ".$f_var['puntos_habilidad']." a $puntos_habilidad PH.\n";
-        $db->query(" 
-            UPDATE `mybb_sg_sg_fichas` SET $ph_query WHERE `fid`='$ficha_id';
-        ");
+        sg_ficha_set_campo($ficha_id, 'puntos_habilidad', $puntos_habilidad, 'staff', SG_ORIGEN_ATRIBUTOS, $razon, $grupo);
     }
 
     if ($puntos_rol != $u_var['newpoints']) {
-        $pr_query = "newpoints='$puntos_rol'";
         $log .= "-- De ".$u_var['newpoints']." a $puntos_rol PR.\n";
-        $db->query(" 
-            UPDATE `mybb_sg_users` SET $pr_query WHERE `uid`='$ficha_id';
-        "); 
+        sg_usuario_set_campo($ficha_id, 'newpoints', $puntos_rol, 'staff', SG_ORIGEN_ATRIBUTOS, $razon, $grupo);
     }
 
     if ($puntos_experiencia != $f_var['pe']) {
-        $pe_query = "pe='$puntos_experiencia'";
         $log .= "-- De ".$f_var['pe']." a $puntos_experiencia PE.\n";
-        $db->query(" 
-            UPDATE `mybb_sg_sg_fichas` SET $pe_query WHERE `fid`='$ficha_id';
-        ");
+        sg_ficha_set_campo($ficha_id, 'pe', $puntos_experiencia, 'staff', SG_ORIGEN_ATRIBUTOS, $razon, $grupo);
     }
 
     if ($reputacion != $f_var['reputacion']) {
-        $rep_query = "reputacion='$reputacion'";
         $log .= "-- De ".$f_var['reputacion']." a $reputacion de reputación.\n";
-        $db->query(" 
-            UPDATE `mybb_sg_sg_fichas` SET $rep_query WHERE `fid`='$ficha_id';
-        ");
+        sg_ficha_set_campo($ficha_id, 'reputacion', $reputacion, 'staff', SG_ORIGEN_ATRIBUTOS, $razon, $grupo);
     }
 
     $db->query(" 

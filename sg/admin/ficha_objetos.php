@@ -56,27 +56,25 @@ if ($accion && $ficha_id && $es_staff) {
 
         $detalle = "";
         $cambios = 0;
+        $grupo = uniqid();
+        // inventario es InnoDB -> transacción real para todo el guardado.
+        $db->query("START TRANSACTION");
         foreach ($cantidades as $oid_raw => $qty) {
             $oid_raw = trim($oid_raw);
             if ($oid_raw === '' || !array_key_exists($oid_raw, $actuales)) {
                 continue;
             }
-            $oid    = $db->escape_string($oid_raw);
             $qty    = intval($qty);
             $actual = $actuales[$oid_raw];
+            if ($qty < 0) { $qty = 0; }
 
-            if ($qty > 0) {
-                if ($qty != $actual) {
-                    $db->query("UPDATE `mybb_sg_sg_inventario` SET `cantidad`='$qty' WHERE uid='$ficha_id' AND objeto_id='$oid'");
-                    $detalle .= "-- $oid_raw: $actual -> $qty\n";
-                    $cambios++;
-                }
-            } else {
-                $db->query("DELETE FROM `mybb_sg_sg_inventario` WHERE uid='$ficha_id' AND objeto_id='$oid'");
-                $detalle .= "-- $oid_raw = eliminado\n";
+            if ($qty != $actual) {
+                sg_inventario_set_cantidad($ficha_id, $oid_raw, $qty, 'staff', SG_ORIGEN_FICHA_OBJETOS, $razon, $grupo);
+                $detalle .= ($qty > 0) ? "-- $oid_raw: $actual -> $qty\n" : "-- $oid_raw = eliminado\n";
                 $cambios++;
             }
         }
+        $db->query("COMMIT");
 
         // Solo registrar/auditar/alertar si de verdad hubo cambios
         if ($cambios > 0) {
@@ -111,12 +109,8 @@ if ($accion && $ficha_id && $es_staff) {
                     $actual = intval($q['cantidad']);
                 }
 
-                if ($has) {
-                    $nueva = $actual + $cant_add;
-                    $db->query("UPDATE `mybb_sg_sg_inventario` SET `cantidad`='$nueva' WHERE uid='$ficha_id' AND objeto_id='$objeto_esc'");
-                } else {
-                    $db->query("INSERT INTO `mybb_sg_sg_inventario` (`objeto_id`, `uid`, `cantidad`) VALUES ('$objeto_esc', '$ficha_id', '$cant_add')");
-                }
+                $nueva = $actual + $cant_add;
+                sg_inventario_set_cantidad($ficha_id, $objeto_input, $nueva, 'staff', SG_ORIGEN_FICHA_OBJETOS, $razon);
                 $log = "Inventario ficha UID $ficha_id ($ficha_nombre):\n-- Añadir $cant_add x $objeto_input\n";
             }
         }

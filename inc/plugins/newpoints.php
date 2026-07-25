@@ -359,7 +359,7 @@ function newpoints_add_setting($name, $plugin, $title, $description, $type, $val
  * Note: some pages (by other plugins) do not run queries on shutdown so adding this to shutdown may not be good if you're not sure if it will run.
  *
 */
-function newpoints_addpoints($uid, $points, $forumrate = 1, $grouprate = 1, $isstring = false, $immediate = true)
+function newpoints_addpoints($uid, $points, $forumrate = 1, $grouprate = 1, $isstring = false, $immediate = true, $sg_origen = null, $sg_pid = null, $sg_tid = null, $sg_defer = false)
 {
 	global $db, $mybb, $userpoints;
 	
@@ -469,6 +469,19 @@ function newpoints_addpoints($uid, $points, $forumrate = 1, $grouprate = 1, $iss
 	$db->query("
         INSERT INTO `mybb_sg_sg_audit_general`(`uid`, `username`, `categoria`, `log`) VALUES ('$uid','$user_username','[Post]', '$log_expe');
     ");
+
+	// Historial estructurado (tab de la ficha). El contexto llega por parámetros
+	// (crear/editar post y tema) o, en su defecto, por globals que setean los
+	// hooks de moderación (borrar/aprobar/etc.). Las demás fuentes de newpoints
+	// (registro, PM, votos, pageview…) no setean nada y no se loguean.
+	// function_exists cubre que sg_functions no esté cargado (flujo sin global.php).
+	$sg_o = ($sg_origen !== null) ? $sg_origen : (isset($GLOBALS['sg_np_origen']) ? $GLOBALS['sg_np_origen'] : null);
+	if ($sg_o !== null && function_exists('sg_historial_post_xp')) {
+		$sg_p = ($sg_origen !== null) ? $sg_pid   : (isset($GLOBALS['sg_np_pid']) ? $GLOBALS['sg_np_pid'] : null);
+		$sg_t = ($sg_origen !== null) ? $sg_tid   : (isset($GLOBALS['sg_np_tid']) ? $GLOBALS['sg_np_tid'] : null);
+		$sg_d = ($sg_origen !== null) ? $sg_defer : false;
+		sg_historial_post_xp($uid, $exp_actual, $exp_combinada, $rins_actual, $rin_combinado, $sg_o, $sg_p, $sg_t, $sg_d);
+	}
 	echo("<br><br><div style='text-align: center;'><h3>¡Has ganado $pointsAwarded de Experiencia y $rinExperiencia Rins!</h3></div>");
 
 	

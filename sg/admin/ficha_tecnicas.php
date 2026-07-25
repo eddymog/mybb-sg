@@ -59,15 +59,19 @@ if ($accion && $ficha_id && $staff && $razon && $es_staff) {
     if ($accion == 'Guardar') {
         $detalle = "";
         $cambios = 0;
+        $grupo = uniqid();
+        $db->query("START TRANSACTION");
         foreach ($quitar as $tid_raw) {
-            $tid = $db->escape_string(trim($tid_raw));
-            if ($tid === '') { continue; }
+            $tid_trim = trim($tid_raw);
+            if ($tid_trim === '') { continue; }
+            $tid = $db->escape_string($tid_trim);
 
             $tinfo = select_one_query_with_id('mybb_sg_sg_tecnicas', 'tid', $tid);
-            $db->query("DELETE FROM `mybb_sg_sg_tec_aprendidas` WHERE uid='$ficha_id' AND tid='$tid'");
-            $detalle .= "-- Quitar: $tid" . ($tinfo ? " ({$tinfo['nombre']})" : "") . "\n";
+            sg_tecnica_quitar($ficha_id, $tid_trim, 'staff', SG_ORIGEN_FICHA_TECNICAS, $razon, $grupo);
+            $detalle .= "-- Quitar: $tid_trim" . ($tinfo ? " ({$tinfo['nombre']})" : "") . "\n";
             $cambios++;
         }
+        $db->query("COMMIT");
         if ($cambios > 0) {
             $log = "Técnicas de ficha UID $ficha_id ($ficha_nombre):\n" . $detalle;
         }
@@ -91,8 +95,8 @@ if ($accion && $ficha_id && $staff && $razon && $es_staff) {
                 if ($ya_tiene) {
                     $error = "La ficha ya tiene aprendida \"" . $tinfo['nombre'] . "\".";
                 } else {
-                    $db->query("INSERT INTO `mybb_sg_sg_tec_aprendidas` (`tid`, `uid`) VALUES ('$tid_esc', '$ficha_id')");
-                    $log = "Técnicas de ficha UID $ficha_id ($ficha_nombre):\n-- Añadir: $tid_esc (" . $tinfo['nombre'] . ")\n";
+                    sg_dojo_aprender($ficha_id, $tecnica_add, 'staff', SG_ORIGEN_FICHA_TECNICAS, $razon);
+                    $log = "Técnicas de ficha UID $ficha_id ($ficha_nombre):\n-- Añadir: $tecnica_add (" . $tinfo['nombre'] . ")\n";
                 }
             }
         }
@@ -107,22 +111,26 @@ if ($accion && $ficha_id && $staff && $razon && $es_staff) {
             $detalle = "";
             $cambios = 0;
             $omitidos = array();
+            $grupo = uniqid();
+            $db->query("START TRANSACTION");
             foreach ($tids_array as $tid_raw) {
-                $tid = $db->escape_string(trim($tid_raw));
-                if ($tid === '') { continue; }
+                $tid_trim = trim($tid_raw);
+                if ($tid_trim === '') { continue; }
+                $tid = $db->escape_string($tid_trim);
 
                 $tinfo = select_one_query_with_id('mybb_sg_sg_tecnicas', 'tid', $tid);
-                if (!$tinfo) { $omitidos[] = $tid; continue; }
+                if (!$tinfo) { $omitidos[] = $tid_trim; continue; }
 
                 $ya_tiene = false;
                 $q_check = $db->query("SELECT tid FROM mybb_sg_sg_tec_aprendidas WHERE uid='$ficha_id' AND tid='$tid'");
                 while ($c = $db->fetch_array($q_check)) { $ya_tiene = true; }
                 if ($ya_tiene) { continue; }
 
-                $db->query("INSERT INTO `mybb_sg_sg_tec_aprendidas` (`tid`, `uid`) VALUES ('$tid', '$ficha_id')");
-                $detalle .= "-- Añadir: $tid ({$tinfo['nombre']})\n";
+                sg_dojo_aprender($ficha_id, $tid_trim, 'staff', SG_ORIGEN_FICHA_TECNICAS, $razon, $grupo);
+                $detalle .= "-- Añadir: $tid_trim ({$tinfo['nombre']})\n";
                 $cambios++;
             }
+            $db->query("COMMIT");
             if ($cambios > 0) {
                 $log = "Técnicas de ficha UID $ficha_id ($ficha_nombre):\n" . $detalle;
             }

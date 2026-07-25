@@ -37,6 +37,11 @@ $ficha = select_one_query_with_id('mybb_sg_sg_fichas', 'fid', $uid);
 $ryos = intval($ficha['ryos']);
 $precio_mult = sg_tienda_multiplicador($db, $uid);
 
+// Stats efectivas del comprador, para resolver códigos [FUEx1]/[MDESx1]/etc.
+// en los efectos de cada objeto. $ficha acá es la fila cruda (sin pasivas
+// aplicadas), a diferencia de ficha.php -> sí hace falta sg_stats_efectivas().
+$stats_ef_comprador = $ficha ? sg_stats_efectivas($ficha) : null;
+
 // ── Compra (validada y serializada en el servidor) ────────────
 if ($accion === 'comprar' && $objeto_post !== '' && $uid > 0) {
     $objeto_esc = $db->escape_string($objeto_post);
@@ -95,15 +100,16 @@ if ($accion === 'comprar' && $objeto_post !== '' && $uid > 0) {
                 if ($ryos_actual < $totalCoste) {
                     $compra_error = "Ryos insuficientes: necesitas " . number_format($totalCoste, 0, ',', '.') . " y tienes " . number_format($ryos_actual, 0, ',', '.') . ".";
                 } else {
-                    if ($has) {
-                        $nueva = $actual + $n;
-                        $db->query("UPDATE `mybb_sg_sg_inventario` SET `cantidad`='$nueva' WHERE uid='$uid' AND objeto_id='$objeto_esc'");
-                    } else {
-                        $db->query("INSERT INTO `mybb_sg_sg_inventario` (`objeto_id`, `uid`, `cantidad`) VALUES ('$objeto_esc', '$uid', '$n')");
-                    }
-
+                    $nueva = $actual + $n;
                     $ryos_actual = $ryos_actual - $totalCoste;
-                    $db->query("UPDATE `mybb_sg_sg_fichas` SET ryos='$ryos_actual' WHERE `fid`='$uid'");
+                    $grupo = uniqid();
+                    $detalle = "Compra en tienda: $n × " . $obj['nombre'];
+
+                    // inventario + ryos son ambos InnoDB -> la transacción da atomicidad real.
+                    $db->query("START TRANSACTION");
+                    sg_inventario_set_cantidad($uid, $objeto_post, $nueva, 'usuario', SG_ORIGEN_TIENDA, $detalle, $grupo);
+                    sg_ficha_set_campo($uid, 'ryos', $ryos_actual, 'usuario', SG_ORIGEN_TIENDA, $detalle, $grupo);
+                    $db->query("COMMIT");
 
                     $compra_ok = "Compraste $n × \"$onombre\" por " . number_format($totalCoste, 0, ',', '.') . " ryos.";
                 }
@@ -150,9 +156,11 @@ while ($q = $db->fetch_array($query_objetos)) {
     $tamano    = htmlspecialchars($q['tamano'], ENT_QUOTES);
     $municion  = htmlspecialchars($q['municion'], ENT_QUOTES);
     $desc_attr = htmlspecialchars($q['descripcion'], ENT_QUOTES);
-    $ef1 = htmlspecialchars($q['efecto1'], ENT_QUOTES);
-    $ef2 = htmlspecialchars($q['efecto2'], ENT_QUOTES);
-    $ef3 = htmlspecialchars($q['efecto3'], ENT_QUOTES);
+    // strip_tags: esto viaja por data-ef1 y el JS lo inserta como texto plano
+    // (textContent), no como HTML, así que no puede llevar el <span> con tooltip.
+    $ef1 = strip_tags(sg_parsear_codigos_stats(htmlspecialchars($q['efecto1'], ENT_QUOTES), $stats_ef_comprador));
+    $ef2 = strip_tags(sg_parsear_codigos_stats(htmlspecialchars($q['efecto2'], ENT_QUOTES), $stats_ef_comprador));
+    $ef3 = strip_tags(sg_parsear_codigos_stats(htmlspecialchars($q['efecto3'], ENT_QUOTES), $stats_ef_comprador));
     $coste_raw = intval($q['coste']);
     $coste     = ($coste_raw >= 99999) ? $coste_raw : (int) round($coste_raw * $precio_mult);
     $maxq      = intval($q['cantidadMaxima']);

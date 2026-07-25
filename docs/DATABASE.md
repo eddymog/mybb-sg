@@ -667,6 +667,50 @@ Notes:
 - There is overlap in domain with `mybb_sg_sg_objetos`.
 - Verify which table is actually authoritative before changing shop logic.
 
+### `mybb_sg_sg_gacha_premios` / `mybb_sg_sg_gacha_recompensas`
+
+Purpose:
+
+- Gacha system for pergamino objects (`PERG001`..`PERG007`, whitelisted in
+  `sg_gacha_pergamino_ids()`). See `docs/pergaminos_diseno.md`.
+- `gacha_premios`: one row per weighted "slot" in a pergamino's prize table
+  (`pergamino_id`, `probabilidad`, `es_jackpot`, `jackpot_tiradas`, `activo`).
+- `gacha_recompensas`: one-to-many reward package per premio (`tipo` in
+  `ryos`/`rin`/`madara`/`tobi`/`objeto`, `valor` or `objeto_id`, `cantidad`).
+  A single premio can bundle multiple currencies and/or multiple objects.
+
+Representative code paths:
+
+- `sg/pergaminos.php` (public page)
+- `sg/abrir_pergamino.php` (AJAX draw endpoint)
+- `sg/admin/gestionar_pergaminos.php` (Staff config tool)
+- `sg_gacha_premios()`, `sg_gacha_elegir_premio()`, `sg_gacha_abrir()` in `sg/functions/sg_functions.php`
+
+Notes:
+
+- Added via `docs/alter_gacha_pergaminos.sql`; not part of the original SQL dump.
+- Draw is decided server-side only, inside a `GET_LOCK` per user, mirroring
+  the `tienda.php` purchase-lock pattern.
+
+### `mybb_sg_sg_gacha_log`
+
+Purpose:
+
+- One row per pergamino opening (the PRINCIPAL premio drawn, plus whether it
+  was a jackpot). Powers the public "Estadísticas Globales" panel on
+  `sg/pergaminos.php` (total opened, jackpot count, per-pergamino breakdown).
+- Extra jackpot sub-draws do not get their own row; they're implied by
+  `es_jackpot` on the principal row.
+
+Representative code paths:
+
+- `sg_gacha_abrir_bajo_lock()` (writes), `sg_gacha_estadisticas()` (reads) in `sg/functions/sg_functions.php`
+- `sg/pergaminos.php`
+
+Notes:
+
+- Added via `docs/alter_gacha_log.sql`; not part of the original SQL dump.
+
 ## Post/Thread-Linked Custom Mechanics
 
 ### `mybb_sg_sg_likes`

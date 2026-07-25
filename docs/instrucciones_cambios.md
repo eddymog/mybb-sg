@@ -1,5 +1,60 @@
 # Historial de cambios de ficha (Staff + Usuario)
 
+## Progreso (checkpoints)
+
+Estado de la implementación. `[x]` hecho · `[~]` en progreso · `[ ]` pendiente.
+
+- [x] **Paso 1 — Tablas SQL** · `docs/alter_historial.sql` (3 tablas). *Falta
+  correr el SQL en la BD.*
+- [x] **Paso 2 — Funciones + constantes** en `sg/functions/sg_functions.php`:
+  - [x] Constantes `SG_ORIGEN_*`
+  - [x] Helpers internos de inserción al historial (`sg_historial_*_log`)
+  - [x] `sg_ficha_set_campo` / `sg_usuario_set_campo` (nuevas)
+  - [x] `sg_dojo_aprender` ampliada (drop `$db`) + `sg_tecnica_quitar` (nueva)
+  - [x] `sg_inventario_dar_objeto` ampliada + `sg_inventario_quitar_objeto` /
+    `sg_inventario_set_cantidad` (nuevas)
+  - [x] Actualizar los 9 llamadores de `sg_dojo_aprender` (dentro de
+    `sg_dojo_aplicar_accion`) + el 1 de `sg_inventario_dar_objeto`
+    (`recompensas_mision.php:358`), para no dejar el código roto
+- [~] **Paso 3 — Migrar call sites** (ver tablas al final):
+  - [x] Campos escalares: `modificar_ficha`, `ficha_atributos`,
+    `recompensas_staff`, `recompensas_mision`, `fichas_en_cola`, `tienda_rins`
+    (canjes), `sg_dojo_guardar` (tobi). `backfill_arboles` **excluido** a
+    propósito (JSON grande de mantenimiento, no user-facing).
+  - [x] Técnicas: `ficha_tecnicas` (agregar/quitar/lote)
+  - [x] Objetos: `tienda`, `tienda_rins` (compra), `vender`, `ficha_objetos`,
+    `recompensas_mision` (pergamino)
+  - [~] XP de foro en `newpoints_addpoints` + hooks diferidos para pid/tid:
+    - [x] Mecanismo: `sg_historial_post_xp` + buffer + `sg_historial_post_xp_flush`
+      (sg_functions.php); firma de `newpoints_addpoints` extendida con contexto
+      opcional (`$sg_origen/$sg_pid/$sg_tid/$sg_defer`), llamada guardada con
+      `function_exists`.
+    - [x] `newpoints_newpost` (crear respuesta) — defer, flush en
+      `datahandler_post_insert_post_end`.
+    - [x] `newpoints_newthread` (crear tema) — defer, flush en
+      `datahandler_post_insert_thread_end` (crear tema NO dispara
+      insert_post_end, por eso su flush es aparte).
+    - [x] `newpoints_editpost` (editar) — pid/tid directos, sin defer.
+    - [x] Hooks de moderación (borrar/aprobar/desaprobar/restaurar post y tema,
+      10 hooks): cada uno setea el origen (`post_borrado`/`post_aprobado`/
+      `post_desaprobado`/`tema_*`) en un global que `addpoints` lee por
+      **fallback** cuando no vienen params. Se usa fallback (no params por
+      llamada) porque las llamadas a `addpoints` están duplicadas casi idénticas
+      entre hooks y editarlas una por una sería frágil. `pid`/`tid` van `NULL`
+      (para borrados el contenido ya no existe; el origen ya identifica la
+      acción). Sin fuga de estado: `perview` (pageview) corre en `global_end`,
+      antes de que ningún hook de moderación setee el global.
+- [x] **Paso 4 — Tab "Historial"** en `sg/ficha.php` + `sg_ficha.html`:
+  helper `sg_historial_ficha_feed_html` (mezcla las 3 tablas, agrupa por
+  `grupo`, resuelve nombres de técnica/objeto, enlaza al post vía pid/tid);
+  tab nuevo con filtro Staff/Usuario client-side. *Falta reimportar el
+  template en el ACP.*
+- [x] **Paso 5 — Consola del historial**: nueva `sg/admin/log_historial.php`
+  + `staff_log_historial.html` (UNION de las 3 tablas, filtros por
+  ficha/tipo/dominio/origen, paginada). Enlazada desde `staff_consola_mod`.
+  Las consolas de texto libre (`log_consola*`) se dejan como están (no se
+  reemplazan). *Falta reimportar los templates en el ACP.*
+
 ## Objetivo
 
 Llevar un registro cronológico de **todos** los cambios que sufre una ficha
@@ -313,10 +368,34 @@ para enlazar desde el feed. La disponibilidad depende del evento:
 
 **Solución para el caso de creación — escritura diferida.** `addpoints`
 acumula el registro pendiente en un buffer global (`tid` + deltas + `grupo`),
-y un hook nuevo en `datahandler_post_insert_post_end` (`post.php:1379`, donde
+y un hook en `datahandler_post_insert_post_end` (`post.php:1379`, donde
 `$this->pid` ya está seteado) lee el `pid`, lo completa y vuelca el buffer al
-historial. Solo la creación necesita esto; el resto de los eventos escriben
-`pid`/`tid` directo.
+historial. Solo la creación necesita esto; el resto escribe `pid`/`tid` directo.
+
+**⚠️ Crear TEMA usa su propio flush.** `insert_thread()` NO llama a
+`insert_post()` — inserta el primer post inline — así que
+`datahandler_post_insert_post_end` **no** dispara al crear un tema. Por eso
+`newpoints_newthread` difiere igual, pero su buffer se vuelca en
+`datahandler_post_insert_thread_end` (`post.php:1839`, donde `$this->pid` del
+primer post y `$this->tid` ya existen). Son dos flushes distintos
+(`newpoints_sg_flush_postxp` para respuestas, `newpoints_sg_flush_threadxp`
+para temas); como cada acción dispara solo uno y ambos vacían el buffer, no
+hay doble-volcado.
+
+**Implementación: parámetros para crear/editar, globals para moderación.**
+Crear post/tema y editar pasan el contexto como **parámetros** de
+`newpoints_addpoints` (`$sg_origen/$sg_pid/$sg_tid/$sg_defer`) — sin fugas de
+estado. Los 10 hooks de **moderación** lo pasan por **globals**
+(`$GLOBALS['sg_np_origen']` etc.) que `addpoints` lee por fallback cuando no
+hay params: sus llamadas a `addpoints` están duplicadas casi idénticas entre
+hooks, así que editarlas una por una sería frágil; setear un global al entrar
+al hook es más seguro. No hay fuga porque `perview` (pageview, la única fuente
+sin params que corre en cada request) se ejecuta en `global_end` — al inicio,
+antes de que ningún hook de moderación setee el global — y ningún `addpoints`
+corre después de un hook de moderación en el mismo request. Las demás fuentes
+(registro, PM, votos…) no setean nada y no loguean. En `hooks.php` se pasan
+literales (`'post_nuevo'`, etc.) en vez de las constantes `SG_ORIGEN_*` para
+no acoplar el plugin a que sg_functions esté cargado en ese punto.
 
 `pid`/`tid` quedan `NULL` para orígenes que no sean de foro (cambios de Staff,
 compras, etc.).
@@ -332,15 +411,32 @@ comparten `grupo` deberían envolverse:
 ```php
 $db->query("START TRANSACTION");
 $grupo = uniqid();
-sg_ficha_set_campo(...);   // ryos
-sg_ficha_set_campo(...);   // tobi
-sg_usuario_set_campo(...); // newpoints
+sg_ficha_set_campo(...);   // ryos (fichas, InnoDB)
+sg_ficha_set_campo(...);   // tobi (fichas, InnoDB)
 $db->query("COMMIT");
 ```
 
-Ningún script del proyecto usa transacciones hoy, así que es un patrón nuevo
-— pero es la forma correcta de que un fallo a mitad de una recompensa no deje
-la ficha inconsistente.
+**⚠️ Caveat MyISAM — `newpoints` no entra en la transacción.** Los motores
+son mixtos:
+
+- `mybb_sg_sg_fichas`, `mybb_sg_sg_inventario`, `mybb_sg_sg_tec_aprendidas` y
+  las 3 tablas `historial_*` → **InnoDB** (transaccionales).
+- `mybb_sg_users` (que tiene `newpoints`) → **MyISAM** (NO transaccional).
+
+Una transacción protege solo las tablas InnoDB. Si una acción mezcla ryos/tobi
+(fichas, InnoDB) con newpoints (users, MyISAM), la parte de newpoints
+**autocommitea igual** y no se revierte con un ROLLBACK. Por eso:
+
+- Se envuelven en transacción las acciones **solo-InnoDB** (ej. compra en
+  tienda: inventario + ryos), donde sí da atomicidad real.
+- En acciones que tocan `newpoints`, la transacción es de beneficio parcial;
+  no se promete atomicidad total. El log del historial (InnoDB) sí queda
+  consistente entre sí; el desajuste posible es entre el saldo de newpoints y
+  el resto — mismo riesgo que ya existe hoy con los `UPDATE` sueltos, así que
+  no es una regresión. (Migrar `mybb_sg_users` a InnoDB resolvería esto, pero
+  queda fuera de alcance.)
+
+Ningún script del proyecto usa transacciones hoy, así que es un patrón nuevo.
 
 ### 4. UI: nuevo tab "Historial" en la ficha
 
@@ -356,11 +452,22 @@ contra el catálogo (`mybb_sg_sg_tecnicas`, `mybb_sg_sg_objetos`) para mostrar
 borrado del catálogo después, el join no encuentra nombre → mostrar el ID
 crudo como fallback en lugar de un hueco vacío.
 
-### 5. Reorganizar la consola de audits
+### 5. Consola del historial (implementado)
 
-`sg/admin/log_consola.php` y `sg/admin/log_consola_mod.php` deberían
-unificarse para leer también de las tres tablas de historial, así consola y
-tab de ficha comparten la misma fuente de verdad estructurada.
+En vez de reescribir las consolas de texto libre (`log_consola.php` /
+`log_consola_mod.php`, que siguen sirviendo su propósito), se creó una consola
+**nueva y aparte** para el historial estructurado:
+
+- `sg/admin/log_historial.php` — hace un `UNION ALL` de las 3 tablas
+  normalizado a columnas comunes, con filtros (ficha/usuario por nombre, tipo
+  staff/usuario, dominio campos/técnicas/objetos, origen) y paginación.
+  Resuelve nombres de ficha/actor/técnica/objeto en PHP tras traer la página.
+- `templates/html/staff_log_historial.html` — vista con el mismo estilo que
+  `staff_log_consola_mod`.
+- Enlazada desde `staff_consola_mod.html` ("Historial de cambios de ficha").
+
+Comparte las etiquetas (`sg_origen_label`, `sg_campo_label`) con el tab de la
+ficha, así ambos leen la misma fuente de verdad estructurada.
 
 ## Call sites a migrar
 
@@ -376,6 +483,11 @@ tab de ficha comparten la misma fuente de verdad estructurada.
 | `sg/admin/backfill_arboles.php` | 93 | `arboles` (JSON grande — candidato a excluir del historial campo-por-campo) | **No** |
 | `sg/functions/sg_functions.php` (`sg_dojo_guardar`) | 1277-1286 | `tobi`, `arboles_progreso` (gasto de usuario en el dojo) | No aplica (no es admin) |
 | `sg/tienda_rins.php` | 92, 103, 148 | `rin`, `ryos`/`tobi` (gasto de usuario) | **No** |
+| `sg/misiones.php` | 140-149 | `ryos`, `newpoints` (recompensa de misión de entrenamiento) | No (solo `audit_misiones`, tabla legacy aparte) — **detectado y migrado a posteriori**, se había escapado del barrido inicial por no estar en `sg/admin/` |
+| `sg/recompensa_diaria.php` | 204-205 | `ryos`, `tobi`, `newpoints` (racha diaria) | No (solo `audit_recompensas`, tabla legacy aparte) — **detectado y migrado a posteriori**, mismo motivo |
+| `sg/ficha_editada.php` | 64-66 | 16 campos de stats (reparto de puntos de estadística) | No — **detectado y migrado a posteriori**. Bonus: el `UPDATE` original interpolaba `$_POST` sin escapar (inyección SQL); migrar a `sg_ficha_set_campo` (que escapa + castea a int) cierra ese hueco también. |
+| `sg/entrenamientos.php` | 130-154 | `newpoints`, `puntos_habilidad`, `espe`, `espe_estilo` + aprende técnica (INSERT directo a `tec_aprendidas`) | No — **detectado, pendiente de migrar** (mismo patrón, no confirmado todavía). |
+| `sg/ficha.php` | 126-145 | `historia`, `apariencia`, `personalidad`, `frase`, `extra` (edición inline de trasfondo, dueño o Staff) | No — **migrado**. Campos de texto largo: en el tab de la ficha se renderizan con "Leer más" colapsable (`sg_hist_texto_clamp_html`, mismo patrón CSS-only que `.fx-bio-*`); en la consola solo se amplía el recorte a 220 caracteres (sin toggle interactivo ahí). |
 
 ### Técnicas (requieren migrar a `sg_dojo_aprender` ampliada / `sg_tecnica_quitar` nueva)
 

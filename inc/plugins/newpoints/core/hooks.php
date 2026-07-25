@@ -106,6 +106,9 @@ elseif (NP_HOOKS == 2)
 	
 	// per new post
 	$plugins->add_hook('datahandler_post_insert_post', 'newpoints_newpost');
+	// SG: vuelca al historial la XP de creación de posts/temas con el pid ya asignado.
+	$plugins->add_hook('datahandler_post_insert_post_end', 'newpoints_sg_flush_postxp');
+	$plugins->add_hook('datahandler_post_insert_thread_end', 'newpoints_sg_flush_threadxp');
 	// edit post
 	$plugins->add_hook('datahandler_post_update', 'newpoints_editpost');
 	$plugins->add_hook('xmlhttp', 'newpoints_editpost_xmlhttp');
@@ -347,19 +350,46 @@ elseif (NP_HOOKS == 2)
 		$subject = $post['subject'];
 		
 		// give points to the poster
-		newpoints_addpoints($mybb->user['uid'], $mybb->settings['newpoints_income_newpost']+$bonus, $forumrules['rate'], $grouprules['rate']);
-		
+		// SG: origen 'post_nuevo', pid diferido (aún no asignado), tid conocido.
+		newpoints_addpoints($mybb->user['uid'], $mybb->settings['newpoints_income_newpost']+$bonus, $forumrules['rate'], $grouprules['rate'], false, true, 'post_nuevo', null, $post['tid'], true);
+
 		if ($thread['uid'] != $mybb->user['uid'])
 		{
 			// we are not the thread started so give points to him/her
 			if ($mybb->settings['newpoints_income_perreply'] != 0)
-				newpoints_addpoints($thread['uid'], $mybb->settings['newpoints_income_perreply'], $forumrules['rate'], $grouprules['rate']);
+				newpoints_addpoints($thread['uid'], $mybb->settings['newpoints_income_perreply'], $forumrules['rate'], $grouprules['rate'], false, true, 'post_nuevo', null, $post['tid'], true);
+		}
+	}
+
+	// SG: al crear un post el pid no existe cuando se otorga la XP (el hook
+	// datahandler_post_insert_post corre antes del INSERT). Este hook corre en
+	// _end, con $data->pid ya asignado, y vuelca el buffer del historial.
+	function newpoints_sg_flush_postxp(&$data)
+	{
+		if (function_exists('sg_historial_post_xp_flush'))
+		{
+			$pid = isset($data->pid) ? (int) $data->pid : 0;
+			sg_historial_post_xp_flush($pid);
+		}
+	}
+
+	// SG: crear un tema no dispara insert_post_end, así que su XP diferida se
+	// vuelca en thread_end (pid del primer post + tid ya asignados en $data).
+	function newpoints_sg_flush_threadxp(&$data)
+	{
+		if (function_exists('sg_historial_post_xp_flush'))
+		{
+			$pid = isset($data->pid) ? (int) $data->pid : 0;
+			$tid = isset($data->tid) ? (int) $data->tid : null;
+			sg_historial_post_xp_flush($pid, $tid);
 		}
 	}
 
 	function newpoints_approveposts($pids)
 	{
 		global $db, $mybb, $fid;
+		// SG: contexto de moderación para el historial (lo lee addpoints por fallback).
+		$GLOBALS['sg_np_origen'] = 'post_aprobado'; $GLOBALS['sg_np_pid'] = null; $GLOBALS['sg_np_tid'] = null;
 		
 		if (!$mybb->user['uid'])
 			return;
@@ -419,6 +449,7 @@ elseif (NP_HOOKS == 2)
 	function newpoints_unapproveposts($pids)
 	{
 		global $db, $mybb, $fid;
+		$GLOBALS['sg_np_origen'] = 'post_desaprobado'; $GLOBALS['sg_np_pid'] = null; $GLOBALS['sg_np_tid'] = null;
 		
 		if (!$mybb->user['uid'])
 			return;
@@ -554,7 +585,8 @@ elseif (NP_HOOKS == 2)
 		$mypid = $newpost->data['pid'];
 
 		// give points to the poster
-		newpoints_addpoints($mybb->user['uid'], $bonus, $forumrules['rate'], $grouprules['rate'], false, true);
+		// SG: origen 'post_editado', pid y tid ya existen (el post ya está creado).
+		newpoints_addpoints($mybb->user['uid'], $bonus, $forumrules['rate'], $grouprules['rate'], false, true, 'post_editado', $mypid, $post['tid'], false);
 	}
 
 	// edit post - counts less chars on edit because of \n\r being deleted
@@ -675,6 +707,7 @@ elseif (NP_HOOKS == 2)
 	function newpoints_deletepost($pid)
 	{
 		global $db, $mybb, $fid;
+		$GLOBALS['sg_np_origen'] = 'post_borrado'; $GLOBALS['sg_np_pid'] = null; $GLOBALS['sg_np_tid'] = null;
 		
 		if (!$mybb->user['uid'])
 			return;
@@ -739,6 +772,7 @@ elseif (NP_HOOKS == 2)
 	function newpoints_softdeleteposts($pids)
 	{
 		global $db, $mybb, $fid;
+		$GLOBALS['sg_np_origen'] = 'post_borrado'; $GLOBALS['sg_np_pid'] = null; $GLOBALS['sg_np_tid'] = null;
 		
 		if (!$mybb->user['uid'])
 			return;
@@ -799,6 +833,7 @@ elseif (NP_HOOKS == 2)
 	function newpoints_restoreposts($pids)
 	{
 		global $db, $mybb, $fid;
+		$GLOBALS['sg_np_origen'] = 'post_aprobado'; $GLOBALS['sg_np_pid'] = null; $GLOBALS['sg_np_tid'] = null;
 		
 		if (!$mybb->user['uid'])
 			return;
@@ -909,12 +944,15 @@ elseif (NP_HOOKS == 2)
 		$myusername = $mybb->user['username'];
 
 		// give points to the author of the new thread
-		newpoints_addpoints($mybb->user['uid'], $mybb->settings['newpoints_income_newthread']+$bonus, $forumrules['rate'], $grouprules['rate']);
+		// SG: origen 'tema_nuevo'; pid y tid del primer post aún no existen aquí,
+		// se difieren y los completa newpoints_sg_flush_threadxp en thread_end.
+		newpoints_addpoints($mybb->user['uid'], $mybb->settings['newpoints_income_newthread']+$bonus, $forumrules['rate'], $grouprules['rate'], false, true, 'tema_nuevo', null, null, true);
 	}
 
 	function newpoints_approvethreads($tids)
 	{
 		global $db, $mybb, $fid;
+		$GLOBALS['sg_np_origen'] = 'tema_aprobado'; $GLOBALS['sg_np_pid'] = null; $GLOBALS['sg_np_tid'] = null;
 		
 		if (!$mybb->user['uid'])
 			return;
@@ -966,6 +1004,7 @@ elseif (NP_HOOKS == 2)
 	function newpoints_unapprovethreads($tids)
 	{
 		global $db, $mybb, $fid;
+		$GLOBALS['sg_np_origen'] = 'tema_desaprobado'; $GLOBALS['sg_np_pid'] = null; $GLOBALS['sg_np_tid'] = null;
 		
 		if (!$mybb->user['uid'])
 			return;
@@ -1018,6 +1057,7 @@ elseif (NP_HOOKS == 2)
 	function newpoints_deletethread($tid)
 	{
 		global $db, $mybb;
+		$GLOBALS['sg_np_origen'] = 'tema_borrado'; $GLOBALS['sg_np_pid'] = null; $GLOBALS['sg_np_tid'] = null;
 		
 		if (!$mybb->user['uid'])
 			return;
@@ -1087,6 +1127,7 @@ elseif (NP_HOOKS == 2)
 	function newpoints_softdeletethreads($tids)
 	{
 		global $db, $mybb, $fid;
+		$GLOBALS['sg_np_origen'] = 'tema_borrado'; $GLOBALS['sg_np_pid'] = null; $GLOBALS['sg_np_tid'] = null;
 		
 		if (!$mybb->user['uid'])
 			return;
@@ -1147,6 +1188,7 @@ elseif (NP_HOOKS == 2)
 	function newpoints_restorethreads($tids)
 	{
 		global $db, $mybb, $fid;
+		$GLOBALS['sg_np_origen'] = 'tema_aprobado'; $GLOBALS['sg_np_pid'] = null; $GLOBALS['sg_np_tid'] = null;
 		
 		if (!$mybb->user['uid'])
 			return;

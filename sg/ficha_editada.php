@@ -61,9 +61,17 @@ if (($habilidad || $habilidad == '0') && ($mejoras || $mejoras == '0') &&
         $mcchakra = stat_modifier($cchakra);
         $minteligencia = stat_modifier($inteligencia);
 
-        $db->query("
-            UPDATE `mybb_sg_sg_fichas` SET `vida`='$vida',`chakra`='$chakra',`puntos_estadistica`='$habilidad',`mejoras`='$mejoras',`fuerza`='$fuerza',`destreza`='$destreza',`cchakra`='$cchakra',`inteligencia`='$inteligencia',`mfuerza`='$mfuerza',`mdestreza`='$mdestreza',`mcchakra`='$mcchakra',`minteligencia`='$minteligencia',`salud`='$salud',`velocidad`='$velocidad',`tenketsu`='$tenketsu',`sigilo`='$sigilo' WHERE `fid`='$uid';
-        ");
+        $grupo = uniqid();
+        $campos_cambio = array(
+            'vida' => $vida, 'chakra' => $chakra,
+            'puntos_estadistica' => $habilidad, 'mejoras' => $mejoras,
+            'fuerza' => $fuerza, 'destreza' => $destreza, 'cchakra' => $cchakra, 'inteligencia' => $inteligencia,
+            'mfuerza' => $mfuerza, 'mdestreza' => $mdestreza, 'mcchakra' => $mcchakra, 'minteligencia' => $minteligencia,
+            'salud' => $salud, 'velocidad' => $velocidad, 'tenketsu' => $tenketsu, 'sigilo' => $sigilo,
+        );
+        foreach ($campos_cambio as $campo => $valor) {
+            sg_ficha_set_campo($uid, $campo, (int) $valor, 'usuario', SG_ORIGEN_FICHA_EDITADA, 'Reparto de puntos de estadística', $grupo);
+        }
 
         eval("\$page = \"".$templates->get("sg_ficha_editada")."\";");
         output_page($page);

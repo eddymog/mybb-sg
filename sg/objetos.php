@@ -22,8 +22,23 @@ $default_img = '/images/sg/objeto_default.png';
 $uid = intval($mybb->user['uid']);
 $es_staff = (is_mod($uid) || is_staff($uid));
 
+// Stats efectivas del VISITANTE (para resolver códigos [FUEx1]/[MDESx1]/etc.
+// en los efectos). null si es invitado o no tiene ficha -> sg_parsear_codigos_stats
+// deja el código tal cual en vez de mostrar un valor engañoso.
+$stats_ef_viewer = null;
+if ($uid > 0) {
+    $ficha_viewer = select_one_query_with_id('mybb_sg_sg_fichas', 'fid', $uid);
+    if ($ficha_viewer) {
+        $stats_ef_viewer = sg_stats_efectivas($ficha_viewer);
+    }
+}
+
+// Los objetos con visibilidad=0 quedan ocultos para usuarios normales;
+// Staff los sigue viendo (útil para revisar/gestionar antes de publicarlos).
+$where_visibilidad = $es_staff ? "" : "WHERE visibilidad != 0";
 $query_objetos = $db->query("
     SELECT * FROM `mybb_sg_sg_objetos`
+    $where_visibilidad
     ORDER BY tipo, nombre
 ");
 
@@ -45,9 +60,11 @@ while ($q = $db->fetch_array($query_objetos)) {
     // Los campos de texto se pasan crudos (escapados como atributo) para que el
     // modal los pinte con textContent y respete los saltos de línea (pre-wrap).
     $desc_attr = htmlspecialchars($q['descripcion'], ENT_QUOTES);
-    $ef1 = htmlspecialchars($q['efecto1'], ENT_QUOTES);
-    $ef2 = htmlspecialchars($q['efecto2'], ENT_QUOTES);
-    $ef3 = htmlspecialchars($q['efecto3'], ENT_QUOTES);
+    // strip_tags: esto viaja por data-ef1 y el JS lo inserta como texto plano
+    // (textContent), no como HTML, así que no puede llevar el <span> con tooltip.
+    $ef1 = strip_tags(sg_parsear_codigos_stats(htmlspecialchars($q['efecto1'], ENT_QUOTES), $stats_ef_viewer));
+    $ef2 = strip_tags(sg_parsear_codigos_stats(htmlspecialchars($q['efecto2'], ENT_QUOTES), $stats_ef_viewer));
+    $ef3 = strip_tags(sg_parsear_codigos_stats(htmlspecialchars($q['efecto3'], ENT_QUOTES), $stats_ef_viewer));
     $coste     = intval($q['coste']);
     $maxq      = ($q['cantidadMaxima'] === null || $q['cantidadMaxima'] === '') ? '?' : intval($q['cantidadMaxima']);
     $img       = trim($q['imagen']) !== '' ? htmlspecialchars($q['imagen'], ENT_QUOTES) : $default_img;

@@ -1,0 +1,15 @@
+Tengo que crear una pagina en /sg/ llamada tienda_tobis.php, basicamente es una tienda donde tienes opcion a comprar usando la moneda de Tobis, ciertas "pasivas" para el personaje. La pasiva seria similar visualmente a un objeto de la pagina de objetos, tambien con foto propia.
+
+Las pasivas de Tobis, algunas requeriran programacion particular y otras seran puro texto. Por ejemplo, algunas cambiaran las estadisticas pasivas de los personajes.
+
+El gasto de Tobis debe mostrar en la pagina de Historial.
+
+Las pasivas compradas deberian mostrarse en la pestana de "Pasivas" en la ficha, hay que crearla.
+
+Debera crearse una tabla en la base de datos que contenga estas pasivas. Y debera existir una herramienta de Staff para poder modificar los campos de las pasivas. (No el efecto a programar como tal, solo texto)
+
+Por ahora quiero que crees la pagina pero no quiero que implementes ninguna programacion aun. Se pueden comprar las pasivas y verse visibles, pero no tendria ningun efecto. Eso solo se implementaria luego.
+
+Instrucciones:
+- Lee este documento y crea otro documento de implementacion llamado tienda_tobis.md
+- Dame sugerencias

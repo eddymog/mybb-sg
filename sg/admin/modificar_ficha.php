@@ -52,14 +52,14 @@ if ($mybb->request_method === 'post' && $es_staff) {
                               // Acceso al Dojo (0/1)
                               'puede_usar_dojo');
 
-        $sets = array();
+        // Cambios reales como campo => valor_nuevo (crudo; sg_ficha_set_campo escapa).
+        $cambios_campos = array();
         $cambios = array();
 
         foreach ($campos_texto as $campo) {
             if (!isset($_POST[$campo])) { continue; }
             if ((string) $_POST[$campo] !== (string) $actual[$campo]) {
-                $val = addslashes($_POST[$campo]);
-                $sets[] = "`$campo`='$val'";
+                $cambios_campos[$campo] = $_POST[$campo];
                 $cambios[] = "$campo: '".$actual[$campo]."' -> '".$_POST[$campo]."'";
             }
         }
@@ -68,7 +68,7 @@ if ($mybb->request_method === 'post' && $es_staff) {
             if (!isset($_POST[$campo])) { continue; }
             $nuevo = (int) $_POST[$campo];
             if ((int) $actual[$campo] !== $nuevo) {
-                $sets[] = "`$campo`='$nuevo'";
+                $cambios_campos[$campo] = $nuevo;
                 $cambios[] = "$campo: ".$actual[$campo]." -> ".$nuevo;
             }
         }
@@ -92,8 +92,7 @@ if ($mybb->request_method === 'post' && $es_staff) {
             }
         }
         if ($prog_cambio) {
-            $prog_json = $db->escape_string(json_encode($prog_nuevo, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
-            $sets[] = "`arboles_progreso`='$prog_json'";
+            $cambios_campos['arboles_progreso'] = json_encode($prog_nuevo, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
         }
 
         // Experiencia (PR) vive en mybb_sg_users.newpoints — se trata aparte
@@ -113,13 +112,16 @@ if ($mybb->request_method === 'post' && $es_staff) {
         // Solo se actúa si hubo al menos un cambio (ficha o experiencia)
         if (!empty($cambios)) {
 
-            if (!empty($sets)) {
-                $set_clause = implode(', ', $sets);
-                $db->query("UPDATE `mybb_sg_sg_fichas` SET $set_clause WHERE `fid`='$ficha_id'");
+            // Un grupo por edición: todos los campos de este guardado quedan
+            // enlazados en el historial. newpoints (users) es MyISAM: se enlaza
+            // por grupo pero sin transacción (caveat MyISAM en el doc).
+            $grupo = uniqid();
+            foreach ($cambios_campos as $campo => $valor) {
+                sg_ficha_set_campo($ficha_id, $campo, $valor, 'staff', SG_ORIGEN_MODIFICAR_FICHA, $razon, $grupo);
             }
 
             if ($exp_cambio) {
-                $db->query("UPDATE `mybb_sg_users` SET newpoints='$exp_nueva' WHERE `uid`='$ficha_id'");
+                sg_usuario_set_campo($ficha_id, 'newpoints', $exp_nueva, 'staff', SG_ORIGEN_MODIFICAR_FICHA, $razon, $grupo);
             }
 
             // Sincronizar usergroup SOLO si la villa cambió y mapea a un grupo conocido

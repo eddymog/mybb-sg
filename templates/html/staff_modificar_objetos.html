@@ -207,6 +207,8 @@
                 <option value="Empuñada" <if $objeto['tipo'] == 'Empuñada' then>selected</if>>Empuñada</option>
                 <option value="Herramienta" <if $objeto['tipo'] == 'Herramienta' then>selected</if>>Herramienta</option>
                 <option value="Pergamino" <if $objeto['tipo'] == 'Pergamino' then>selected</if>>Pergamino</option>
+                <option value="Coleccionable" <if $objeto['tipo'] == 'Coleccionable' then>selected</if>>Coleccionable</option>
+                <option value="Consumible" <if $objeto['tipo'] == 'Consumible' then>selected</if>>Consumible</option>
                 <option value="Otro" <if $objeto['tipo'] == 'Otro' || $objeto['tipo'] == '' then>selected</if>>Otro</option>
               </select>
             </div>
@@ -236,6 +238,13 @@
               <select class="sg-select" name="en_tienda" id="en_tienda">
                 <option value="1" <if $objeto['en_tienda'] != 0 then>selected</if>>Sí</option>
                 <option value="0" <if $objeto['en_tienda'] == 0 then>selected</if>>No</option>
+              </select>
+            </div>
+            <div class="sg-field">
+              <label class="sg-label" for="visibilidad">Visibilidad</label>
+              <select class="sg-select" name="visibilidad" id="visibilidad">
+                <option value="1" <if $objeto['visibilidad'] != 0 then>selected</if>>Visible</option>
+                <option value="0" <if $objeto['visibilidad'] == 0 then>selected</if>>Invisible</option>
               </select>
             </div>
             <div class="sg-field sg-field--full">

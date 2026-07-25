@@ -1,172 +1,536 @@
 <html>
-
 <head>
-   <style>
-	.statscalculator {
-		background-color: #083875;
-		width: 400px;
-		height: 370px;
-		margin-right: 5px;
-		margin-top: -10px;
-		border-radius: 3px;
-		margin-bottom: 20px;
-		text-align: center
-	}
-	   
-	.fichastats {
-		padding-bottom: 5px;
-		margin: 10px auto
-	}
-	   
-    .upperblackbar {
-		height: 40px;
-		background-color: #0e1a28;
-		padding-bottom: 2px;
-		border-radius: 3px 3px 0 0
-	}
-	   
-	.upperbartittle {
-		padding-top: 5px;
-		color: #fff;
-		font-size: 24px;
-		font-family: Lemon Milk,Impact,Haettenschweiler,"Franklin Gothic Bold",Charcoal,"Helvetica Inserat","Bitstream Vera Sans Bold","Arial Black","sans serif"
-	}
-	   
-	.cstats {
-		width: 150px;
-		display: inline-block;
-		padding: 10px;
-		margin-left: 10px
-	}
-
-	.cstat {
-		height: 19px;
-		font-size: 14px;
-		font-family: Lemon Milk,Impact,Haettenschweiler,"Franklin Gothic Bold",Charcoal,"Helvetica Inserat","Bitstream Vera Sans Bold","Arial Black","sans serif";
-		text-align: right;
-		color: white;
-	}
-	   
-	.calcstatsedit {
-		width: 200px;
-		float: right;
-		margin: 10px
-	}
-
-	.calcstatsedit input {
-		width: 200px;
-		height: 16px;
-		border: 1px solid #083875;
-		background: #245a9e;
-		color: #FFF;
-		text-align: center;
-		font-weight: bold;
-	}
-	   
-	.personaje_stats {
-		font-weight: bold;
-		color: #ff8700
-	}
-
-	.personaje_vida {
-		font-weight: bold;
-		color: #c80514
-	}
-
-	.personaje_chakra {
-		font-weight: bold;
-		color: #338bce
-	}
-
-
-
-   </style>
   <title>Shinobi Gaiden</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Source+Serif+4:wght@300;400;600;700&family=Zen+Old+Mincho:wght@400;700&display=swap" rel="stylesheet">
   {$headerinclude}
+  <style>
+    :root {
+      --bg: #0f0c18;
+      --bg2: #130f1e;
+      --bg3: #171224;
+      --bg4: #1c162c;
+      --surface: rgba(28, 22, 44, 0.68);
+      --surface-strong: rgba(24, 18, 36, 0.88);
+      --border: rgba(156, 107, 204, 0.12);
+      --ink: #e8dff8;
+      --plum: #7b4ab8;
+      --plum2: #9c6bcc;
+      --plum3: #b890e0;
+      --plum4: #d4b8f0;
+      --oxide: #c0582a;
+      --stone: #8a7a9a;
+      --mist: #5a4a6a;
+      --fiber: rgba(156, 107, 204, 0.04);
+      --shadow: 0 24px 60px rgba(0, 0, 0, 0.32);
+      --shadow-soft: 0 14px 32px rgba(0, 0, 0, 0.22);
+      --radius-xl: 28px;
+      --radius-lg: 22px;
+      --radius-md: 16px;
+      --radius-sm: 12px;
+    }
+
+    body {
+      background:
+        radial-gradient(circle at top left, rgba(123, 74, 184, 0.12), transparent 28%),
+        radial-gradient(circle at bottom right, rgba(192, 88, 42, 0.08), transparent 24%),
+        var(--bg);
+      color: var(--ink);
+      font-family: "Source Serif 4", serif;
+      margin: 0;
+      position: relative;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      background-image:
+        repeating-linear-gradient(13deg, transparent 0, transparent 24px, var(--fiber) 24px, var(--fiber) 25px),
+        repeating-linear-gradient(82deg, transparent 0, transparent 36px, var(--fiber) 36px, var(--fiber) 37px),
+        repeating-linear-gradient(151deg, transparent 0, transparent 19px, var(--fiber) 19px, var(--fiber) 19.5px);
+    }
+
+    .sg-calc-page {
+      max-width: 1120px;
+      margin: 32px auto 48px;
+      padding: 0 18px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .sg-calc-shell {
+      overflow: hidden;
+      border: 1px solid var(--border);
+      border-radius: 34px;
+      background: linear-gradient(180deg, rgba(19, 15, 30, 0.92), rgba(23, 18, 36, 0.96));
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(8px);
+    }
+
+    .sg-calc-hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(280px, 0.8fr);
+      min-height: 280px;
+      border-bottom: 1px solid var(--border);
+      background:
+        linear-gradient(135deg, rgba(28, 22, 44, 0.7), rgba(19, 15, 30, 0.96)),
+        var(--bg2);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .sg-calc-hero::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background:
+        radial-gradient(circle at top right, rgba(123, 74, 184, 0.12), transparent 34%),
+        radial-gradient(circle at bottom left, rgba(192, 88, 42, 0.09), transparent 28%);
+    }
+
+    .sg-calc-main,
+    .sg-calc-side {
+      position: relative;
+      z-index: 1;
+    }
+
+    .sg-calc-main {
+      padding: 42px 40px 36px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .sg-kicker {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 18px;
+      font: 700 10px/1 "Cinzel", serif;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--oxide);
+    }
+
+    .sg-kicker::before {
+      content: "";
+      width: 48px;
+      height: 1px;
+      background: var(--oxide);
+    }
+
+    .sg-heading-wrap {
+      display: grid;
+      grid-template-columns: 54px minmax(0, 1fr);
+      gap: 18px;
+      align-items: start;
+    }
+
+    .sg-kanji {
+      font: 700 44px/0.8 "Zen Old Mincho", serif;
+      color: rgba(212, 184, 240, 0.16);
+      writing-mode: vertical-rl;
+      letter-spacing: 8px;
+      user-select: none;
+    }
+
+    .sg-title {
+      margin: 0;
+      font: 900 clamp(34px, 5vw, 56px)/0.95 "Cinzel", serif;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--ink);
+    }
+
+    .sg-subtitle {
+      max-width: 700px;
+      margin: 16px 0 0;
+      font-size: 17px;
+      line-height: 1.9;
+      color: var(--stone);
+      text-align: justify;
+    }
+
+    .sg-calc-side {
+      padding: 36px 28px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      background: linear-gradient(180deg, rgba(61, 31, 110, 0.96), rgba(61, 31, 110, 0.9));
+      color: #ede0fa;
+    }
+
+    .sg-side-label,
+    .sg-side-stat-label,
+    .sg-field-label,
+    .sg-reset {
+      font-family: "Cinzel", serif;
+      text-transform: uppercase;
+    }
+
+    .sg-side-label {
+      margin-bottom: 14px;
+      font-size: 10px;
+      letter-spacing: 3px;
+      color: rgba(237, 224, 250, 0.72);
+    }
+
+    .sg-side-copy {
+      margin: 0;
+      font-size: 15px;
+      line-height: 1.9;
+      color: rgba(237, 224, 250, 0.84);
+      text-align: justify;
+    }
+
+    .sg-calc-body {
+      padding: 24px;
+      display: grid;
+      grid-template-columns: minmax(0, 1.15fr) minmax(280px, 0.85fr);
+      gap: 22px;
+      background: linear-gradient(180deg, rgba(15, 12, 24, 0.68), rgba(15, 12, 24, 0.96));
+    }
+
+    .sg-card {
+      position: relative;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      background:
+        linear-gradient(180deg, rgba(28, 22, 44, 0.84), rgba(19, 15, 30, 0.96)),
+        var(--surface);
+      box-shadow: var(--shadow-soft);
+    }
+
+    .sg-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background:
+        radial-gradient(circle at top right, rgba(123, 74, 184, 0.1), transparent 34%),
+        linear-gradient(120deg, transparent 0%, rgba(192, 88, 42, 0.06) 100%);
+    }
+
+    .sg-card-head,
+    .sg-card-body {
+      position: relative;
+      z-index: 1;
+    }
+
+    .sg-card-head {
+      padding: 24px 26px 18px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .sg-card-eyebrow {
+      margin-bottom: 10px;
+      font: 700 10px/1 "Cinzel", serif;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--oxide);
+    }
+
+    .sg-card-title {
+      margin: 0;
+      font: 900 24px/1.1 "Cinzel", serif;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--ink);
+    }
+
+    .sg-card-copy {
+      margin: 12px 0 0;
+      color: var(--stone);
+      line-height: 1.85;
+      text-align: justify;
+    }
+
+    .sg-card-body {
+      padding: 22px;
+    }
+
+    .sg-fields {
+      display: grid;
+      gap: 12px;
+    }
+
+    .sg-field {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 140px;
+      align-items: center;
+      gap: 16px;
+      padding: 14px 16px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      background: rgba(28, 22, 44, 0.72);
+    }
+
+    .sg-field-label {
+      display: block;
+      font-size: 11px;
+      letter-spacing: 1.8px;
+      color: var(--plum3);
+    }
+
+    .sg-field input {
+      width: 100%;
+      height: 44px;
+      border: 1px solid rgba(156, 107, 204, 0.2);
+      border-radius: 12px;
+      background: rgba(15, 12, 24, 0.9);
+      color: var(--ink);
+      text-align: center;
+      font: 700 16px/1 "Cinzel", serif;
+      outline: none;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+    }
+
+    .sg-field input:focus {
+      border-color: rgba(156, 107, 204, 0.42);
+      box-shadow: 0 0 0 3px rgba(123, 74, 184, 0.14);
+      transform: translateY(-1px);
+    }
+
+    .sg-summary {
+      display: grid;
+      gap: 14px;
+    }
+
+    .sg-summary-grid {
+      display: grid;
+      gap: 12px;
+    }
+
+    .sg-summary-item {
+      padding: 16px 18px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      background: rgba(28, 22, 44, 0.72);
+    }
+
+    .sg-side-stat-label {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 10px;
+      letter-spacing: 2px;
+      color: var(--mist);
+    }
+
+    .sg-side-stat-value {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font: 700 28px/1 "Cinzel", serif;
+      color: var(--ink);
+    }
+
+    .sg-side-stat-value img {
+      width: 12px;
+      height: 12px;
+      object-fit: contain;
+      position: relative;
+      top: -1px;
+    }
+
+    .personaje_vida {
+      color: #ff7b7b;
+    }
+
+    .personaje_chakra {
+      color: #8cc8ff;
+    }
+
+    .personaje_stats {
+      color: #ffc16e;
+    }
+
+    .sg-reset-wrap {
+      margin-top: 4px;
+    }
+
+    .sg-reset {
+      width: 100%;
+      min-height: 48px;
+      border: 1px solid rgba(237, 224, 250, 0.16);
+      border-radius: 999px;
+      background: linear-gradient(135deg, rgba(61, 31, 110, 0.96), rgba(90, 46, 154, 0.88));
+      color: #fff;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      cursor: pointer;
+      transition: transform 0.2s ease, filter 0.2s ease;
+    }
+
+    .sg-reset:hover {
+      transform: translateY(-2px);
+      filter: brightness(1.05);
+    }
+
+    @media (max-width: 980px) {
+      .sg-calc-hero,
+      .sg-calc-body {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 720px) {
+      .sg-calc-page {
+        margin-top: 20px;
+        padding: 0 12px;
+      }
+
+      .sg-calc-shell {
+        border-radius: 24px;
+      }
+
+      .sg-calc-main,
+      .sg-calc-side,
+      .sg-calc-body,
+      .sg-card-head,
+      .sg-card-body {
+        padding-left: 18px;
+        padding-right: 18px;
+      }
+
+      .sg-heading-wrap {
+        grid-template-columns: 1fr;
+      }
+
+      .sg-kanji {
+        display: none;
+      }
+
+      .sg-field {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
 </head>
 
 <body>
   {$header}
-  <div class="fondo-blanco" style="text-align: center;">
-  <table class="tripanel" style=" margin: auto; ">
-    <tbody>
-      <tr>
-        <td>
-          <div class="statscalculator">
-            <div class="fichastats">
-              <div class="upperblackbar">
-                <div class="upperbartittle">Calculadora de Estadísticas</div>
-              </div>
-              <div class="cstats">
-                <div class="cstat">Fuerza:</div>
-                <div class="cstat">Destreza:</div>
-                <div class="cstat">Ctrl. de Chakra:</div>
-                <div class="cstat">Inteligencia:</div>
-                <div class="cstat">Salud:</div>
-                <div class="cstat">Velocidad:</div>
-                <div class="cstat">Tenketsu:</div>
-                <div class="cstat">Sigilo:</div>
-              </div>
-              <div class="calcstatsedit">
+  <div class="sg-calc-page">
+    <div class="sg-calc-shell">
+      <section class="sg-calc-hero">
+        <div class="sg-calc-main">
+          <div class="sg-kicker">Herramienta Shinobi</div>
+          <div class="sg-heading-wrap">
+            <div class="sg-kanji">算盤</div>
+            <div>
+              <h1 class="sg-title">Calculadora de Estadísticas</h1>
+              <p class="sg-subtitle">
+                Ajusta los atributos base de tu personaje y consulta al instante el resultado de vida, chakra y nivel estimado. La herramienta mantiene el cálculo tradicional del sistema, pero ahora se presenta con una lectura más clara, más ordenada y mucho más cómoda de usar.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <aside class="sg-calc-side">
+          <div class="sg-side-label">Referencia</div>
+          <p class="sg-side-copy">
+            Introduce los valores de cada estadística y la calculadora actualizará automáticamente los recursos principales del personaje. Los atributos físicos inferiores comienzan en su base mínima para reflejar el comportamiento habitual del sistema.
+          </p>
+        </aside>
+      </section>
+
+      <section class="sg-calc-body">
+        <article class="sg-card">
+          <div class="sg-card-head">
+            <div class="sg-card-eyebrow">Entrada</div>
+            <h2 class="sg-card-title">Atributos base</h2>
+            <p class="sg-card-copy">
+              Modifica los valores manualmente para revisar distintos repartos. Los cambios recalculan la ficha en tiempo real sin alterar las fórmulas originales.
+            </p>
+          </div>
+          <div class="sg-card-body">
+            <div class="sg-fields">
+              <label class="sg-field">
+                <span class="sg-field-label">Fuerza</span>
                 <input onchange="statsvalue();" type="number" id="fuerza" min="0" value="0">
+              </label>
+              <label class="sg-field">
+                <span class="sg-field-label">Destreza</span>
                 <input onchange="statsvalue();" type="number" id="destreza" min="0" value="0">
+              </label>
+              <label class="sg-field">
+                <span class="sg-field-label">Control de Chakra</span>
                 <input onchange="statsvalue();" type="number" id="cchakra" min="0" value="0">
+              </label>
+              <label class="sg-field">
+                <span class="sg-field-label">Inteligencia</span>
                 <input onchange="statsvalue();" type="number" id="inteligencia" min="0" value="0">
+              </label>
+              <label class="sg-field">
+                <span class="sg-field-label">Salud</span>
                 <input onchange="statsvalue();" type="number" id="salud" min="9" value="9">
+              </label>
+              <label class="sg-field">
+                <span class="sg-field-label">Velocidad</span>
                 <input onchange="statsvalue();" type="number" id="velocidad" min="9" value="9">
+              </label>
+              <label class="sg-field">
+                <span class="sg-field-label">Tenketsu</span>
                 <input onchange="statsvalue();" type="number" id="tenketsu" min="9" value="9">
+              </label>
+              <label class="sg-field">
+                <span class="sg-field-label">Sigilo</span>
                 <input onchange="statsvalue();" type="number" id="sigilo" min="9" value="9">
+              </label>
+            </div>
+          </div>
+        </article>
+
+        <aside class="sg-summary">
+          <article class="sg-card">
+            <div class="sg-card-head">
+              <div class="sg-card-eyebrow">Resultado</div>
+              <h2 class="sg-card-title">Resumen actual</h2>
+              <p class="sg-card-copy">
+                Estos valores se actualizan automáticamente según la distribución elegida en los atributos.
+              </p>
+            </div>
+            <div class="sg-card-body">
+              <div class="sg-summary-grid">
+                <div class="sg-summary-item">
+                  <span class="sg-side-stat-label">Vida</span>
+                  <div class="sg-side-stat-value personaje_vida"><span id="hp">180</span><img title="Vida" src="/images/sg/icons/vida.png"></div>
+                </div>
+                <div class="sg-summary-item">
+                  <span class="sg-side-stat-label">Chakra</span>
+                  <div class="sg-side-stat-value personaje_chakra"><span id="mp">180</span><img title="Chakra" src="/images/sg/icons/chakra.png"></div>
+                </div>
+                <div class="sg-summary-item">
+                  <span class="sg-side-stat-label">Nivel</span>
+                  <div class="sg-side-stat-value personaje_stats"><span id="n">1</span></div>
+                </div>
               </div>
             </div>
-			  <br>
-			<div style=" color: white; text-align: center; ">
-			Vida: <span class="personaje_vida" id="hp">180</span> <img title="Vida" style="width: 9px;top: -1px;position: relative;" src="/images/sg/icons/vida.png"><br>
-			Chakra: <span class="personaje_chakra" id="mp">180</span> <img title="Chakra" style=" width: 9px; top: -1px; position: relative; " src="/images/sg/icons/chakra.png"><br>
-<!-- 			Reg. Chakra: <span class="personaje_chakra" id="regc">0</span><br> -->
-			Nivel: <span id="n">1</span><br>
-<!-- 			Estadísticas necesarias: <span id="h">8</span><br> -->
-		</div>
+          </article>
 
+          <div class="sg-reset-wrap">
+            <input class="sg-reset" type="button" value="Resetear" onclick="reset()">
           </div>
-        </td>
-      </tr>
-    </tbody>
-  </table>
-
-  <table class="buttonstable" style=" margin: auto; ">
-    <tbody>
-      <tr>
-        <td>
-          <div class="editstatsbutton" style="text-align: center;"><input class="button" type="button" value="Resetear" onclick="reset()"></div>
-        </td>
-      </tr>
-    </tbody>
-  </table>
-	</div>
+        </aside>
+      </section>
+    </div>
+  </div>
   {$footer}
 </body>
+
 <script>
-  /* Función para calcular vida del personaje */
-  /*
-  */
   function calcHp(fuerza, destreza, cchakra, inteligencia, salud, velocidad, tenketsu, sigilo) {
-    return (fuerza * 2) + (destreza * 1) + (cchakra * 1) + (inteligencia * 2) + (salud * 10) + (velocidad * 0) + (tenketsu * 5) + (sigilo * 5);
+    return (fuerza * 2) + (destreza * 1) + (cchakra * 1) + (inteligencia * 2) + (salud * 10) + (velocidad * 5) + (tenketsu * 0) + (sigilo * 5);
   }
-	
+
   function calcCh(fuerza, destreza, cchakra, inteligencia, salud, velocidad, tenketsu, sigilo) {
-	return (fuerza * 1) + (destreza * 2) + (cchakra * 2) + (inteligencia * 1) + (salud * 0) + (velocidad * 10) + (tenketsu * 5) + (sigilo * 5);
-  }
-
-  // function calcRegCh(str, res, vel, agi, des, pre, int, cc, niv) {
-  //   return Math.round((((str + res + vel + agi + des + pre + int + cc) * 2) / 40) + 1);
-  // }
-
-  function statsvalue() {
-    nivelvalue(parseInt(fuerza.value), parseInt(destreza.value), parseInt(cchakra.value), parseInt(inteligencia.value));
-    vida.innerHTML = calcHp(parseInt(fuerza.value), parseInt(destreza.value), parseInt(cchakra.value), parseInt(inteligencia.value), parseInt(salud.value), parseInt(velocidad.value), parseInt(tenketsu.value), parseInt(sigilo.value));
-	chakra.innerHTML = calcCh(parseInt(fuerza.value), parseInt(destreza.value), parseInt(cchakra.value), parseInt(inteligencia.value), parseInt(salud.value), parseInt(velocidad.value), parseInt(tenketsu.value), parseInt(sigilo.value));
-
-	// regchakra.innerHTML = Math.round(calcRegCh(parseInt(fuerza.value), parseInt(res.value), parseInt(vel.value), parseInt(agi.value), parseInt(dex.value), parseInt(pres.value), parseInt(int.value), parseInt(ctrl.value), parseInt(nivelida.value)));
+    return (fuerza * 1) + (destreza * 2) + (cchakra * 2) + (inteligencia * 1) + (salud * 0) + (velocidad * 5) + (tenketsu * 10) + (sigilo * 5);
   }
 
   var fuerza = document.getElementById('fuerza');
@@ -177,20 +541,38 @@
   var velocidad = document.getElementById('velocidad');
   var tenketsu = document.getElementById('tenketsu');
   var sigilo = document.getElementById('sigilo');
-  var hab = document.getElementById('h');
 
   var vida = document.getElementById('hp');
-  var aguante = document.getElementById('sp');
   var chakra = document.getElementById('mp');
-  var regaguante = document.getElementById('regr');
-  var regchakra = document.getElementById('regc');
   var nivelida = document.getElementById('n');
-  var hab = document.getElementById('h');
 
   function nivelvalue(fuerza, destreza, cchakra, inteligencia) {
     var prom = ((fuerza + destreza + cchakra + inteligencia) / 15) + 1;
     nivelida.innerHTML = Math.floor(prom);
-    // hab.innerHTML = (parseInt(fuerza.value) + parseInt(res.value) + parseInt(vel.value) + parseInt(agi.value) + parseInt(dex.value) + parseInt(pres.value) + parseInt(int.value) + parseInt(ctrl.value));
+  }
+
+  function statsvalue() {
+    nivelvalue(parseInt(fuerza.value, 10), parseInt(destreza.value, 10), parseInt(cchakra.value, 10), parseInt(inteligencia.value, 10));
+    vida.innerHTML = calcHp(
+      parseInt(fuerza.value, 10),
+      parseInt(destreza.value, 10),
+      parseInt(cchakra.value, 10),
+      parseInt(inteligencia.value, 10),
+      parseInt(salud.value, 10),
+      parseInt(velocidad.value, 10),
+      parseInt(tenketsu.value, 10),
+      parseInt(sigilo.value, 10)
+    );
+    chakra.innerHTML = calcCh(
+      parseInt(fuerza.value, 10),
+      parseInt(destreza.value, 10),
+      parseInt(cchakra.value, 10),
+      parseInt(inteligencia.value, 10),
+      parseInt(salud.value, 10),
+      parseInt(velocidad.value, 10),
+      parseInt(tenketsu.value, 10),
+      parseInt(sigilo.value, 10)
+    );
   }
 
   function reset() {
@@ -198,14 +580,13 @@
     destreza.value = 0;
     cchakra.value = 0;
     inteligencia.value = 0;
-    salud.value = 0;
-    velocidad.value = 0;
-    tenketsu.value = 0;
-    sigilo.value = 0;
-    nivelida.innerHTML = 0;
-    hab.innerHTML = 0;
-    statsvalue()
+    salud.value = 9;
+    velocidad.value = 9;
+    tenketsu.value = 9;
+    sigilo.value = 9;
+    statsvalue();
   }
-</script>
 
+  statsvalue();
+</script>
 </html>

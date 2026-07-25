@@ -1,0 +1,838 @@
+<html>
+
+<head>
+  <title>Pergaminos</title>
+  {$headerinclude}
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Noto+Serif+JP:wght@300;400;700&display=swap" rel="stylesheet">
+  <style>
+    .perg-page {
+      --bg: #0f0c18; --bg2: #130f1e; --bg3: #171224;
+      --border: rgba(156, 107, 204, 0.12);
+      --border-strong: rgba(156, 107, 204, 0.22);
+      --ink: #e8dff8; --plum: #7b4ab8; --plum2: #9c6bcc; --plum3: #b890e0;
+      --stone: #8a7a9a; --mist: #5a4a6a; --oxide: #c0582a; --lavender: #ede0fa;
+      --gold: #c09840; --green: #4f9d69;
+      max-width: 1100px;
+      margin: 24px auto 44px;
+      padding: 0 16px;
+      color: var(--ink);
+      font-family: 'Noto Serif JP', serif;
+    }
+
+    .perg-shell {
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), transparent 16%), var(--bg2);
+      border: 0.5px solid var(--border);
+      overflow: hidden;
+    }
+
+    .perg-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 20px 24px;
+      background: var(--bg3);
+      border-bottom: 0.5px solid var(--border);
+    }
+    .perg-header::before {
+      content: '';
+      width: 3px;
+      height: 26px;
+      background: var(--oxide);
+      flex-shrink: 0;
+    }
+    .perg-eyebrow {
+      font-family: 'Cinzel', serif;
+      font-size: 8px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--plum3);
+    }
+    .perg-title {
+      margin: 2px 0 0;
+      font-family: 'Cinzel', serif;
+      font-size: 18px;
+      font-weight: 900;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--ink);
+      line-height: 1;
+    }
+
+    .perg-intro {
+      margin: 0;
+      padding: 13px 24px;
+      background: var(--bg2);
+      border-bottom: 0.5px solid var(--border);
+      color: var(--stone);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+    .perg-intro strong { color: var(--gold); font-weight: 700; }
+
+    .perg-body { padding: 22px 24px; }
+
+    /* ── Estadísticas globales ────────────────────────────────────── */
+    .perg-stats {
+      padding: 20px 24px 24px;
+      border-top: 0.5px solid var(--border);
+      background: var(--bg2);
+    }
+    .perg-stats__title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 0 0 14px;
+      font-family: 'Cinzel', serif;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--plum3);
+    }
+    .perg-stats__title::after { content: ''; flex: 1; height: 0.5px; background: var(--border); }
+    .perg-stats__grid {
+      display: grid;
+      grid-template-columns: 200px 1fr;
+      gap: 18px;
+      align-items: start;
+    }
+    .perg-stats__main {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .perg-stats__pergs {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 10px;
+    }
+    .perg-stat {
+      text-align: center;
+      padding: 14px 8px;
+      background: var(--bg);
+      border: 0.5px solid var(--border);
+    }
+    .perg-stat__v {
+      font-family: 'Cinzel', serif;
+      font-weight: 700;
+      font-size: 20px;
+      color: var(--plum3);
+      font-variant-numeric: tabular-nums;
+    }
+    .perg-stat__k {
+      margin-top: 4px;
+      font-family: 'Cinzel', serif;
+      font-size: 9px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--stone);
+    }
+    @media (max-width: 640px) {
+      .perg-stats__grid { grid-template-columns: 1fr; }
+      .perg-stats__main { flex-direction: row; }
+      .perg-stats__main .perg-stat { flex: 1; }
+    }
+
+    /* ── Historial (global + personal) ───────────────────────────── */
+    .perg-hist-wrap {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+      padding: 20px 24px 24px;
+      border-top: 0.5px solid var(--border);
+    }
+    .perg-hist-title {
+      margin: 0 0 10px;
+      font-family: 'Cinzel', serif;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--plum3);
+    }
+    .perg-hist-title__hint {
+      font-family: 'Noto Serif JP', serif;
+      font-size: 10px;
+      font-weight: 400;
+      letter-spacing: 0;
+      text-transform: none;
+      color: var(--mist);
+    }
+    .perg-hist-list {
+      max-height: 380px;
+      overflow-y: auto;
+      background: var(--bg);
+      border: 0.5px solid var(--border);
+    }
+    .perg-hist-list::-webkit-scrollbar { width: 8px; }
+    .perg-hist-list::-webkit-scrollbar-track { background: var(--bg); }
+    .perg-hist-list::-webkit-scrollbar-thumb { background: rgba(156, 107, 204, 0.25); }
+    .perg-hist-empty { padding: 18px; text-align: center; color: var(--mist); font-size: 12.5px; }
+    .perg-hist-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 12px;
+      border-bottom: 0.5px solid var(--border);
+      font-size: 12px;
+    }
+    .perg-hist-row:last-child { border-bottom: none; }
+    .perg-hist-date { color: var(--mist); font-variant-numeric: tabular-nums; flex-shrink: 0; }
+    .perg-hist-user { font-family: 'Cinzel', serif; font-weight: 700; font-size: 11px; color: var(--plum3); }
+    .perg-hist-perg { color: var(--stone); }
+    .perg-hist-premio { color: var(--ink); margin-left: auto; text-align: right; }
+    .perg-hist-badge {
+      padding: 2px 7px;
+      background: rgba(192, 152, 64, 0.16);
+      border: 0.5px solid rgba(192, 152, 64, 0.4);
+      color: var(--gold);
+      font-family: 'Cinzel', serif;
+      font-size: 8px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+    @media (max-width: 760px) {
+      .perg-hist-wrap { grid-template-columns: 1fr; }
+      .perg-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (max-width: 460px) {
+      .perg-grid { grid-template-columns: 1fr; }
+    }
+
+    /* ── Regalo global de Staff (solo uid 10) ────────────────────── */
+    .perg-regalo {
+      padding: 20px 24px 24px;
+      border-top: 0.5px solid var(--border);
+      background: rgba(192, 88, 42, 0.05);
+    }
+    .perg-regalo__title {
+      margin: 0 0 6px;
+      font-family: 'Cinzel', serif;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--oxide);
+    }
+    .perg-regalo__desc { margin: 0 0 14px; color: var(--stone); font-size: 12.5px; line-height: 1.6; }
+    .perg-regalo__msg { margin-bottom: 14px; padding: 10px 12px; font-size: 13px; border-left: 2px solid; }
+    .perg-regalo__msg.is-ok { border-color: var(--green); background: rgba(79, 157, 105, 0.12); color: var(--ink); }
+    .perg-regalo__msg.is-error { border-color: var(--oxide); background: rgba(192, 88, 42, 0.12); color: var(--ink); }
+    .perg-regalo__row { display: flex; flex-wrap: wrap; gap: 10px; }
+    .perg-regalo__select, .perg-regalo__input {
+      height: 40px;
+      padding: 0 12px;
+      background: var(--bg);
+      border: 0.5px solid var(--border-strong);
+      color: var(--ink);
+      font-family: 'Noto Serif JP', serif;
+      font-size: 13px;
+      box-sizing: border-box;
+    }
+    .perg-regalo__select { flex: 1; min-width: 170px; }
+    .perg-regalo__input { flex: 1; min-width: 160px; }
+    .perg-regalo__btn {
+      height: 40px;
+      padding: 0 18px;
+      background: var(--oxide);
+      border: none;
+      color: #fff;
+      font-family: 'Cinzel', serif;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 1.4px;
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+    .perg-regalo__btn:hover { filter: brightness(1.12); }
+
+    .perg-empty {
+      grid-column: 1 / -1;
+      padding: 36px 20px;
+      text-align: center;
+      color: var(--mist);
+      font-size: 14px;
+      border: 0.5px solid var(--border);
+      background: var(--bg);
+    }
+
+    .perg-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .perg-card {
+      display: flex;
+      flex-direction: column;
+      background: var(--bg);
+      border: 0.5px solid var(--border);
+      transition: border-color .15s ease, transform .12s ease;
+    }
+    .perg-card:hover { border-color: var(--plum3); transform: translateY(-2px); }
+
+    .perg-card__thumb {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      background: var(--bg3);
+      border-bottom: 0.5px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+    .perg-card__thumb::before {
+      content: '巻';
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Noto Serif JP', serif;
+      font-size: 64px;
+      color: rgba(156, 107, 204, 0.14);
+      pointer-events: none;
+    }
+    .perg-card__thumb img {
+      position: relative;
+      z-index: 1;
+      max-width: 78%;
+      max-height: 78%;
+      object-fit: contain;
+    }
+
+    .perg-card__body { display: flex; flex-direction: column; gap: 8px; padding: 14px 16px 16px; flex: 1; }
+    .perg-card__name {
+      margin: 0;
+      font-family: 'Cinzel', serif;
+      font-size: 14px;
+      font-weight: 900;
+      letter-spacing: 0.4px;
+      color: var(--ink);
+      line-height: 1.3;
+    }
+    .perg-card__qty {
+      font-family: 'Cinzel', serif;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      color: var(--stone);
+    }
+    .perg-card__qty strong { color: var(--gold); }
+    .perg-card__desc {
+      margin: 0;
+      color: var(--stone);
+      font-size: 12.5px;
+      line-height: 1.6;
+      flex: 1;
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 3;
+      line-clamp: 3;
+      overflow: hidden;
+    }
+    /* "Leer más" — checkbox+label CSS-only, igual patrón que el resto del sitio. */
+    .perg-desc-toggle-input { display: none; }
+    .perg-desc-toggle-input:checked ~ .perg-card__desc {
+      -webkit-line-clamp: unset !important;
+      line-clamp: unset !important;
+      overflow: visible !important;
+    }
+    .perg-card__desc-more {
+      align-self: flex-start;
+      cursor: pointer;
+      font-family: 'Cinzel', serif;
+      font-size: 8px;
+      font-weight: 700;
+      letter-spacing: 1.3px;
+      text-transform: uppercase;
+      color: var(--plum3);
+    }
+    .perg-card__desc-more:hover { color: var(--plum2); }
+    .perg-card__desc-more__less { display: none; }
+    .perg-desc-toggle-input:checked ~ .perg-card__desc-more .perg-card__desc-more__more { display: none !important; }
+    .perg-desc-toggle-input:checked ~ .perg-card__desc-more .perg-card__desc-more__less { display: inline !important; }
+
+    .perg-btn {
+      margin-top: 4px;
+      height: 40px;
+      padding: 0 16px;
+      background: var(--plum);
+      border: none;
+      color: var(--lavender);
+      font-family: 'Cinzel', serif;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1.6px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .perg-btn:hover { background: var(--plum2); }
+
+    .perg-soon {
+      margin-top: 4px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg2);
+      border: 0.5px dashed var(--border-strong);
+      color: var(--mist);
+      font-family: 'Cinzel', serif;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 1.4px;
+      text-transform: uppercase;
+    }
+    .perg-soon--notienes { border-style: solid; opacity: 0.6; }
+
+    /* ── Modales (confirmación / apertura) ───────────────────────── */
+    .perg-modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      background: rgba(8, 6, 14, 0.78);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity .18s ease, visibility .18s ease;
+    }
+    .perg-modal-backdrop.is-open { opacity: 1; visibility: visible; }
+
+    .perg-modal {
+      position: relative;
+      width: 100%;
+      max-width: 420px;
+      background: var(--bg2);
+      border: 0.5px solid var(--border-strong);
+      box-shadow: 0 24px 60px rgba(0,0,0,0.5);
+      transform: translateY(10px) scale(.98);
+      transition: transform .18s ease;
+      padding: 26px 24px;
+      text-align: center;
+    }
+    .perg-modal-backdrop.is-open .perg-modal { transform: none; }
+
+    .perg-modal h3 {
+      margin: 0 0 10px;
+      font-family: 'Cinzel', serif;
+      font-size: 16px;
+      font-weight: 900;
+      letter-spacing: 0.6px;
+      text-transform: uppercase;
+      color: var(--ink);
+    }
+    .perg-modal p { margin: 0 0 20px; color: var(--stone); font-size: 13.5px; line-height: 1.6; }
+    .perg-modal p strong { color: var(--gold); }
+
+    .perg-modal-actions { display: flex; gap: 10px; }
+    .perg-modal-actions button {
+      flex: 1;
+      height: 40px;
+      border: none;
+      font-family: 'Cinzel', serif;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 1.4px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background .15s ease;
+    }
+    .perg-btn-cancel { background: var(--bg3); color: var(--stone); border: 0.5px solid var(--border-strong) !important; }
+    .perg-btn-cancel:hover { color: var(--ink); }
+    .perg-btn-confirm { background: var(--oxide); color: #fff; }
+    .perg-btn-confirm:hover { filter: brightness(1.12); }
+
+    /* Tragamonedas */
+    .perg-reel-viewport {
+      position: relative;
+      height: 92px;
+      margin-bottom: 18px;
+      background: var(--bg);
+      border: 0.5px solid var(--border-strong);
+      overflow: hidden;
+    }
+    .perg-reel-viewport::before, .perg-reel-viewport::after {
+      content: '';
+      position: absolute;
+      top: 0; bottom: 0;
+      width: 30%;
+      z-index: 2;
+      pointer-events: none;
+    }
+    .perg-reel-viewport::before { left: 0; background: linear-gradient(90deg, var(--bg), transparent); }
+    .perg-reel-viewport::after { right: 0; background: linear-gradient(270deg, var(--bg), transparent); }
+    .perg-reel-marker {
+      position: absolute;
+      left: 50%; top: 0; bottom: 0;
+      width: 2px;
+      margin-left: -1px;
+      background: var(--gold);
+      z-index: 3;
+      box-shadow: 0 0 8px rgba(192, 152, 64, 0.7);
+    }
+    .perg-reel-track {
+      position: absolute;
+      top: 0; left: 50%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      transition: transform 2.4s cubic-bezier(.12,.72,.14,1);
+      transform: translateX(0);
+    }
+    .perg-reel-item {
+      flex-shrink: 0;
+      width: 84px;
+      height: 84px;
+      margin: 0 3px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 6px;
+      background: var(--bg3);
+      border: 0.5px solid var(--border);
+      font-family: 'Cinzel', serif;
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--plum3);
+      line-height: 1.3;
+    }
+    .perg-reel-item.is-jackpot { color: var(--gold); border-color: rgba(192, 152, 64, 0.5); }
+
+    .perg-reveal { display: none; flex-direction: column; gap: 6px; margin-bottom: 16px; }
+    .perg-reveal.is-jackpot-banner {
+      font-family: 'Cinzel', serif;
+      font-size: 13px;
+      font-weight: 900;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--gold);
+      text-shadow: 0 0 12px rgba(192, 152, 64, 0.5);
+    }
+    .perg-reveal-item {
+      padding: 8px 10px;
+      background: rgba(192, 152, 64, 0.08);
+      border: 0.5px solid rgba(192, 152, 64, 0.35);
+      color: var(--ink);
+      font-size: 13px;
+    }
+    .perg-reveal-item strong { color: var(--gold); }
+
+    .perg-modal-close {
+      display: none;
+      height: 40px;
+      width: 100%;
+      background: var(--plum);
+      border: none;
+      color: var(--lavender);
+      font-family: 'Cinzel', serif;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 1.4px;
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+    .perg-modal-close:hover { background: var(--plum2); }
+
+    body.perg-modal-open { overflow: hidden; }
+  </style>
+</head>
+
+<body>
+  {$header}
+  <main class="perg-page">
+    <div class="perg-shell">
+      <div class="perg-header">
+        <div>
+          <div class="perg-eyebrow">Gacha</div>
+          <h1 class="perg-title">Pergaminos</h1>
+        </div>
+      </div>
+      <p class="perg-intro">Abre tus <strong>pergaminos</strong> para sortear un premio: ryos, rins, madara, tobis, objetos, o incluso un <strong>JACKPOT</strong>. Cada apertura consume 1 pergamino de tu inventario y queda registrada en el Historial de tu ficha.</p>
+      <div class="perg-body">
+        <div class="perg-grid">
+          {$pergHtml}
+        </div>
+      </div>
+
+      <div class="perg-stats">
+        <div class="perg-stats__title">Estadísticas Globales</div>
+        <div class="perg-stats__grid">
+          <div class="perg-stats__main">{$pergStatsMainHtml}</div>
+          <div class="perg-stats__pergs">{$pergStatsPergHtml}</div>
+        </div>
+      </div>
+
+      <div class="perg-stats">
+        <div class="perg-stats__title">Mis Estadísticas</div>
+        <div class="perg-stats__grid">
+          <div class="perg-stats__main">{$pergStatsPersonalMainHtml}</div>
+          <div class="perg-stats__pergs">{$pergStatsPersonalPergHtml}</div>
+        </div>
+      </div>
+
+      <div class="perg-hist-wrap">
+        <div class="perg-hist-col">
+          <div class="perg-hist-title">Historial Global <span class="perg-hist-title__hint">(últimas 100 tiradas)</span></div>
+          <div class="perg-hist-list">{$pergHistGlobalHtml}</div>
+        </div>
+        <div class="perg-hist-col">
+          <div class="perg-hist-title">Mi Historial <span class="perg-hist-title__hint">(últimas 100 tiradas)</span></div>
+          <div class="perg-hist-list">{$pergHistPersonalHtml}</div>
+        </div>
+      </div>
+
+      <if $pergRegaloHtml != '' then>
+      {$pergRegaloHtml}
+      </if>
+    </div>
+  </main>
+  {$footer}
+
+  <!-- Confirmación -->
+  <div class="perg-modal-backdrop" id="perg-confirm" aria-hidden="true">
+    <div class="perg-modal" role="dialog" aria-modal="true">
+      <h3>¿Abrir pergamino?</h3>
+      <p>Vas a abrir <strong id="perg-confirm-nombre"></strong>. Esta acción consume 1 unidad de tu inventario y no se puede deshacer.</p>
+      <div class="perg-modal-actions">
+        <button class="perg-btn-cancel" type="button" onclick="pergCerrarConfirm()">Cancelar</button>
+        <button class="perg-btn-confirm" type="button" onclick="pergAbrirConfirmado()">Aceptar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Apertura / tragamonedas -->
+  <div class="perg-modal-backdrop" id="perg-open" aria-hidden="true">
+    <div class="perg-modal" role="dialog" aria-modal="true">
+      <h3 id="perg-open-title">Abriendo pergamino…</h3>
+      <div class="perg-reel-viewport" id="perg-reel-viewport">
+        <div class="perg-reel-marker"></div>
+        <div class="perg-reel-track" id="perg-reel-track"></div>
+      </div>
+      <div class="perg-reveal" id="perg-reveal"></div>
+      <button class="perg-modal-close" id="perg-close-btn" type="button" onclick="pergCerrarOpen()">Cerrar</button>
+    </div>
+  </div>
+
+  <script>
+    var PERG_PENDIENTE = null; // {pid, nombre, btn}
+
+    function pergConfirmar(btn) {
+      PERG_PENDIENTE = { pid: btn.getAttribute('data-pid'), nombre: btn.getAttribute('data-nombre'), btn: btn };
+      document.getElementById('perg-confirm-nombre').textContent = PERG_PENDIENTE.nombre;
+      var m = document.getElementById('perg-confirm');
+      m.classList.add('is-open');
+      m.setAttribute('aria-hidden', 'false');
+      document.body.classList.add('perg-modal-open');
+    }
+
+    function pergCerrarConfirm() {
+      var m = document.getElementById('perg-confirm');
+      m.classList.remove('is-open');
+      m.setAttribute('aria-hidden', 'true');
+      document.body.classList.remove('perg-modal-open');
+    }
+
+    // Etiquetas cortas para llenar el carrete mientras esperamos la respuesta real.
+    var PERG_SIMBOLOS = ['Ryos', 'Rin', 'Madara', 'Tobi', 'Objeto', '???'];
+
+    function pergBuildReel(track, etiquetaGanadora, esJackpot) {
+      track.innerHTML = '';
+      track.style.transition = 'none';
+      track.style.transform = 'translateX(0)';
+
+      var total = 24;
+      var itemWidth = 90; // 84px + 2*3px margin
+      for (var i = 0; i < total; i++) {
+        var item = document.createElement('div');
+        item.className = 'perg-reel-item';
+        if (i === total - 1) {
+          item.textContent = etiquetaGanadora;
+          if (esJackpot) { item.classList.add('is-jackpot'); }
+        } else {
+          item.textContent = PERG_SIMBOLOS[Math.floor(Math.random() * PERG_SIMBOLOS.length)];
+        }
+        track.appendChild(item);
+      }
+
+      // Fuerza reflow para que el "transition:none" inicial se aplique antes de animar.
+      void track.offsetWidth;
+      track.style.transition = 'transform 2.4s cubic-bezier(.12,.72,.14,1)';
+      // El track está anclado con left:50% (x=0 == centro del viewport), así
+      // que hay que centrar el ÍTEM (no su borde izquierdo) bajo la marca:
+      // el centro del último ítem está en (total-1)*itemWidth + itemWidth/2.
+      var destino = -((total - 1) * itemWidth + itemWidth / 2);
+      requestAnimationFrame(function () {
+        track.style.transform = 'translateX(' + destino + 'px)';
+      });
+    }
+
+    // Suma 1 al valor numérico de una celda de estadística, respetando el
+    // mismo separador de miles ('.') que usa number_format en el servidor.
+    function pergBumpStat(cell) {
+      if (!cell) return;
+      var v = cell.querySelector('.perg-stat__v');
+      if (!v) return;
+      var n = parseInt(v.textContent.replace(/\./g, ''), 10) || 0;
+      n++;
+      v.textContent = n.toLocaleString('es-ES');
+    }
+
+    function pergEtiquetaRecompensa(r) {
+      if (r.tipo === 'objeto') {
+        return (r.cantidad > 1 ? r.cantidad + '× ' : '') + (r.objeto_nombre || r.objeto_id);
+      }
+      var labels = { ryos: 'Ryos', rin: 'Rin', madara: 'Madara', tobi: 'Tobi' };
+      return '+' + r.valor + ' ' + (labels[r.tipo] || r.tipo);
+    }
+
+    function pergRenderReveal(premios) {
+      var cont = document.getElementById('perg-reveal');
+      cont.innerHTML = '';
+
+      var huboJackpot = premios.some(function (p) { return p.es_jackpot; });
+      if (huboJackpot) {
+        var banner = document.createElement('div');
+        banner.className = 'perg-reveal-item is-jackpot-banner';
+        banner.textContent = '¡JACKPOT!';
+        cont.appendChild(banner);
+      }
+
+      premios.forEach(function (premio) {
+        premio.recompensas.forEach(function (r) {
+          var row = document.createElement('div');
+          row.className = 'perg-reveal-item';
+          row.innerHTML = '<strong>' + pergEtiquetaRecompensa(r) + '</strong>';
+          cont.appendChild(row);
+        });
+      });
+
+      cont.style.display = 'flex';
+    }
+
+    function pergAbrirConfirmado() {
+      if (!PERG_PENDIENTE) return;
+      var info = PERG_PENDIENTE;
+      pergCerrarConfirm();
+
+      var openModal = document.getElementById('perg-open');
+      var title = document.getElementById('perg-open-title');
+      var reveal = document.getElementById('perg-reveal');
+      var closeBtn = document.getElementById('perg-close-btn');
+      var track = document.getElementById('perg-reel-track');
+
+      title.textContent = 'Abriendo ' + info.nombre + '…';
+      reveal.style.display = 'none';
+      reveal.innerHTML = '';
+      closeBtn.style.display = 'none';
+
+      openModal.classList.add('is-open');
+      openModal.setAttribute('aria-hidden', 'false');
+      document.body.classList.add('perg-modal-open');
+
+      var body = new URLSearchParams();
+      body.set('pergamino_id', info.pid);
+
+      fetch('/sg/abrir_pergamino.php', { method: 'POST', body: body })
+        .then(function (res) { return res.json(); })
+        .then(function (data) {
+          if (!data.ok) {
+            title.textContent = 'No se pudo abrir el pergamino';
+            var msg = document.createElement('div');
+            msg.className = 'perg-reveal-item';
+            msg.textContent = data.msg || 'Intenta de nuevo.';
+            reveal.appendChild(msg);
+            reveal.style.display = 'flex';
+            closeBtn.style.display = 'block';
+            return;
+          }
+
+          var principal = data.premios[0];
+          var etiqueta = principal.es_jackpot ? '¡JACKPOT!' : (principal.recompensas[0] ? pergEtiquetaRecompensa(principal.recompensas[0]) : principal.nombre);
+          pergBuildReel(track, etiqueta, principal.es_jackpot);
+
+          window.setTimeout(function () {
+            title.textContent = '¡Premio!';
+            pergRenderReveal(data.premios);
+            closeBtn.style.display = 'block';
+
+            // Refleja la cantidad restante en la tarjeta. La tarjeta sigue
+            // visible aunque llegue a 0 (siempre se muestran los 7 pergaminos).
+            var card = info.btn.closest('.perg-card');
+            if (card) {
+              var qty = card.querySelector('.perg-card__qty strong');
+              if (qty) { qty.textContent = data.restante; }
+              if (data.restante <= 0) {
+                var soon = document.createElement('div');
+                soon.className = 'perg-soon perg-soon--notienes';
+                soon.textContent = 'No tienes ninguno';
+                info.btn.replaceWith(soon);
+              }
+            }
+
+            // Refleja la apertura en las estadísticas (globales y personales) sin esperar a recargar.
+            ['perg-stat-total', 'perg-stat-mio-total'].forEach(function (id) { pergBumpStat(document.getElementById(id)); });
+            if (principal.es_jackpot) {
+              ['perg-stat-jackpot', 'perg-stat-mio-jackpot'].forEach(function (id) { pergBumpStat(document.getElementById(id)); });
+            }
+            document.querySelectorAll('.perg-stat[data-pid="' + info.pid + '"]').forEach(pergBumpStat);
+          }, 2500);
+        })
+        .catch(function () {
+          title.textContent = 'Error de conexión';
+          closeBtn.style.display = 'block';
+        });
+    }
+
+    function pergCerrarOpen() {
+      var m = document.getElementById('perg-open');
+      m.classList.remove('is-open');
+      m.setAttribute('aria-hidden', 'true');
+      document.body.classList.remove('perg-modal-open');
+      PERG_PENDIENTE = null;
+    }
+
+    document.addEventListener('keydown', function (ev) {
+      if (ev.key !== 'Escape') return;
+      var confirmM = document.getElementById('perg-confirm');
+      var openM = document.getElementById('perg-open');
+      if (openM.classList.contains('is-open') && document.getElementById('perg-close-btn').style.display !== 'none') {
+        pergCerrarOpen();
+      } else if (confirmM.classList.contains('is-open')) {
+        pergCerrarConfirm();
+      }
+    });
+
+    // Confirmación reforzada para el regalo global: afecta a TODAS las
+    // fichas del foro y no se puede deshacer, así que además de un confirm()
+    // normal se pide re-escribir el ID del pergamino elegido.
+    function pergConfirmarRegalo(form) {
+      var select = form.querySelector('[name=pergamino_regalo]');
+      var pid = select.value;
+      var label = select.options[select.selectedIndex].textContent;
+      if (!confirm('¿Regalar "' + label + '" a TODAS las fichas del foro? Esta acción no se puede deshacer.')) {
+        return false;
+      }
+      var escrito = prompt('Para confirmar, escribe exactamente el código del pergamino (' + pid + '):');
+      if (escrito === null || escrito.trim().toUpperCase() !== pid) {
+        alert('Código no coincide. Regalo cancelado.');
+        return false;
+      }
+      return true;
+    }
+  </script>
+</body>
+
+</html>

@@ -1,5 +1,8 @@
 <script>
 var sgFichaTecAprendidas = {$tec_aprendidas};
+// Solo el dueño de la ficha (logueado, viendo su propia ficha) ve el
+// formulario de venta dentro del modal de inventario.
+var sgInvPuedeVender = {$sgInvPuedeVender};
 
 // Toggle "Ver valores reales": el PHP ya calculó tecnica.efecto_parsed (con
 // las stats efectivas de ESTE personaje). Misma clave de localStorage que
@@ -407,6 +410,139 @@ function fxInvImgFallback(img) {
 
   function fxInvIsDetail() { return !!(grid && grid.classList.contains('is-detail')); }
 
+  // Formulario de venta: se usa tanto dentro del modal (fxInvOpen) como en la
+  // vista detalle de la cuadrícula (fxInvBuildAllDetails), da igual — no
+  // depende del modal. d.sell es el precio unitario ya calculado por PHP
+  // (50% del coste base, o 0 si el objeto no es vendible). Al vender, recarga
+  // la página entera, así que no hace falta que este formulario mantenga su
+  // propio estado sincronizado (cantidad restante, etc.) después del éxito.
+  // Devuelve null si no aplica (no es el dueño, o el objeto no es vendible).
+  function fxInvBuildSell(d, tile) {
+    if (typeof sgInvPuedeVender === 'undefined' || !sgInvPuedeVender) { return null; }
+    var precio = parseInt(d.sell, 10) || 0;
+    var cant = parseInt(d.cant, 10) || 0;
+    if (precio <= 0 || cant <= 0) { return null; }
+
+    var wrap = fxEl('div', 'fx-inv-sell');
+    wrap.appendChild(fxEl('div', 'fx-inv-sell-price', 'Venta: ' + precio + ' ryos c/u'));
+
+    var form = fxEl('div', 'fx-inv-sell-form');
+    var qty = document.createElement('input');
+    qty.type = 'number'; qty.className = 'fx-inv-sell-qty';
+    qty.min = '1'; qty.step = '1'; qty.max = String(cant); qty.value = '1';
+    form.appendChild(qty);
+    var btnVender = fxEl('button', 'fx-inv-sell-btn', 'Vender');
+    btnVender.type = 'button';
+    form.appendChild(btnVender);
+    wrap.appendChild(form);
+
+    var totalLine = fxEl('div', 'fx-inv-sell-total', 'Total: ' + precio + ' ryos');
+    wrap.appendChild(totalLine);
+
+    var okMsg = fxEl('div', 'fx-inv-sell-ok', '');
+    okMsg.style.display = 'none';
+    wrap.appendChild(okMsg);
+    var errMsg = fxEl('div', 'fx-inv-sell-error', '');
+    errMsg.style.display = 'none';
+    wrap.appendChild(errMsg);
+
+    var confirmBox = fxEl('div', 'fx-inv-sell-confirm');
+    confirmBox.style.display = 'none';
+    var confirmMsg = fxEl('div', 'fx-inv-sell-confirm-msg', '');
+    confirmBox.appendChild(confirmMsg);
+    var confirmRow = fxEl('div', 'fx-inv-sell-confirm-row');
+    var btnOk = fxEl('button', 'fx-inv-sell-btn', 'Confirmar');
+    btnOk.type = 'button';
+    var btnCancel = fxEl('button', 'fx-inv-sell-cancel', 'Cancelar');
+    btnCancel.type = 'button';
+    confirmRow.appendChild(btnOk);
+    confirmRow.appendChild(btnCancel);
+    confirmBox.appendChild(confirmRow);
+    wrap.appendChild(confirmBox);
+
+    function clampQty() {
+      var n = parseInt(qty.value, 10);
+      if (!n || n < 1) { n = 1; }
+      if (n > cant) { n = cant; }
+      qty.value = String(n);
+      return n;
+    }
+    qty.addEventListener('input', function () {
+      var n = clampQty();
+      totalLine.textContent = 'Total: ' + (precio * n) + ' ryos';
+    });
+
+    btnVender.addEventListener('click', function () {
+      var n = clampQty();
+      okMsg.style.display = 'none';
+      errMsg.style.display = 'none';
+      confirmMsg.textContent = 'Vender ' + n + ' × ' + d.nombre + ' por ' + (precio * n) + ' ryos. ¿Confirmas?';
+      form.style.display = 'none';
+      totalLine.style.display = 'none';
+      confirmBox.style.display = 'flex';
+    });
+
+    btnCancel.addEventListener('click', function () {
+      confirmBox.style.display = 'none';
+      form.style.display = 'flex';
+      totalLine.style.display = 'block';
+    });
+
+    btnOk.addEventListener('click', function () {
+      var n = clampQty();
+      btnOk.disabled = true;
+      btnCancel.disabled = true;
+
+      fetch('vender.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: 'objeto=' + encodeURIComponent(d.oid) + '&cantidad=' + n
+      })
+        .then(function (r) { return r.json(); })
+        .then(function (res) {
+          btnOk.disabled = false;
+          btnCancel.disabled = false;
+          confirmBox.style.display = 'none';
+
+          if (!res || !res.ok) {
+            form.style.display = 'flex';
+            totalLine.style.display = 'block';
+            errMsg.textContent = (res && res.msg) ? res.msg : 'No se pudo vender.';
+            errMsg.style.display = 'block';
+            return;
+          }
+
+          var ryosEl = document.getElementById('fx-inv-ryos');
+          if (ryosEl) { ryosEl.textContent = res.nuevos_ryos; }
+
+          form.style.display = 'none';
+          totalLine.style.display = 'none';
+          okMsg.textContent = 'Vendiste ' + n + ' × ' + d.nombre + ' por ' + res.total + ' ryos. Actualizando…';
+          okMsg.style.display = 'block';
+
+          // Recarga completa: navegación GET nueva a la misma URL (no
+          // location.reload(), que reenviaría el body si esta página se
+          // hubiera cargado por un POST propio, ej. tras editar avatar/
+          // banner/trasfondo en esta misma ficha.php -> evita el aviso de
+          // "reenviar formulario" del navegador).
+          setTimeout(function () {
+            window.location.href = window.location.href;
+          }, 700);
+        })
+        .catch(function () {
+          btnOk.disabled = false;
+          btnCancel.disabled = false;
+          confirmBox.style.display = 'none';
+          form.style.display = 'flex';
+          totalLine.style.display = 'block';
+          errMsg.textContent = 'Error de conexión. Intenta de nuevo.';
+          errMsg.style.display = 'block';
+        });
+    });
+
+    return wrap;
+  }
+
   function fxInvOpen(tile) {
     if (fxInvIsDetail()) return;
     var d = tile.dataset;
@@ -418,6 +554,8 @@ function fxInvImgFallback(img) {
     mImg.alt = d.nombre;
     mDetail.innerHTML = '';
     mDetail.appendChild(fxRenderDetail(d));
+    var sellUi = fxInvBuildSell(d, tile);
+    if (sellUi) { mDetail.appendChild(sellUi); }
     modal.classList.add('is-open');
     modal.setAttribute('aria-hidden', 'false');
     document.body.classList.add('fx-inv-modal-open');
@@ -436,6 +574,8 @@ function fxInvImgFallback(img) {
       var cont = tiles[i].querySelector('.fx-inv-detail');
       if (cont && !cont.dataset.built) {
         cont.appendChild(fxRenderDetail(tiles[i].dataset));
+        var sellUi = fxInvBuildSell(tiles[i].dataset, tiles[i]);
+        if (sellUi) { cont.appendChild(sellUi); }
         cont.dataset.built = '1';
       }
     }

@@ -139,8 +139,9 @@ if ($sg_edit_campo !== '' && isset($campos_transfondo[$sg_edit_campo])) {
     $target_fid   = intval($mybb->get_input('uid'));
     $puede_editar = ($target_fid > 0 && $mybb->user['uid'] == $target_fid) || $g_is_staff;
     if ($puede_editar && $target_fid > 0) {
-        $valor = $db->escape_string($mybb->get_input('sg_edit_valor'));
-        $db->query("UPDATE `mybb_sg_sg_fichas` SET `$sg_edit_campo`='$valor' WHERE `fid`='$target_fid'");
+        $valor = $mybb->get_input('sg_edit_valor'); // sin escapar: sg_ficha_set_campo escapa internamente
+        $tipo_edicion = ($mybb->user['uid'] == $target_fid) ? 'usuario' : 'staff';
+        sg_ficha_set_campo($target_fid, $sg_edit_campo, $valor, $tipo_edicion, SG_ORIGEN_TRASFONDO, 'Edición de trasfondo');
     }
 }
 
@@ -210,6 +211,17 @@ if ($ficha_existe == true && ($moderated == true || is_mod($s_uid) || is_staff($
     eval('$sgCombate1v1Perdedor = $sg_combate_1v1[\'perdedor\'];');
     eval('$sgCombate1v1Empate = $sg_combate_1v1[\'empate\'];');
     eval('$sgCombate1v1Total = $sg_combate_1v1[\'total\'];');
+
+    // Feed del historial de cambios de la ficha (pestaña "Historial").
+    $sg_hist = sg_historial_ficha_feed_html($uid);
+    $sg_hist_origenes_html = '';
+    foreach ($sg_hist['origenes'] as $sg_o_val => $sg_o_lbl) {
+        $sg_hist_origenes_html .= '<option value="' . htmlspecialchars($sg_o_val, ENT_QUOTES) . '">'
+                                . htmlspecialchars($sg_o_lbl, ENT_QUOTES) . '</option>';
+    }
+    eval('$sgHistorialHtml = $sg_hist[\'html\'];');
+    eval('$sgHistorialCount = $sg_hist[\'count\'];');
+    eval('$sgHistorialOrigenesHtml = $sg_hist_origenes_html;');
 
     // Semana actual (mismo epoch que newpoints) y timestamp de cierre para el contador
     $sg_exp_epoch  = 1721620800;
@@ -704,9 +716,14 @@ if ($ficha_existe == true && ($moderated == true || is_mod($s_uid) || is_staff($
         $i_tam    = htmlspecialchars($it['tamano'], ENT_QUOTES);
         $i_mun    = htmlspecialchars($it['municion'], ENT_QUOTES);
         $i_desc   = htmlspecialchars($it['descripcion'], ENT_QUOTES);
-        $i_ef1    = htmlspecialchars($it['efecto1'], ENT_QUOTES);
-        $i_ef2    = htmlspecialchars($it['efecto2'], ENT_QUOTES);
-        $i_ef3    = htmlspecialchars($it['efecto3'], ENT_QUOTES);
+        // Códigos [FUEx1]/[MDESx1]/etc. resueltos con las stats de ESTA ficha
+        // ($ficha ya trae las pasivas aplicadas más arriba, sg_aplicar_pasivas
+        // -> NO volver a pasarla por sg_stats_efectivas, sumaría la pasiva
+        // 2 veces). strip_tags: esto viaja por data-ef1 y el JS lo inserta
+        // como texto plano (textContent), no como HTML.
+        $i_ef1    = strip_tags(sg_parsear_codigos_stats(htmlspecialchars($it['efecto1'], ENT_QUOTES), $ficha));
+        $i_ef2    = strip_tags(sg_parsear_codigos_stats(htmlspecialchars($it['efecto2'], ENT_QUOTES), $ficha));
+        $i_ef3    = strip_tags(sg_parsear_codigos_stats(htmlspecialchars($it['efecto3'], ENT_QUOTES), $ficha));
         $i_cant   = intval($it['cantidad']);
         $i_oid    = htmlspecialchars($it['objeto_id'], ENT_QUOTES);
         $i_coste  = intval($it['coste']);

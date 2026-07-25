@@ -201,8 +201,10 @@ if ($recompensa_accepted == 'true' && $should_accept) {
 
     $log = "Ryos: $ryos->$new_ryos & Tobi: $tobi->$new_tobi & Exp: $experiencia->$new_exp";
 
-    $db->query("UPDATE `mybb_sg_sg_fichas` SET ryos='$new_ryos', tobi='$new_tobi' WHERE `fid`='$uid'");
-    $db->query("UPDATE `mybb_sg_users` SET newpoints='$new_exp' WHERE `uid`='$uid'");
+    $grupo = uniqid();
+    sg_ficha_set_campo($uid, 'ryos', $new_ryos, 'usuario', SG_ORIGEN_RECOMPENSA_DIARIA, $recompensa_items, $grupo);
+    sg_ficha_set_campo($uid, 'tobi', $new_tobi, 'usuario', SG_ORIGEN_RECOMPENSA_DIARIA, $recompensa_items, $grupo);
+    sg_usuario_set_campo($uid, 'newpoints', $new_exp, 'usuario', SG_ORIGEN_RECOMPENSA_DIARIA, $recompensa_items, $grupo);
 
     $days_count = intval($days_count) + 1;
     $days_season_count = intval($recompensas_temporada_maxima) + 1;

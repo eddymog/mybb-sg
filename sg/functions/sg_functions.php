@@ -1,5 +1,39 @@
 <?php
 
+// ============================================================================
+// Historial estructurado de cambios de ficha (ver docs/instrucciones_cambios.md).
+// `origen` es un vocabulario controlado: NUNCA se pasa un literal suelto, siempre
+// una de estas constantes, para que el filtrado por origen no se rompa por typos.
+// ============================================================================
+define('SG_ORIGEN_MODIFICAR_FICHA',  'modificar_ficha');
+define('SG_ORIGEN_ATRIBUTOS',        'ficha_atributos');
+define('SG_ORIGEN_RECOMPENSA_STAFF', 'recompensa_staff');
+define('SG_ORIGEN_RECOMPENSA_MISION','recompensa_mision');
+define('SG_ORIGEN_APROBACION',       'aprobacion');
+define('SG_ORIGEN_TIENDA',           'tienda');
+define('SG_ORIGEN_TIENDA_RINS',      'tienda_rins');
+define('SG_ORIGEN_VENDER',           'vender');
+define('SG_ORIGEN_DOJO',             'dojo');
+define('SG_ORIGEN_FICHA_TECNICAS',   'ficha_tecnicas');
+define('SG_ORIGEN_FICHA_OBJETOS',    'ficha_objetos');
+define('SG_ORIGEN_MISION_ENTRENAMIENTO', 'mision_entrenamiento');
+define('SG_ORIGEN_RECOMPENSA_DIARIA',    'recompensa_diaria');
+define('SG_ORIGEN_FICHA_EDITADA',        'ficha_editada');
+define('SG_ORIGEN_TRASFONDO',            'trasfondo');
+define('SG_ORIGEN_CONSUMIR',             'consumir');
+define('SG_ORIGEN_PERGAMINO',            'pergamino');
+define('SG_ORIGEN_PERGAMINO_REGALO',     'pergamino_regalo');
+// Eventos de foro que mueven XP/rin (todos vía newpoints_addpoints)
+define('SG_ORIGEN_POST_NUEVO',       'post_nuevo');
+define('SG_ORIGEN_POST_EDITADO',     'post_editado');
+define('SG_ORIGEN_POST_BORRADO',     'post_borrado');
+define('SG_ORIGEN_POST_APROBADO',    'post_aprobado');
+define('SG_ORIGEN_POST_DESAPROBADO', 'post_desaprobado');
+define('SG_ORIGEN_TEMA_NUEVO',       'tema_nuevo');
+define('SG_ORIGEN_TEMA_BORRADO',     'tema_borrado');
+define('SG_ORIGEN_TEMA_APROBADO',    'tema_aprobado');
+define('SG_ORIGEN_TEMA_DESAPROBADO', 'tema_desaprobado');
+
 // Redimensiona/recomprime UNA imagen en el disco (JPEG/PNG/WebP) usando GD.
 // No agranda: si ya es más angosta que $max_ancho, solo recomprime con $calidad.
 // No toca GIF (podría ser animado; GD solo conserva el primer frame).
@@ -185,11 +219,11 @@ function calculate_chakra($str, $res, $spd, $agi, $dex, $pres, $inte, $ctrl) {
 }
 
 function calculate_vida2($fuerza, $destreza, $cchakra, $inteligencia, $salud, $velocidad, $tenketsu, $sigilo) {
-    return ($fuerza * 2) + ($destreza * 1) + ($cchakra * 1) + ($inteligencia * 2) + ($salud * 10) + ($velocidad * 0) + ($tenketsu * 5) + ($sigilo * 5);
+    return ($fuerza * 2) + ($destreza * 1) + ($cchakra * 1) + ($inteligencia * 2) + ($salud * 10) + ($velocidad * 5) + ($tenketsu * 0) + ($sigilo * 5);
 }
 
 function calculate_chakra2($fuerza, $destreza, $cchakra, $inteligencia, $salud, $velocidad, $tenketsu, $sigilo) {
-    return ($fuerza * 1) + ($destreza * 2) + ($cchakra * 2) + ($inteligencia * 1) + ($salud * 0) + ($velocidad * 10) + ($tenketsu * 5) + ($sigilo * 5);
+    return ($fuerza * 1) + ($destreza * 2) + ($cchakra * 2) + ($inteligencia * 1) + ($salud * 0) + ($velocidad * 5) + ($tenketsu * 10) + ($sigilo * 5);
 }
 
 function calculate_reg_chakra($str, $res, $spd, $agi, $dex, $pres, $inte, $ctrl) {
@@ -1266,19 +1300,31 @@ function sg_npc_afiliacion_color($afiliacion) {
     return isset($map[$a]) ? $map[$a] : '#7b4ab8'; // plum por defecto
 }
 
-// Inserta una técnica aprendida (idempotente).
-function sg_dojo_aprender($db, $uid, $tid) {
+// Inserta una técnica aprendida (idempotente). Loguea en historial solo si
+// realmente se agregó (INSERT IGNORE que sí insertó). Usa `global $db`.
+function sg_dojo_aprender($uid, $tid, $tipo, $origen, $detalle = '', $grupo = null, $actor_uid = null) {
+    global $db;
     $uid = (int) $uid;
     $tid_esc = $db->escape_string($tid);
     $db->query("INSERT IGNORE INTO mybb_sg_sg_tec_aprendidas (tid, uid) VALUES ('$tid_esc','$uid')");
+    if ($db->affected_rows() > 0) {
+        sg_historial_tecnica_log($uid, $tid, 'aprender', $tipo, $origen, $detalle, $grupo, $actor_uid);
+    }
 }
 
 // Persiste tobi + arboles_progreso (y opcionalmente slot_elementales) para una ficha.
+// El gasto de tobi (gasto de usuario en el dojo) se loguea vía sg_ficha_set_campo
+// solo si realmente cambió; arboles_progreso/slot son estado interno derivado y se
+// persisten directo, sin loguear. (El tobi queda como fila suelta, no comparte grupo
+// con la técnica aprendida en la misma acción — refinamiento pendiente.)
 function sg_dojo_guardar($db, $uid, $tobi, $progreso, $slot = null) {
     $uid = (int) $uid;
     $tobi = (int) $tobi;
+
+    sg_ficha_set_campo($uid, 'tobi', $tobi, 'usuario', SG_ORIGEN_DOJO, 'Gasto en el dojo');
+
     $prog_json = $db->escape_string(json_encode($progreso, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
-    $set = "tobi='$tobi', arboles_progreso='$prog_json'";
+    $set = "arboles_progreso='$prog_json'";
     if ($slot !== null) {
         $set .= ", slot_elementales='" . (int) $slot . "'";
     }
@@ -1369,7 +1415,7 @@ function sg_dojo_aplicar_accion($db, $uid, $action, $params) {
                 }
                 $progreso = $pago['progreso'];
                 $tobi = $pago['tobi'];
-                sg_dojo_aprender($db, $uid, $base_tid);
+                sg_dojo_aprender($uid, $base_tid, 'usuario', SG_ORIGEN_DOJO);
                 sg_dojo_guardar($db, $uid, $tobi, $progreso);
                 $result = $ok("Desbloqueaste el árbol " . ucfirst($arbol) . " por {$costos['arbol']} Tobis.");
                 break;
@@ -1404,7 +1450,7 @@ function sg_dojo_aplicar_accion($db, $uid, $action, $params) {
                     break;
                 }
                 $slots_nuevo = $slots - 1;
-                sg_dojo_aprender($db, $uid, $base_tid);
+                sg_dojo_aprender($uid, $base_tid, 'usuario', SG_ORIGEN_DOJO);
                 sg_dojo_guardar($db, $uid, $tobi, $progreso, $slots_nuevo);
 
                 $result = $ok("¡La ruleta te otorgó el árbol " . ucfirst($elegido) . "!");
@@ -1436,7 +1482,7 @@ function sg_dojo_aplicar_accion($db, $uid, $action, $params) {
                 $progreso = $pago['progreso'];
                 $tobi = $pago['tobi'];
                 $slots_nuevo = (int) $estado['slot_elementales'] - 1;
-                sg_dojo_aprender($db, $uid, $base_tid);
+                sg_dojo_aprender($uid, $base_tid, 'usuario', SG_ORIGEN_DOJO);
                 sg_dojo_guardar($db, $uid, $tobi, $progreso, $slots_nuevo);
                 $result = $ok("Elegiste el elemento " . ucfirst($arbol) . " por {$costos['arbol']} Tobis.");
                 break;
@@ -1458,7 +1504,7 @@ function sg_dojo_aplicar_accion($db, $uid, $action, $params) {
                 }
                 $tobi -= $costos['rama'];
                 $progreso['desbloqueo_ramas']++;
-                sg_dojo_aprender($db, $uid, $rinfo['base']);
+                sg_dojo_aprender($uid, $rinfo['base'], 'usuario', SG_ORIGEN_DOJO);
                 sg_dojo_guardar($db, $uid, $tobi, $progreso);
                 $result = $ok("Desbloqueaste una rama por {$costos['rama']} Tobis.");
                 break;
@@ -1484,7 +1530,7 @@ function sg_dojo_aplicar_accion($db, $uid, $action, $params) {
                 }
                 if ((int) $progreso['nivel_rama_disponibles'] > 0) {
                     $progreso['nivel_rama_disponibles']--;
-                    foreach ($mejoras_in as $mtid) { sg_dojo_aprender($db, $uid, $mtid); }
+                    foreach ($mejoras_in as $mtid) { sg_dojo_aprender($uid, $mtid, 'usuario', SG_ORIGEN_DOJO); }
                     sg_dojo_guardar($db, $uid, $tobi, $progreso);
                     $result = $ok("Subiste de nivel la rama (gratis).");
                     break;
@@ -1495,7 +1541,7 @@ function sg_dojo_aplicar_accion($db, $uid, $action, $params) {
                 }
                 $tobi -= $costos['nivel'];
                 $progreso['desbloqueo_nivel_ramas']++;
-                foreach ($mejoras_in as $mtid) { sg_dojo_aprender($db, $uid, $mtid); }
+                foreach ($mejoras_in as $mtid) { sg_dojo_aprender($uid, $mtid, 'usuario', SG_ORIGEN_DOJO); }
                 sg_dojo_guardar($db, $uid, $tobi, $progreso);
                 $result = $ok("Subiste de nivel la rama por {$costos['nivel']} Tobis.");
                 break;
@@ -1512,7 +1558,7 @@ function sg_dojo_aplicar_accion($db, $uid, $action, $params) {
                     $result = $err("No tienes cupo de especializaciones todavía.");
                     break;
                 }
-                sg_dojo_aprender($db, $uid, $tid);
+                sg_dojo_aprender($uid, $tid, 'usuario', SG_ORIGEN_DOJO);
                 $result = $ok("Aprendiste una especialización (gratis).");
                 break;
 
@@ -1537,7 +1583,7 @@ function sg_dojo_aplicar_accion($db, $uid, $action, $params) {
                     break;
                 }
                 $progreso['clan_rama_usada'] = 1;
-                sg_dojo_aprender($db, $uid, $rinfo['base']);
+                sg_dojo_aprender($uid, $rinfo['base'], 'usuario', SG_ORIGEN_DOJO);
                 sg_dojo_guardar($db, $uid, $tobi, $progreso);
                 $result = $ok("Aprendiste una rama de tu clan (gratis).");
                 break;
@@ -1557,7 +1603,7 @@ function sg_dojo_aplicar_accion($db, $uid, $action, $params) {
                 // Es tu primera rama del árbol: gratis, sin Tobis y sin subir
                 // desbloqueo_ramas. El estado "ya usada" se deriva solo (al quedar
                 // 1 rama desbloqueada, deja de ofrecerse).
-                sg_dojo_aprender($db, $uid, $rinfo['base']);
+                sg_dojo_aprender($uid, $rinfo['base'], 'usuario', SG_ORIGEN_DOJO);
                 $result = $ok("Elegiste una rama gratis en " . ucfirst($arbol) . ".");
                 break;
 
@@ -1731,8 +1777,8 @@ function sg_recompensa_combate($resultado, $nivel_propio, $nivel_oponente) {
 }
 
 // Entrega +1 de un objeto al inventario de un usuario (upsert). Mismo patrón
-// que el helper comentado de recompensa_diaria.php.
-function sg_inventario_dar_objeto($uid, $objeto_id) {
+// que el helper comentado de recompensa_diaria.php. Loguea en historial (delta +1).
+function sg_inventario_dar_objeto($uid, $objeto_id, $tipo, $origen, $detalle = '', $grupo = null, $actor_uid = null, $pid = null, $tid = null) {
     global $db;
     $uid = intval($uid);
     $objeto_id_db = $db->escape_string($objeto_id);
@@ -1745,11 +1791,37 @@ function sg_inventario_dar_objeto($uid, $objeto_id) {
     if ($tiene) {
         $cantidad_nueva = $cantidad_actual + 1;
         $db->query("UPDATE `mybb_sg_sg_inventario` SET cantidad='$cantidad_nueva' WHERE objeto_id='$objeto_id_db' AND uid='$uid'");
-        return $cantidad_nueva;
+    } else {
+        $db->query("INSERT INTO `mybb_sg_sg_inventario` (objeto_id, uid, cantidad) VALUES ('$objeto_id_db', '$uid', '1')");
+        $cantidad_nueva = 1;
     }
 
-    $db->query("INSERT INTO `mybb_sg_sg_inventario` (objeto_id, uid, cantidad) VALUES ('$objeto_id_db', '$uid', '1')");
-    return 1;
+    sg_historial_objeto_log($uid, $objeto_id, 1, $tipo, $origen, $detalle, $grupo, $actor_uid, $pid, $tid);
+    return $cantidad_nueva;
+}
+
+// Igual que sg_inventario_dar_objeto pero para cantidades > 1 en una sola fila
+// de historial (ej. premios de gacha que dan varias unidades de un objeto).
+function sg_inventario_dar_objeto_cantidad($uid, $objeto_id, $cantidad, $tipo, $origen, $detalle = '', $grupo = null, $actor_uid = null, $pid = null, $tid = null) {
+    global $db;
+    $uid = intval($uid);
+    $cantidad = max(1, (int) $cantidad);
+    $objeto_id_db = $db->escape_string($objeto_id);
+
+    $cantidad_actual = 0;
+    $tiene = false;
+    $q = $db->query("SELECT cantidad FROM `mybb_sg_sg_inventario` WHERE uid='$uid' AND objeto_id='$objeto_id_db'");
+    while ($r = $db->fetch_array($q)) { $tiene = true; $cantidad_actual = intval($r['cantidad']); }
+
+    $cantidad_nueva = $cantidad_actual + $cantidad;
+    if ($tiene) {
+        $db->query("UPDATE `mybb_sg_sg_inventario` SET cantidad='$cantidad_nueva' WHERE objeto_id='$objeto_id_db' AND uid='$uid'");
+    } else {
+        $db->query("INSERT INTO `mybb_sg_sg_inventario` (objeto_id, uid, cantidad) VALUES ('$objeto_id_db', '$uid', '$cantidad_nueva')");
+    }
+
+    sg_historial_objeto_log($uid, $objeto_id, $cantidad, $tipo, $origen, $detalle, $grupo, $actor_uid, $pid, $tid);
+    return $cantidad_nueva;
 }
 
 // ============================================================================
@@ -1971,4 +2043,810 @@ function sg_publicar_post_recompensas($tid, $fid, $mensaje) {
 
     $post_info = $posthandler->insert_post();
     return array('ok' => true, 'pid' => isset($post_info['pid']) ? $post_info['pid'] : null, 'error' => '');
+}
+
+// ============================================================================
+// Historial estructurado de cambios de ficha — capa de escritura.
+// Ver docs/instrucciones_cambios.md. Los call sites NO insertan a mano en las
+// tablas de historial: usan sg_ficha_set_campo / sg_usuario_set_campo /
+// sg_dojo_aprender / sg_tecnica_quitar / sg_inventario_* , que hacen el cambio
+// Y el log en un solo lugar. Estas tres funciones sg_historial_*_log son
+// helpers internos de inserción (no llamarlas directo desde los scripts).
+// ============================================================================
+
+// Compara dos valores tratándolos como número si ambos lo son (evita falsos
+// cambios tipo '100' vs '100.00'); si no, como string exacto.
+function sg_valores_iguales($a, $b) {
+    if (is_numeric($a) && is_numeric($b)) {
+        return (float) $a == (float) $b;
+    }
+    return (string) $a === (string) $b;
+}
+
+// Resuelve el actor: si no se pasó explícito, es el usuario logueado.
+function sg_historial_actor($actor_uid) {
+    global $mybb;
+    if ($actor_uid !== null) { return (int) $actor_uid; }
+    return isset($mybb->user['uid']) ? (int) $mybb->user['uid'] : 0;
+}
+
+// INSERT en historial_ficha (campos escalares de fichas / users).
+function sg_historial_ficha_log($uid, $tabla, $campo, $valor_anterior, $valor_nuevo, $tipo, $origen, $detalle = '', $grupo = null, $actor_uid = null, $pid = null, $tid = null) {
+    global $db;
+    $uid       = (int) $uid;
+    $actor     = sg_historial_actor($actor_uid);
+    $tabla_db  = $db->escape_string($tabla);
+    $campo_db  = $db->escape_string($campo);
+    $tipo_db   = $db->escape_string($tipo);
+    $origen_db = $db->escape_string($origen);
+    $va = ($valor_anterior === null) ? 'NULL' : "'".$db->escape_string($valor_anterior)."'";
+    $vn = ($valor_nuevo   === null) ? 'NULL' : "'".$db->escape_string($valor_nuevo)."'";
+    $grupo_db   = ($grupo   === null || $grupo   === '') ? 'NULL' : "'".$db->escape_string($grupo)."'";
+    $detalle_db = ($detalle === null || $detalle === '') ? 'NULL' : "'".$db->escape_string($detalle)."'";
+    $pid_db = ($pid === null) ? 'NULL' : (string) (int) $pid;
+    $tid_db = ($tid === null) ? 'NULL' : (string) (int) $tid;
+    $db->query("
+        INSERT INTO `mybb_sg_sg_historial_ficha`
+        (`uid`, `actor_uid`, `grupo`, `tabla`, `campo`, `valor_anterior`, `valor_nuevo`, `tipo`, `origen`, `pid`, `tid`, `detalle`)
+        VALUES ('$uid', '$actor', $grupo_db, '$tabla_db', '$campo_db', $va, $vn, '$tipo_db', '$origen_db', $pid_db, $tid_db, $detalle_db)
+    ");
+}
+
+// INSERT en historial_tecnicas.
+function sg_historial_tecnica_log($uid, $tecnica_id, $accion, $tipo, $origen, $detalle = '', $grupo = null, $actor_uid = null) {
+    global $db;
+    $uid        = (int) $uid;
+    $actor      = sg_historial_actor($actor_uid);
+    $tec_db     = $db->escape_string($tecnica_id);
+    $accion_db  = ($accion === 'quitar') ? 'quitar' : 'aprender';
+    $tipo_db    = $db->escape_string($tipo);
+    $origen_db  = $db->escape_string($origen);
+    $grupo_db   = ($grupo   === null || $grupo   === '') ? 'NULL' : "'".$db->escape_string($grupo)."'";
+    $detalle_db = ($detalle === null || $detalle === '') ? 'NULL' : "'".$db->escape_string($detalle)."'";
+    $db->query("
+        INSERT INTO `mybb_sg_sg_historial_tecnicas`
+        (`uid`, `actor_uid`, `grupo`, `tecnica_id`, `accion`, `tipo`, `origen`, `detalle`)
+        VALUES ('$uid', '$actor', $grupo_db, '$tec_db', '$accion_db', '$tipo_db', '$origen_db', $detalle_db)
+    ");
+}
+
+// INSERT en historial_objetos. $cantidad es el delta (+ ganado, - gastado).
+function sg_historial_objeto_log($uid, $objeto_id, $cantidad, $tipo, $origen, $detalle = '', $grupo = null, $actor_uid = null, $pid = null, $tid = null) {
+    global $db;
+    $uid        = (int) $uid;
+    $actor      = sg_historial_actor($actor_uid);
+    $obj_db     = $db->escape_string($objeto_id);
+    $cantidad   = (int) $cantidad;
+    $tipo_db    = $db->escape_string($tipo);
+    $origen_db  = $db->escape_string($origen);
+    $grupo_db   = ($grupo   === null || $grupo   === '') ? 'NULL' : "'".$db->escape_string($grupo)."'";
+    $detalle_db = ($detalle === null || $detalle === '') ? 'NULL' : "'".$db->escape_string($detalle)."'";
+    $pid_db = ($pid === null) ? 'NULL' : (string) (int) $pid;
+    $tid_db = ($tid === null) ? 'NULL' : (string) (int) $tid;
+    $db->query("
+        INSERT INTO `mybb_sg_sg_historial_objetos`
+        (`uid`, `actor_uid`, `grupo`, `objeto_id`, `cantidad`, `tipo`, `origen`, `pid`, `tid`, `detalle`)
+        VALUES ('$uid', '$actor', $grupo_db, '$obj_db', '$cantidad', '$tipo_db', '$origen_db', $pid_db, $tid_db, $detalle_db)
+    ");
+}
+
+// ── Choke points públicos ───────────────────────────────────────────────────
+
+// Setea un campo escalar de mybb_sg_sg_fichas: lee el valor actual, si cambió
+// hace el UPDATE y loguea; si no cambió, no hace nada. Devuelve true si cambió.
+// $campo debe ser un nombre de columna provisto por código (no input de usuario).
+function sg_ficha_set_campo($fid, $campo, $valor_nuevo, $tipo, $origen, $detalle = '', $grupo = null, $actor_uid = null) {
+    global $db;
+    $fid = (int) $fid;
+    $campo_db = $db->escape_string($campo);
+
+    $actual = null;
+    $q = $db->query("SELECT `$campo_db` AS v FROM `mybb_sg_sg_fichas` WHERE `fid`='$fid'");
+    while ($r = $db->fetch_array($q)) { $actual = $r['v']; }
+
+    if (sg_valores_iguales($actual, $valor_nuevo)) { return false; }
+
+    $vn_db = $db->escape_string($valor_nuevo);
+    $db->query("UPDATE `mybb_sg_sg_fichas` SET `$campo_db`='$vn_db' WHERE `fid`='$fid'");
+    sg_historial_ficha_log($fid, 'fichas', $campo, $actual, $valor_nuevo, $tipo, $origen, $detalle, $grupo, $actor_uid);
+    return true;
+}
+
+// Igual que sg_ficha_set_campo pero sobre mybb_sg_users (cubre newpoints). uid == fid.
+function sg_usuario_set_campo($uid, $campo, $valor_nuevo, $tipo, $origen, $detalle = '', $grupo = null, $actor_uid = null) {
+    global $db;
+    $uid = (int) $uid;
+    $campo_db = $db->escape_string($campo);
+
+    $actual = null;
+    $q = $db->query("SELECT `$campo_db` AS v FROM `mybb_sg_users` WHERE `uid`='$uid'");
+    while ($r = $db->fetch_array($q)) { $actual = $r['v']; }
+
+    if (sg_valores_iguales($actual, $valor_nuevo)) { return false; }
+
+    $vn_db = $db->escape_string($valor_nuevo);
+    $db->query("UPDATE `mybb_sg_users` SET `$campo_db`='$vn_db' WHERE `uid`='$uid'");
+    sg_historial_ficha_log($uid, 'users', $campo, $actual, $valor_nuevo, $tipo, $origen, $detalle, $grupo, $actor_uid);
+    return true;
+}
+
+// Quita una técnica aprendida; hermana de sg_dojo_aprender. Loguea solo si
+// realmente existía (DELETE que afectó filas).
+function sg_tecnica_quitar($uid, $tid, $tipo, $origen, $detalle = '', $grupo = null, $actor_uid = null) {
+    global $db;
+    $uid = (int) $uid;
+    $tid_esc = $db->escape_string($tid);
+    $db->query("DELETE FROM `mybb_sg_sg_tec_aprendidas` WHERE uid='$uid' AND tid='$tid_esc'");
+    if ($db->affected_rows() > 0) {
+        sg_historial_tecnica_log($uid, $tid, 'quitar', $tipo, $origen, $detalle, $grupo, $actor_uid);
+    }
+}
+
+// Resta $cantidad de un objeto del inventario (no baja de 0; borra la fila si
+// llega a 0). Loguea el delta negativo realmente aplicado. Devuelve la cantidad
+// restante.
+function sg_inventario_quitar_objeto($uid, $objeto_id, $cantidad, $tipo, $origen, $detalle = '', $grupo = null, $actor_uid = null, $pid = null, $tid = null) {
+    global $db;
+    $uid = (int) $uid;
+    $objeto_id_db = $db->escape_string($objeto_id);
+    $cantidad = max(0, (int) $cantidad);
+
+    $actual = 0;
+    $q = $db->query("SELECT cantidad FROM `mybb_sg_sg_inventario` WHERE uid='$uid' AND objeto_id='$objeto_id_db'");
+    while ($r = $db->fetch_array($q)) { $actual = (int) $r['cantidad']; }
+    if ($actual <= 0 || $cantidad === 0) { return $actual; }
+
+    $quitar = min($cantidad, $actual);
+    $nueva = $actual - $quitar;
+    if ($nueva > 0) {
+        $db->query("UPDATE `mybb_sg_sg_inventario` SET cantidad='$nueva' WHERE uid='$uid' AND objeto_id='$objeto_id_db'");
+    } else {
+        $db->query("DELETE FROM `mybb_sg_sg_inventario` WHERE uid='$uid' AND objeto_id='$objeto_id_db'");
+    }
+    sg_historial_objeto_log($uid, $objeto_id, -$quitar, $tipo, $origen, $detalle, $grupo, $actor_uid, $pid, $tid);
+    return $nueva;
+}
+
+// Setea la cantidad ABSOLUTA de un objeto (para el ajuste manual de Staff en
+// ficha_objetos.php, que edita cantidades directas). Calcula y loguea el delta
+// contra el valor actual; si no cambió, no hace nada. Devuelve la cantidad final.
+function sg_inventario_set_cantidad($uid, $objeto_id, $cantidad, $tipo, $origen, $detalle = '', $grupo = null, $actor_uid = null, $pid = null, $tid = null) {
+    global $db;
+    $uid = (int) $uid;
+    $objeto_id_db = $db->escape_string($objeto_id);
+    $cantidad = max(0, (int) $cantidad);
+
+    $actual = 0;
+    $existe = false;
+    $q = $db->query("SELECT cantidad FROM `mybb_sg_sg_inventario` WHERE uid='$uid' AND objeto_id='$objeto_id_db'");
+    while ($r = $db->fetch_array($q)) { $existe = true; $actual = (int) $r['cantidad']; }
+
+    if ($cantidad === $actual) { return $actual; }
+
+    if ($cantidad === 0) {
+        $db->query("DELETE FROM `mybb_sg_sg_inventario` WHERE uid='$uid' AND objeto_id='$objeto_id_db'");
+    } else if ($existe) {
+        $db->query("UPDATE `mybb_sg_sg_inventario` SET cantidad='$cantidad' WHERE uid='$uid' AND objeto_id='$objeto_id_db'");
+    } else {
+        $db->query("INSERT INTO `mybb_sg_sg_inventario` (objeto_id, uid, cantidad) VALUES ('$objeto_id_db', '$uid', '$cantidad')");
+    }
+    sg_historial_objeto_log($uid, $objeto_id, $cantidad - $actual, $tipo, $origen, $detalle, $grupo, $actor_uid, $pid, $tid);
+    return $cantidad;
+}
+
+// ============================================================================
+// Gacha de pergaminos (ver docs/pergaminos_diseno.md). PERG001..PERG007 son
+// objetos normales de mybb_sg_sg_objetos; al "abrirse" se consumen del
+// inventario y disparan un sorteo ponderado configurado por Staff en
+// mybb_sg_sg_gacha_premios / mybb_sg_sg_gacha_recompensas.
+// ============================================================================
+
+// Únicos IDs de objeto válidos como pergamino de gacha (whitelist; se usa para
+// validar entrada de usuario antes de tocar la tabla de premios).
+function sg_gacha_pergamino_ids() {
+    return array('PERG001', 'PERG002', 'PERG003', 'PERG004', 'PERG005', 'PERG006', 'PERG007');
+}
+
+// Etiqueta de rango (E/D/C/B/A/A+/S) de un pergamino, reutilizando el mismo
+// mapeo que ya usan las misiones (sg_mision_pergaminos). Null si no matchea.
+function sg_gacha_pergamino_rango($pergamino_id) {
+    static $mapa = null;
+    if ($mapa === null) { $mapa = array_flip(sg_mision_pergaminos()); }
+    return isset($mapa[$pergamino_id]) ? $mapa[$pergamino_id] : null;
+}
+
+// Trae los premios de un pergamino (por defecto solo los ACTIVOS, que es lo
+// que debe usar el sorteo público), cada uno con su lista de recompensas
+// anidada. $solo_activos=false trae también los inactivos (para el panel de
+// Staff, que necesita poder ver/reactivar premios apagados). Devuelve array
+// de premios (vacío si no hay ninguno configurado todavía).
+function sg_gacha_premios($pergamino_id, $solo_activos = true) {
+    global $db;
+    $pid_esc = $db->escape_string($pergamino_id);
+    $filtro_activo = $solo_activos ? "AND activo='1'" : '';
+
+    $premios = array();
+    $q = $db->query("SELECT * FROM `mybb_sg_sg_gacha_premios` WHERE pergamino_id='$pid_esc' $filtro_activo ORDER BY orden, id");
+    while ($p = $db->fetch_array($q)) {
+        $p['recompensas'] = array();
+        $premios[$p['id']] = $p;
+    }
+    if (empty($premios)) { return array(); }
+
+    $ids = implode(',', array_map('intval', array_keys($premios)));
+    $qr = $db->query("SELECT * FROM `mybb_sg_sg_gacha_recompensas` WHERE premio_id IN ($ids) ORDER BY orden, id");
+    while ($r = $db->fetch_array($qr)) {
+        $premios[$r['premio_id']]['recompensas'][] = $r;
+    }
+
+    return array_values($premios);
+}
+
+// Suma la probabilidad de los premios ACTIVOS de un pergamino (jackpot incluido).
+function sg_gacha_probabilidad_total($pergamino_id) {
+    global $db;
+    $pid_esc = $db->escape_string($pergamino_id);
+    $total = 0.0;
+    $q = $db->query("SELECT SUM(probabilidad) AS total FROM `mybb_sg_sg_gacha_premios` WHERE pergamino_id='$pid_esc' AND activo='1'");
+    while ($r = $db->fetch_array($q)) { $total = (float) $r['total']; }
+    return $total;
+}
+
+// Un pergamino solo puede abrirse si sus premios activos suman EXACTAMENTE
+// 100% (tolerancia de 0.01 por redondeo de punto flotante / decimal(5,2)).
+function sg_gacha_probabilidad_lista($pergamino_id) {
+    return abs(sg_gacha_probabilidad_total($pergamino_id) - 100) < 0.01;
+}
+
+// Sorteo ponderado: elige un premio de la lista según su `probabilidad`.
+// Asume que la lista ya pasó sg_gacha_probabilidad_lista() (100% exacto);
+// aun así normaliza sobre el total real por robustez.
+// Devuelve null si la lista está vacía o el total de probabilidad es 0.
+function sg_gacha_elegir_premio($premios) {
+    $total = 0.0;
+    foreach ($premios as $p) { $total += (float) $p['probabilidad']; }
+    if (empty($premios) || $total <= 0) { return null; }
+
+    // Precisión de centésimas (columna es decimal(5,2)).
+    $r = mt_rand(1, (int) round($total * 100)) / 100;
+    $acumulado = 0.0;
+    foreach ($premios as $p) {
+        $acumulado += (float) $p['probabilidad'];
+        if ($r <= $acumulado) { return $p; }
+    }
+    return $premios[count($premios) - 1]; // fallback por redondeo
+}
+
+// Abre un pergamino para $uid: consume 1 del inventario y sortea premio(s).
+// Todo el sorteo se decide en el servidor (nunca confiar en el cliente).
+// Devuelve array('ok'=>bool, 'msg'=>string en error, 'premios'=>[...],
+// 'restante'=>int) donde cada premio ganado es
+// array('nombre'=>string, 'es_jackpot'=>bool, 'recompensas'=>[
+//   array('tipo','valor','objeto_id','objeto_nombre','cantidad')
+// ]).
+function sg_gacha_abrir($uid, $pergamino_id) {
+    global $db;
+    $uid = (int) $uid;
+
+    if (!in_array($pergamino_id, sg_gacha_pergamino_ids(), true)) {
+        return array('ok' => false, 'msg' => 'Pergamino inválido.');
+    }
+
+    $lock = "sg_pergamino_$uid";
+    $got = 0;
+    $rl = $db->query("SELECT GET_LOCK('$lock', 5) AS l");
+    while ($r = $db->fetch_array($rl)) { $got = (int) $r['l']; }
+    if ($got !== 1) {
+        return array('ok' => false, 'msg' => 'No se pudo procesar la apertura. Intenta de nuevo.');
+    }
+
+    $resultado = sg_gacha_abrir_bajo_lock($uid, $pergamino_id);
+
+    $db->query("SELECT RELEASE_LOCK('$lock')");
+    return $resultado;
+}
+
+// Cuerpo real de sg_gacha_abrir(); corre siempre dentro del candado.
+function sg_gacha_abrir_bajo_lock($uid, $pergamino_id) {
+    global $db;
+    $pid_esc = $db->escape_string($pergamino_id);
+
+    $tiene = 0;
+    $q = $db->query("SELECT cantidad FROM `mybb_sg_sg_inventario` WHERE uid='$uid' AND objeto_id='$pid_esc'");
+    while ($r = $db->fetch_array($q)) { $tiene = (int) $r['cantidad']; }
+    if ($tiene <= 0) {
+        return array('ok' => false, 'msg' => 'No tienes ese pergamino.');
+    }
+
+    $premios = sg_gacha_premios($pergamino_id);
+    if (empty($premios)) {
+        return array('ok' => false, 'msg' => 'Este pergamino todavía no tiene premios configurados.');
+    }
+
+    // La probabilidad activa debe sumar EXACTAMENTE 100% para poder abrir (si
+    // no, el sorteo estaría mal calibrado). Se revalida acá server-side —no
+    // basta con ocultar el botón en sg/pergaminos.php— por si se llama a este
+    // endpoint directamente. Tolerancia de 0.01 por redondeo de punto flotante.
+    if (!sg_gacha_probabilidad_lista($pergamino_id)) {
+        return array('ok' => false, 'msg' => 'Este pergamino todavía no está listo para abrirse.');
+    }
+
+    $premios_sin_jackpot = array_values(array_filter($premios, function ($p) { return !$p['es_jackpot']; }));
+
+    // Elige el premio principal, y si es jackpot, tiradas extra gratis sobre
+    // el pool SIN jackpots (evita encadenar jackpots infinitos).
+    $ganados = array();
+    $principal = sg_gacha_elegir_premio($premios);
+    if ($principal === null) {
+        return array('ok' => false, 'msg' => 'Este pergamino todavía no tiene premios configurados.');
+    }
+    $ganados[] = $principal;
+
+    if ((int) $principal['es_jackpot'] === 1) {
+        $tiradas = max(1, (int) $principal['jackpot_tiradas']);
+        for ($i = 0; $i < $tiradas; $i++) {
+            $extra = sg_gacha_elegir_premio($premios_sin_jackpot);
+            if ($extra !== null) { $ganados[] = $extra; }
+        }
+    }
+
+    $grupo = uniqid();
+    $detalle = "Abrió $pergamino_id";
+
+    // Consume el pergamino (comparte $grupo con las recompensas de abajo, así
+    // el tab Historial de la ficha muestra todo el evento agrupado).
+    $db->query("START TRANSACTION");
+    sg_inventario_quitar_objeto($uid, $pergamino_id, 1, 'usuario', SG_ORIGEN_PERGAMINO, $detalle, $grupo);
+
+    // Una fila por apertura, para las estadísticas globales (sg_gacha_estadisticas).
+    // Las tiradas extra de un jackpot no generan filas propias; quedan reflejadas
+    // en el es_jackpot de esta fila principal.
+    $db->query("
+        INSERT INTO `mybb_sg_sg_gacha_log` (`uid`, `pergamino_id`, `premio_id`, `es_jackpot`) VALUES
+        ('" . (int) $uid . "', '$pid_esc', '" . (int) $principal['id'] . "', '" . ((int) $principal['es_jackpot']) . "');
+    ");
+
+    // Acumula las recompensas de TODOS los premios ganados (principal + jackpot)
+    // antes de aplicar, para que monedas repetidas entre tiradas se sumen en
+    // un solo UPDATE/fila de historial por moneda.
+    $deltas_moneda = array('ryos' => 0, 'rin' => 0, 'madara' => 0, 'tobi' => 0);
+    $deltas_objeto = array();
+    foreach ($ganados as $premio) {
+        foreach ($premio['recompensas'] as $rec) {
+            if ($rec['tipo'] === 'objeto') {
+                $oid = $rec['objeto_id'];
+                if ($oid === null || $oid === '') { continue; }
+                $cant = max(1, (int) $rec['cantidad']);
+                $deltas_objeto[$oid] = (isset($deltas_objeto[$oid]) ? $deltas_objeto[$oid] : 0) + $cant;
+            } else if (isset($deltas_moneda[$rec['tipo']])) {
+                $deltas_moneda[$rec['tipo']] += (int) $rec['valor'];
+            }
+        }
+    }
+
+    foreach ($deltas_moneda as $campo => $delta) {
+        if ($delta === 0) { continue; }
+        $actual = 0;
+        $qf = $db->query("SELECT `$campo` AS v FROM `mybb_sg_sg_fichas` WHERE fid='$uid'");
+        while ($rf = $db->fetch_array($qf)) { $actual = (int) $rf['v']; }
+        sg_ficha_set_campo($uid, $campo, $actual + $delta, 'usuario', SG_ORIGEN_PERGAMINO, $detalle, $grupo);
+    }
+
+    foreach ($deltas_objeto as $oid => $cant) {
+        sg_inventario_dar_objeto_cantidad($uid, $oid, $cant, 'usuario', SG_ORIGEN_PERGAMINO, $detalle, $grupo);
+    }
+
+    $db->query("COMMIT");
+
+    // Resuelve nombres de objetos referenciados, para la respuesta al cliente.
+    $obj_ids = array_keys($deltas_objeto);
+    $obj_nombres = array();
+    if (!empty($obj_ids)) {
+        $in = array();
+        foreach ($obj_ids as $x) { $in[] = "'" . $db->escape_string($x) . "'"; }
+        $qn = $db->query("SELECT objeto_id, nombre FROM `mybb_sg_sg_objetos` WHERE objeto_id IN (" . implode(',', $in) . ")");
+        while ($rn = $db->fetch_array($qn)) { $obj_nombres[$rn['objeto_id']] = $rn['nombre']; }
+    }
+
+    $premios_out = array();
+    foreach ($ganados as $premio) {
+        $recompensas_out = array();
+        foreach ($premio['recompensas'] as $rec) {
+            $recompensas_out[] = array(
+                'tipo'          => $rec['tipo'],
+                'valor'         => $rec['valor'] !== null ? (int) $rec['valor'] : null,
+                'objeto_id'     => $rec['objeto_id'],
+                'objeto_nombre' => isset($obj_nombres[$rec['objeto_id']]) ? $obj_nombres[$rec['objeto_id']] : $rec['objeto_id'],
+                'cantidad'      => (int) $rec['cantidad'],
+            );
+        }
+        $premios_out[] = array(
+            'nombre'      => $premio['nombre'],
+            'es_jackpot'  => (bool) $premio['es_jackpot'],
+            'recompensas' => $recompensas_out,
+        );
+    }
+
+    return array(
+        'ok'       => true,
+        'premios'  => $premios_out,
+        'restante' => $tiene - 1,
+    );
+}
+
+// Estadísticas globales de aperturas (panel público en sg/pergaminos.php).
+// Devuelve array('total'=>int, 'jackpots'=>int, 'por_pergamino'=>array(pergamino_id=>int)).
+function sg_gacha_estadisticas() {
+    return sg_gacha_estadisticas_filtro(null);
+}
+
+// Mismo shape que sg_gacha_estadisticas() pero acotado a un usuario (panel
+// "Mis Estadísticas" en sg/pergaminos.php).
+function sg_gacha_estadisticas_usuario($uid) {
+    return sg_gacha_estadisticas_filtro((int) $uid);
+}
+
+function sg_gacha_estadisticas_filtro($uid) {
+    global $db;
+    $where = ($uid !== null) ? "WHERE uid='" . (int) $uid . "'" : '';
+    $where_and = ($uid !== null) ? "AND uid='" . (int) $uid . "'" : '';
+
+    $total = 0;
+    $q = $db->query("SELECT COUNT(*) AS c FROM `mybb_sg_sg_gacha_log` $where");
+    while ($r = $db->fetch_array($q)) { $total = (int) $r['c']; }
+
+    $jackpots = 0;
+    $q = $db->query("SELECT COUNT(*) AS c FROM `mybb_sg_sg_gacha_log` WHERE es_jackpot='1' $where_and");
+    while ($r = $db->fetch_array($q)) { $jackpots = (int) $r['c']; }
+
+    $por_pergamino = array();
+    foreach (sg_gacha_pergamino_ids() as $pid) { $por_pergamino[$pid] = 0; }
+    $q = $db->query("SELECT pergamino_id, COUNT(*) AS c FROM `mybb_sg_sg_gacha_log` $where GROUP BY pergamino_id");
+    while ($r = $db->fetch_array($q)) {
+        if (isset($por_pergamino[$r['pergamino_id']])) { $por_pergamino[$r['pergamino_id']] = (int) $r['c']; }
+    }
+
+    return array('total' => $total, 'jackpots' => $jackpots, 'por_pergamino' => $por_pergamino);
+}
+
+// Últimas $limite aperturas de TODOS los usuarios (historial global). Cada
+// fila trae ya resuelto el nombre del premio y el username, para no tener
+// que hacer lookups aparte al armar el feed.
+function sg_gacha_historial_global($limite = 100) {
+    global $db;
+    $limite = max(1, (int) $limite);
+
+    $rows = array();
+    $q = $db->query("
+        SELECT l.uid, l.pergamino_id, l.es_jackpot, l.tiempo, p.nombre AS premio_nombre, u.username
+        FROM `mybb_sg_sg_gacha_log` l
+        LEFT JOIN `mybb_sg_sg_gacha_premios` p ON p.id = l.premio_id
+        LEFT JOIN `mybb_sg_users` u ON u.uid = l.uid
+        ORDER BY l.id DESC
+        LIMIT $limite
+    ");
+    while ($r = $db->fetch_array($q)) { $rows[] = $r; }
+    return $rows;
+}
+
+// Últimas $limite aperturas de UN usuario (historial personal).
+function sg_gacha_historial_usuario($uid, $limite = 100) {
+    global $db;
+    $uid = (int) $uid;
+    $limite = max(1, (int) $limite);
+
+    $rows = array();
+    $q = $db->query("
+        SELECT l.pergamino_id, l.es_jackpot, l.tiempo, p.nombre AS premio_nombre
+        FROM `mybb_sg_sg_gacha_log` l
+        LEFT JOIN `mybb_sg_sg_gacha_premios` p ON p.id = l.premio_id
+        WHERE l.uid='$uid'
+        ORDER BY l.id DESC
+        LIMIT $limite
+    ");
+    while ($r = $db->fetch_array($q)) { $rows[] = $r; }
+    return $rows;
+}
+
+// Regala +1 de $pergamino_id a TODAS las cuentas con ficha (uso exclusivo del
+// botón de Staff en sg/pergaminos.php, gateado a un uid fijo ahí). No pasa
+// por sg_gacha_log (eso es solo para aperturas reales) — el rastro de este
+// evento masivo queda en el Historial de cada ficha (origen=pergamino_regalo)
+// y en la auditoría de consola. Devuelve la cantidad de fichas afectadas.
+function sg_gacha_regalar_global($pergamino_id, $actor_uid) {
+    global $db;
+    if (!in_array($pergamino_id, sg_gacha_pergamino_ids(), true)) { return 0; }
+
+    $fids = array();
+    $q = $db->query("SELECT fid FROM `mybb_sg_sg_fichas`");
+    while ($r = $db->fetch_array($q)) { $fids[] = (int) $r['fid']; }
+    if (empty($fids)) { return 0; }
+
+    $grupo = uniqid();
+    $detalle = "Regalo global de Staff: $pergamino_id";
+
+    $db->query("START TRANSACTION");
+    foreach ($fids as $fid) {
+        sg_inventario_dar_objeto($fid, $pergamino_id, 'staff', SG_ORIGEN_PERGAMINO_REGALO, $detalle, $grupo, $actor_uid);
+    }
+    $db->query("COMMIT");
+
+    return count($fids);
+}
+
+// ── XP por actividad de foro (posts / temas) ────────────────────────────────
+// newpoints_addpoints() (inc/plugins/newpoints.php) llama a sg_historial_post_xp
+// con los valores de exp/rin YA calculados: esta función solo LOGUEA, no re-hace
+// el UPDATE (newpoints ya actualiza fichas.rin y users.newpoints por su cuenta).
+// El contexto (origen/pid/tid) llega por parámetros desde cada hook instrumentado,
+// así no hay fugas de estado entre llamadas. Ver docs/instrucciones_cambios.md §2.1.
+//
+// Al CREAR un post/tema el pid aún no existe cuando se otorga la XP (se asigna
+// después del hook): esos casos pasan $defer=true y se acumulan en un buffer que
+// el hook datahandler_post_insert_post_end vuelca con el pid ya conocido, vía
+// sg_historial_post_xp_flush().
+$GLOBALS['sg_np_buffer'] = array();
+
+function sg_historial_post_xp($uid, $exp_old, $exp_new, $rin_old, $rin_new, $origen, $pid = null, $tid = null, $defer = false) {
+    $uid = (int) $uid;
+    $grupo = uniqid();
+
+    // Una fila por moneda que cambió; el actor de una ganancia de foro es el
+    // propio usuario (su ficha cambia por su actividad).
+    $filas = array();
+    if ((float) $exp_old != (float) $exp_new) { $filas[] = array('users',  'newpoints', $exp_old, $exp_new); }
+    if ((float) $rin_old != (float) $rin_new) { $filas[] = array('fichas', 'rin',       $rin_old, $rin_new); }
+    if (empty($filas)) { return; }
+
+    foreach ($filas as $f) {
+        if ($defer) {
+            $GLOBALS['sg_np_buffer'][] = array(
+                'uid' => $uid, 'tabla' => $f[0], 'campo' => $f[1],
+                'va' => $f[2], 'vn' => $f[3], 'origen' => $origen,
+                'grupo' => $grupo, 'tid' => $tid,
+            );
+        } else {
+            sg_historial_ficha_log($uid, $f[0], $f[1], $f[2], $f[3], 'usuario', $origen, '', $grupo, $uid, $pid, $tid);
+        }
+    }
+}
+
+// Vuelca el buffer diferido con el pid ya asignado (hook datahandler_post_insert_post_end).
+function sg_historial_post_xp_flush($pid, $tid = null) {
+    if (empty($GLOBALS['sg_np_buffer'])) { return; }
+    foreach ($GLOBALS['sg_np_buffer'] as $e) {
+        $use_tid = ($e['tid'] !== null) ? $e['tid'] : $tid;
+        sg_historial_ficha_log($e['uid'], $e['tabla'], $e['campo'], $e['va'], $e['vn'], 'usuario', $e['origen'], '', $e['grupo'], $e['uid'], $pid, $use_tid);
+    }
+    $GLOBALS['sg_np_buffer'] = array();
+}
+
+// ── Feed del historial para el tab "Historial" de la ficha ──────────────────
+// Etiqueta legible de un origen (SG_ORIGEN_*).
+function sg_origen_label($origen) {
+    $map = array(
+        'modificar_ficha'   => 'Edición de ficha',
+        'ficha_atributos'   => 'Atributos',
+        'recompensa_staff'  => 'Recompensa de Staff',
+        'recompensa_mision' => 'Recompensa de misión',
+        'aprobacion'        => 'Aprobación de ficha',
+        'tienda'            => 'Tienda',
+        'tienda_rins'       => 'Tienda de Rins',
+        'vender'            => 'Venta',
+        'dojo'              => 'Dojo',
+        'ficha_tecnicas'    => 'Técnicas (Staff)',
+        'ficha_objetos'     => 'Objetos (Staff)',
+        'mision_entrenamiento' => 'Misión de entrenamiento',
+        'recompensa_diaria'    => 'Recompensa diaria',
+        'ficha_editada'        => 'Reparto de estadísticas',
+        'trasfondo'            => 'Edición de trasfondo',
+        'consumir'             => 'Objeto consumido',
+        'pergamino'            => 'Apertura de pergamino',
+        'pergamino_regalo'     => 'Regalo de pergamino (Staff)',
+        'post_nuevo'        => 'Nuevo post',
+        'post_editado'      => 'Post editado',
+        'post_borrado'      => 'Post borrado',
+        'post_aprobado'     => 'Post aprobado',
+        'post_desaprobado'  => 'Post desaprobado',
+        'tema_nuevo'        => 'Nuevo tema',
+        'tema_borrado'      => 'Tema borrado',
+        'tema_aprobado'     => 'Tema aprobado',
+        'tema_desaprobado'  => 'Tema desaprobado',
+    );
+    return isset($map[$origen]) ? $map[$origen] : $origen;
+}
+
+// Etiqueta legible de un campo escalar.
+function sg_campo_label($campo) {
+    $map = array(
+        'ryos' => 'Ryos', 'tobi' => 'Tobi', 'rin' => 'Rin', 'madara' => 'Madara',
+        'newpoints' => 'Experiencia', 'pe' => 'PE', 'reputacion' => 'Reputación',
+        'puntos_habilidad' => 'Puntos de habilidad', 'nivel' => 'Nivel',
+        'moderated' => 'Estado de moderación', 'rango' => 'Rango',
+        'arboles_progreso' => 'Progreso de árboles',
+        'vida' => 'Vida', 'chakra' => 'Chakra', 'puntos_estadistica' => 'Puntos de estadística',
+        'mejoras' => 'Mejoras', 'fuerza' => 'Fuerza', 'destreza' => 'Destreza',
+        'cchakra' => 'Control de chakra', 'inteligencia' => 'Inteligencia',
+        'mfuerza' => 'Mod. fuerza', 'mdestreza' => 'Mod. destreza',
+        'mcchakra' => 'Mod. control de chakra', 'minteligencia' => 'Mod. inteligencia',
+        'salud' => 'Salud', 'velocidad' => 'Velocidad', 'tenketsu' => 'Tenketsu', 'sigilo' => 'Sigilo',
+        'espe' => 'Especialización', 'espe_estilo' => 'Estilo',
+        'historia' => 'Biografía', 'apariencia' => 'Apariencia', 'personalidad' => 'Personalidad',
+        'frase' => 'Frase', 'extra' => 'Extra',
+    );
+    return isset($map[$campo]) ? $map[$campo] : ucfirst(str_replace('_', ' ', $campo));
+}
+
+// Recorta un string a $n caracteres (UTF-8 seguro) con elipsis.
+function sg_hist_trim($s, $n = 44) {
+    $s = (string) $s;
+    if (function_exists('mb_strlen')) {
+        return (mb_strlen($s, 'UTF-8') > $n) ? mb_substr($s, 0, $n, 'UTF-8') . '…' : $s;
+    }
+    return (strlen($s) > $n) ? substr($s, 0, $n) . '…' : $s;
+}
+
+// Campos de trasfondo: texto largo, se muestran completos con "Leer más" en
+// vez de recortados con "…" (el usuario necesita poder revisar el texto real).
+function sg_campo_es_texto_largo($campo) {
+    return in_array($campo, array('historia', 'apariencia', 'personalidad', 'frase', 'extra'), true);
+}
+
+// Bloque de texto colapsable (mismo patrón CSS-only checkbox+label que la
+// Biografía de la ficha, .fx-bio-*). $id_base debe ser único en la página
+// (ej. "va-123" combinando lado + id de la fila del historial).
+function sg_hist_texto_clamp_html($id_base, $texto, $umbral = 260) {
+    $texto = (string) $texto;
+    if ($texto === '') { return '<span class="fx-hist-text-empty">(vacío)</span>'; }
+    $texto_html = nl2br(htmlspecialchars($texto));
+    $largo = function_exists('mb_strlen') ? (mb_strlen($texto, 'UTF-8') > $umbral) : (strlen($texto) > $umbral);
+    if (!$largo) {
+        return '<div class="fx-hist-text">' . $texto_html . '</div>';
+    }
+    $cb_id = 'fx-hist-toggle-' . htmlspecialchars($id_base, ENT_QUOTES);
+    return '<input type="checkbox" id="' . $cb_id . '" class="fx-hist-text-toggle-input">'
+         . '<div class="fx-hist-text fx-hist-text--clamped">' . $texto_html . '</div>'
+         . '<label class="fx-hist-text-more" for="' . $cb_id . '">'
+         . '<span class="fx-hist-text-more__more">Leer más ↓</span>'
+         . '<span class="fx-hist-text-more__less">Leer menos ↑</span>'
+         . '</label>';
+}
+
+// Construye el HTML del feed de historial de una ficha (las 3 tablas mezcladas
+// cronológicamente, agrupadas por `grupo`, con nombres de técnica/objeto
+// resueltos). Devuelve array('html'=>string, 'count'=>int).
+function sg_historial_ficha_feed_html($uid, $max_eventos = 150) {
+    global $db, $mybb;
+    $uid = (int) $uid;
+    $bburl = isset($mybb->settings['bburl']) ? $mybb->settings['bburl'] : '';
+
+    $rows = array();
+    $q = $db->query("SELECT grupo, tabla, campo, valor_anterior, valor_nuevo, tipo, origen, pid, tid, actor_uid, tiempo
+                     FROM `mybb_sg_sg_historial_ficha` WHERE uid='$uid' ORDER BY id DESC LIMIT 120");
+    while ($r = $db->fetch_array($q)) { $r['dominio'] = 'ficha'; $rows[] = $r; }
+
+    $q = $db->query("SELECT grupo, tecnica_id, accion, tipo, origen, actor_uid, tiempo
+                     FROM `mybb_sg_sg_historial_tecnicas` WHERE uid='$uid' ORDER BY id DESC LIMIT 120");
+    while ($r = $db->fetch_array($q)) { $r['dominio'] = 'tecnica'; $rows[] = $r; }
+
+    $q = $db->query("SELECT grupo, objeto_id, cantidad, tipo, origen, pid, tid, actor_uid, tiempo
+                     FROM `mybb_sg_sg_historial_objetos` WHERE uid='$uid' ORDER BY id DESC LIMIT 120");
+    while ($r = $db->fetch_array($q)) { $r['dominio'] = 'objeto'; $rows[] = $r; }
+
+    if (empty($rows)) { return array('html' => '', 'count' => 0, 'origenes' => array()); }
+
+    // Resolver nombres de técnicas / objetos referenciados.
+    $tec_ids = array(); $obj_ids = array();
+    foreach ($rows as $r) {
+        if ($r['dominio'] === 'tecnica' && $r['tecnica_id'] !== '') { $tec_ids[$r['tecnica_id']] = true; }
+        if ($r['dominio'] === 'objeto'  && $r['objeto_id']  !== '') { $obj_ids[$r['objeto_id']]  = true; }
+    }
+    $tec_nombres = array(); $obj_nombres = array();
+    if (!empty($tec_ids)) {
+        $in = array();
+        foreach (array_keys($tec_ids) as $x) { $in[] = "'" . $db->escape_string($x) . "'"; }
+        $q = $db->query("SELECT tid, nombre FROM `mybb_sg_sg_tecnicas` WHERE tid IN (" . implode(',', $in) . ")");
+        while ($r = $db->fetch_array($q)) { $tec_nombres[$r['tid']] = $r['nombre']; }
+    }
+    if (!empty($obj_ids)) {
+        $in = array();
+        foreach (array_keys($obj_ids) as $x) { $in[] = "'" . $db->escape_string($x) . "'"; }
+        $q = $db->query("SELECT objeto_id, nombre FROM `mybb_sg_sg_objetos` WHERE objeto_id IN (" . implode(',', $in) . ")");
+        while ($r = $db->fetch_array($q)) { $obj_nombres[$r['objeto_id']] = $r['nombre']; }
+    }
+
+    // Orden cronológico descendente (por tiempo; estable por id vía orden previo).
+    usort($rows, function ($a, $b) {
+        $ta = strtotime($a['tiempo']); $tb = strtotime($b['tiempo']);
+        if ($ta == $tb) { return 0; }
+        return ($ta < $tb) ? 1 : -1;
+    });
+
+    // Agrupar por `grupo`; grupo vacío = evento propio (clave sintética).
+    $eventos = array(); $orden = array(); $sint = 0;
+    foreach ($rows as $r) {
+        $g = ($r['grupo'] !== null && $r['grupo'] !== '') ? 'g:' . $r['grupo'] : 's:' . (++$sint);
+        if (!isset($eventos[$g])) { $eventos[$g] = array(); $orden[] = $g; }
+        $eventos[$g][] = $r;
+    }
+
+    $html = ''; $count = 0; $origenes = array();
+    foreach ($orden as $g) {
+        if ($count >= $max_eventos) { break; }
+        $count++;
+        $grp   = $eventos[$g];
+        $first = $grp[0];
+        $tipo  = ($first['tipo'] === 'staff') ? 'staff' : 'usuario';
+        $origen_raw = $first['origen'];
+        $fecha = htmlspecialchars(substr($first['tiempo'], 0, 16));
+        $origen_lbl = htmlspecialchars(sg_origen_label($origen_raw));
+        $origenes[$origen_raw] = sg_origen_label($origen_raw);
+
+        $enlace = '';
+        if (!empty($first['tid'])) {
+            $tid = (int) $first['tid'];
+            $pid = !empty($first['pid']) ? (int) $first['pid'] : 0;
+            $url = $bburl . '/showthread.php?tid=' . $tid . ($pid ? '&pid=' . $pid . '#pid' . $pid : '');
+            $enlace = ' <a class="fx-hist-event__link" href="' . htmlspecialchars($url) . '">ver post</a>';
+        }
+
+        $cambios = '';
+        foreach ($grp as $r) {
+            if ($r['dominio'] === 'ficha' && sg_campo_es_texto_largo($r['campo'])) {
+                $camp = htmlspecialchars(sg_campo_label($r['campo']));
+                $va_html = sg_hist_texto_clamp_html('va-' . $r['id'], $r['valor_anterior']);
+                $vn_html = sg_hist_texto_clamp_html('vn-' . $r['id'], $r['valor_nuevo']);
+                $cambios .= '<li class="fx-hist-change fx-hist-change--texto">'
+                          . '<span class="fx-hist-change__k">' . $camp . '</span>'
+                          . '<div class="fx-hist-text-block"><span class="fx-hist-text-label">Antes</span>' . $va_html . '</div>'
+                          . '<div class="fx-hist-text-block"><span class="fx-hist-text-label">Después</span>' . $vn_html . '</div>'
+                          . '</li>';
+            } else if ($r['dominio'] === 'ficha') {
+                $camp = htmlspecialchars(sg_campo_label($r['campo']));
+                $va = $r['valor_anterior']; $vn = $r['valor_nuevo'];
+                $delta = '';
+                if (is_numeric($va) && is_numeric($vn)) {
+                    $d = (float) $vn - (float) $va;
+                    if ($d != 0) {
+                        $sign = ($d > 0) ? 'pos' : 'neg';
+                        $dtxt = ($d > 0 ? '+' : '') . rtrim(rtrim(sprintf('%.2f', $d), '0'), '.');
+                        $delta = ' <span class="fx-hist-delta fx-hist-delta--' . $sign . '">' . $dtxt . '</span>';
+                    }
+                }
+                $va_s = htmlspecialchars(sg_hist_trim($va));
+                $vn_s = htmlspecialchars(sg_hist_trim($vn));
+                $cambios .= '<li class="fx-hist-change"><span class="fx-hist-change__k">' . $camp . '</span> '
+                          . '<span class="fx-hist-change__v">' . $va_s . ' → ' . $vn_s . '</span>' . $delta . '</li>';
+            } else if ($r['dominio'] === 'tecnica') {
+                $nom = isset($tec_nombres[$r['tecnica_id']]) ? $tec_nombres[$r['tecnica_id']] : $r['tecnica_id'];
+                $nom = htmlspecialchars($nom);
+                $es_quitar = ($r['accion'] === 'quitar');
+                $verbo = $es_quitar ? 'Quitó técnica' : 'Aprendió técnica';
+                $cls   = $es_quitar ? 'neg' : 'pos';
+                $cambios .= '<li class="fx-hist-change"><span class="fx-hist-change__k fx-hist-change__k--' . $cls . '">' . $verbo . '</span> '
+                          . '<span class="fx-hist-change__v">' . $nom . '</span></li>';
+            } else {
+                $nom = isset($obj_nombres[$r['objeto_id']]) ? $obj_nombres[$r['objeto_id']] : $r['objeto_id'];
+                $nom = htmlspecialchars($nom);
+                $c = (int) $r['cantidad'];
+                $sign = ($c >= 0) ? 'pos' : 'neg';
+                $ctxt = ($c > 0 ? '+' : '') . $c;
+                $cambios .= '<li class="fx-hist-change"><span class="fx-hist-change__k fx-hist-change__k--' . $sign . '">' . $ctxt . '</span> '
+                          . '<span class="fx-hist-change__v">' . $nom . '</span></li>';
+            }
+        }
+
+        $html .= '<article class="fx-hist-event" data-tipo="' . $tipo . '" data-origen="' . htmlspecialchars($origen_raw, ENT_QUOTES) . '">'
+               . '<div class="fx-hist-event__head">'
+               . '<span class="fx-hist-event__date">' . $fecha . '</span>'
+               . '<span class="fx-hist-badge fx-hist-badge--' . $tipo . '">' . (($tipo === 'staff') ? 'Staff' : 'Usuario') . '</span>'
+               . '<span class="fx-hist-event__origen">' . $origen_lbl . '</span>'
+               . $enlace
+               . '</div>'
+               . '<ul class="fx-hist-changes">' . $cambios . '</ul>'
+               . '</article>';
+    }
+
+    asort($origenes);
+    return array('html' => $html, 'count' => $count, 'origenes' => $origenes);
 }

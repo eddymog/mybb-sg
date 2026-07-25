@@ -1,0 +1,372 @@
+<html>
+
+<head>
+  <title>Pergaminos (Gacha)</title>
+  {$headerinclude}
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Noto+Serif+JP:wght@300;400;700&display=swap" rel="stylesheet">
+  <style>
+    .sg-admin {
+      --bg: #0f0c18; --bg2: #130f1e; --bg3: #171224;
+      --border: rgba(156, 107, 204, 0.12);
+      --border-strong: rgba(156, 107, 204, 0.22);
+      --ink: #e8dff8; --plum: #7b4ab8; --plum2: #9c6bcc; --plum3: #b890e0;
+      --stone: #8a7a9a; --mist: #5a4a6a; --oxide: #c0582a; --lavender: #ede0fa;
+      --gold: #c09840; --green: #4f9d69;
+      max-width: 920px;
+      margin: 24px auto 40px;
+      padding: 0 16px;
+      color: var(--ink);
+      font-family: 'Noto Serif JP', serif;
+    }
+
+    .sg-admin-card {
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), transparent 16%), var(--bg2);
+      border: 0.5px solid var(--border);
+      overflow: hidden;
+    }
+
+    .sg-admin-head {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 18px 22px;
+      background: var(--bg3);
+      border-bottom: 0.5px solid var(--border);
+    }
+    .sg-admin-head::before { content: ''; width: 3px; height: 20px; background: var(--oxide); flex-shrink: 0; }
+    .sg-admin-head h1 {
+      margin: 0;
+      font-family: 'Cinzel', serif;
+      font-size: 15px;
+      font-weight: 900;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--ink);
+    }
+
+    .sg-admin-body { padding: 22px; }
+
+    .sg-mode {
+      margin-bottom: 16px;
+      font-family: 'Cinzel', serif;
+      font-size: 8px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--plum3);
+    }
+
+    .sg-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .sg-field { display: flex; flex-direction: column; gap: 5px; }
+    .sg-field--full { grid-column: 1 / -1; }
+
+    .sg-label {
+      font-family: 'Cinzel', serif;
+      font-size: 8px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--mist);
+    }
+    .sg-label .req { color: var(--oxide); }
+
+    .sg-input, .sg-select {
+      width: 100%;
+      height: 40px;
+      padding: 9px 12px;
+      background: var(--bg);
+      border: 0.5px solid var(--border-strong);
+      color: var(--ink);
+      font-family: 'Noto Serif JP', serif;
+      font-size: 14px;
+      box-sizing: border-box;
+      transition: border-color 0.15s;
+    }
+    .sg-select {
+      -webkit-appearance: none;
+      appearance: none;
+      padding-right: 32px;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%238a7a9a' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+    }
+    .sg-input:focus, .sg-select:focus { outline: none; border-color: var(--plum3); }
+
+    .sg-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      height: 38px;
+      padding: 0 22px;
+      background: var(--plum);
+      border: none;
+      color: var(--lavender);
+      font-family: 'Cinzel', serif;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .sg-btn:hover { background: var(--plum2); }
+    .sg-btn--danger { background: var(--oxide); color: #fff; }
+    .sg-btn--danger:hover { filter: brightness(1.15); background: var(--oxide); }
+
+    .sg-actions { display: flex; justify-content: space-between; gap: 10px; margin-top: 18px; padding-top: 16px; border-top: 0.5px solid var(--border); }
+
+    /* ── Selector de pergamino + resumen ─────────────────────────── */
+    .sg-gacha-top { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 14px; margin-bottom: 20px; padding-bottom: 20px; border-bottom: 0.5px solid var(--border); }
+    .sg-gacha-total { font-family: 'Cinzel', serif; font-size: 12px; font-weight: 700; letter-spacing: 0.5px; }
+    .sg-gacha-total.is-ok { color: var(--green); }
+    .sg-gacha-total.is-warn { color: var(--oxide); }
+
+    /* ── Lista de premios existentes ─────────────────────────────── */
+    .sg-gacha-lista { display: flex; flex-direction: column; gap: 8px; margin-bottom: 26px; }
+    .sg-gacha-empty { padding: 18px; text-align: center; color: var(--mist); font-size: 13px; border: 0.5px solid var(--border); background: var(--bg); }
+    .sg-gacha-premio { padding: 10px 14px; background: var(--bg); border: 0.5px solid var(--border); border-left: 2px solid transparent; }
+    .sg-gacha-premio.is-editing { border-left-color: var(--plum3); background: rgba(123, 74, 184, 0.08); }
+    .sg-gacha-premio__head { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+    .sg-gacha-premio__prob { font-family: 'Cinzel', serif; font-size: 13px; font-weight: 900; color: var(--gold); min-width: 46px; }
+    .sg-gacha-premio__nombre { font-family: 'Cinzel', serif; font-size: 12px; font-weight: 700; color: var(--ink); }
+    .sg-gacha-premio__edit { margin-left: auto; font-family: 'Cinzel', serif; font-size: 8px; font-weight: 700; letter-spacing: 1.3px; text-transform: uppercase; color: var(--plum3); }
+    .sg-gacha-premio__edit:hover { color: var(--lavender); }
+    .sg-gacha-premio__rec { margin-top: 6px; font-size: 12.5px; color: var(--stone); line-height: 1.6; }
+    .sg-gacha-rec--empty { font-style: italic; }
+    .sg-gacha-badge { padding: 2px 7px; font-family: 'Cinzel', serif; font-size: 8px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
+    .sg-gacha-badge--jackpot { background: rgba(192, 152, 64, 0.16); color: var(--gold); border: 0.5px solid rgba(192, 152, 64, 0.4); }
+    .sg-gacha-badge--off { background: rgba(192, 88, 42, 0.14); color: var(--oxide); border: 0.5px solid rgba(192, 88, 42, 0.35); }
+
+    /* ── Sección Jackpot (independiente del formulario de premios normales) ── */
+    .sg-gacha-jackpot {
+      margin-bottom: 26px;
+      padding: 16px 18px;
+      background: rgba(192, 152, 64, 0.05);
+      border: 0.5px solid rgba(192, 152, 64, 0.3);
+    }
+    .sg-gacha-jackpot__title {
+      margin: 0 0 6px;
+      font-family: 'Cinzel', serif;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--gold);
+    }
+    .sg-gacha-jackpot__desc { margin: 0 0 14px; color: var(--stone); font-size: 12.5px; line-height: 1.6; }
+    .sg-gacha-jackpot__row { display: flex; flex-wrap: wrap; gap: 10px; align-items: end; }
+    .sg-gacha-jackpot__row .sg-field { flex: 1; min-width: 140px; }
+    .sg-gacha-jackpot__row .sg-btn { flex-shrink: 0; }
+
+    /* ── Recompensas del formulario de premio normal (filas dinámicas) ── */
+    .sg-gacha-rec-rows { display: flex; flex-direction: column; gap: 10px; margin-bottom: 10px; }
+    .sg-gacha-rec-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: end; padding: 10px; background: var(--bg); border: 0.5px solid var(--border); }
+    .sg-gacha-rec-row .sg-field { flex: 1; min-width: 120px; }
+    .sg-gacha-rec-remove {
+      flex-shrink: 0;
+      width: 40px;
+      height: 40px;
+      background: var(--bg2);
+      border: 0.5px solid var(--border-strong);
+      color: var(--oxide);
+      font-size: 14px;
+      line-height: 1;
+      cursor: pointer;
+    }
+    .sg-gacha-rec-remove:hover { background: rgba(192, 88, 42, 0.12); }
+    .sg-gacha-rec-add {
+      align-self: flex-start;
+      padding: 9px 16px;
+      background: var(--bg2);
+      border: 0.5px dashed var(--border-strong);
+      color: var(--plum3);
+      font-family: 'Cinzel', serif;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 1.3px;
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+    .sg-gacha-rec-add:hover { color: var(--lavender); border-color: var(--plum3); }
+
+    @media (max-width: 720px) {
+      .sg-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+
+<body>
+  {$header}
+  <main class="sg-admin">
+    <div class="sg-admin-card">
+      <div class="sg-admin-head"><h1>Pergaminos (Gacha)</h1></div>
+      <div class="sg-admin-body">
+
+        <div class="sg-gacha-top">
+          <div class="sg-field" style="min-width: 160px;">
+            <label class="sg-label" for="pergamino_sel">Pergamino</label>
+            <select class="sg-select" id="pergamino_sel" onchange="window.location.href = '?pergamino_id=' + encodeURIComponent(this.value);">
+              {$pergaminoOpts}
+            </select>
+          </div>
+          <div class="sg-gacha-total <if $totalProbabilidad == 100 then>is-ok<else>is-warn</if>">
+            Probabilidad total: {$totalProbabilidad}%<if $totalProbabilidad != 100 then> — debe sumar EXACTAMENTE 100% para que los usuarios puedan abrir este pergamino<else> — listo, los usuarios ya pueden abrir este pergamino</if>
+          </div>
+        </div>
+
+        <div class="sg-gacha-lista">
+          {$premiosHtml}
+        </div>
+
+        <!-- Jackpot: un caso especial de premio, con su propia sección. Siempre
+             son 5 tiradas extra gratis; solo hace falta su probabilidad. -->
+        <div class="sg-gacha-jackpot">
+          <div class="sg-gacha-jackpot__title">Jackpot</div>
+          <p class="sg-gacha-jackpot__desc">El Jackpot otorga siempre <strong>5 tiradas extra gratis</strong> sobre los demás premios de este pergamino. Solo hace falta definir con qué probabilidad puede salir.</p>
+          <form method="post" action="/sg/admin/gestionar_pergaminos.php" id="gestionar_jackpot">
+            <input type="hidden" name="pergamino_id" value="{$pergaminoIdSel}">
+            <input type="hidden" name="jackpot_id_old" value="{$jackpotId}">
+            <div class="sg-gacha-jackpot__row">
+              <div class="sg-field">
+                <label class="sg-label" for="jackpot_probabilidad">Probabilidad (%) <span class="req">*</span></label>
+                <input class="sg-input" value="{$jackpotProbabilidad}" type="number" step="0.01" min="0.01" max="100" name="jackpot_probabilidad" id="jackpot_probabilidad" required />
+              </div>
+              <if $jackpotId > 0 then>
+              <button class="sg-btn sg-btn--danger" type="submit" name="accion" value="EliminarJackpot" onclick="return confirm('¿Eliminar el Jackpot de este pergamino?');">Eliminar</button>
+              </if>
+              <button class="sg-btn" type="submit" name="accion" value="GuardarJackpot">Guardar Jackpot</button>
+            </div>
+          </form>
+        </div>
+
+        <div class="sg-mode">
+          <if $premioId > 0 then>Modificando premio #{$premioId}<else>Nuevo premio para {$pergaminoIdSel}</if>
+        </div>
+
+        <form method="post" action="/sg/admin/gestionar_pergaminos.php" name="gestionar_pergaminos" id="gestionar_pergaminos">
+          <input type="hidden" name="premio_id_old" value="{$premioId}">
+          <input type="hidden" name="pergamino_id" value="{$pergaminoIdSel}">
+
+          <div class="sg-grid">
+            <div class="sg-field">
+              <label class="sg-label" for="nombre">Nombre <span class="req">*</span></label>
+              <input class="sg-input" value="{$premio['nombre']}" type="text" name="nombre" id="nombre" placeholder="Ej. 100 Ryos" required />
+            </div>
+            <div class="sg-field">
+              <label class="sg-label" for="probabilidad">Probabilidad (%) <span class="req">*</span></label>
+              <input class="sg-input" value="{$premio['probabilidad']}" type="number" step="0.01" min="0.01" max="100" name="probabilidad" id="probabilidad" required />
+            </div>
+            <div class="sg-field">
+              <label class="sg-label" for="activo">Activo</label>
+              <select class="sg-select" name="activo" id="activo">
+                <option value="1" <if $premio['activo'] != 0 then>selected</if>>Sí</option>
+                <option value="0" <if $premio['activo'] == 0 then>selected</if>>No</option>
+              </select>
+            </div>
+
+            <div class="sg-field sg-field--full">
+              <label class="sg-label">Recompensas</label>
+              <div class="sg-gacha-rec-rows" id="sg-gacha-rec-rows"></div>
+              <button class="sg-gacha-rec-add" type="button" onclick="pergAdminAgregarFila()">+ Agregar recompensa</button>
+            </div>
+
+          </div>
+
+          <div class="sg-actions">
+            <if $premioId > 0 then>
+              <button class="sg-btn sg-btn--danger" type="submit" name="accion" value="Eliminar" onclick="return confirm('¿Eliminar este premio? Esta acción no se puede deshacer.');">Eliminar</button>
+            <else>
+              <span></span>
+            </if>
+            <button class="sg-btn" type="submit" name="accion" value="Guardar">Guardar</button>
+          </div>
+        </form>
+
+      </div>
+    </div>
+  </main>
+  {$footer}
+</body>
+<if $log_var != '' then><script>alert(`{$log_var}`);</script></if>
+{$reload_script}
+
+<script>
+  var PERG_ADMIN_RECOMPENSAS = {$recompensasJson};
+  var PERG_ADMIN_MONEDAS = ['ryos', 'rin', 'madara', 'tobi'];
+  var PERG_ADMIN_TIPOS = [['', '—'], ['ryos', 'Ryos'], ['rin', 'Rin'], ['madara', 'Madara'], ['tobi', 'Tobi'], ['objeto', 'Objeto']];
+
+  function pergAdminActualizarFila(row) {
+    var tipo = row.querySelector('select[name="rec_tipo[]"]').value;
+    var esMoneda = PERG_ADMIN_MONEDAS.indexOf(tipo) !== -1;
+    var esObjeto = tipo === 'objeto';
+    row.querySelector('.sg-gacha-rec-valor').style.display = esMoneda ? '' : 'none';
+    row.querySelector('.sg-gacha-rec-objeto').style.display = esObjeto ? '' : 'none';
+    row.querySelector('.sg-gacha-rec-cantidad').style.display = esObjeto ? '' : 'none';
+  }
+
+  function pergAdminRecRow(data) {
+    data = data || { tipo: '', valor: '', objeto_id: '', cantidad: 1 };
+    var row = document.createElement('div');
+    row.className = 'sg-gacha-rec-row';
+
+    var tipoWrap = document.createElement('div'); tipoWrap.className = 'sg-field';
+    var tipoLabel = document.createElement('label'); tipoLabel.className = 'sg-label'; tipoLabel.textContent = 'Tipo';
+    var tipoSel = document.createElement('select'); tipoSel.className = 'sg-select'; tipoSel.name = 'rec_tipo[]';
+    PERG_ADMIN_TIPOS.forEach(function (opt) {
+      var o = document.createElement('option'); o.value = opt[0]; o.textContent = opt[1];
+      if (opt[0] === data.tipo) { o.selected = true; }
+      tipoSel.appendChild(o);
+    });
+    tipoWrap.appendChild(tipoLabel); tipoWrap.appendChild(tipoSel);
+
+    var valorWrap = document.createElement('div'); valorWrap.className = 'sg-field sg-gacha-rec-valor';
+    var valorLabel = document.createElement('label'); valorLabel.className = 'sg-label'; valorLabel.textContent = 'Valor';
+    var valorInput = document.createElement('input'); valorInput.className = 'sg-input'; valorInput.type = 'number'; valorInput.name = 'rec_valor[]';
+    if (data.valor) { valorInput.value = data.valor; }
+    valorWrap.appendChild(valorLabel); valorWrap.appendChild(valorInput);
+
+    var objetoWrap = document.createElement('div'); objetoWrap.className = 'sg-field sg-gacha-rec-objeto';
+    var objetoLabel = document.createElement('label'); objetoLabel.className = 'sg-label'; objetoLabel.textContent = 'Objeto ID';
+    var objetoInput = document.createElement('input'); objetoInput.className = 'sg-input'; objetoInput.type = 'text'; objetoInput.name = 'rec_objeto[]';
+    if (data.objeto_id) { objetoInput.value = data.objeto_id; }
+    objetoWrap.appendChild(objetoLabel); objetoWrap.appendChild(objetoInput);
+
+    var cantWrap = document.createElement('div'); cantWrap.className = 'sg-field sg-gacha-rec-cantidad';
+    var cantLabel = document.createElement('label'); cantLabel.className = 'sg-label'; cantLabel.textContent = 'Cantidad';
+    var cantInput = document.createElement('input'); cantInput.className = 'sg-input'; cantInput.type = 'number'; cantInput.min = '1'; cantInput.name = 'rec_cantidad[]';
+    cantInput.value = data.cantidad || 1;
+    cantWrap.appendChild(cantLabel); cantWrap.appendChild(cantInput);
+
+    var removeBtn = document.createElement('button');
+    removeBtn.type = 'button';
+    removeBtn.className = 'sg-gacha-rec-remove';
+    removeBtn.textContent = '✕';
+    removeBtn.title = 'Quitar fila';
+    removeBtn.addEventListener('click', function () { row.remove(); });
+
+    tipoSel.addEventListener('change', function () { pergAdminActualizarFila(row); });
+
+    row.appendChild(tipoWrap);
+    row.appendChild(valorWrap);
+    row.appendChild(objetoWrap);
+    row.appendChild(cantWrap);
+    row.appendChild(removeBtn);
+
+    pergAdminActualizarFila(row);
+    return row;
+  }
+
+  function pergAdminAgregarFila() {
+    document.getElementById('sg-gacha-rec-rows').appendChild(pergAdminRecRow());
+  }
+
+  document.addEventListener('DOMContentLoaded', function () {
+    var cont = document.getElementById('sg-gacha-rec-rows');
+    var datos = (PERG_ADMIN_RECOMPENSAS && PERG_ADMIN_RECOMPENSAS.length) ? PERG_ADMIN_RECOMPENSAS : [null];
+    datos.forEach(function (d) { cont.appendChild(pergAdminRecRow(d)); });
+  });
+</script>
+
+</html>

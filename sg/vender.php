@@ -65,19 +65,19 @@ if ($cantidad > $actual) {
 }
 
 // Aplica la venta: descuenta inventario (borra si llega a 0) y suma ryos.
-$nueva_cant = $actual - $cantidad;
-if ($nueva_cant > 0) {
-    $db->query("UPDATE `mybb_sg_sg_inventario` SET cantidad='$nueva_cant' WHERE uid='$uid' AND objeto_id='$objeto_esc'");
-} else {
-    $db->query("DELETE FROM `mybb_sg_sg_inventario` WHERE uid='$uid' AND objeto_id='$objeto_esc'");
-}
-
+// inventario + ryos son ambos InnoDB -> transacción con atomicidad real.
 $total_venta = $precio_venta * $cantidad;
 $ryos_actual = 0;
 $qr = $db->query("SELECT ryos FROM `mybb_sg_sg_fichas` WHERE fid='$uid'");
 while ($r = $db->fetch_array($qr)) { $ryos_actual = intval($r['ryos']); }
 $nuevo_ryos = $ryos_actual + $total_venta;
-$db->query("UPDATE `mybb_sg_sg_fichas` SET ryos='$nuevo_ryos' WHERE fid='$uid'");
+
+$grupo = uniqid();
+$detalle = "Venta: $cantidad × $objeto";
+$db->query("START TRANSACTION");
+$nueva_cant = sg_inventario_quitar_objeto($uid, $objeto, $cantidad, 'usuario', SG_ORIGEN_VENDER, $detalle, $grupo);
+sg_ficha_set_campo($uid, 'ryos', $nuevo_ryos, 'usuario', SG_ORIGEN_VENDER, $detalle, $grupo);
+$db->query("COMMIT");
 
 $db->query("SELECT RELEASE_LOCK('$lock')");
 

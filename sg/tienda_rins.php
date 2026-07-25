@@ -27,16 +27,13 @@ $TOBI_RIN  = 50;  $TOBI_GANA = 1;   // 50 Rin -> 1 Tobi
 
 // Precio en Rins de los pergaminos (hardcode)
 $precios_rin = array(
-    'PER001' => 100,
-    'PER002' => 200,
-    'PER003' => 300,
-    'PER004' => 500,
-    'PER005' => 1000,
-    'PER006' => 1500,
-    'PER007' => 2500,
-    'PER008' => 5000,
-    'PER009' => 7500,
-    'PER010' => 15000,
+    'PERG001' => 100,
+    'PERG002' => 200,
+    'PERG003' => 300,
+    'PERG004' => 500,
+    'PERG005' => 1000,
+    'PERG006' => 1500,
+    'PERG007' => 3000,
 );
 
 $accion      = $_POST["accion"];
@@ -89,7 +86,12 @@ if (in_array($accion, array('cambiar_ryos', 'cambiar_tobi', 'comprar_pergamino')
             } else {
                 $rin_act  -= $costo;
                 $ryos_act += $gana;
-                $db->query("UPDATE `mybb_sg_sg_fichas` SET rin='$rin_act', ryos='$ryos_act' WHERE fid='$uid'");
+                $grupo = uniqid();
+                $detalle = "Canje: " . number_format($costo, 0, ',', '.') . " rin -> " . number_format($gana, 0, ',', '.') . " ryos";
+                $db->query("START TRANSACTION");
+                sg_ficha_set_campo($uid, 'rin', $rin_act, 'usuario', SG_ORIGEN_TIENDA_RINS, $detalle, $grupo);
+                sg_ficha_set_campo($uid, 'ryos', $ryos_act, 'usuario', SG_ORIGEN_TIENDA_RINS, $detalle, $grupo);
+                $db->query("COMMIT");
                 $msg_ok = "Cambiaste " . number_format($costo, 0, ',', '.') . " Rin por " . number_format($gana, 0, ',', '.') . " Ryos.";
             }
         } else if ($accion === 'cambiar_tobi') {
@@ -100,7 +102,12 @@ if (in_array($accion, array('cambiar_ryos', 'cambiar_tobi', 'comprar_pergamino')
             } else {
                 $rin_act  -= $costo;
                 $tobi_act += $gana;
-                $db->query("UPDATE `mybb_sg_sg_fichas` SET rin='$rin_act', tobi='$tobi_act' WHERE fid='$uid'");
+                $grupo = uniqid();
+                $detalle = "Canje: " . number_format($costo, 0, ',', '.') . " rin -> $gana tobi";
+                $db->query("START TRANSACTION");
+                sg_ficha_set_campo($uid, 'rin', $rin_act, 'usuario', SG_ORIGEN_TIENDA_RINS, $detalle, $grupo);
+                sg_ficha_set_campo($uid, 'tobi', $tobi_act, 'usuario', SG_ORIGEN_TIENDA_RINS, $detalle, $grupo);
+                $db->query("COMMIT");
                 $msg_ok = "Cambiaste " . number_format($costo, 0, ',', '.') . " Rin por $gana Tobi" . ($gana == 1 ? '' : 's') . ".";
             }
         } else if ($accion === 'comprar_pergamino') {
@@ -138,14 +145,14 @@ if (in_array($accion, array('cambiar_ryos', 'cambiar_tobi', 'comprar_pergamino')
                         if ($rin_act < $total) {
                             $msg_error = "Rins insuficientes: necesitas " . number_format($total, 0, ',', '.') . " y tienes " . number_format($rin_act, 0, ',', '.') . ".";
                         } else {
-                            if ($has) {
-                                $nueva = $actual + $n;
-                                $db->query("UPDATE `mybb_sg_sg_inventario` SET `cantidad`='$nueva' WHERE uid='$uid' AND objeto_id='$objeto_esc'");
-                            } else {
-                                $db->query("INSERT INTO `mybb_sg_sg_inventario` (`objeto_id`, `uid`, `cantidad`) VALUES ('$objeto_esc', '$uid', '$n')");
-                            }
+                            $nueva = $actual + $n;
                             $rin_act -= $total;
-                            $db->query("UPDATE `mybb_sg_sg_fichas` SET rin='$rin_act' WHERE fid='$uid'");
+                            $grupo = uniqid();
+                            $detalle = "Compra (rins): $n × " . $obj['nombre'];
+                            $db->query("START TRANSACTION");
+                            sg_inventario_set_cantidad($uid, $objeto_post, $nueva, 'usuario', SG_ORIGEN_TIENDA_RINS, $detalle, $grupo);
+                            sg_ficha_set_campo($uid, 'rin', $rin_act, 'usuario', SG_ORIGEN_TIENDA_RINS, $detalle, $grupo);
+                            $db->query("COMMIT");
                             $msg_ok = "Compraste $n × \"$onombre\" por " . number_format($total, 0, ',', '.') . " Rin.";
                         }
                     }
