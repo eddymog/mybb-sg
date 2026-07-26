@@ -265,11 +265,6 @@
           <div>
             <div class="sg-tree-label">Árbol de técnicas</div>
             <h1 class="sg-tree-title">{$arbol}</h1>
-            <if $clan_desc then>
-              <p class="sg-tree-copy">{$clan_desc}</p>
-            <else>
-              <p class="sg-tree-copy"></p>
-            </if>
           </div>
         </div>
       </section>
@@ -440,6 +435,7 @@ function sgCreateBadge(icon, text, accent) {
 
 function sgCreateTechniqueCard(tecnica) {
   var badges = [];
+  var description = tecnica.descripcion ? tecnica.descripcion : 'Sin descripción disponible.';
   var effectText = tecnica.efecto ? tecnica.efecto : 'No tiene efecto adicional especificado.';
   var effectParsedText = tecnica.efecto ? (tecnica.efecto_parsed || tecnica.efecto) : effectText;
   var costText = tecnica.coste ? tecnica.coste : 'Sin coste indicado';
@@ -487,6 +483,10 @@ function sgCreateTechniqueCard(tecnica) {
     +     '</div>'
     +   '</div>'
     +   '<div class="sg-technique__main">'
+    +     '<div class="sg-technique__section">'
+    +       '<div class="sg-technique__section-label"><span class="sg-technique__label-icon">▣</span>Descripción</div>'
+    +       '<p class="sg-technique__text">' + description + '</p>'
+    +     '</div>'
     +     '<div class="sg-technique__section">'
     +       '<div class="sg-technique__section-label"><span class="sg-technique__label-icon">✧</span>Efecto</div>'
     +       '<div class="sg-technique__text sg-tec-effect' + (tecnica.efecto ? '' : ' sg-technique__text--muted') + '" data-tid="' + (tecnica.tid || '') + '">' + effectShown + '</div>'

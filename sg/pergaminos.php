@@ -87,11 +87,8 @@ while ($o = $db->fetch_array($qo)) {
     $catalogo[$o['objeto_id']] = $o;
 }
 
-// Umbral (caracteres) a partir del cual la descripción de la tarjeta lleva
-// el toggle "Leer más" en vez de mostrarse siempre completa.
-$PERG_DESC_UMBRAL = 90;
-
 $pergaminos_html = '';
+$premios_paneles_html = '';
 $total = 0;
 // Orden fijo E→S (PERG001..PERG007).
 foreach ($perg_ids as $pid) {
@@ -100,22 +97,10 @@ foreach ($perg_ids as $pid) {
 
     $o = $catalogo[$pid];
     $nombre = htmlspecialchars($o['nombre'], ENT_QUOTES);
-    $desc_raw = trim($o['descripcion']);
-    $desc   = nl2br(htmlspecialchars($desc_raw));
     $img    = trim($o['imagen']) !== '' ? htmlspecialchars($o['imagen'], ENT_QUOTES) : $default_img;
     $cant   = isset($inv[$pid]) ? intval($inv[$pid]) : 0;
     $listo  = isset($configurados[$pid]);
     $pid_esc = htmlspecialchars($pid, ENT_QUOTES);
-
-    $es_larga = function_exists('mb_strlen') ? (mb_strlen($desc_raw, 'UTF-8') > $PERG_DESC_UMBRAL) : (strlen($desc_raw) > $PERG_DESC_UMBRAL);
-    if ($es_larga) {
-        $desc_id = 'perg-desc-' . preg_replace('/[^a-zA-Z0-9_-]/', '', $pid);
-        $desc_html = "<input type=\"checkbox\" id=\"$desc_id\" class=\"perg-desc-toggle-input\">"
-            . "<p class=\"perg-card__desc\">$desc</p>"
-            . "<label class=\"perg-card__desc-more\" for=\"$desc_id\"><span class=\"perg-card__desc-more__more\">Leer más ↓</span><span class=\"perg-card__desc-more__less\">Leer menos ↑</span></label>";
-    } else {
-        $desc_html = "<p class=\"perg-card__desc\">$desc</p>";
-    }
 
     if ($cant <= 0) {
         $boton = "<div class=\"perg-soon perg-soon--notienes\">No tienes ninguno</div>";
@@ -125,12 +110,36 @@ foreach ($perg_ids as $pid) {
         $boton = "<div class=\"perg-soon\">Próximamente</div>";
     }
 
+    // "Ver premios": tabla de probabilidades, solo tiene sentido si el
+    // pergamino ya está configurado (probabilidad activa = 100%).
+    $ver_premios_btn = '';
+    if ($listo) {
+        $ver_premios_btn = "<button class=\"perg-btn perg-btn--ghost\" type=\"button\" data-pid=\"$pid_esc\" data-nombre=\"$nombre\" onclick=\"pergVerPremios(this)\">Ver premios</button>";
+
+        $filas_html = '';
+        foreach (sg_gacha_premios_tabla($pid) as $fila) {
+            $fnombre = htmlspecialchars($fila['nombre'], ENT_QUOTES);
+            $fprob   = number_format($fila['probabilidad'], 2, ',', '.') . '%';
+            $frecs   = htmlspecialchars(implode(', ', $fila['recompensas']), ENT_QUOTES);
+            $fbadge  = $fila['es_jackpot'] ? '<span class="perg-ptable-jackpot">JACKPOT</span>' : '';
+            $filas_html .= "<div class=\"perg-ptable-row\">"
+                . "<div class=\"perg-ptable-prob\">$fprob</div>"
+                . "<div class=\"perg-ptable-main\"><span class=\"perg-ptable-name\">$fnombre</span>$fbadge</div>"
+                . "<div class=\"perg-ptable-rewards\">$frecs</div>"
+                . "</div>";
+        }
+        if ($filas_html === '') {
+            $filas_html = "<div class=\"perg-ptable-empty\">Sin premios configurados.</div>";
+        }
+        $premios_paneles_html .= "<div class=\"perg-ptable-data\" data-pid=\"$pid_esc\" style=\"display:none;\">$filas_html</div>";
+    }
+
     $pergaminos_html .= "<article class=\"perg-card\" data-pid=\"$pid_esc\">"
         . "<div class=\"perg-card__thumb\"><img src=\"$img\" alt=\"$nombre\" onerror=\"this.src='$default_img'\"></div>"
         . "<div class=\"perg-card__body\">"
         . "<h2 class=\"perg-card__name\">$nombre</h2>"
         . "<div class=\"perg-card__qty\">Tienes <strong>$cant</strong></div>"
-        . $desc_html
+        . $ver_premios_btn
         . $boton
         . "</div>"
         . "</article>";
@@ -228,6 +237,7 @@ if ($uid === $UID_REGALO_GLOBAL) {
 }
 
 eval('$pergHtml = $pergaminos_html;');
+eval('$pergPremiosPanelesHtml = $premios_paneles_html;');
 eval('$pergStatsMainHtml = $stats_main_html;');
 eval('$pergStatsPergHtml = $stats_perg_html;');
 eval('$pergStatsPersonalMainHtml = $stats_personal_main_html;');

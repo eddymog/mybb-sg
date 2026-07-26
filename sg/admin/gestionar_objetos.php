@@ -37,8 +37,10 @@ $efecto1        = addslashes($_POST["efecto1"]);
 $efecto2        = addslashes($_POST["efecto2"]);
 $efecto3        = addslashes($_POST["efecto3"]);
 $coste          = ($_POST["coste"] === '' || !isset($_POST["coste"])) ? 99999 : intval($_POST["coste"]);
+$coste_tobi     = ($_POST["coste_tobi"] === '' || !isset($_POST["coste_tobi"])) ? null : intval($_POST["coste_tobi"]);
 $cantidadMaxima = ($_POST["cantidadMaxima"] === '' || !isset($_POST["cantidadMaxima"])) ? 99 : intval($_POST["cantidadMaxima"]);
 $en_tienda      = intval($_POST["en_tienda"]);
+$en_tienda_tobis = intval($_POST["en_tienda_tobis"]);
 $visibilidad    = isset($_POST["visibilidad"]) ? intval($_POST["visibilidad"]) : 1;
 $staff          = trim($_POST["staff"]);
 $razon          = trim($_POST["razon"]);
@@ -49,6 +51,8 @@ $log = null;
 // ── Guardar (crear o modificar) ───────────────────────────────
 if ($accion_post == 'Guardar' && $objeto_id_post && $nombre && $tipo && $descripcion && $staff && $razon && $es_staff) {
     $lookup_id = $objeto_id_old !== '' ? $objeto_id_old : $objeto_id_post;
+
+    $coste_tobi_db = ($coste_tobi === null) ? 'NULL' : "'$coste_tobi'";
 
     $existe = null;
     $query_existe = $db->query("SELECT id FROM `mybb_sg_sg_objetos` WHERE objeto_id='$lookup_id'");
@@ -65,21 +69,22 @@ if ($accion_post == 'Guardar' && $objeto_id_post && $nombre && $tipo && $descrip
         $db->query("
             UPDATE `mybb_sg_sg_objetos` SET
                 `objeto_id`='$objeto_id_post', `nombre`='$nombre', `tipo`='$tipo', `municion`='$municion',
-                `tamano`='$tamano', `descripcion`='$descripcion', `coste`='$coste', `cantidadMaxima`='$cantidadMaxima',
-                `imagen`='$imagen', `efecto1`='$efecto1', `efecto2`='$efecto2', `efecto3`='$efecto3', `en_tienda`='$en_tienda',
+                `tamano`='$tamano', `descripcion`='$descripcion', `coste`='$coste', `coste_tobi`=$coste_tobi_db,
+                `cantidadMaxima`='$cantidadMaxima', `imagen`='$imagen', `efecto1`='$efecto1', `efecto2`='$efecto2',
+                `efecto3`='$efecto3', `en_tienda`='$en_tienda', `en_tienda_tobis`='$en_tienda_tobis',
                 `visibilidad`='$visibilidad'
             WHERE `objeto_id`='$lookup_id';
         ");
 
-        $log = "Modificar objeto ID $lookup_id -> $objeto_id_post ($nombre).\ntipo=$tipo,\nmunicion=$municion,\ntamano=$tamano,\ncoste=$coste,\ncantidadMaxima=$cantidadMaxima,\nen_tienda=$en_tienda,\nvisibilidad=$visibilidad,\nefecto1=$efecto1,\nefecto2=$efecto2,\nefecto3=$efecto3,\ndescripcion=$descripcion";
+        $log = "Modificar objeto ID $lookup_id -> $objeto_id_post ($nombre).\ntipo=$tipo,\nmunicion=$municion,\ntamano=$tamano,\ncoste=$coste,\ncoste_tobi=$coste_tobi,\ncantidadMaxima=$cantidadMaxima,\nen_tienda=$en_tienda,\nen_tienda_tobis=$en_tienda_tobis,\nvisibilidad=$visibilidad,\nefecto1=$efecto1,\nefecto2=$efecto2,\nefecto3=$efecto3,\ndescripcion=$descripcion";
     } else {
         // Crear
         $db->query("
-            INSERT INTO `mybb_sg_sg_objetos` (`objeto_id`, `nombre`, `tipo`, `municion`, `tamano`, `descripcion`, `coste`, `cantidadMaxima`, `imagen`, `efecto1`, `efecto2`, `efecto3`, `en_tienda`, `visibilidad`) VALUES
-            ('$objeto_id_post','$nombre','$tipo','$municion','$tamano','$descripcion','$coste','$cantidadMaxima','$imagen','$efecto1','$efecto2','$efecto3','$en_tienda','$visibilidad');
+            INSERT INTO `mybb_sg_sg_objetos` (`objeto_id`, `nombre`, `tipo`, `municion`, `tamano`, `descripcion`, `coste`, `coste_tobi`, `cantidadMaxima`, `imagen`, `efecto1`, `efecto2`, `efecto3`, `en_tienda`, `en_tienda_tobis`, `visibilidad`) VALUES
+            ('$objeto_id_post','$nombre','$tipo','$municion','$tamano','$descripcion','$coste',$coste_tobi_db,'$cantidadMaxima','$imagen','$efecto1','$efecto2','$efecto3','$en_tienda','$en_tienda_tobis','$visibilidad');
         ");
 
-        $log = "Nuevo objeto ID $objeto_id_post ($nombre).\ntipo=$tipo,\nmunicion=$municion,\ntamano=$tamano,\ncoste=$coste,\ncantidadMaxima=$cantidadMaxima,\nen_tienda=$en_tienda,\nvisibilidad=$visibilidad,\nefecto1=$efecto1,\nefecto2=$efecto2,\nefecto3=$efecto3,\ndescripcion=$descripcion";
+        $log = "Nuevo objeto ID $objeto_id_post ($nombre).\ntipo=$tipo,\nmunicion=$municion,\ntamano=$tamano,\ncoste=$coste,\ncoste_tobi=$coste_tobi,\ncantidadMaxima=$cantidadMaxima,\nen_tienda=$en_tienda,\nen_tienda_tobis=$en_tienda_tobis,\nvisibilidad=$visibilidad,\nefecto1=$efecto1,\nefecto2=$efecto2,\nefecto3=$efecto3,\ndescripcion=$descripcion";
     }
 }
 

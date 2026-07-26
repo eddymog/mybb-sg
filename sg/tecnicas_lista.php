@@ -24,15 +24,10 @@ $viewer_ficha = ($viewer_uid > 0) ? select_one_query_with_id('mybb_sg_sg_fichas'
 $viewer_stats_ef = $viewer_ficha ? sg_stats_efectivas($viewer_ficha) : null;
 eval('$sgViewerTieneFicha = '.($viewer_ficha ? '1' : '0').';');
 
-$query_clan = $db->query(" SELECT * FROM mybb_sg_sg_clanes WHERE nombreClan='$arbol' ");
 $query_tecnicas_base = $db->query(" SELECT * FROM mybb_sg_sg_tecnicas WHERE arbol='$arbol' AND rama='Base' ");
 $query_tecnicas_rama1 = $db->query(" SELECT * FROM mybb_sg_sg_tecnicas WHERE arbol='$arbol' AND rama='Rama 1' ");
 $query_tecnicas_rama2 = $db->query(" SELECT * FROM mybb_sg_sg_tecnicas WHERE arbol='$arbol' AND rama='Rama 2' ");
 $query_tecnicas_rama3 = $db->query(" SELECT * FROM mybb_sg_sg_tecnicas WHERE arbol='$arbol' AND rama='Rama 3' ");
-
-while ($clan = $db->fetch_array($query_clan)) {
-    eval('$clan_desc = "'.nl2br($clan['descripcion']).'";');
-}
 
 $tecs_base = array();
 $tecs_rama1 = array();

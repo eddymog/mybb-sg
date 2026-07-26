@@ -12,6 +12,7 @@ define('SG_ORIGEN_RECOMPENSA_MISION','recompensa_mision');
 define('SG_ORIGEN_APROBACION',       'aprobacion');
 define('SG_ORIGEN_TIENDA',           'tienda');
 define('SG_ORIGEN_TIENDA_RINS',      'tienda_rins');
+define('SG_ORIGEN_TIENDA_TOBIS',     'tienda_tobis');
 define('SG_ORIGEN_VENDER',           'vender');
 define('SG_ORIGEN_DOJO',             'dojo');
 define('SG_ORIGEN_FICHA_TECNICAS',   'ficha_tecnicas');
@@ -2130,6 +2131,24 @@ function sg_historial_objeto_log($uid, $objeto_id, $cantidad, $tipo, $origen, $d
     ");
 }
 
+// INSERT en historial_pasivas.
+function sg_historial_pasiva_log($uid, $pasiva_id, $accion, $tipo, $origen, $detalle = '', $grupo = null, $actor_uid = null) {
+    global $db;
+    $uid        = (int) $uid;
+    $actor      = sg_historial_actor($actor_uid);
+    $pas_db     = $db->escape_string($pasiva_id);
+    $accion_db  = ($accion === 'quitar') ? 'quitar' : 'comprar';
+    $tipo_db    = $db->escape_string($tipo);
+    $origen_db  = $db->escape_string($origen);
+    $grupo_db   = ($grupo   === null || $grupo   === '') ? 'NULL' : "'".$db->escape_string($grupo)."'";
+    $detalle_db = ($detalle === null || $detalle === '') ? 'NULL' : "'".$db->escape_string($detalle)."'";
+    $db->query("
+        INSERT INTO `mybb_sg_sg_historial_pasivas`
+        (`uid`, `actor_uid`, `grupo`, `pasiva_id`, `accion`, `tipo`, `origen`, `detalle`)
+        VALUES ('$uid', '$actor', $grupo_db, '$pas_db', '$accion_db', '$tipo_db', '$origen_db', $detalle_db)
+    ");
+}
+
 // ── Choke points públicos ───────────────────────────────────────────────────
 
 // Setea un campo escalar de mybb_sg_sg_fichas: lee el valor actual, si cambió
@@ -2180,6 +2199,64 @@ function sg_tecnica_quitar($uid, $tid, $tipo, $origen, $detalle = '', $grupo = n
     if ($db->affected_rows() > 0) {
         sg_historial_tecnica_log($uid, $tid, 'quitar', $tipo, $origen, $detalle, $grupo, $actor_uid);
     }
+}
+
+// Da una pasiva de Tobis a una ficha; hermana de sg_dojo_aprender. Única por
+// personaje (INSERT IGNORE sobre la UNIQUE KEY uid_pasiva) — si ya la tenía,
+// no hace nada y no loguea de nuevo.
+function sg_ficha_pasiva_dar($uid, $pasiva_id, $tipo, $origen, $detalle = '', $grupo = null, $actor_uid = null) {
+    global $db;
+    $uid = (int) $uid;
+    $pas_esc = $db->escape_string($pasiva_id);
+    $db->query("INSERT IGNORE INTO mybb_sg_sg_ficha_pasivas (uid, pasiva_id) VALUES ('$uid','$pas_esc')");
+    if ($db->affected_rows() > 0) {
+        sg_historial_pasiva_log($uid, $pasiva_id, 'comprar', $tipo, $origen, $detalle, $grupo, $actor_uid);
+    }
+}
+
+// Catálogo de pasivas de Tobis. $solo_visibles=true (uso público, tienda/ficha)
+// trae solo las publicadas en tienda; false trae todo (uso Staff en el panel
+// de edición). $incluir_inactivas permite que, dentro de las publicadas en
+// tienda, el Staff vea también las marcadas activo=0 (para que las revise en
+// la propia tienda, aunque no se puedan comprar — eso ya lo bloquea el
+// backend de tienda_tobis.php al validar la compra).
+function sg_pasivas_tobis_catalogo($solo_visibles = true, $incluir_inactivas = false) {
+    global $db;
+    $condiciones = array();
+    if ($solo_visibles) {
+        $condiciones[] = "en_tienda='1'";
+        if (!$incluir_inactivas) {
+            $condiciones[] = "activo='1'";
+        }
+    }
+    $filtro = $condiciones ? 'WHERE ' . implode(' AND ', $condiciones) : '';
+    $catalogo = array();
+    $q = $db->query("SELECT * FROM `mybb_sg_sg_pasivas_tobis` $filtro ORDER BY coste, nombre");
+    while ($r = $db->fetch_array($q)) {
+        $catalogo[$r['pasiva_id']] = $r;
+    }
+    return $catalogo;
+}
+
+// Pasivas de Tobis que ya tiene una ficha, con los datos del catálogo unidos
+// (nombre/descripcion/imagen). Si la pasiva fue borrada del
+// catálogo después de comprada, esos campos vuelven null (fallback al id crudo
+// lo resuelve quien renderiza, igual que con técnicas/objetos del historial).
+function sg_ficha_pasivas_compradas($uid) {
+    global $db;
+    $uid = (int) $uid;
+    $compradas = array();
+    $q = $db->query("
+        SELECT p.*, fp.tiempo AS tiempo_compra
+        FROM `mybb_sg_sg_ficha_pasivas` fp
+        LEFT JOIN `mybb_sg_sg_pasivas_tobis` p ON p.pasiva_id = fp.pasiva_id
+        WHERE fp.uid='$uid'
+        ORDER BY fp.tiempo DESC
+    ");
+    while ($r = $db->fetch_array($q)) {
+        $compradas[] = $r;
+    }
+    return $compradas;
 }
 
 // Resta $cantidad de un objeto del inventario (no baja de 0; borra la fila si
@@ -2296,6 +2373,65 @@ function sg_gacha_probabilidad_total($pergamino_id) {
 // 100% (tolerancia de 0.01 por redondeo de punto flotante / decimal(5,2)).
 function sg_gacha_probabilidad_lista($pergamino_id) {
     return abs(sg_gacha_probabilidad_total($pergamino_id) - 100) < 0.01;
+}
+
+// Texto legible de una recompensa individual (tabla de premios / historial).
+// $obj_nombres debe venir con claves en MAYÚSCULAS (ver sg_gacha_abrir_bajo_lock:
+// el objeto_id cargado en gacha_recompensas puede tener otro casing que el
+// objeto_id real de mybb_sg_sg_objetos, así que la clave se normaliza siempre).
+function sg_gacha_recompensa_texto($rec, $obj_nombres = array()) {
+    $cant = (int) $rec['cantidad'];
+    if ($rec['tipo'] === 'objeto') {
+        $key = strtoupper((string) $rec['objeto_id']);
+        $nombre = isset($obj_nombres[$key]) ? $obj_nombres[$key] : $rec['objeto_id'];
+        return ($cant > 1 ? $cant . '× ' : '') . $nombre;
+    }
+    $labels = array('ryos' => 'Ryos', 'rin' => 'Rin', 'madara' => 'Madara', 'tobi' => 'Tobi');
+    $label = isset($labels[$rec['tipo']]) ? $labels[$rec['tipo']] : $rec['tipo'];
+    return '+' . (int) $rec['valor'] . ' ' . $label;
+}
+
+// Tabla de premios (nombre, recompensas ya resueltas a texto, probabilidad)
+// de UN pergamino — para mostrarle al jugador qué puede ganar y con qué
+// probabilidad antes de abrir. Solo premios activos (los mismos que entran
+// al sorteo real de sg_gacha_abrir). Ordenada de mayor a menor probabilidad
+// (orden de lectura, no afecta al sorteo real: eso usa sg_gacha_premios()
+// directo, con su propio orden de acumulación).
+function sg_gacha_premios_tabla($pergamino_id) {
+    global $db;
+    $premios = sg_gacha_premios($pergamino_id);
+
+    $obj_ids = array();
+    foreach ($premios as $p) {
+        foreach ($p['recompensas'] as $r) {
+            if ($r['tipo'] === 'objeto' && $r['objeto_id'] !== null && $r['objeto_id'] !== '') {
+                $obj_ids[] = $r['objeto_id'];
+            }
+        }
+    }
+    $obj_nombres = array();
+    if (!empty($obj_ids)) {
+        $in = array();
+        foreach (array_unique($obj_ids) as $x) { $in[] = "'" . $db->escape_string($x) . "'"; }
+        $qn = $db->query("SELECT objeto_id, nombre FROM `mybb_sg_sg_objetos` WHERE objeto_id IN (" . implode(',', $in) . ")");
+        while ($rn = $db->fetch_array($qn)) { $obj_nombres[strtoupper($rn['objeto_id'])] = $rn['nombre']; }
+    }
+
+    $filas = array();
+    foreach ($premios as $p) {
+        $recs = array();
+        foreach ($p['recompensas'] as $r) {
+            $recs[] = sg_gacha_recompensa_texto($r, $obj_nombres);
+        }
+        $filas[] = array(
+            'nombre'       => $p['nombre'],
+            'es_jackpot'   => (bool) $p['es_jackpot'],
+            'probabilidad' => (float) $p['probabilidad'],
+            'recompensas'  => $recs,
+        );
+    }
+    usort($filas, function ($a, $b) { return $b['probabilidad'] <=> $a['probabilidad']; });
+    return $filas;
 }
 
 // Sorteo ponderado: elige un premio de la lista según su `probabilidad`.
@@ -2439,24 +2575,31 @@ function sg_gacha_abrir_bajo_lock($uid, $pergamino_id) {
     $db->query("COMMIT");
 
     // Resuelve nombres de objetos referenciados, para la respuesta al cliente.
+    // Clave normalizada en mayúsculas: el objeto_id cargado en
+    // mybb_sg_sg_gacha_recompensas puede tener otro casing que el objeto_id
+    // real de mybb_sg_sg_objetos (el WHERE ... IN de abajo igual encuentra la
+    // fila porque el collation de MySQL es case-insensitive, pero la clave de
+    // ESTE array en PHP no lo es, así que sin normalizar el isset() de más
+    // abajo fallaba y mostraba el ID crudo en vez del nombre).
     $obj_ids = array_keys($deltas_objeto);
     $obj_nombres = array();
     if (!empty($obj_ids)) {
         $in = array();
         foreach ($obj_ids as $x) { $in[] = "'" . $db->escape_string($x) . "'"; }
         $qn = $db->query("SELECT objeto_id, nombre FROM `mybb_sg_sg_objetos` WHERE objeto_id IN (" . implode(',', $in) . ")");
-        while ($rn = $db->fetch_array($qn)) { $obj_nombres[$rn['objeto_id']] = $rn['nombre']; }
+        while ($rn = $db->fetch_array($qn)) { $obj_nombres[strtoupper($rn['objeto_id'])] = $rn['nombre']; }
     }
 
     $premios_out = array();
     foreach ($ganados as $premio) {
         $recompensas_out = array();
         foreach ($premio['recompensas'] as $rec) {
+            $obj_key = strtoupper((string) $rec['objeto_id']);
             $recompensas_out[] = array(
                 'tipo'          => $rec['tipo'],
                 'valor'         => $rec['valor'] !== null ? (int) $rec['valor'] : null,
                 'objeto_id'     => $rec['objeto_id'],
-                'objeto_nombre' => isset($obj_nombres[$rec['objeto_id']]) ? $obj_nombres[$rec['objeto_id']] : $rec['objeto_id'],
+                'objeto_nombre' => isset($obj_nombres[$obj_key]) ? $obj_nombres[$obj_key] : $rec['objeto_id'],
                 'cantidad'      => (int) $rec['cantidad'],
             );
         }
@@ -2632,6 +2775,7 @@ function sg_origen_label($origen) {
         'aprobacion'        => 'Aprobación de ficha',
         'tienda'            => 'Tienda',
         'tienda_rins'       => 'Tienda de Rins',
+        'tienda_tobis'      => 'Tienda de Tobis',
         'vender'            => 'Venta',
         'dojo'              => 'Dojo',
         'ficha_tecnicas'    => 'Técnicas (Staff)',
@@ -2733,15 +2877,20 @@ function sg_historial_ficha_feed_html($uid, $max_eventos = 150) {
                      FROM `mybb_sg_sg_historial_objetos` WHERE uid='$uid' ORDER BY id DESC LIMIT 120");
     while ($r = $db->fetch_array($q)) { $r['dominio'] = 'objeto'; $rows[] = $r; }
 
+    $q = $db->query("SELECT grupo, pasiva_id, accion, tipo, origen, actor_uid, tiempo
+                     FROM `mybb_sg_sg_historial_pasivas` WHERE uid='$uid' ORDER BY id DESC LIMIT 120");
+    while ($r = $db->fetch_array($q)) { $r['dominio'] = 'pasiva'; $rows[] = $r; }
+
     if (empty($rows)) { return array('html' => '', 'count' => 0, 'origenes' => array()); }
 
-    // Resolver nombres de técnicas / objetos referenciados.
-    $tec_ids = array(); $obj_ids = array();
+    // Resolver nombres de técnicas / objetos / pasivas referenciados.
+    $tec_ids = array(); $obj_ids = array(); $pas_ids = array();
     foreach ($rows as $r) {
         if ($r['dominio'] === 'tecnica' && $r['tecnica_id'] !== '') { $tec_ids[$r['tecnica_id']] = true; }
         if ($r['dominio'] === 'objeto'  && $r['objeto_id']  !== '') { $obj_ids[$r['objeto_id']]  = true; }
+        if ($r['dominio'] === 'pasiva'  && $r['pasiva_id']  !== '') { $pas_ids[$r['pasiva_id']]  = true; }
     }
-    $tec_nombres = array(); $obj_nombres = array();
+    $tec_nombres = array(); $obj_nombres = array(); $pas_nombres = array();
     if (!empty($tec_ids)) {
         $in = array();
         foreach (array_keys($tec_ids) as $x) { $in[] = "'" . $db->escape_string($x) . "'"; }
@@ -2753,6 +2902,12 @@ function sg_historial_ficha_feed_html($uid, $max_eventos = 150) {
         foreach (array_keys($obj_ids) as $x) { $in[] = "'" . $db->escape_string($x) . "'"; }
         $q = $db->query("SELECT objeto_id, nombre FROM `mybb_sg_sg_objetos` WHERE objeto_id IN (" . implode(',', $in) . ")");
         while ($r = $db->fetch_array($q)) { $obj_nombres[$r['objeto_id']] = $r['nombre']; }
+    }
+    if (!empty($pas_ids)) {
+        $in = array();
+        foreach (array_keys($pas_ids) as $x) { $in[] = "'" . $db->escape_string($x) . "'"; }
+        $q = $db->query("SELECT pasiva_id, nombre FROM `mybb_sg_sg_pasivas_tobis` WHERE pasiva_id IN (" . implode(',', $in) . ")");
+        while ($r = $db->fetch_array($q)) { $pas_nombres[$r['pasiva_id']] = $r['nombre']; }
     }
 
     // Orden cronológico descendente (por tiempo; estable por id vía orden previo).
@@ -2822,6 +2977,14 @@ function sg_historial_ficha_feed_html($uid, $max_eventos = 150) {
                 $nom = htmlspecialchars($nom);
                 $es_quitar = ($r['accion'] === 'quitar');
                 $verbo = $es_quitar ? 'Quitó técnica' : 'Aprendió técnica';
+                $cls   = $es_quitar ? 'neg' : 'pos';
+                $cambios .= '<li class="fx-hist-change"><span class="fx-hist-change__k fx-hist-change__k--' . $cls . '">' . $verbo . '</span> '
+                          . '<span class="fx-hist-change__v">' . $nom . '</span></li>';
+            } else if ($r['dominio'] === 'pasiva') {
+                $nom = isset($pas_nombres[$r['pasiva_id']]) ? $pas_nombres[$r['pasiva_id']] : $r['pasiva_id'];
+                $nom = htmlspecialchars($nom);
+                $es_quitar = ($r['accion'] === 'quitar');
+                $verbo = $es_quitar ? 'Quitó pasiva' : 'Compró pasiva';
                 $cls   = $es_quitar ? 'neg' : 'pos';
                 $cambios .= '<li class="fx-hist-change"><span class="fx-hist-change__k fx-hist-change__k--' . $cls . '">' . $verbo . '</span> '
                           . '<span class="fx-hist-change__v">' . $nom . '</span></li>';

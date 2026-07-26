@@ -760,6 +760,21 @@ if ($ficha_existe == true && ($moderated == true || is_mod($s_uid) || is_staff($
     $sgInventarioCount = $inv_count;
     $sgInvChipsHtml = $inv_chips_html;
 
+    // ── Pasivas de Tobis (pestaña Pasivas) ─────────────────────────
+    $pas_html = '';
+    $pas_lista = sg_ficha_pasivas_compradas($uid);
+    foreach ($pas_lista as $pa) {
+        $pa_nombre = htmlspecialchars($pa['nombre'] !== null ? $pa['nombre'] : $pa['pasiva_id'], ENT_QUOTES);
+        $pa_desc   = trim((string) $pa['descripcion']) !== '' ? nl2br(htmlspecialchars($pa['descripcion'], ENT_QUOTES)) : '';
+
+        $pas_html .= "<article class=\"fx-pas-item\">"
+            . "<h4 class=\"fx-pas-name\">$pa_nombre</h4>"
+            . ($pa_desc !== '' ? "<p class=\"fx-pas-desc\">$pa_desc</p>" : '')
+            . "</article>";
+    }
+    $sgPasivasHtml = $pas_html;
+    $sgPasivasCount = count($pas_lista);
+
     eval("\$page = \"".$templates->get("sg_ficha")."\";");
     output_page($page);
 

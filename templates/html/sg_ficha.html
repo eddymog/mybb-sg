@@ -161,6 +161,7 @@
 
     #fx-dossier:checked ~ .fx-tabs .fx-tab[for="fx-dossier"],
     #fx-inventario:checked ~ .fx-tabs .fx-tab[for="fx-inventario"],
+    #fx-pasivas:checked ~ .fx-tabs .fx-tab[for="fx-pasivas"],
     #fx-tecnicas:checked ~ .fx-tabs .fx-tab[for="fx-tecnicas"],
     #fx-perfil:checked ~ .fx-tabs .fx-tab[for="fx-perfil"],
     #fx-stats:checked ~ .fx-tabs .fx-tab[for="fx-stats"],
@@ -171,6 +172,7 @@
     }
     #fx-dossier:checked ~ .fx-tabs .fx-tab[for="fx-dossier"] .fx-tab__gem,
     #fx-inventario:checked ~ .fx-tabs .fx-tab[for="fx-inventario"] .fx-tab__gem,
+    #fx-pasivas:checked ~ .fx-tabs .fx-tab[for="fx-pasivas"] .fx-tab__gem,
     #fx-tecnicas:checked ~ .fx-tabs .fx-tab[for="fx-tecnicas"] .fx-tab__gem,
     #fx-perfil:checked ~ .fx-tabs .fx-tab[for="fx-perfil"] .fx-tab__gem,
     #fx-stats:checked ~ .fx-tabs .fx-tab[for="fx-stats"] .fx-tab__gem,
@@ -179,6 +181,7 @@
     .fx-radio:focus-visible ~ .fx-tabs .fx-tab { outline: none; }
     #fx-dossier:focus-visible ~ .fx-tabs .fx-tab[for="fx-dossier"],
     #fx-inventario:focus-visible ~ .fx-tabs .fx-tab[for="fx-inventario"],
+    #fx-pasivas:focus-visible ~ .fx-tabs .fx-tab[for="fx-pasivas"],
     #fx-tecnicas:focus-visible ~ .fx-tabs .fx-tab[for="fx-tecnicas"],
     #fx-perfil:focus-visible ~ .fx-tabs .fx-tab[for="fx-perfil"],
     #fx-stats:focus-visible ~ .fx-tabs .fx-tab[for="fx-stats"],
@@ -207,6 +210,7 @@
     .fx-panel { display: none; position: relative; }
     #fx-dossier:checked ~ .fx-panels .fx-panel--dossier,
     #fx-inventario:checked ~ .fx-panels .fx-panel--inventario,
+    #fx-pasivas:checked ~ .fx-panels .fx-panel--pasivas,
     #fx-tecnicas:checked ~ .fx-panels .fx-panel--tecnicas,
     #fx-perfil:checked ~ .fx-panels .fx-panel--perfil,
     #fx-stats:checked ~ .fx-panels .fx-panel--stats,
@@ -216,6 +220,7 @@
     @media (prefers-reduced-motion: reduce) {
       #fx-dossier:checked ~ .fx-panels .fx-panel--dossier,
       #fx-inventario:checked ~ .fx-panels .fx-panel--inventario,
+      #fx-pasivas:checked ~ .fx-panels .fx-panel--pasivas,
       #fx-tecnicas:checked ~ .fx-panels .fx-panel--tecnicas,
       #fx-perfil:checked ~ .fx-panels .fx-panel--perfil,
       #fx-stats:checked ~ .fx-panels .fx-panel--stats,
@@ -232,6 +237,7 @@
     .fx-panel--tecnicas::before { content: '術'; }
     .fx-panel--perfil::before  { content: '魂'; }
     .fx-panel--inventario::before { content: '蔵'; }
+    .fx-panel--pasivas::before { content: '能'; }
     .fx-panel--stats::before { content: '暦'; }
     .fx-panel--historial::before { content: '録'; }
 
@@ -244,8 +250,9 @@
     .fx-panel--perfil::after   { content: 'Folio ii'; }
     .fx-panel--tecnicas::after { content: 'Folio iii'; }
     .fx-panel--inventario::after { content: 'Folio iv'; }
-    .fx-panel--stats::after { content: 'Folio v'; }
-    .fx-panel--historial::after { content: 'Folio vi'; }
+    .fx-panel--pasivas::after { content: 'Folio v'; }
+    .fx-panel--stats::after { content: 'Folio vi'; }
+    .fx-panel--historial::after { content: 'Folio vii'; }
 
     .fx-layout { position: relative; z-index: 1; display: grid; grid-template-columns: 260px 1fr; gap: 26px; align-items: start; }
     @media (max-width: 760px){ .fx-layout { grid-template-columns: 1fr; } }
@@ -533,6 +540,12 @@
     .fx-vt-badge--excl { color: #d9b35c; border-color: rgba(217, 179, 92, 0.5); background: rgba(217, 179, 92, 0.14); }
     .fx-vt-desc { margin: 0; color: var(--stone); font-size: 13.5px; line-height: 1.55; }
     .fx-vt-empty { padding: 14px; text-align: center; color: var(--mist); font-size: 13.5px; border: 0.5px dashed var(--border); }
+
+    /* Pasivas de Tobis */
+    .fx-pas-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 12px; }
+    .fx-pas-item { border: 0.5px solid var(--border); background: var(--card2); padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; }
+    .fx-pas-name { margin: 0; font-family: 'Cinzel', serif; font-size: 13px; font-weight: 700; color: var(--ink); line-height: 1.3; }
+    .fx-pas-desc { margin: 0; color: var(--stone); font-size: 13px; line-height: 1.55; }
 
     /* Notas de staff */
     .fx-notes textarea {
@@ -898,6 +911,7 @@
       <!-- ═══ PESTAÑAS ═══ -->
       <input class="fx-radio" type="radio" name="fxtab" id="fx-dossier" checked>
       <input class="fx-radio" type="radio" name="fxtab" id="fx-inventario">
+      <input class="fx-radio" type="radio" name="fxtab" id="fx-pasivas">
       <input class="fx-radio" type="radio" name="fxtab" id="fx-tecnicas">
       <input class="fx-radio" type="radio" name="fxtab" id="fx-perfil">
       <input class="fx-radio" type="radio" name="fxtab" id="fx-stats">
@@ -908,6 +922,7 @@
         <label class="fx-tab" for="fx-perfil"><span class="fx-tab__gem"></span>Trasfondo</label>
         <label class="fx-tab" for="fx-tecnicas"><span class="fx-tab__gem"></span>Técnicas</label>
         <label class="fx-tab" for="fx-inventario"><span class="fx-tab__gem"></span>Inventario</label>
+        <label class="fx-tab" for="fx-pasivas"><span class="fx-tab__gem"></span>Pasivas</label>
         <label class="fx-tab" for="fx-stats"><span class="fx-tab__gem"></span>Estadísticas</label>
         <label class="fx-tab" for="fx-historial"><span class="fx-tab__gem"></span>Historial</label>
       </nav>
@@ -1113,6 +1128,19 @@
               <div class="fx-inv-empty__k" aria-hidden="true">蔵</div>
               <div class="fx-inv-empty__t">Inventario</div>
               <p class="fx-inv-empty__p">Este personaje no tiene objetos en su inventario.</p>
+            </div>
+          </if>
+        </section>
+
+        <!-- ── PASIVAS (Tienda de Tobis) ── -->
+        <section class="fx-panel fx-panel--pasivas" role="tabpanel">
+          <if $sgPasivasCount != 0 then>
+            <div class="fx-pas-grid">{$sgPasivasHtml}</div>
+          <else>
+            <div class="fx-inv-empty">
+              <div class="fx-inv-empty__k" aria-hidden="true">能</div>
+              <div class="fx-inv-empty__t">Pasivas</div>
+              <p class="fx-inv-empty__p">Este personaje todavía no adquirió ninguna pasiva en la Tienda de Tobis.</p>
             </div>
           </if>
         </section>
