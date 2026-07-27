@@ -252,6 +252,13 @@
               </select>
             </div>
             <div class="sg-field">
+              <label class="sg-label" for="en_gacha">En gacha de Pergaminos</label>
+              <select class="sg-select" name="en_gacha" id="en_gacha">
+                <option value="1" <if $objeto['en_gacha'] == 1 then>selected</if>>Sí</option>
+                <option value="0" <if $objeto['en_gacha'] != 1 then>selected</if>>No</option>
+              </select>
+            </div>
+            <div class="sg-field">
               <label class="sg-label" for="visibilidad">Visibilidad</label>
               <select class="sg-select" name="visibilidad" id="visibilidad">
                 <option value="1" <if $objeto['visibilidad'] != 0 then>selected</if>>Visible</option>

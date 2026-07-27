@@ -21,15 +21,16 @@ require_once "./functions/sg_functions.php";
 $uid = intval($mybb->user['uid']);
 $default_img = '/images/sg/objeto_default.png';
 
-// Único uid habilitado para el botón de regalo global (ver instrucciones del
-// usuario: "un staff, usuario de uid 10" — literal, no el grupo de Staff en
-// general). Se procesa ANTES del gate de ficha para que funcione aunque esa
-// cuenta puntual no tenga una ficha activa.
-$UID_REGALO_GLOBAL = 10;
+// Grupo habilitado para el botón de regalo global (GID 24, ya sea como
+// usergroup principal o dentro de additionalgroups). Se procesa ANTES del
+// gate de ficha para que funcione aunque esa cuenta puntual no tenga una
+// ficha activa.
+$GID_REGALO_GLOBAL = 24;
+$puede_regalar_global = sg_usuario_en_grupo($uid, $GID_REGALO_GLOBAL);
 $regalo_msg = '';
 $regalo_ok = false;
 
-if ($uid === $UID_REGALO_GLOBAL && isset($_POST['accion_regalo']) && $_POST['accion_regalo'] === 'regalar_global') {
+if ($puede_regalar_global && isset($_POST['accion_regalo']) && $_POST['accion_regalo'] === 'regalar_global') {
     $pergamino_regalo = trim($_POST['pergamino_regalo']);
     $staff_regalo = trim($_POST['staff_regalo']);
     $razon_regalo = trim($_POST['razon_regalo']);
@@ -57,11 +58,15 @@ if (!does_ficha_exist($uid)) {
     exit;
 }
 
-// Se muestran los 7 pergaminos SIEMPRE (aunque el usuario tenga 0), no solo
-// los que están en su inventario.
+// Se muestran los pergaminos SIEMPRE (aunque el usuario tenga 0), no solo
+// los que están en su inventario. La lista ahora es dinámica (en_gacha=1) y
+// puede venir vacía si Staff todavía no marcó ninguno; se agrega un sentinel
+// que no matchea ningún objeto_id real para que el IN(...) siga siendo SQL
+// válido en vez de romper con una lista vacía.
 $perg_ids = sg_gacha_pergamino_ids();
 $in = array();
 foreach ($perg_ids as $pid) { $in[] = "'" . $db->escape_string($pid) . "'"; }
+if (empty($in)) { $in[] = "''"; }
 
 $inv = array();
 $qinv = $db->query("SELECT objeto_id, cantidad FROM `mybb_sg_sg_inventario` WHERE uid='$uid' AND objeto_id IN (" . implode(',', $in) . ") AND cantidad > 0");
@@ -206,9 +211,9 @@ $hist_personal_html = '';
 foreach ($hist_personal as $row) { $hist_personal_html .= sg_perg_fila_historial_html($row, false); }
 if (empty($hist_personal_html)) { $hist_personal_html = '<div class="perg-hist-empty">Todavía no has abierto ningún pergamino.</div>'; }
 
-// ── Botón de regalo global (solo uid 10) ─────────────────────────
+// ── Botón de regalo global (solo grupo GID 24) ────────────────────
 $regalo_html = '';
-if ($uid === $UID_REGALO_GLOBAL) {
+if ($puede_regalar_global) {
     $regalo_opts = '';
     foreach ($perg_ids as $pid) {
         $rango = sg_gacha_pergamino_rango($pid);

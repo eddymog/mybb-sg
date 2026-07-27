@@ -28,10 +28,13 @@ $es_staff = (is_mod($uid) || is_staff($uid));
 $TIPOS_MONEDA = array('ryos', 'rin', 'madara', 'tobi');
 $JACKPOT_TIRADAS_FIJO = 5;
 
+// $pergamino_ids ahora es dinámica (objetos tipo='Pergamino' con en_gacha=1)
+// en vez de un array fijo: puede venir vacía si Staff todavía no marcó
+// ninguno, así que los fallbacks a $pergamino_ids[0] deben cubrir ese caso.
 $pergamino_ids = sg_gacha_pergamino_ids();
 $pergamino_id_input = trim($mybb->get_input('pergamino_id'));
 if (!in_array($pergamino_id_input, $pergamino_ids, true)) {
-    $pergamino_id_input = $pergamino_ids[0];
+    $pergamino_id_input = !empty($pergamino_ids) ? $pergamino_ids[0] : '';
 }
 $premio_id_input = intval($mybb->get_input('premio_id'));
 
@@ -39,7 +42,7 @@ $premio_id_input = intval($mybb->get_input('premio_id'));
 $accion_post    = $_POST["accion"];
 $pergamino_post = trim($_POST["pergamino_id"]);
 if (!in_array($pergamino_post, $pergamino_ids, true)) {
-    $pergamino_post = $pergamino_ids[0];
+    $pergamino_post = !empty($pergamino_ids) ? $pergamino_ids[0] : '';
 }
 $reload_js = "<script>window.location.href = window.location.pathname + '?pergamino_id=' + encodeURIComponent(" . json_encode($pergamino_post) . ");</script>";
 $log = null;
@@ -169,7 +172,7 @@ if ($log !== null && $es_staff) {
 }
 
 if (!in_array($pergamino_id_input, $pergamino_ids, true)) {
-    $pergamino_id_input = $pergamino_ids[0];
+    $pergamino_id_input = !empty($pergamino_ids) ? $pergamino_ids[0] : '';
 }
 
 // ── Premio normal a editar (vía GET) — el Jackpot no pasa por acá,
@@ -213,7 +216,9 @@ foreach ($premios_lista as $p) {
 
 $labels_moneda = array('ryos' => 'Ryos', 'rin' => 'Rin', 'madara' => 'Madara', 'tobi' => 'Tobi');
 $premios_html = '';
-if (empty($premios_lista)) {
+if (empty($pergamino_ids)) {
+    $premios_html = '<div class="sg-gacha-empty">Ningún objeto está marcado "En gacha de Pergaminos" todavía. Marcá uno (tipo Pergamino) desde Gestionar objetos.</div>';
+} else if (empty($premios_lista)) {
     $premios_html = '<div class="sg-gacha-empty">Este pergamino todavía no tiene premios configurados.</div>';
 } else {
     foreach ($premios_lista as $p) {
@@ -250,9 +255,13 @@ if (empty($premios_lista)) {
 }
 
 $pergamino_opts = '';
-foreach ($pergamino_ids as $pid) {
-    $sel = ($pid === $pergamino_id_input) ? ' selected' : '';
-    $pergamino_opts .= "<option value=\"$pid\"$sel>$pid</option>";
+if (empty($pergamino_ids)) {
+    $pergamino_opts = '<option value="">— Ningún pergamino en gacha —</option>';
+} else {
+    foreach ($pergamino_ids as $pid) {
+        $sel = ($pid === $pergamino_id_input) ? ' selected' : '';
+        $pergamino_opts .= "<option value=\"$pid\"$sel>$pid</option>";
+    }
 }
 
 eval('$pergaminoOpts = $pergamino_opts;');

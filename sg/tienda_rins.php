@@ -200,7 +200,6 @@ foreach ($precios_rin as $oid_raw => $precio) {
     $oid       = htmlspecialchars($oid_raw, ENT_QUOTES);
     $nombre    = htmlspecialchars($o['nombre'], ENT_QUOTES);
     $tamano    = htmlspecialchars($o['tamano'], ENT_QUOTES);
-    $desc      = nl2br(htmlspecialchars($o['descripcion'], ENT_QUOTES));
     $efecto    = nl2br(htmlspecialchars($o['efecto'], ENT_QUOTES));
     $maxq      = intval($o['cantidadMaxima']);
     $img       = trim($o['imagen']) !== '' ? htmlspecialchars($o['imagen'], ENT_QUOTES) : $default_img;
@@ -230,7 +229,6 @@ foreach ($precios_rin as $oid_raw => $precio) {
         $badges .= "<span class=\"sg-item-badge sg-item-badge--soft\">$tamano</span>";
     }
 
-    $desc_html   = trim($o['descripcion']) !== '' ? "<p class=\"sg-item-desc\">$desc</p>" : '';
     $efecto_html = trim($o['efecto']) !== '' ? "<div class=\"sg-item-effect\"><span class=\"sg-item-eff-label\">Efecto</span> $efecto</div>" : '';
 
     $pergaminos_html .= "<article class=\"sg-item\" data-name=\"$data_name\" data-tipo=\"pergamino\">"
@@ -241,7 +239,6 @@ foreach ($precios_rin as $oid_raw => $precio) {
         . "<div class=\"sg-item-body\">"
         . "<h3 class=\"sg-item-name\">$nombre</h3>"
         . "<div class=\"sg-item-badges\">$badges</div>"
-        . $desc_html
         . $efecto_html
         . "<div class=\"sg-item-meta\">Tienes <strong>$actual</strong> / $maxq</div>"
         . $buy

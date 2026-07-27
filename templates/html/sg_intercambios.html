@@ -1,0 +1,380 @@
+<html>
+
+<head>
+  <title>Intercambios</title>
+  {$headerinclude}
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Noto+Serif+JP:wght@300;400;700&display=swap" rel="stylesheet">
+  <style>
+    .ic-page {
+      --bg: #0f0c18; --bg2: #130f1e; --bg3: #171224;
+      --border: rgba(156, 107, 204, 0.12);
+      --border-strong: rgba(156, 107, 204, 0.22);
+      --ink: #e8dff8; --plum: #7b4ab8; --plum2: #9c6bcc; --plum3: #b890e0;
+      --stone: #8a7a9a; --mist: #5a4a6a; --oxide: #c0582a; --lavender: #ede0fa;
+      --gold: #c09840; --green: #4f9d69;
+      max-width: 1100px;
+      margin: 24px auto 44px;
+      padding: 0 16px;
+      color: var(--ink);
+      font-family: 'Noto Serif JP', serif;
+    }
+
+    .ic-shell {
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), transparent 16%), var(--bg2);
+      border: 0.5px solid var(--border);
+      overflow: hidden;
+    }
+
+    .ic-header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 12px 16px;
+      padding: 20px 24px;
+      background: var(--bg3);
+      border-bottom: 0.5px solid var(--border);
+    }
+    .ic-titles { display: flex; align-items: center; gap: 12px; margin-right: auto; }
+    .ic-titles::before { content: ''; width: 3px; height: 26px; background: var(--oxide); flex-shrink: 0; }
+    .ic-eyebrow {
+      font-family: 'Cinzel', serif;
+      font-size: 8px; font-weight: 700; letter-spacing: 2px;
+      text-transform: uppercase; color: var(--plum3);
+    }
+    .ic-title {
+      margin: 2px 0 0;
+      font-family: 'Cinzel', serif;
+      font-size: 18px; font-weight: 900; letter-spacing: 1px;
+      text-transform: uppercase; color: var(--ink); line-height: 1;
+    }
+    .ic-balance {
+      display: inline-flex; align-items: baseline; gap: 7px;
+      padding: 8px 14px; border: 0.5px solid var(--border-strong); background: var(--bg);
+    }
+    .ic-balance-label {
+      font-family: 'Cinzel', serif; font-size: 8px; font-weight: 700; letter-spacing: 1.5px;
+      text-transform: uppercase; color: var(--mist);
+    }
+    .ic-balance-value { font-family: 'Cinzel', serif; font-size: 14px; font-weight: 700; color: var(--gold); }
+
+    .ic-intro {
+      margin: 0; padding: 13px 24px;
+      background: var(--bg2); border-bottom: 0.5px solid var(--border);
+      color: var(--stone); font-size: 13px; line-height: 1.6;
+    }
+    .ic-intro strong { color: var(--plum3); font-weight: 700; }
+
+    .ic-body { padding: 22px 24px; }
+
+    .ic-msg {
+      margin-bottom: 18px; padding: 12px 14px;
+      border: 0.5px solid var(--border-strong); border-left-width: 2px;
+      font-size: 14px; line-height: 1.6; color: var(--ink);
+    }
+    .ic-msg--ok { border-left-color: var(--green); background: rgba(79, 157, 105, 0.12); }
+    .ic-msg--error { border-left-color: var(--oxide); background: rgba(192, 88, 42, 0.12); }
+
+    .ic-section-label {
+      margin: 26px 0 12px;
+      font-family: 'Cinzel', serif;
+      font-size: 11px; font-weight: 700; letter-spacing: 2px;
+      text-transform: uppercase; color: var(--plum3);
+      display: flex; align-items: center; gap: 10px;
+    }
+    .ic-section-label:first-child { margin-top: 0; }
+    .ic-section-label::after { content: ''; flex: 1; height: 0.5px; background: var(--border); }
+
+    /* Formulario */
+    .ic-fields { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    @media (max-width: 640px) { .ic-fields { grid-template-columns: 1fr; } }
+    .ic-field { display: flex; flex-direction: column; gap: 5px; }
+    .ic-field-label {
+      font-family: 'Cinzel', serif; font-size: 8px; font-weight: 700; letter-spacing: 1.5px;
+      text-transform: uppercase; color: var(--mist);
+    }
+    .ic-input {
+      height: 40px; padding: 0 12px;
+      background: var(--bg); border: 0.5px solid var(--border-strong);
+      color: var(--ink); font-family: 'Noto Serif JP', serif; font-size: 14px;
+      box-sizing: border-box;
+    }
+    .ic-input:focus { outline: none; border-color: var(--plum3); }
+    .ic-field-hint { font-size: 11px; color: var(--mist); line-height: 1.4; }
+
+    .ic-inv-toolbar { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+    .ic-inv-search { flex: 1; min-width: 0; }
+    .ic-inv-count {
+      font-family: 'Cinzel', serif; font-size: 9px; font-weight: 700; letter-spacing: 1px;
+      text-transform: uppercase; color: var(--mist); white-space: nowrap;
+    }
+    .ic-inv-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+    .ic-chip {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 5px 11px; background: var(--bg); border: 0.5px solid var(--border-strong);
+      color: var(--stone); font-family: 'Cinzel', serif; font-size: 8.5px; font-weight: 700;
+      letter-spacing: 1px; text-transform: uppercase; cursor: pointer; transition: all 0.15s;
+    }
+    .ic-chip:hover { color: var(--ink); border-color: var(--plum3); }
+    .ic-chip.is-active { background: var(--plum); border-color: var(--plum); color: var(--lavender); }
+    .ic-chip-n { font-size: 8px; opacity: 0.7; font-variant-numeric: tabular-nums; }
+    .ic-inv-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px;
+      margin-top: 4px;
+    }
+    .ic-inv-noresults { display: none; padding: 22px; text-align: center; color: var(--mist); font-size: 13px; }
+    .ic-inv-pager {
+      display: none; align-items: center; justify-content: center; gap: 14px; margin-top: 14px;
+    }
+    .ic-pager-btn {
+      height: 32px; padding: 0 14px; background: var(--bg); border: 0.5px solid var(--border-strong);
+      color: var(--plum3); font-family: 'Cinzel', serif; font-size: 9px; font-weight: 700;
+      letter-spacing: 1px; text-transform: uppercase; cursor: pointer; transition: background 0.15s;
+    }
+    .ic-pager-btn:hover:not(:disabled) { background: rgba(156, 107, 204, 0.1); }
+    .ic-pager-btn:disabled { opacity: 0.4; cursor: default; }
+    .ic-pager-info {
+      font-family: 'Cinzel', serif; font-size: 10px; font-weight: 700; letter-spacing: 1px;
+      color: var(--stone); font-variant-numeric: tabular-nums;
+    }
+    .ic-item {
+      display: flex; gap: 10px; padding: 10px;
+      background: var(--bg); border: 0.5px solid var(--border); cursor: default;
+    }
+    .ic-item-thumb {
+      width: 54px; height: 54px; flex-shrink: 0; background: var(--bg3);
+      border: 0.5px solid var(--border); display: flex; align-items: center; justify-content: center; overflow: hidden;
+    }
+    .ic-item-thumb img { max-width: 100%; max-height: 100%; object-fit: contain; }
+    .ic-item-body { display: flex; flex-direction: column; gap: 5px; min-width: 0; flex: 1; }
+    .ic-item-name { font-family: 'Cinzel', serif; font-size: 12px; font-weight: 700; color: var(--ink); line-height: 1.25; }
+    .ic-item-badges { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+    .ic-item-badge {
+      padding: 1px 7px; border: 0.5px solid var(--border-strong); color: var(--plum3);
+      font-family: 'Cinzel', serif; font-size: 7.5px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
+    }
+    .ic-item-have { font-size: 10px; color: var(--mist); }
+    .ic-item-qty { display: flex; align-items: center; gap: 8px; margin-top: auto; }
+    .ic-item-qty-label {
+      font-family: 'Cinzel', serif; font-size: 8px; font-weight: 700; letter-spacing: 1px;
+      text-transform: uppercase; color: var(--mist);
+    }
+    .ic-qty {
+      width: 64px; height: 32px; padding: 4px 8px;
+      background: var(--bg2); border: 0.5px solid var(--border-strong);
+      color: var(--ink); font-family: 'Noto Serif JP', serif; font-size: 13px; text-align: center; box-sizing: border-box;
+    }
+    .ic-qty:focus { outline: none; border-color: var(--plum3); }
+
+    .ic-empty {
+      padding: 22px; text-align: center; color: var(--mist); font-size: 13px;
+      border: 0.5px dashed var(--border-strong); background: var(--bg);
+    }
+
+    .ic-submit-row { margin-top: 18px; display: flex; justify-content: flex-end; }
+    .ic-btn {
+      height: 42px; padding: 0 28px; background: var(--plum); border: none;
+      color: var(--lavender); font-family: 'Cinzel', serif; font-size: 10px; font-weight: 700;
+      letter-spacing: 1.6px; text-transform: uppercase; cursor: pointer; transition: background 0.15s;
+    }
+    .ic-btn:hover { background: var(--plum2); }
+
+    /* Registros */
+    .ic-hist-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+    @media (max-width: 760px) { .ic-hist-wrap { grid-template-columns: 1fr; } }
+    .ic-hist-list {
+      max-height: 420px; overflow-y: auto;
+      background: var(--bg); border: 0.5px solid var(--border);
+    }
+    .ic-hist-list::-webkit-scrollbar { width: 8px; }
+    .ic-hist-list::-webkit-scrollbar-thumb { background: rgba(156, 107, 204, 0.25); }
+    .ic-hist-empty { padding: 18px; text-align: center; color: var(--mist); font-size: 12.5px; }
+    .ic-hist-row {
+      display: flex; flex-wrap: wrap; align-items: center; gap: 8px;
+      padding: 10px 12px; border-bottom: 0.5px solid var(--border); font-size: 12px;
+    }
+    .ic-hist-row:last-child { border-bottom: none; }
+    .ic-hist-date { color: var(--mist); font-variant-numeric: tabular-nums; flex-shrink: 0; }
+    .ic-hist-dir {
+      padding: 1px 7px; font-family: 'Cinzel', serif; font-size: 7.5px; font-weight: 700;
+      letter-spacing: 1px; text-transform: uppercase; border: 0.5px solid var(--border-strong);
+    }
+    .ic-hist-dir--out { color: var(--oxide); border-color: rgba(192, 88, 42, 0.5); }
+    .ic-hist-dir--in { color: var(--green); border-color: rgba(79, 157, 105, 0.5); }
+    .ic-hist-people { color: var(--stone); }
+    .ic-hist-ficha { color: var(--plum3); font-family: 'Cinzel', serif; font-weight: 700; text-decoration: none; }
+    .ic-hist-ficha:hover { color: var(--plum2); text-decoration: underline; }
+    .ic-hist-content { color: var(--ink); margin-left: auto; text-align: right; }
+    .ic-hist-link { color: var(--plum3); }
+    .ic-hist-nada { color: var(--mist); }
+  </style>
+</head>
+
+<body>
+  {$header}
+  <main class="ic-page">
+    <div class="ic-shell">
+      <div class="ic-header">
+        <div class="ic-titles">
+          <div>
+            <div class="ic-eyebrow">Rol</div>
+            <h1 class="ic-title">Intercambios</h1>
+          </div>
+        </div>
+        <span class="ic-balance"><span class="ic-balance-label">Ryos</span><span class="ic-balance-value">{$ryos_label}</span></span>
+      </div>
+
+      <p class="ic-intro">Envía <strong>ryos y/o objetos</strong> a otro personaje. Requisitos: indicar un <strong>tema (TID)</strong> de rol donde ambos hayan posteado, y que el destinatario sea de tu <strong>misma aldea</strong>. Cada envío queda en el Historial de ambas fichas y en el registro de abajo. No se puede deshacer.</p>
+
+      <div class="ic-body">
+        <if $msg_ok != '' then><div class="ic-msg ic-msg--ok">{$msg_ok}</div></if>
+        <if $msg_error != '' then><div class="ic-msg ic-msg--error">{$msg_error}</div></if>
+
+        <form method="post" action="/sg/intercambios.php" id="ic-form" onsubmit="return icConfirmar();">
+          <input type="hidden" name="accion" value="enviar">
+
+          <div class="ic-section-label">Nuevo envío</div>
+          <div class="ic-fields">
+            <div class="ic-field">
+              <label class="ic-field-label" for="ic-dest">Destinatario (usuario o UID)</label>
+              <input class="ic-input" type="text" id="ic-dest" name="destinatario" placeholder="Nombre de usuario o UID" required>
+            </div>
+            <div class="ic-field">
+              <label class="ic-field-label" for="ic-tid">Tema (TID)</label>
+              <input class="ic-input" type="text" id="ic-tid" name="tid" placeholder="Nº de tema o URL" required>
+              <span class="ic-field-hint">Un tema de rol donde ambos hayan posteado.</span>
+            </div>
+            <div class="ic-field">
+              <label class="ic-field-label" for="ic-ryos">Ryos a enviar</label>
+              <input class="ic-input" type="number" id="ic-ryos" name="ryos" min="0" value="0">
+            </div>
+          </div>
+
+          <div class="ic-section-label">Objetos a enviar</div>
+          <div class="ic-inv-toolbar">
+            <input class="ic-input ic-inv-search" type="text" id="ic-inv-search" placeholder="Buscar objeto o tipo…" oninput="icInvFilter()" autocomplete="off">
+            <span class="ic-inv-count" id="ic-inv-count"></span>
+          </div>
+          <div class="ic-inv-chips" id="ic-inv-chips">{$icInvChipsHtml}</div>
+          <div class="ic-inv-grid" id="ic-inv-grid">
+            {$icInventarioHtml}
+          </div>
+          <div class="ic-inv-noresults" id="ic-inv-noresults">Ningún objeto coincide con la búsqueda.</div>
+          <div class="ic-inv-pager" id="ic-inv-pager">
+            <button class="ic-pager-btn" type="button" id="ic-inv-prev" onclick="icInvGo(-1)">‹ Anterior</button>
+            <span class="ic-pager-info" id="ic-inv-pageinfo"></span>
+            <button class="ic-pager-btn" type="button" id="ic-inv-next" onclick="icInvGo(1)">Siguiente ›</button>
+          </div>
+
+          <div class="ic-submit-row">
+            <button class="ic-btn" type="submit">Enviar</button>
+          </div>
+        </form>
+
+        <div class="ic-section-label">Registros</div>
+        <div class="ic-hist-wrap">
+          <div>
+            <div class="ic-field-label" style="margin-bottom:8px;">Mis intercambios</div>
+            <div class="ic-hist-list">{$icHistPersonalHtml}</div>
+          </div>
+          <div>
+            <div class="ic-field-label" style="margin-bottom:8px;">Intercambios globales</div>
+            <div class="ic-hist-list">{$icHistGlobalHtml}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+  {$footer}
+
+  <script>
+    function icImgFallback(img) {
+      if (!img.dataset.fallback) { img.dataset.fallback = '1'; img.src = '/images/sg/objeto_default.png'; }
+      else { img.style.display = 'none'; }
+    }
+
+    // ── Filtro + paginación de "Objetos a enviar" (solo muestra/oculta; los
+    // inputs de cantidad de páginas no visibles siguen en el DOM y se envían).
+    var IC_PER_PAGE = 12;
+    var icInvPage = 1;
+    var icInvTipo = ''; // '' = todos
+
+    function icInvMatches() {
+      var q = (document.getElementById('ic-inv-search').value || '').trim().toLowerCase();
+      var items = Array.prototype.slice.call(document.querySelectorAll('#ic-inv-grid .ic-item'));
+      return items.filter(function (el) {
+        var okSearch = q === '' || (el.getAttribute('data-search') || '').indexOf(q) !== -1;
+        var okTipo = icInvTipo === '' || (el.getAttribute('data-tipo') || '') === icInvTipo;
+        return okSearch && okTipo;
+      });
+    }
+
+    function icInvSetTipo(btn) {
+      icInvTipo = btn.getAttribute('data-tipo') || '';
+      document.querySelectorAll('#ic-inv-chips .ic-chip').forEach(function (c) { c.classList.remove('is-active'); });
+      btn.classList.add('is-active');
+      icInvPage = 1;
+      icInvRender();
+    }
+
+    function icInvRender() {
+      var all = Array.prototype.slice.call(document.querySelectorAll('#ic-inv-grid .ic-item'));
+      if (!all.length) { return; } // inventario vacío
+      var matches = icInvMatches();
+      var pages = Math.max(1, Math.ceil(matches.length / IC_PER_PAGE));
+      if (icInvPage > pages) { icInvPage = pages; }
+      if (icInvPage < 1) { icInvPage = 1; }
+
+      var start = (icInvPage - 1) * IC_PER_PAGE;
+      var end = start + IC_PER_PAGE;
+
+      all.forEach(function (el) { el.style.display = 'none'; });
+      matches.forEach(function (el, i) {
+        el.style.display = (i >= start && i < end) ? '' : 'none';
+      });
+
+      var noResults = document.getElementById('ic-inv-noresults');
+      var grid = document.getElementById('ic-inv-grid');
+      noResults.style.display = matches.length === 0 ? 'block' : 'none';
+      grid.style.display = matches.length === 0 ? 'none' : 'grid';
+
+      var count = document.getElementById('ic-inv-count');
+      count.textContent = matches.length + (matches.length === 1 ? ' objeto' : ' objetos');
+
+      var pager = document.getElementById('ic-inv-pager');
+      pager.style.display = pages > 1 ? 'flex' : 'none';
+      document.getElementById('ic-inv-pageinfo').textContent = 'Página ' + icInvPage + ' / ' + pages;
+      document.getElementById('ic-inv-prev').disabled = (icInvPage <= 1);
+      document.getElementById('ic-inv-next').disabled = (icInvPage >= pages);
+    }
+
+    function icInvFilter() { icInvPage = 1; icInvRender(); }
+    function icInvGo(delta) { icInvPage += delta; icInvRender(); }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', icInvRender);
+    } else {
+      icInvRender();
+    }
+
+    function icConfirmar() {
+      var dest = document.getElementById('ic-dest').value.trim();
+      var ryos = parseInt(document.getElementById('ic-ryos').value, 10) || 0;
+      var objetos = 0;
+      document.querySelectorAll('.ic-qty').forEach(function (q) {
+        objetos += Math.max(0, parseInt(q.value, 10) || 0);
+      });
+      if (ryos <= 0 && objetos <= 0) {
+        alert('Debes enviar al menos ryos u objetos.');
+        return false;
+      }
+      var resumen = [];
+      if (ryos > 0) { resumen.push(ryos + ' Ryos'); }
+      if (objetos > 0) { resumen.push(objetos + ' objeto(s)'); }
+      return confirm('¿Enviar ' + resumen.join(' y ') + ' a "' + dest + '"? Esta acción no se puede deshacer.');
+    }
+  </script>
+</body>
+
+</html>

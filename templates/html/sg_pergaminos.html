@@ -703,6 +703,12 @@
       font-size: 13px;
     }
     .perg-reveal-item strong { color: var(--gold); }
+    .perg-reveal-item--objeto { display: flex; align-items: center; gap: 10px; }
+    .perg-reveal-item__img {
+      width: 36px; height: 36px; flex-shrink: 0;
+      object-fit: contain; background: var(--bg3);
+      border: 0.5px solid var(--border-strong);
+    }
     .perg-reveal-item--premio {
       padding: 0 2px;
       background: none;
@@ -1009,7 +1015,21 @@
         premio.recompensas.forEach(function (r) {
           var row = document.createElement('div');
           row.className = 'perg-reveal-item';
-          row.innerHTML = '<strong>' + pergEtiquetaRecompensa(r) + '</strong>';
+          if (r.tipo === 'objeto') {
+            row.classList.add('perg-reveal-item--objeto');
+            var img = document.createElement('img');
+            img.className = 'perg-reveal-item__img';
+            img.src = r.objeto_imagen || '/images/sg/objeto_default.png';
+            img.alt = '';
+            img.loading = 'lazy';
+            img.onerror = function () { this.onerror = null; this.src = '/images/sg/objeto_default.png'; };
+            row.appendChild(img);
+            var label = document.createElement('strong');
+            label.textContent = pergEtiquetaRecompensa(r);
+            row.appendChild(label);
+          } else {
+            row.innerHTML = '<strong>' + pergEtiquetaRecompensa(r) + '</strong>';
+          }
           cont.appendChild(row);
         });
       });

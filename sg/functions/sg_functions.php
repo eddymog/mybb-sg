@@ -13,6 +13,8 @@ define('SG_ORIGEN_APROBACION',       'aprobacion');
 define('SG_ORIGEN_TIENDA',           'tienda');
 define('SG_ORIGEN_TIENDA_RINS',      'tienda_rins');
 define('SG_ORIGEN_TIENDA_TOBIS',     'tienda_tobis');
+define('SG_ORIGEN_INTERCAMBIO',      'intercambio');
+define('SG_ORIGEN_NUEVA_FICHA',      'nueva_ficha');
 define('SG_ORIGEN_VENDER',           'vender');
 define('SG_ORIGEN_DOJO',             'dojo');
 define('SG_ORIGEN_FICHA_TECNICAS',   'ficha_tecnicas');
@@ -430,7 +432,30 @@ function is_user($uid) {
     $query = $db->query(" SELECT * FROM `mybb_sg_users` WHERE uid='$uid' AND (additionalgroups LIKE '3%' OR additionalgroups LIKE '%,3' OR additionalgroups LIKE '%,3,%' OR usergroup = '3' OR usergroup = '4'); ");
     while ($q = $db->fetch_array($query)) { $has_staff_role = true; }
 
-    return $has_staff_role;    
+    return $has_staff_role;
+}
+
+// Chequeo genérico de pertenencia a un grupo (usergroup principal o
+// additionalgroups), mismo patrón LIKE que is_user() usa para el grupo 3.
+function sg_usuario_en_grupo($uid, $gid) {
+    global $db;
+    $uid = (int) $uid;
+    $gid = (int) $gid;
+
+    $en_grupo = false;
+    $query = $db->query("
+        SELECT uid FROM `mybb_sg_users`
+        WHERE uid='$uid' AND (
+            usergroup = '$gid'
+            OR additionalgroups LIKE '$gid,%'
+            OR additionalgroups LIKE '%,$gid'
+            OR additionalgroups LIKE '%,$gid,%'
+            OR additionalgroups = '$gid'
+        )
+    ");
+    while ($db->fetch_array($query)) { $en_grupo = true; }
+
+    return $en_grupo;
 }
 
 function is_user2($uid) {
@@ -2319,9 +2344,28 @@ function sg_inventario_set_cantidad($uid, $objeto_id, $cantidad, $tipo, $origen,
 // ============================================================================
 
 // Únicos IDs de objeto válidos como pergamino de gacha (whitelist; se usa para
-// validar entrada de usuario antes de tocar la tabla de premios).
+// validar entrada de usuario antes de tocar la tabla de premios). Staff los
+// da de alta marcando `en_gacha=1` en un objeto tipo='Pergamino' desde
+// gestionar_objetos.php — no hace falta tocar código para agregar uno nuevo.
 function sg_gacha_pergamino_ids() {
-    return array('PERG001', 'PERG002', 'PERG003', 'PERG004', 'PERG005', 'PERG006', 'PERG007');
+    global $db;
+    static $ids = null;
+    if ($ids === null) {
+        $ids = array();
+        // Los 7 "de rango" (E..S, mismo orden que sg_mision_pergaminos) van
+        // siempre primero y en ese orden fijo; cualquier pergamino nuevo que
+        // Staff cree después entra al final, alfabéticamente por nombre.
+        $in = array();
+        foreach (array_values(sg_mision_pergaminos()) as $rid) { $in[] = "'" . $db->escape_string($rid) . "'"; }
+        $rango_list = implode(',', $in);
+        $q = $db->query("
+            SELECT objeto_id FROM `mybb_sg_sg_objetos`
+            WHERE tipo='Pergamino' AND en_gacha='1'
+            ORDER BY (FIELD(objeto_id, $rango_list) = 0), FIELD(objeto_id, $rango_list), nombre
+        ");
+        while ($r = $db->fetch_array($q)) { $ids[] = $r['objeto_id']; }
+    }
+    return $ids;
 }
 
 // Etiqueta de rango (E/D/C/B/A/A+/S) de un pergamino, reutilizando el mismo
@@ -2583,11 +2627,16 @@ function sg_gacha_abrir_bajo_lock($uid, $pergamino_id) {
     // abajo fallaba y mostraba el ID crudo en vez del nombre).
     $obj_ids = array_keys($deltas_objeto);
     $obj_nombres = array();
+    $obj_imagenes = array();
     if (!empty($obj_ids)) {
         $in = array();
         foreach ($obj_ids as $x) { $in[] = "'" . $db->escape_string($x) . "'"; }
-        $qn = $db->query("SELECT objeto_id, nombre FROM `mybb_sg_sg_objetos` WHERE objeto_id IN (" . implode(',', $in) . ")");
-        while ($rn = $db->fetch_array($qn)) { $obj_nombres[strtoupper($rn['objeto_id'])] = $rn['nombre']; }
+        $qn = $db->query("SELECT objeto_id, nombre, imagen FROM `mybb_sg_sg_objetos` WHERE objeto_id IN (" . implode(',', $in) . ")");
+        while ($rn = $db->fetch_array($qn)) {
+            $key = strtoupper($rn['objeto_id']);
+            $obj_nombres[$key] = $rn['nombre'];
+            $obj_imagenes[$key] = trim($rn['imagen']);
+        }
     }
 
     $premios_out = array();
@@ -2600,6 +2649,7 @@ function sg_gacha_abrir_bajo_lock($uid, $pergamino_id) {
                 'valor'         => $rec['valor'] !== null ? (int) $rec['valor'] : null,
                 'objeto_id'     => $rec['objeto_id'],
                 'objeto_nombre' => isset($obj_nombres[$obj_key]) ? $obj_nombres[$obj_key] : $rec['objeto_id'],
+                'objeto_imagen' => (isset($obj_imagenes[$obj_key]) && $obj_imagenes[$obj_key] !== '') ? $obj_imagenes[$obj_key] : null,
                 'cantidad'      => (int) $rec['cantidad'],
             );
         }
@@ -2776,6 +2826,8 @@ function sg_origen_label($origen) {
         'tienda'            => 'Tienda',
         'tienda_rins'       => 'Tienda de Rins',
         'tienda_tobis'      => 'Tienda de Tobis',
+        'intercambio'       => 'Intercambio',
+        'nueva_ficha'       => 'Creación de ficha',
         'vender'            => 'Venta',
         'dojo'              => 'Dojo',
         'ficha_tecnicas'    => 'Técnicas (Staff)',
@@ -2865,7 +2917,7 @@ function sg_historial_ficha_feed_html($uid, $max_eventos = 150) {
     $bburl = isset($mybb->settings['bburl']) ? $mybb->settings['bburl'] : '';
 
     $rows = array();
-    $q = $db->query("SELECT grupo, tabla, campo, valor_anterior, valor_nuevo, tipo, origen, pid, tid, actor_uid, tiempo
+    $q = $db->query("SELECT grupo, tabla, campo, valor_anterior, valor_nuevo, tipo, origen, pid, tid, actor_uid, detalle, tiempo
                      FROM `mybb_sg_sg_historial_ficha` WHERE uid='$uid' ORDER BY id DESC LIMIT 120");
     while ($r = $db->fetch_array($q)) { $r['dominio'] = 'ficha'; $rows[] = $r; }
 
@@ -2873,7 +2925,7 @@ function sg_historial_ficha_feed_html($uid, $max_eventos = 150) {
                      FROM `mybb_sg_sg_historial_tecnicas` WHERE uid='$uid' ORDER BY id DESC LIMIT 120");
     while ($r = $db->fetch_array($q)) { $r['dominio'] = 'tecnica'; $rows[] = $r; }
 
-    $q = $db->query("SELECT grupo, objeto_id, cantidad, tipo, origen, pid, tid, actor_uid, tiempo
+    $q = $db->query("SELECT grupo, objeto_id, cantidad, tipo, origen, pid, tid, actor_uid, detalle, tiempo
                      FROM `mybb_sg_sg_historial_objetos` WHERE uid='$uid' ORDER BY id DESC LIMIT 120");
     while ($r = $db->fetch_array($q)) { $r['dominio'] = 'objeto'; $rows[] = $r; }
 
@@ -2945,6 +2997,14 @@ function sg_historial_ficha_feed_html($uid, $max_eventos = 150) {
             $enlace = ' <a class="fx-hist-event__link" href="' . htmlspecialchars($url) . '">ver post</a>';
         }
 
+        // Contraparte del intercambio: el detalle ya dice "envío a X" /
+        // "recibido de X". Solo se muestra para intercambios (no para otros
+        // orígenes, cuyo detalle puede ser una razón de Staff privada).
+        $contraparte = '';
+        if ($origen_raw === 'intercambio' && isset($first['detalle']) && trim($first['detalle']) !== '') {
+            $contraparte = '<span class="fx-hist-event__detalle">' . htmlspecialchars($first['detalle']) . '</span>';
+        }
+
         $cambios = '';
         foreach ($grp as $r) {
             if ($r['dominio'] === 'ficha' && sg_campo_es_texto_largo($r['campo'])) {
@@ -3004,6 +3064,7 @@ function sg_historial_ficha_feed_html($uid, $max_eventos = 150) {
                . '<span class="fx-hist-event__date">' . $fecha . '</span>'
                . '<span class="fx-hist-badge fx-hist-badge--' . $tipo . '">' . (($tipo === 'staff') ? 'Staff' : 'Usuario') . '</span>'
                . '<span class="fx-hist-event__origen">' . $origen_lbl . '</span>'
+               . $contraparte
                . $enlace
                . '</div>'
                . '<ul class="fx-hist-changes">' . $cambios . '</ul>'
@@ -3012,4 +3073,148 @@ function sg_historial_ficha_feed_html($uid, $max_eventos = 150) {
 
     asort($origenes);
     return array('html' => $html, 'count' => $count, 'origenes' => $origenes);
+}
+
+// ============================================================================
+// Intercambios entre jugadores (regalo unilateral). Ver docs/intercambios_diseno.md.
+// El movimiento real de ryos/objetos va por los choke points del historial
+// (sg_ficha_set_campo / sg_inventario_*) con origen SG_ORIGEN_INTERCAMBIO; estas
+// funciones son las validaciones de elegibilidad y el registro visual.
+// ============================================================================
+
+// ¿El TID es un tema válido para intercambio? Existe, es visible, y su foro está
+// dentro de la zona de rol: foro 37 o cualquier descendiente (subforo, subforo
+// de subforo, etc.). Se usa el chequeo robusto por elemento sobre parentlist
+// (que cubre también un tema DIRECTO en el foro 37), superset de la convención
+// del repo `parentlist LIKE '37,%'` (censo.php / recompensa_diaria.php).
+function sg_tid_zona_rol($tid) {
+    global $db;
+    $tid = (int) $tid;
+    if ($tid <= 0) { return false; }
+    $ok = false;
+    $q = $db->query("
+        SELECT 1 AS v
+        FROM `mybb_sg_threads` t
+        INNER JOIN `mybb_sg_forums` f ON f.fid = t.fid
+        WHERE t.tid = '$tid' AND t.visible = 1
+          AND (f.fid = 37 OR CONCAT(',', f.parentlist, ',') LIKE '%,37,%')
+        LIMIT 1
+    ");
+    while ($db->fetch_array($q)) { $ok = true; }
+    return $ok;
+}
+
+// ¿Ambos jugadores tienen posts visibles en ESE tid? (una sola pasada).
+function sg_ambos_en_tema($uid_a, $uid_b, $tid) {
+    global $db;
+    $uid_a = (int) $uid_a;
+    $uid_b = (int) $uid_b;
+    $tid   = (int) $tid;
+    if ($tid <= 0 || $uid_a <= 0 || $uid_b <= 0) { return false; }
+    $a = 0; $b = 0;
+    $q = $db->query("
+        SELECT
+            SUM(uid = '$uid_a') AS a,
+            SUM(uid = '$uid_b') AS b
+        FROM `mybb_sg_posts`
+        WHERE tid = '$tid' AND visible = 1
+    ");
+    while ($r = $db->fetch_array($q)) { $a = (int) $r['a']; $b = (int) $r['b']; }
+    return ($a > 0 && $b > 0);
+}
+
+// ¿Dos fichas son de la misma aldea? Compara mybb_sg_sg_fichas.villa (vid).
+// Falso si a alguno le falta la ficha o el campo villa está vacío.
+function sg_fichas_misma_aldea($uid_a, $uid_b) {
+    global $db;
+    $uid_a = (int) $uid_a;
+    $uid_b = (int) $uid_b;
+    $villa_a = null; $villa_b = null;
+    $q = $db->query("SELECT fid, villa FROM `mybb_sg_sg_fichas` WHERE fid IN ('$uid_a','$uid_b')");
+    while ($r = $db->fetch_array($q)) {
+        if ((int) $r['fid'] === $uid_a) { $villa_a = trim($r['villa']); }
+        if ((int) $r['fid'] === $uid_b) { $villa_b = trim($r['villa']); }
+    }
+    if ($villa_a === null || $villa_b === null || $villa_a === '' || $villa_b === '') {
+        return false;
+    }
+    return $villa_a === $villa_b;
+}
+
+// Registro global de intercambios (últimos N), con nombres de usuarios y sus
+// items (objetos) anidados. Mismo patrón que sg_gacha_historial_global().
+function sg_intercambios_global($limite = 100) {
+    global $db;
+    $limite = max(1, (int) $limite);
+    $rows = array();
+    $q = $db->query("
+        SELECT i.id, i.from_uid, i.to_uid, i.tid, i.ryos, i.tiempo,
+               uf.username AS from_username, ut.username AS to_username
+        FROM `mybb_sg_sg_intercambios` i
+        LEFT JOIN `mybb_sg_users` uf ON uf.uid = i.from_uid
+        LEFT JOIN `mybb_sg_users` ut ON ut.uid = i.to_uid
+        ORDER BY i.id DESC
+        LIMIT $limite
+    ");
+    while ($r = $db->fetch_array($q)) { $rows[$r['id']] = $r; $rows[$r['id']]['items'] = array(); }
+    return sg_intercambios_adjuntar_items($rows);
+}
+
+// Registro personal: intercambios que este uid envió o recibió.
+function sg_intercambios_usuario($uid, $limite = 100) {
+    global $db;
+    $uid = (int) $uid;
+    $limite = max(1, (int) $limite);
+    $rows = array();
+    $q = $db->query("
+        SELECT i.id, i.from_uid, i.to_uid, i.tid, i.ryos, i.tiempo,
+               uf.username AS from_username, ut.username AS to_username
+        FROM `mybb_sg_sg_intercambios` i
+        LEFT JOIN `mybb_sg_users` uf ON uf.uid = i.from_uid
+        LEFT JOIN `mybb_sg_users` ut ON ut.uid = i.to_uid
+        WHERE i.from_uid = '$uid' OR i.to_uid = '$uid'
+        ORDER BY i.id DESC
+        LIMIT $limite
+    ");
+    while ($r = $db->fetch_array($q)) { $rows[$r['id']] = $r; $rows[$r['id']]['items'] = array(); }
+    return sg_intercambios_adjuntar_items($rows);
+}
+
+// Anexa los objetos (items) a un set de intercambios ya traídos, resolviendo el
+// nombre del objeto por join contra el catálogo (fallback al id crudo si fue
+// borrado; clave normalizada en mayúsculas por el casing de gacha_recompensas).
+// Devuelve el array como lista (values), preservando el orden por id DESC.
+function sg_intercambios_adjuntar_items($rows) {
+    global $db;
+    if (empty($rows)) { return array(); }
+
+    $ids = implode(',', array_map('intval', array_keys($rows)));
+    $obj_ids = array();
+    $items_raw = array();
+    $q = $db->query("SELECT intercambio_id, objeto_id, cantidad FROM `mybb_sg_sg_intercambios_items` WHERE intercambio_id IN ($ids)");
+    while ($r = $db->fetch_array($q)) {
+        $items_raw[] = $r;
+        if ($r['objeto_id'] !== '') { $obj_ids[] = $r['objeto_id']; }
+    }
+
+    $obj_nombres = array();
+    if (!empty($obj_ids)) {
+        $in = array();
+        foreach (array_unique($obj_ids) as $x) { $in[] = "'" . $db->escape_string($x) . "'"; }
+        $qn = $db->query("SELECT objeto_id, nombre FROM `mybb_sg_sg_objetos` WHERE objeto_id IN (" . implode(',', $in) . ")");
+        while ($rn = $db->fetch_array($qn)) { $obj_nombres[strtoupper($rn['objeto_id'])] = $rn['nombre']; }
+    }
+
+    foreach ($items_raw as $r) {
+        $iid = $r['intercambio_id'];
+        if (!isset($rows[$iid])) { continue; }
+        $key = strtoupper((string) $r['objeto_id']);
+        $rows[$iid]['items'][] = array(
+            'objeto_id' => $r['objeto_id'],
+            'nombre'    => isset($obj_nombres[$key]) ? $obj_nombres[$key] : $r['objeto_id'],
+            'cantidad'  => (int) $r['cantidad'],
+        );
+    }
+
+    return array_values($rows);
 }

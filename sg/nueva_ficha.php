@@ -119,6 +119,11 @@ if ($name && $age && $season && $villa && $clan && $phi && $psi && $history && $
         $db->query("INSERT IGNORE INTO `mybb_sg_sg_tec_aprendidas`(`tid`, `uid`) VALUES ('$tec_clan','$uid')");
     }
 
+    // Pergaminos iniciales: 3× Rango E (PERG001) + 1× Rango D (PERG002).
+    $grupo_pergs = uniqid();
+    sg_inventario_dar_objeto_cantidad($uid, 'PERG001', 3, 'usuario', SG_ORIGEN_NUEVA_FICHA, 'Personaje creado', $grupo_pergs);
+    sg_inventario_dar_objeto_cantidad($uid, 'PERG002', 1, 'usuario', SG_ORIGEN_NUEVA_FICHA, 'Personaje creado', $grupo_pergs);
+
     // Progreso/economía del Dojo por defecto (ver docs/arboles_instruciones.txt).
     // El estado del árbol se DERIVA de tec_aprendidas; ya no se guarda un espejo
     // en la columna `arboles` (queda obsoleta).
