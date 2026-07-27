@@ -466,5 +466,10 @@ $forums = $forum_list['forum_list'];
 
 $plugins->run_hooks('index_end');
 
+// Sección de Afiliados (índice). Ver docs/afiliados_diseno.md. Llena el hook
+// {$index_section_final} de templates/html/index.html; sg_functions.php ya
+// está cargado (global.php lo require_once en cada request).
+$index_section_final = function_exists('sg_afiliados_index_html') ? sg_afiliados_index_html() : '';
+
 eval('$index = "'.$templates->get('index').'";');
 output_page($index);

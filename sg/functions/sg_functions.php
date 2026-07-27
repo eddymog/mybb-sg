@@ -178,6 +178,117 @@ function sg_banner_rotativo($db, $duracion = 300) {
     return array('banners' => $banners, 'slot' => $slot, 'actual' => $banners[$slot]);
 }
 
+// ============================================================================
+// Afiliados (índice). Ver docs/afiliados_diseno.md.
+// Catálogo administrado en sg/admin/gestionar_afiliados.php, mostrado en el
+// índice vía index.php (llena $index_section_final antes del eval de la
+// plantilla "index" — sin plugin, llamada directa).
+// ============================================================================
+
+// Espacios mínimos a mostrar por nivel: si hay menos afiliados activos que
+// esto, se completan con cuadros vacíos + link a peticion_afiliados.php.
+// No son un tope: si hay más activos que el mínimo, se muestran todos.
+define('SG_AFILIADOS_SLOTS_GRANDE', 4);
+define('SG_AFILIADOS_SLOTS_PEQUENO', 24);
+
+// Tarjeta de un afiliado. 'pequeno' es solo el logo (cuadro 45x45, sin texto
+// visible, con el nombre en el `title`); solo 'grande' muestra logo+nombre
+// (+ descripción corta si la tiene).
+function sg_afil_card_html($a, $tier) {
+    $nombre = htmlspecialchars($a['nombre'], ENT_QUOTES);
+    $url    = htmlspecialchars($a['url'], ENT_QUOTES);
+    $img    = htmlspecialchars($a['imagen'], ENT_QUOTES);
+
+    if ($tier === 'pequeno' || $tier === 'hermano') {
+        return '<a class="afil-card afil-card--' . $tier . '" href="' . $url . '" target="_blank" rel="noopener noreferrer nofollow" title="' . $nombre . '">'
+            . '<img class="afil-card__img" src="' . $img . '" alt="' . $nombre . '" loading="lazy" onerror="this.style.opacity=0.2">'
+            . '</a>';
+    }
+
+    $desc = trim((string) $a['descripcion']);
+    $desc_html = $desc !== '' ? '<p class="afil-card__desc">' . nl2br(htmlspecialchars($desc)) . '</p>' : '';
+
+    return '<a class="afil-card afil-card--' . $tier . '" href="' . $url . '" target="_blank" rel="noopener noreferrer nofollow">'
+        . '<span class="afil-card__thumb"><img src="' . $img . '" alt="' . $nombre . '" loading="lazy" onerror="this.style.opacity=0.2"></span>'
+        . '<span class="afil-card__body"><span class="afil-card__name">' . $nombre . '</span>' . $desc_html . '</span>'
+        . '</a>';
+}
+
+// Cuadro vacío: placeholder + link a la solicitud pública. 'grande' vs
+// 'pequeño' es nomenclatura interna de la herramienta de Staff nada más; el
+// formulario público no distingue nivel (quien quiera pedir "grande" lo
+// aclara en el mensaje). 'hermano' no tiene versión vacía (no es solicitable).
+function sg_afil_slot_vacio_html($tier, $bburl) {
+    $url = htmlspecialchars($bburl . '/sg/peticion_afiliados.php', ENT_QUOTES);
+    return '<a class="afil-card afil-card--vacio afil-card--' . $tier . '" href="' . $url . '" title="Solicitar afiliación">'
+        . '<span class="afil-slot-plus">+</span>'
+        . '</a>';
+}
+
+// Arma el HTML completo de la sección de Afiliados para el índice.
+function sg_afiliados_index_html() {
+    global $db, $mybb;
+    $bburl = isset($mybb->settings['bburl']) ? $mybb->settings['bburl'] : '';
+
+    $filas = array('hermano' => array(), 'grande' => array(), 'pequeno' => array());
+    $q = $db->query("SELECT * FROM `mybb_sg_sg_afiliados` WHERE activo=1 ORDER BY tipo, orden, id");
+    while ($r = $db->fetch_array($q)) {
+        if (isset($filas[$r['tipo']])) { $filas[$r['tipo']][] = $r; }
+    }
+
+    if (!empty($filas['hermano'])) {
+        $hermano_html = sg_afil_card_html($filas['hermano'][0], 'hermano');
+    } else {
+        $hermano_html = '<div class="afil-empty">Todavía no hay afiliado hermano.</div>';
+    }
+
+    $grandes_html = '';
+    foreach ($filas['grande'] as $a) { $grandes_html .= sg_afil_card_html($a, 'grande'); }
+    $faltan_grande = max(0, SG_AFILIADOS_SLOTS_GRANDE - count($filas['grande']));
+    for ($i = 0; $i < $faltan_grande; $i++) { $grandes_html .= sg_afil_slot_vacio_html('grande', $bburl); }
+
+    $pequenos_html = '';
+    foreach ($filas['pequeno'] as $a) { $pequenos_html .= sg_afil_card_html($a, 'pequeno'); }
+    $faltan_pequeno = max(0, SG_AFILIADOS_SLOTS_PEQUENO - count($filas['pequeno']));
+    for ($i = 0; $i < $faltan_pequeno; $i++) { $pequenos_html .= sg_afil_slot_vacio_html('pequeno', $bburl); }
+
+    return '
+    <div class="afil-columns">
+      <section class="afil-section afil-col afil-col--hermano">
+        <div class="afil-section__head"><span class="afil-section__title">Afiliado Kage</span></div>
+        <div class="afil-hermano">' . $hermano_html . '</div>
+      </section>
+      <section class="afil-section afil-col afil-col--grande">
+        <div class="afil-section__head"><span class="afil-section__title">Afiliados ANBU</span></div>
+        <div class="afil-grid afil-grid--grande">' . $grandes_html . '</div>
+      </section>
+      <section class="afil-section afil-col afil-col--pequeno">
+        <div class="afil-section__head"><span class="afil-section__title">Afiliados Shinobis</span></div>
+        <div class="afil-grid afil-grid--pequeno">' . $pequenos_html . '</div>
+      </section>
+    </div>
+    ';
+}
+
+// Rate-limit simple para sg/peticion_afiliados.php (sin login, así que se
+// limita por IP): máximo 1 solicitud cada $minutos. Devuelve true y registra
+// el intento si está permitido; false si hay que esperar. De paso, limpia
+// filas viejas (>1 día) para que la tabla no crezca sin límite.
+function sg_afiliados_rate_limit_ok($ip, $minutos = 10) {
+    global $db;
+    $ip_esc = $db->escape_string($ip);
+
+    $db->query("DELETE FROM `mybb_sg_sg_afiliados_rate_limit` WHERE tiempo < DATE_SUB(NOW(), INTERVAL 1 DAY)");
+
+    $reciente = false;
+    $q = $db->query("SELECT id FROM `mybb_sg_sg_afiliados_rate_limit` WHERE ip='$ip_esc' AND tiempo > DATE_SUB(NOW(), INTERVAL $minutos MINUTE) LIMIT 1");
+    while ($db->fetch_array($q)) { $reciente = true; }
+    if ($reciente) { return false; }
+
+    $db->query("INSERT INTO `mybb_sg_sg_afiliados_rate_limit` (`ip`) VALUES ('$ip_esc')");
+    return true;
+}
+
 function does_ficha_exist($uid) {
     global $db;
     $ficha = select_one_query_with_id('mybb_sg_sg_fichas', 'fid', $uid);

@@ -26,6 +26,7 @@ function peticiones_categoria_label($categoria) {
         'tema' => 'Moderacion de Tema',
         'combate' => 'Moderacion de Combate',
         'tecnica' => 'Moderacion de Tecnica',
+        'afiliados' => 'Solicitud de Afiliación',
         'otros' => 'Otros'
     );
 

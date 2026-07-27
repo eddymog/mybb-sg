@@ -722,8 +722,82 @@
     color: var(--ix-mist);
   }
 
-  .sg-index-hook {
+  /* Oculto solo si está realmente vacío (index_section_mundo/offrol/final sin
+     usar); en cuanto uno de esos hooks tenga contenido (ej. Afiliados, llenado
+     directo en index.php), se muestra solo. */
+  .sg-index-hook:empty {
     display: none;
+  }
+
+  /* ── Afiliados (index.php llena $index_section_final directo) ──
+     Un solo row, tres columnas: Kage (hermano) / ANBU (grande) / Shinobis
+     (pequeño). "hermano/grande/pequeño" siguen siendo el `tipo` interno de
+     la tabla y de la herramienta de Staff; estos son solo los títulos
+     públicos que se muestran en el índice. */
+  .afil-section { margin-bottom: 22px; }
+  .afil-section:last-child { margin-bottom: 0; }
+  /* Flex (no grid) a propósito: align-items:stretch (default de flex) hace
+     que las 3 columnas siempre midan lo mismo de alto (la más alta manda),
+     sin importar cuántos ítems tenga cada nivel. */
+  .afil-columns { display: flex; gap: 20px; }
+  .afil-columns .afil-section { margin-bottom: 0; }
+  /* min-width:0 porque una imagen grande dentro (ver .afil-card--hermano)
+     ignora el ancho flexible y "revienta" el ancho de su columna (bug
+     clásico de contenido reemplazado: min-width:auto por defecto en los
+     items de flex/grid). display:flex column + flex:1 en el body para que
+     el contenido (imagen o grid) ocupe todo el alto ya emparejado. */
+  .afil-columns > .afil-col { display: flex; flex-direction: column; flex: 1 1 0; min-width: 0; }
+  .afil-section__head { flex: 0 0 auto; display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+  .afil-section__head::before { content: ''; width: 3px; height: 13px; background: var(--ix-oxide); flex-shrink: 0; }
+  .afil-section__head::after { content: ''; flex: 1; height: 0.5px; background: var(--ix-border); }
+  .afil-section__title { font-family: 'Cinzel', serif; font-size: 10px; font-weight: 900; letter-spacing: 1.8px; text-transform: uppercase; color: var(--ix-ink); }
+
+  .afil-hermano { display: flex; flex: 1 1 auto; min-height: 0; }
+  .afil-card {
+    position: relative; display: flex; text-decoration: none;
+    border: 0.5px solid var(--ix-border); background: var(--ix-bg3);
+    transition: border-color 0.15s ease, transform 0.12s ease;
+  }
+  .afil-card:hover { border-color: var(--ix-plum3); transform: translateY(-2px); }
+
+  /* Hermano: solo imagen, ancho de su columna, y ahora alto completo de la
+     fila (igualada con ANBU/Shinobis) — sin aspect-ratio fijo, la imagen se
+     recorta con object-fit:cover para llenar el alto disponible. */
+  .afil-card--hermano { width: 100%; min-width: 0; overflow: hidden; }
+  .afil-card--hermano .afil-card__img { width: 100%; height: 100%; min-width: 0; object-fit: cover; display: block; }
+
+  .afil-grid { display: grid; gap: 10px; flex: 1 1 auto; min-height: 0; align-content: start; }
+  .afil-grid--grande { grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); }
+  .afil-grid--pequeno { grid-template-columns: repeat(auto-fill, 45px); justify-content: center; align-content: start; gap: 8px; }
+
+  .afil-card--grande { flex-direction: column; }
+  .afil-card--grande .afil-card__thumb { width: 100%; aspect-ratio: 16 / 9; overflow: hidden; background: var(--ix-bg4); }
+  .afil-card--grande .afil-card__thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .afil-card--grande .afil-card__body { padding: 8px 10px 10px; }
+  .afil-card--grande .afil-card__name { font-family: 'Cinzel', serif; font-size: 11px; font-weight: 700; color: var(--ix-ink); }
+  .afil-card--grande .afil-card__desc { margin: 4px 0 0; font-size: 11px; line-height: 1.5; color: var(--ix-stone); }
+
+  .afil-card--pequeno { width: 45px; height: 45px; padding: 0; overflow: hidden; flex-shrink: 0; }
+  .afil-card__img { width: 45px; height: 45px; object-fit: cover; display: block; }
+
+  .afil-card--vacio { align-items: center; justify-content: center; border-style: dashed; background: transparent; color: var(--ix-mist); }
+  .afil-card--vacio:hover { color: var(--ix-plum3); border-color: var(--ix-plum3); }
+  .afil-card--vacio.afil-card--grande { aspect-ratio: 15.6 / 9; }
+  .afil-slot-plus { font-family: 'Cinzel', serif; font-size: 18px; font-weight: 700; line-height: 1; }
+  .afil-card--vacio.afil-card--pequeno .afil-slot-plus { font-size: 14px; }
+
+  .afil-empty {
+    padding: 18px; text-align: center; color: var(--ix-mist); font-size: 13px;
+    border: 0.5px dashed var(--ix-border); background: var(--ix-bg3);
+  }
+
+  @media (max-width: 640px) {
+    /* Apiladas: cada columna vuelve a su alto natural (nada de stretch
+       entre ellas, que solo tiene sentido cuando están lado a lado). */
+    .afil-columns { flex-direction: column; gap: 22px; }
+    .afil-columns > .afil-col { flex: 0 0 auto; }
+    .afil-card--hermano .afil-card__img { height: auto; aspect-ratio: 16 / 9; }
+    .afil-grid--grande { grid-template-columns: repeat(2, 1fr); }
   }
 
   @media (max-width: 1140px) {

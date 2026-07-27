@@ -95,6 +95,7 @@ if (is_mod($uid) || is_staff($uid) || is_user($uid)) {
     $peticiones_li .= print_peticion('Moderación de Temas', 'tema', $uid);
     $peticiones_li .= print_peticion('Moderación de Combate', 'combate', $uid);
     $peticiones_li .= print_peticion('Moderación de Técnica', 'tecnica', $uid);
+    $peticiones_li .= print_peticion('Solicitudes de Afiliación', 'afiliados', $uid);
     $peticiones_li .= print_peticion('Otras Moderaciones', 'otros', $uid);
 
     eval("\$page = \"".$templates->get("staff_peticiones_admin")."\";");
