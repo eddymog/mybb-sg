@@ -607,15 +607,7 @@ Dark mode:
   cursor: pointer;
 }
 .tool-btn:hover     { border-color: var(--plum3); }
-.tool-btn svg       { width: 12px; height: 12px; fill: none; stroke: var(--dim, var(--plum2)); stroke-width: 1.5; }
-.tool-btn:hover svg { stroke: var(--plum2); }
-```
-
----
-
-## 7. Key Differences Between Modes
-
-| Element | Light Mode | Dark Mode |
+.tool-btn svg       { width: 12px; height: 12px; fill: none; stroke: var(--dim, var(-de | Dark Mode |
 |---|---|---|
 | Page background | `#f4f2f8` | `#0f0c18` |
 | Header background | `#ede9f4` | `#130f1e` |
@@ -635,7 +627,7 @@ The rust oxide accent is the most important visual accent and must appear in **e
 
 1. **Accent line above the title** — `width: 32px; height: 2px`
 2. **Hanko seal** — border and text of the logo circle
-3. **Navigation and recent card spiral marks** — small Naruto-style swirl indicators, ideally inline SVG or curved line motifs
+3. **Navigation and recent card diamonds** — `clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)`
 
 Never use oxide on: backgrounds, body text, primary buttons, or any role beyond these three.
 
@@ -680,7 +672,7 @@ The hanko seal can also be used as a watermark on section backgrounds:
   opacity: 0.03;
   position: absolute;
   font-size: 120px;
-  font-family: 'Zen Old Mincho', serif;
+  font-family: 'Noto Serif JP', serif;
   font-weight: 700;
   color: var(--oxide);
   pointer-events: none;
@@ -731,8 +723,9 @@ if (saved === 'dark') {
 
 ## 13. Final Notes
 
-- The `font-weight: 300` of Source Serif 4 is ideal for long-form Latin body readability; use `400` only when contrast requires it
+- The `font-weight: 300` of Noto Serif JP is essential for long-form body readability — do not increase to 400 in paragraphs
 - Never use `box-shadow` — fine 0.5px borders replace all visual elevation
 - Keep the `3px` gap between cards — it creates the ukiyo-e mosaic feel without separating elements too much
 - Decorative large kanji must never be readable at first glance — always at opacity ≤ 0.08
+- Both modes share the exact same structure, proportions, and typography — only the color palette changest never be readable at first glance — always at opacity ≤ 0.08
 - Both modes share the exact same structure, proportions, and typography — only the color palette changes

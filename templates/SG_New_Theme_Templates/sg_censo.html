@@ -1,0 +1,261 @@
+<html>
+	<head>
+		<style>
+		.container {
+			text-align: center;	
+			font-size: 25px;
+		}
+			
+		.form-text {
+			font-size: 13px;
+		}
+			
+		.container h3, .container h5, .container h6, .container h4 {
+			 margin: 5px 0px;	
+		}
+
+		</style>
+		<title>Censo</title>
+		{$headerinclude}
+	</head>
+	<body>
+		{$header}
+		
+		<div class="container fondo-blanco">
+			<div class="row">
+				<div class="col-3">
+					<span class="h3 form-text" style="">Acción:</span>
+					<select class="form-control" id="select-accion" onchange="onChangeAccion(this)">
+						<option value='censo'>Censo</option>
+						<option value='top-10'>Top 10 Usuarios actual</option>
+						<option value='top-10-historico'>Top 10 Usuarios histórico</option>
+						<option value='posts'>Posts de Usuarios</option>
+						<option value='puntos-rol'>PRs de Usuarios</option>
+						<option value='recompensas'>Recompensas Diarias</option>
+						<if $uid != '0' then><option value='personales'>Estadísticas Personales</option></if>
+						<option value='extras'>Extras</option>
+					</select>
+				</div>
+				<div class="col-3">
+					<span class="h3 form-text" >Duración:</span>
+					<select class="form-control" id="select-tiempo" onchange="onChangeTiempo(this)">
+						<option value='1'>24 horas</option>
+						<option value='2'>48 horas</option>
+						<option value='7'>1 semana</option>
+						<option value='14'>2 semanas</option>
+						<option value='28'>4 semanas</option>
+					</select>
+				</div>
+			</div>
+			<br>
+			
+			<if $accion == 'posts' then>
+				<br>
+				<div class="text-center">
+					<h3>Usuarios que han posteado en <span class="duracion"></span>:</h3><br>
+				</div>
+				<div class="text-center">
+					<div>
+						{$pjNombresTopPosts}
+					</div>
+				</div>
+				<br>
+				<br>
+			</if>
+			
+			<if $accion == 'puntos-rol' then>
+				<br>
+				<div class="text-center">
+					<h3>Usuarios que han ganado PR en <span class="duracion"></span>:</h3><br>
+				</div>
+				<div class="text-center">
+					<div>
+						{$pjNombresTopPrs}
+					</div>
+				</div>
+			</if>
+			
+			<if $accion == 'top-10' then>
+				<br>
+				<div class="text-center">
+					<h3>Top 10 de usuarios que más han posteado en <span class="duracion"></span>:</h3><br>
+				</div>
+				<div class="text-center">
+					<div>
+						{$pjNombresTop10Posts}
+					</div>
+				</div>
+				<br>
+				<br>
+				<div class="text-center">
+					<h3>Top 10 de usuarios que más PR han ganado en <span class="duracion"></span>:</h3><br>
+				</div>
+				<div class="text-center">
+					<div>
+						{$pjNombresTop10Prs}
+					</div>
+				</div>
+				<br>
+				<br>
+				<div class="text-center">
+					<h3>Top 10 de usuarios que más temas han creado en <span class="duracion"></span>:</h3><br>
+				</div>
+				<div class="text-center">
+					<div>
+						{$pjNombresTop10Temas}
+					</div>
+				</div>
+			</if>
+			
+			<if $accion == 'top-10-historico' then>
+				<br>
+				<div class="text-center">
+					<h3>Top 10 de usuarios que más han posteado desde el inicio de los tiempos:<br>
+				</div>
+				<div class="text-center">
+					<div>
+						{$pjNombresTop10PostsTotal}
+					</div>
+				</div>
+				<br>
+				<br>
+				<div class="text-center">
+					<h3>Top 10 de usuarios que más PR han ganado desde el inicio de los tiempos:<br>
+				</div>
+				<div class="text-center">
+					<div>
+						{$pjNombresTop10PrsTotal}
+					</div>
+				</div>
+				<br>
+				<br>
+				<div class="text-center">
+					<h3>Top 10 de usuarios que más temas han creado desde el inicio de los tiempos:<br>
+				</div>
+				<div class="text-center">
+					<div>
+						{$pjNombresTop10TemasTotal}
+					</div>
+				</div>
+			</if>
+			
+			<if $accion == 'recompensas' then>
+				<br>
+				<div class="text-center">
+					<h4>Se han reclamado en total unas {$totalRecompensasReclamadas} recompensas diarias.</h4><br>
+				</div>
+				<div class="text-center">
+					<div>
+						{$pjNombresTop10Posts}
+					</div>
+				</div>
+				<br>
+				<div class="text-center">
+				<h3>Top 10 de usuarios que llevan la racha más alta de recompensas en <span class="duracion"></span>:</h3><br>
+				</div>
+				<div class="text-center">
+					<div>
+						{$topRecompensasActual}
+					</div>
+				</div>
+				<br>
+				<br>
+				<div class="text-center">
+					<h3>Top 10 de usuarios que han mantenido la racha más alta en la historia:</h3><br>
+				</div>
+				<div class="text-center">
+					<div>
+						{$topUsuariosRecompensas}
+					</div>
+				</div>
+			</if>
+			
+			<if $uid != '0' then>
+			<if $accion == 'personales' then>
+				<br>
+				<div class="text-center" style="font-size: 20px;">
+					{$texto_extra}
+				</div>
+				<br><br>
+			</if>
+			</if>
+					
+			<if $accion == 'extras' then>
+				<br>
+				<div class="text-center" style="font-size: 20px;">
+					{$texto_extra}
+				</div>
+				<br><br>
+			</if>
+			
+			<if $accion == 'censo' then>
+				<div class="text-center">
+					<h3>Censo</h3><br>
+					<h5>({$totalPjs} personajes han posteado en la zona de rol {$numeroPosts} veces en <span class="duracion"></span>)</h5><br>
+				</div>
+				<div class="text-center">
+					<div>
+						<h5>Konoha - {$clanesKonoha} personas <if $konohaCerrada then>[Cerrada]</if></h5>
+						<div>
+							{$clanesKonohaStr}
+						</div>
+					</div>
+					<br>
+					<div>
+						<h5>Kiri - {$clanesKiri} personas <if $kiriCerrada then>[Cerrada]</if></h5>
+						<div>
+							{$clanesKiriStr}
+						</div>
+					</div>
+					<br>
+					<div>
+						<h5>Iwa - {$clanesIwa} personas <if $iwaCerrada then>[Cerrada]</if></h5>
+						<div>
+							{$clanesIwaStr}
+						</div>
+					</div>
+					<br>
+					<div>
+						<h5>Kumo - {$clanesKumo} personas <if $kumoCerrada then>[Cerrada]</if></h5>
+						<div>
+							{$clanesKumoStr}
+						</div>
+					</div>
+					<br>
+					<div>
+						<h5>Sin Aldea - {$clanesSinAldea} personas <if $sinAldeaCerrada then>[Cerrada]</if></h5>
+						<div>
+							{$clanesSinAldeaStr}
+						</div>
+					</div>
+					<br>
+					<div>
+						<h5>Renegados - {$clanesRenegados} personas</h5>
+						<div>
+							{$clanesRenegadosStr}
+						</div>
+					</div>
+					<br>
+				</div>
+			</if>
+		</div>
+		{$footer}
+	</body>
+	<script>
+		function onChangeTiempo(tiempo) {
+			console.log(tiempo);
+			window.location.href = window.location.pathname + '?accion={$accion}&tiempo=' + tiempo.value;
+		}
+		
+		function onChangeAccion(accion) {
+			console.log(accion);
+			window.location.href = window.location.pathname + '?accion=' + accion.value + '&tiempo={$tiempo}';
+		}
+		
+		document.getElementById("select-tiempo").value = "{$tiempo}";
+		document.getElementById("select-accion").value = "{$accion}";
+		$('.duracion').map((i) => {
+			$('.duracion')[i].innerHTML = $("#select-tiempo").find("option[value='{$tiempo}']").text();
+		});
+	</script>
+</html>

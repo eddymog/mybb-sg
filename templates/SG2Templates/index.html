@@ -1,0 +1,1157 @@
+<html data-theme="dark">
+<head>
+<title>{$mybb->settings['bbname']}</title>
+{$headerinclude}
+<script type="text/javascript">
+<!--
+	lang.no_new_posts = "{$lang->no_new_posts}";
+	lang.click_mark_read = "{$lang->click_mark_read}";
+// -->
+</script>
+<style>
+  .sg-index-page {
+    --ix-bg: var(--bg, #0f0c18);
+    --ix-bg2: var(--bg2, #130f1e);
+    --ix-bg3: var(--bg3, #171224);
+    --ix-bg4: var(--bg4, #1c162c);
+    --ix-border: var(--border, rgba(156, 107, 204, 0.12));
+    --ix-ink: var(--ink, #e8dff8);
+    --ix-plum: var(--plum, #7b4ab8);
+    --ix-plum2: var(--plum2, #9c6bcc);
+    --ix-plum3: var(--plum3, #b890e0);
+    --ix-oxide: var(--oxide, #c0582a);
+    --ix-stone: var(--stone, #8a7a9a);
+    --ix-mist: var(--mist, #5a4a6a);
+    --ix-fiber: var(--fiber, rgba(156, 107, 204, 0.04));
+    position: relative;
+    padding: 18px 0 38px;
+    color: var(--ix-ink);
+  }
+
+  .sg-index-page::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-image:
+      repeating-linear-gradient(13deg, transparent 0, transparent 24px, var(--ix-fiber) 24px, var(--ix-fiber) 25px),
+      repeating-linear-gradient(82deg, transparent 0, transparent 36px, var(--ix-fiber) 36px, var(--ix-fiber) 37px),
+      repeating-linear-gradient(151deg, transparent 0, transparent 19px, var(--ix-fiber) 19px, var(--ix-fiber) 19.5px);
+    opacity: 0.9;
+  }
+
+  .sg-index-shell {
+    position: relative;
+    z-index: 1;
+    width: 1100px;
+    margin: 0 auto;
+  }
+
+  .sg-index-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .sg-index-zone {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .sg-index-zone-frame {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 16px;
+    border: 0.5px solid var(--ix-border);
+    border-radius: 24px;
+    background:
+      linear-gradient(180deg, rgba(23, 18, 36, 0.86) 0%, rgba(19, 15, 30, 0.94) 100%);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .sg-index-zone-frame::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image:
+      repeating-linear-gradient(16deg, transparent 0, transparent 20px, rgba(255,255,255,0.025) 20px, rgba(255,255,255,0.025) 21px);
+    pointer-events: none;
+  }
+
+  .sg-index-zone-title {
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    min-height: 72px;
+    padding: 0 26px;
+    border: 0.5px solid var(--ix-border);
+    border-radius: 18px;
+    background:
+      linear-gradient(90deg, rgba(214, 229, 236, 0.12) 0%, rgba(123, 74, 184, 0.08) 52%, rgba(18, 14, 28, 0.08) 100%);
+  }
+
+  .sg-index-zone-title::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(90deg, rgba(214, 229, 236, 0.08) 0%, rgba(123, 74, 184, 0.1) 52%, rgba(18, 14, 28, 0.14) 100%);
+    opacity: 0.95;
+  }
+
+  .sg-index-zone-title::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+      repeating-linear-gradient(18deg, transparent 0, transparent 18px, rgba(255,255,255,0.05) 18px, rgba(255,255,255,0.05) 19px);
+    pointer-events: none;
+  }
+
+  .sg-index-zone-title > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  .sg-index-zone-title__count {
+    font-family: 'Cinzel', serif;
+    font-size: 14px;
+    font-weight: 900;
+    letter-spacing: 2.4px;
+    color: rgba(255,255,255,0.64);
+    white-space: nowrap;
+  }
+
+  .sg-index-zone-title__text {
+    font-family: 'Cinzel', serif;
+    font-size: 26px;
+    font-weight: 900;
+    letter-spacing: 2.8px;
+    text-transform: uppercase;
+    color: #ffffff;
+    line-height: 1;
+  }
+
+  .sg-index-zone-title__line {
+    width: 54px;
+    height: 2px;
+    background: var(--ix-oxide);
+    flex-shrink: 0;
+  }
+
+  .sg-index-layout {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    gap: 12px;
+  }
+
+  .sg-index-layout--intro {
+    grid-template-columns: 1.15fr 0.85fr 0.85fr;
+    grid-template-areas:
+      "rules welcome lore"
+      "rules announce offrol";
+  }
+
+  .sg-index-layout--characters {
+    grid-template-columns: 0.82fr 1.18fr 0.82fr;
+    align-items: stretch;
+  }
+
+  .sg-index-layout--world {
+    grid-template-columns: repeat(6, 1fr);
+    grid-template-areas:
+      "fuego fuego fuego agua agua agua"
+      "fuego fuego fuego agua agua agua"
+      "viento viento tierra tierra rayo rayo"
+      "resto resto resto resto resto resto";
+    grid-template-rows: 206px 206px 176px 120px;
+  }
+
+  .sg-index-card {
+    position: relative;
+    display: block;
+    min-height: 260px;
+    overflow: hidden;
+    border: 0.5px solid var(--ix-border);
+    border-radius: 22px;
+    background: rgba(20, 16, 31, 0.82);
+    text-decoration: none;
+    isolation: isolate;
+    transition: transform 0.22s ease, border-color 0.22s ease, background-color 0.22s ease;
+  }
+
+  .sg-index-card:hover {
+    transform: translateY(-2px);
+    border-color: rgba(192, 88, 42, 0.42);
+    background-color: rgba(123, 74, 184, 0.07);
+  }
+
+  .sg-index-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(180deg, rgba(214, 229, 236, 0.01) 0%, rgba(123, 74, 184, 0.03) 100%);
+    pointer-events: none;
+  }
+
+  .sg-index-card::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(180deg, rgba(18, 14, 28, 0.04) 0%, rgba(18, 14, 28, 0.14) 42%, rgba(18, 14, 28, 0.84) 100%),
+      radial-gradient(circle at top left, rgba(123, 74, 184, 0.08) 0%, transparent 34%),
+      radial-gradient(circle at bottom right, rgba(192, 88, 42, 0.05) 0%, transparent 30%),
+      repeating-linear-gradient(20deg, transparent 0, transparent 18px, rgba(255,255,255,0.02) 18px, rgba(255,255,255,0.02) 19px);
+    pointer-events: none;
+  }
+
+  .sg-index-card > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  .sg-index-card--announce { grid-area: announce; min-height: 248px; }
+  .sg-index-card--welcome { grid-area: welcome; min-height: 248px; }
+  .sg-index-card--lore { grid-area: lore; min-height: 248px; }
+  .sg-index-card--rules { grid-area: rules; min-height: 508px; }
+  .sg-index-card--offhome { grid-area: offrol; min-height: 248px; }
+  .sg-index-card--missions { min-height: 420px; }
+  .sg-index-card--profiles { min-height: 420px; }
+  .sg-index-card--records { min-height: 420px; }
+  .sg-index-card--world { min-height: 176px; }
+  .sg-index-card--world-fuego { grid-area: fuego; min-height: 424px; }
+  .sg-index-card--world-agua { grid-area: agua; min-height: 424px; }
+  .sg-index-card--world-viento { grid-area: viento; min-height: 176px; }
+  .sg-index-card--world-rayo { grid-area: rayo; min-height: 176px; }
+  .sg-index-card--world-tierra { grid-area: tierra; min-height: 176px; }
+  .sg-index-card--world-resto { grid-area: resto; min-height: 120px; }
+
+  .sg-index-card__image {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    background: linear-gradient(180deg, rgba(255,255,255,0.02) 0%, rgba(255,255,255,0.04) 100%);
+  }
+
+  .sg-index-card__image.is-placeholder {
+    opacity: 0.84;
+    filter: saturate(1.2);
+  }
+
+  .sg-index-card__title-wrap {
+    position: absolute;
+    left: 16px;
+    right: 16px;
+    bottom: 16px;
+    z-index: 2;
+  }
+
+  .sg-index-card__title-surface {
+    display: inline-flex;
+    max-width: 100%;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 12px 18px;
+    border: 0.5px solid rgba(255,255,255,0.1);
+    border-radius: 12px;
+    background: rgba(18, 14, 28, 0.84);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+
+  .sg-index-card__title {
+    font-family: 'Cinzel', serif;
+    font-size: 17px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #f7f3ff;
+    line-height: 1.25;
+  }
+
+  .sg-index-dashboard {
+    display: grid;
+    grid-template-columns: 1.08fr 0.92fr 1fr;
+    gap: 10px;
+    align-items: stretch;
+  }
+
+  .sg-index-dashboard-stack {
+    display: grid;
+    gap: 10px;
+    grid-template-rows: 228px 1fr;
+  }
+
+  .sg-index-panel {
+    position: relative;
+    overflow: hidden;
+    border: 0.5px solid var(--ix-border);
+    border-radius: 18px;
+    background:
+      linear-gradient(180deg, rgba(23, 18, 36, 0.96) 0%, rgba(19, 15, 30, 0.96) 100%);
+  }
+
+  .sg-index-panel::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image:
+      repeating-linear-gradient(18deg, transparent 0, transparent 18px, var(--ix-fiber) 18px, var(--ix-fiber) 19px);
+    opacity: 0.95;
+    pointer-events: none;
+  }
+
+  .sg-index-panel > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  .sg-index-panel__header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 18px 12px;
+    border-bottom: 0.5px solid var(--ix-border);
+  }
+
+  .sg-index-panel__line {
+    width: 34px;
+    height: 2px;
+    background: var(--ix-oxide);
+    flex-shrink: 0;
+  }
+
+  .sg-index-panel__title {
+    font-family: 'Cinzel', serif;
+    font-size: 13px;
+    font-weight: 900;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--ix-ink);
+  }
+
+  .sg-index-panel__body {
+    padding: 18px;
+  }
+
+  .sg-index-season {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    min-height: 228px;
+  }
+
+  .sg-index-season::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(180deg, rgba(18, 14, 28, 0.12) 0%, rgba(18, 14, 28, 0.82) 100%),
+      url('https://i.ibb.co/kxBKxcp/verano.png') center/cover no-repeat;
+    z-index: 0;
+  }
+
+  .sg-index-season__copy {
+    padding: 22px;
+  }
+
+  .sg-index-season__eyebrow {
+    font-family: 'Cinzel', serif;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.72);
+    margin-bottom: 8px;
+  }
+
+  .sg-index-season__title {
+    font-family: 'Cinzel', serif;
+    font-size: 28px;
+    font-weight: 900;
+    letter-spacing: 2px;
+    color: #ffffff;
+    text-transform: uppercase;
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+
+  .sg-index-season__meta {
+    font-family: 'Source Serif 4', serif;
+    font-size: 14px;
+    line-height: 1.7;
+    color: rgba(255,255,255,0.78);
+  }
+
+  /* Chips de contexto (año / rango de días de la temporada) */
+  .sg-index-season__row {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 2px 0 14px;
+  }
+
+  .sg-index-season__chip {
+    display: inline-flex;
+    align-items: center;
+    padding: 5px 12px;
+    border: 0.5px solid rgba(255,255,255,0.22);
+    border-radius: 999px;
+    background: rgba(255,255,255,0.08);
+    font-family: 'Cinzel', serif;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.3px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.85);
+    white-space: nowrap;
+  }
+
+  /* Fecha límite de rol: discreta, como una línea de meta más, con una
+     barrita fina de referencia (día límite / total de días de temporada). */
+  .sg-index-limit {
+    position: relative;
+    z-index: 1;
+  }
+
+  .sg-index-limit__head {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    font-family: 'Source Serif 4', serif;
+    font-size: 12.5px;
+    line-height: 1.6;
+    color: rgba(255,255,255,0.62);
+  }
+
+  .sg-index-limit__value {
+    font-weight: 700;
+    color: rgba(255,255,255,0.85);
+  }
+
+  .sg-index-limit__bar {
+    position: relative;
+    height: 3px;
+    width: 120px;
+    max-width: 100%;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.14);
+    overflow: visible;
+    margin: 6px 0 0;
+  }
+
+  .sg-index-limit__fill {
+    position: absolute;
+    inset: 0;
+    width: var(--fill, 50%);
+    border-radius: 999px;
+    background: rgba(240, 201, 136, 0.55);
+  }
+
+  .sg-index-limit__marker {
+    position: absolute;
+    top: -1.5px;
+    left: var(--fill, 50%);
+    transform: translateX(-50%);
+    width: 1.5px;
+    height: 6px;
+    background: rgba(255,255,255,0.55);
+    border-radius: 1px;
+  }
+
+  .sg-index-stat-copy {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    font-family: 'Source Serif 4', serif;
+    font-size: 16px;
+    line-height: 1.8;
+    color: var(--ix-ink);
+  }
+
+  .sg-index-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 16px;
+    flex-wrap: wrap;
+  }
+
+  .sg-index-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    border: 0.5px solid var(--ix-border);
+    border-radius: 999px;
+    background: rgba(123, 74, 184, 0.12);
+    color: var(--ix-ink);
+    text-decoration: none;
+    font-family: 'Cinzel', serif;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.8px;
+    text-transform: uppercase;
+    transition: border-color 0.2s ease, background-color 0.2s ease, transform 0.2s ease;
+  }
+
+  .sg-index-btn:hover {
+    transform: translateY(-1px);
+    border-color: rgba(192, 88, 42, 0.42);
+    background: rgba(123, 74, 184, 0.22);
+  }
+
+  .sg-index-btn::before {
+    content: "";
+    width: 12px;
+    height: 12px;
+    flex-shrink: 0;
+    background: no-repeat center/contain url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none'%3E%3Cpath d='M8 13.2c-2.9 0-5.2-2-5.2-4.9 0-2.5 1.9-4.5 4.5-4.5 2.1 0 3.8 1.4 3.8 3.3 0 1.6-1.2 2.8-2.7 2.8-1.1 0-1.9-.7-1.9-1.7 0-.9.7-1.5 1.5-1.5.7 0 1.2.3 1.6.9' stroke='%23c0582a' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  }
+
+  .sg-index-online {
+    display: grid;
+    grid-template-rows: auto 1fr 1fr;
+    min-height: 100%;
+  }
+
+  .sg-index-online-section {
+    padding: 14px 18px 16px;
+    min-height: 0;
+  }
+
+  .sg-index-online-section + .sg-index-online-section {
+    border-top: 0.5px solid var(--ix-border);
+  }
+
+  .sg-index-online-label {
+    font-family: 'Cinzel', serif;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--ix-plum3);
+    margin-bottom: 10px;
+  }
+
+  .sg-index-online-copy,
+  .sg-index-online-copy .smalltext {
+    font-family: 'Source Serif 4', serif;
+    font-size: 13px;
+    line-height: 1.7;
+    color: var(--ix-stone);
+  }
+
+  .sg-index-online-scroll {
+    max-height: 168px;
+    overflow: auto;
+    padding-right: 6px;
+  }
+
+  .sg-index-online-scroll::-webkit-scrollbar,
+  .sg-index-recent-body::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .sg-index-online-scroll::-webkit-scrollbar-thumb,
+  .sg-index-recent-body::-webkit-scrollbar-thumb {
+    background: rgba(156, 107, 204, 0.22);
+    border-radius: 999px;
+  }
+
+  .sg-index-recent {
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    min-height: 100%;
+  }
+
+  .sg-index-recent-body {
+    padding: 14px 18px 10px;
+    max-height: 374px;
+    overflow: auto;
+  }
+
+  .sg-index-recent-tabs {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    border-top: 0.5px solid var(--ix-border);
+  }
+
+  .sg-index-recent-tab {
+    border: none;
+    border-right: 0.5px solid var(--ix-border);
+    background: rgba(123, 74, 184, 0.08);
+    color: var(--ix-ink);
+    font-family: 'Cinzel', serif;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.8px;
+    text-transform: uppercase;
+    padding: 12px 8px;
+    cursor: pointer;
+    transition: background-color 0.18s ease, color 0.18s ease;
+  }
+
+  .sg-index-recent-tab:last-child {
+    border-right: none;
+  }
+
+  .sg-index-recent-tab:hover,
+  .sg-index-recent-tab.is-active {
+    background: var(--ix-plum);
+    color: #ffffff;
+  }
+
+  .sg-index-recent-pane {
+    display: none;
+  }
+
+  .sg-index-recent-pane.is-active {
+    display: block;
+  }
+
+  .sg-index-recent-pane a {
+    color: var(--ix-plum3);
+  }
+
+  .sg-index-recent-entry {
+    position: relative;
+    display: grid;
+    grid-template-columns: 18px minmax(0, 1fr);
+    gap: 12px;
+    padding: 13px 0;
+    border-bottom: 0.5px solid rgba(156, 107, 204, 0.12);
+    transition: transform 0.2s ease;
+  }
+
+  .sg-index-recent-entry:last-child {
+    border-bottom: none;
+  }
+
+  .sg-index-recent-entry:hover {
+    transform: translateX(2px);
+  }
+
+  .sg-index-recent-entry__spiral {
+    width: 18px;
+    height: 18px;
+    margin-top: 3px;
+    background: no-repeat center/contain url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none'%3E%3Cpath d='M8 13.2c-2.9 0-5.2-2-5.2-4.9 0-2.5 1.9-4.5 4.5-4.5 2.1 0 3.8 1.4 3.8 3.3 0 1.6-1.2 2.8-2.7 2.8-1.1 0-1.9-.7-1.9-1.7 0-.9.7-1.5 1.5-1.5.7 0 1.2.3 1.6.9' stroke='%23c0582a' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    opacity: 0.9;
+  }
+
+  .sg-index-recent-entry__body {
+    min-width: 0;
+  }
+
+  .sg-index-recent-entry__thread {
+    display: block;
+    margin-bottom: 6px;
+    font-family: 'Cinzel', serif;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1.1px;
+    text-transform: uppercase;
+    line-height: 1.45;
+    color: var(--ix-ink) !important;
+    text-decoration: none;
+  }
+
+  .sg-index-recent-entry__thread:hover {
+    color: #ffffff !important;
+  }
+
+  .sg-index-recent-entry__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    align-items: center;
+    font-family: 'Source Serif 4', serif;
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--ix-stone);
+    margin-bottom: 4px;
+  }
+
+  .sg-index-recent-entry__date {
+    color: var(--ix-mist);
+  }
+
+  .sg-index-recent-entry__separator {
+    color: rgba(192, 88, 42, 0.82);
+  }
+
+  .sg-index-recent-entry__author a,
+  .sg-index-recent-entry__forum a {
+    color: var(--ix-plum3) !important;
+    text-decoration: none;
+  }
+
+  .sg-index-recent-entry__author a:hover,
+  .sg-index-recent-entry__forum a:hover {
+    color: #ffffff !important;
+  }
+
+  .sg-index-recent-entry__forum {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    align-items: center;
+    font-family: 'Cinzel', serif;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--ix-mist);
+    line-height: 1.5;
+  }
+
+  .sg-index-recent-entry__forum-label {
+    color: var(--ix-mist);
+  }
+
+  /* Oculto solo si está realmente vacío (index_section_mundo/offrol/final sin
+     usar); en cuanto uno de esos hooks tenga contenido (ej. Afiliados, llenado
+     directo en index.php), se muestra solo. */
+  .sg-index-hook:empty {
+    display: none;
+  }
+
+  /* ── Afiliados (index.php llena $index_section_final directo) ──
+     Un solo row, tres columnas: Kage (hermano) / ANBU (grande) / Shinobis
+     (pequeño). "hermano/grande/pequeño" siguen siendo el `tipo` interno de
+     la tabla y de la herramienta de Staff; estos son solo los títulos
+     públicos que se muestran en el índice. */
+  .afil-section { margin-bottom: 22px; }
+  .afil-section:last-child { margin-bottom: 0; }
+  /* Flex (no grid) a propósito: align-items:stretch (default de flex) hace
+     que las 3 columnas siempre midan lo mismo de alto (la más alta manda),
+     sin importar cuántos ítems tenga cada nivel. */
+  .afil-columns { display: flex; gap: 20px; }
+  .afil-columns .afil-section { margin-bottom: 0; }
+  /* min-width:0 porque una imagen grande dentro (ver .afil-card--hermano)
+     ignora el ancho flexible y "revienta" el ancho de su columna (bug
+     clásico de contenido reemplazado: min-width:auto por defecto en los
+     items de flex/grid). display:flex column + flex:1 en el body para que
+     el contenido (imagen o grid) ocupe todo el alto ya emparejado. */
+  .afil-columns > .afil-col { display: flex; flex-direction: column; flex: 1 1 0; min-width: 0; }
+  .afil-section__head { flex: 0 0 auto; display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+  .afil-section__head::before { content: ''; width: 3px; height: 13px; background: var(--ix-oxide); flex-shrink: 0; }
+  .afil-section__head::after { content: ''; flex: 1; height: 0.5px; background: var(--ix-border); }
+  .afil-section__title { font-family: 'Cinzel', serif; font-size: 10px; font-weight: 900; letter-spacing: 1.8px; text-transform: uppercase; color: var(--ix-ink); }
+
+  .afil-hermano { display: flex; flex: 1 1 auto; min-height: 0; }
+  .afil-card {
+    position: relative; display: flex; text-decoration: none;
+    border: 0.5px solid var(--ix-border); background: var(--ix-bg3);
+    transition: border-color 0.15s ease, transform 0.12s ease;
+  }
+  .afil-card:hover { border-color: var(--ix-plum3); transform: translateY(-2px); }
+
+  /* Hermano: solo imagen, ancho de su columna, y ahora alto completo de la
+     fila (igualada con ANBU/Shinobis) — sin aspect-ratio fijo, la imagen se
+     recorta con object-fit:cover para llenar el alto disponible. */
+  .afil-card--hermano { width: 100%; min-width: 0; overflow: hidden; }
+  .afil-card--hermano .afil-card__img { width: 100%; height: 100%; min-width: 0; object-fit: cover; display: block; }
+
+  .afil-grid { display: grid; gap: 10px; flex: 1 1 auto; min-height: 0; align-content: start; }
+  .afil-grid--grande { grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); }
+  .afil-grid--pequeno { grid-template-columns: repeat(auto-fill, 45px); justify-content: center; align-content: start; gap: 8px; }
+
+  .afil-card--grande { flex-direction: column; }
+  .afil-card--grande .afil-card__thumb { width: 100%; aspect-ratio: 16 / 9; overflow: hidden; background: var(--ix-bg4); }
+  .afil-card--grande .afil-card__thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .afil-card--grande .afil-card__body { padding: 8px 10px 10px; }
+  .afil-card--grande .afil-card__name { font-family: 'Cinzel', serif; font-size: 11px; font-weight: 700; color: var(--ix-ink); }
+  .afil-card--grande .afil-card__desc { margin: 4px 0 0; font-size: 11px; line-height: 1.5; color: var(--ix-stone); }
+
+  .afil-card--pequeno { width: 45px; height: 45px; padding: 0; overflow: hidden; flex-shrink: 0; }
+  .afil-card__img { width: 45px; height: 45px; object-fit: cover; display: block; }
+
+  .afil-card--vacio { align-items: center; justify-content: center; border-style: dashed; background: transparent; color: var(--ix-mist); }
+  .afil-card--vacio:hover { color: var(--ix-plum3); border-color: var(--ix-plum3); }
+  .afil-card--vacio.afil-card--grande { aspect-ratio: 15.6 / 9; }
+  .afil-slot-plus { font-family: 'Cinzel', serif; font-size: 18px; font-weight: 700; line-height: 1; }
+  .afil-card--vacio.afil-card--pequeno .afil-slot-plus { font-size: 14px; }
+
+  .afil-empty {
+    padding: 18px; text-align: center; color: var(--ix-mist); font-size: 13px;
+    border: 0.5px dashed var(--ix-border); background: var(--ix-bg3);
+  }
+
+  @media (max-width: 640px) {
+    /* Apiladas: cada columna vuelve a su alto natural (nada de stretch
+       entre ellas, que solo tiene sentido cuando están lado a lado). */
+    .afil-columns { flex-direction: column; gap: 22px; }
+    .afil-columns > .afil-col { flex: 0 0 auto; }
+    .afil-card--hermano .afil-card__img { height: auto; aspect-ratio: 16 / 9; }
+    .afil-grid--grande { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  @media (max-width: 1140px) {
+    .sg-index-shell {
+      width: min(1100px, calc(100vw - 24px));
+    }
+  }
+
+  @media (max-width: 980px) {
+    .sg-index-layout--intro,
+    .sg-index-layout--characters,
+    .sg-index-layout--world,
+    .sg-index-dashboard {
+      grid-template-columns: 1fr;
+    }
+
+    .sg-index-layout--intro {
+      grid-template-areas:
+        "announce"
+        "welcome"
+        "lore"
+        "offrol"
+        "rules";
+    }
+
+    .sg-index-layout--world {
+      grid-template-columns: 1fr;
+      grid-template-areas:
+        "fuego"
+        "agua"
+        "viento"
+        "tierra"
+        "rayo"
+        "resto";
+      grid-template-rows: none;
+    }
+
+    .sg-index-dashboard-stack {
+      grid-template-rows: auto auto;
+    }
+
+    .sg-index-zone-title {
+      min-height: 72px;
+      padding: 0 18px;
+    }
+
+    .sg-index-zone-title__text {
+      font-size: 22px;
+      letter-spacing: 2px;
+    }
+
+    .sg-index-card__copy {
+      padding: 12px 14px;
+    }
+
+    .sg-index-card--announce,
+    .sg-index-card--welcome,
+    .sg-index-card--lore,
+    .sg-index-card--rules,
+    .sg-index-card--missions,
+    .sg-index-card--profiles,
+    .sg-index-card--records,
+    .sg-index-card--world,
+    .sg-index-card--offhome {
+      min-height: 280px;
+    }
+  }
+</style>
+</head>
+<body>
+{$header}
+
+<div class="sg-index-page">
+  <div class="sg-index-shell">
+    <div class="sg-index-stack">
+
+      <section class="sg-index-zone">
+        <div class="sg-index-zone-frame">
+          <div class="sg-index-zone-title">
+            <span class="sg-index-zone-title__count">1.</span>
+            <span class="sg-index-zone-title__text">Puertas de la Villa</span>
+            <span class="sg-index-zone-title__line"></span>
+          </div>
+
+          <div class="sg-index-layout sg-index-layout--intro">
+            <a class="sg-index-card sg-index-card--rules" href="forumdisplay.php?fid=25">
+<img class="sg-index-card__image is-placeholder" src="/images/sg/uploads/guias.webp" alt="Descripción de la imagen">
+              <div class="sg-index-card__title-wrap">
+                <span class="sg-index-card__title-surface">
+                  <span class="sg-index-card__title">Guías &amp; Sistemas</span>
+                </span>
+              </div>
+            </a>
+
+            <a class="sg-index-card sg-index-card--welcome" href="forumdisplay.php?fid=51">
+<img class="sg-index-card__image is-placeholder" src="/images/sg/uploads/bienvenidas.webp" width="1200" height="800" alt="">
+              <div class="sg-index-card__title-wrap">
+                <span class="sg-index-card__title-surface">
+                  <span class="sg-index-card__title">Bienvenidas &amp; Ausencias</span>
+                </span>
+              </div>
+            </a>
+
+            <a class="sg-index-card sg-index-card--lore" href="forumdisplay.php?fid=274">
+<img class="sg-index-card__image is-placeholder" src="/images/sg/uploads/lore.webp" width="1200" height="800" alt="">
+              <div class="sg-index-card__title-wrap">
+                <span class="sg-index-card__title-surface">
+                  <span class="sg-index-card__title">Lore &amp; Ambientación</span>
+                </span>
+              </div>
+            </a>
+
+            <a class="sg-index-card sg-index-card--announce" href="forumdisplay.php?fid=2">
+<img class="sg-index-card__image is-placeholder" src="/images/sg/uploads/anuncios.webp" width="1200" height="800" alt="">
+              <div class="sg-index-card__title-wrap">
+                <span class="sg-index-card__title-surface">
+                  <span class="sg-index-card__title">Anuncios &amp; Eventos</span>
+                </span>
+              </div>
+            </a>
+
+            <a class="sg-index-card sg-index-card--offhome" href="forumdisplay.php?fid=52">
+<img class="sg-index-card__image is-placeholder" src="/images/sg/uploads/off.webp" width="1200" height="800" alt="">
+              <div class="sg-index-card__title-wrap">
+                <span class="sg-index-card__title-surface">
+                  <span class="sg-index-card__title">Off-Rol &amp; Sugerencias</span>
+                </span>
+              </div>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <section class="sg-index-zone">
+        <div class="sg-index-zone-frame">
+          <div class="sg-index-zone-title">
+            <span class="sg-index-zone-title__count">2.</span>
+            <span class="sg-index-zone-title__text">Tablón de Expendientes</span>
+            <span class="sg-index-zone-title__line"></span>
+          </div>
+			
+
+          <div class="sg-index-layout sg-index-layout--characters">
+            <a class="sg-index-card sg-index-card--missions" href="forumdisplay.php?fid=15">
+<img class="sg-index-card__image is-placeholder" src="/images/sg/uploads/misiones.webp" width="1200" height="800" alt="">
+              <div class="sg-index-card__title-wrap">
+                <span class="sg-index-card__title-surface">
+                  <span class="sg-index-card__title">Petición de Misiones</span>
+                </span>
+              </div>
+            </a>
+
+            <a class="sg-index-card sg-index-card--profiles" href="forumdisplay.php?fid=10">
+<img class="sg-index-card__image is-placeholder" src="/images/sg/uploads/perfiles.webp" width="1200" height="800" alt="">
+              <div class="sg-index-card__title-wrap">
+                <span class="sg-index-card__title-surface">
+                  <span class="sg-index-card__title">Perfiles &amp; Creaciones</span>
+                </span>
+              </div>
+            </a>
+
+            <a class="sg-index-card sg-index-card--records" href="forumdisplay.php?fid=289">
+<img class="sg-index-card__image is-placeholder" src="/images/sg/uploads/registros.webp" width="1200" height="800" alt="">
+              <div class="sg-index-card__title-wrap">
+                <span class="sg-index-card__title-surface">
+                  <span class="sg-index-card__title">Registros</span>
+                </span>
+              </div>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <section class="sg-index-zone">
+        <div class="sg-index-zone-frame">
+          <div class="sg-index-zone-title">
+            <span class="sg-index-zone-title__count">3.</span>
+            <span class="sg-index-zone-title__text">Mundo Shinobi</span>
+            <span class="sg-index-zone-title__line"></span>
+          </div>
+
+          <div class="sg-index-layout sg-index-layout--world">
+            <a class="sg-index-card sg-index-card--world sg-index-card--world-fuego" href="forumdisplay.php?fid=46">
+<img class="sg-index-card__image is-placeholder" src="/images/sg/uploads/fuego.webp" width="1200" height="800" alt="">
+
+              <div class="sg-index-card__title-wrap">
+                <span class="sg-index-card__title-surface">
+                  <span class="sg-index-card__title">País del Fuego</span>
+                </span>
+              </div>
+            </a>
+
+            <a class="sg-index-card sg-index-card--world sg-index-card--world-agua" href="forumdisplay.php?fid=39">
+<img class="sg-index-card__image is-placeholder" src="/images/sg/uploads/agua.webp" width="1200" height="800" alt="">
+              <div class="sg-index-card__title-wrap">
+                <span class="sg-index-card__title-surface">
+                  <span class="sg-index-card__title">País del Agua</span>
+                </span>
+              </div>
+            </a>
+
+            <a class="sg-index-card sg-index-card--world sg-index-card--world-viento" href="forumdisplay.php?fid=47">
+<img class="sg-index-card__image is-placeholder" src="/images/sg/uploads/viento.webp" width="1200" height="800" alt="">
+              <div class="sg-index-card__title-wrap">
+                <span class="sg-index-card__title-surface">
+                  <span class="sg-index-card__title">País del Viento</span>
+                </span>
+              </div>
+            </a>
+
+            <a class="sg-index-card sg-index-card--world sg-index-card--world-rayo" href="forumdisplay.php?fid=38">
+<img class="sg-index-card__image is-placeholder" src="/images/sg/uploads/rayo.webp" width="1200" height="800" alt="">
+              <div class="sg-index-card__title-wrap">
+                <span class="sg-index-card__title-surface">
+                  <span class="sg-index-card__title">País del Rayo</span>
+                </span>
+              </div>
+            </a>
+
+            <a class="sg-index-card sg-index-card--world sg-index-card--world-tierra" href="forumdisplay.php?fid=48">
+<img class="sg-index-card__image is-placeholder" src="/images/sg/uploads/tierra.webp" width="1200" height="800" alt="">
+              <div class="sg-index-card__title-wrap">
+                <span class="sg-index-card__title-surface">
+                  <span class="sg-index-card__title">País de la Tierra</span>
+                </span>
+              </div>
+            </a>
+
+            <a class="sg-index-card sg-index-card--world sg-index-card--world-resto" href="forumdisplay.php?fid=49">
+<img class="sg-index-card__image is-placeholder" src="/images/sg/uploads/mundo.webp" width="1200" height="800" alt="">
+              <div class="sg-index-card__title-wrap">
+                <span class="sg-index-card__title-surface">
+                  <span class="sg-index-card__title">Resto del Mundo</span>
+                </span>
+              </div>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <section class="sg-index-dashboard">
+        <div class="sg-index-dashboard-stack">
+          <article class="sg-index-panel sg-index-season">
+            <div class="sg-index-season__copy">
+              <div class="sg-index-season__eyebrow">Calendario Shinobi</div>
+              <div class="sg-index-season__title">Verano</div>
+
+              <div class="sg-index-season__row">
+                <span class="sg-index-season__chip">Año 150</span>
+                <span class="sg-index-season__chip">Días 1–90</span>
+              </div>
+
+              <!-- Al cambiar de temporada, actualiza 2 cosas:
+                   1) "45" y "90" en el texto (día límite / total de días).
+                   2) --fill: (día límite / total de días) × 100%. Hoy 45/90 = 50%. -->
+              <div class="sg-index-limit">
+                <div class="sg-index-limit__head">
+                  Fecha límite de rol: <span class="sg-index-limit__value">día 45</span> de 90
+                </div>
+                <div class="sg-index-limit__bar" style="--fill:50%;">
+                  <div class="sg-index-limit__fill"></div>
+                  <div class="sg-index-limit__marker"></div>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <article class="sg-index-panel">
+            <div class="sg-index-panel__header">
+              <span class="sg-index-panel__line"></span>
+              <span class="sg-index-panel__title">Pulso del Foro</span>
+            </div>
+            <div class="sg-index-panel__body">
+              <div class="sg-index-stat-copy">
+                <div>Se han escrito {$stats['numposts']} posts en {$stats['numthreads']} temas.</div>
+                <div>Actualmente tenemos {$stats['numusers']} miembros registrados.</div>
+                <div>Démosle la bienvenida al miembro más reciente: {$newestmember}.</div>
+              </div>
+              <div class="sg-index-actions">
+                <a class="sg-index-btn" href="https://discord.gg/ngW7P9uzPV">Discord</a>
+                <a class="sg-index-btn" href="/sg/censo.php">Censo y Estadísticas</a>
+              </div>
+            </div>
+          </article>
+        </div>
+
+        <article class="sg-index-panel sg-index-online">
+          <div class="sg-index-panel__header">
+            <span class="sg-index-panel__line"></span>
+            <span class="sg-index-panel__title">Presencias</span>
+          </div>
+
+          <div class="sg-index-online-section">
+            <div class="sg-index-online-label"><a href="/online.php">Conectados Ahora</a></div>
+            <div class="sg-index-online-copy sg-index-online-scroll">{$onlinemembers}</div>
+          </div>
+
+          <div class="sg-index-online-section">
+            <div class="sg-index-online-label">En Línea Esta Semana</div>
+            <div class="sg-index-online-copy sg-index-online-scroll">{$online_today}</div>
+          </div>
+        </article>
+
+        <article class="sg-index-panel sg-index-recent">
+          <div class="sg-index-panel__header">
+            <span class="sg-index-panel__line"></span>
+            <span class="sg-index-panel__title"><a href="misc.php?action=recent_threads">Últimos Posts</a></span>
+          </div>
+
+          <div class="sg-index-recent-body">
+            <div id="ultimos_todo" class="sg-index-recent-pane is-active">{$g_ultimos_post}</div>
+            <div id="ultimos_rol" class="sg-index-recent-pane">{$g_ultimos_post_rol}</div>
+            <div id="ultimos_off" class="sg-index-recent-pane">{$g_ultimos_post_off}</div>
+          </div>
+
+          <div class="sg-index-recent-tabs">
+            <button class="sg-index-recent-tab is-active" type="button" data-target="todo" onclick="clickUltimoPost('todo');">Todo</button>
+            <button class="sg-index-recent-tab" type="button" data-target="rol" onclick="clickUltimoPost('rol');">Rol</button>
+            <button class="sg-index-recent-tab" type="button" data-target="off" onclick="clickUltimoPost('off');">Off</button>
+          </div>
+        </article>
+      </section>
+
+<!--       <div class="sg-index-hook">{index_section_mundo}{index_section_offrol}{index_section_final}</div> -->
+    </div>
+  </div>
+</div>
+
+<script>
+function clickUltimoPost(tipo) {
+  var panes = document.querySelectorAll('.sg-index-recent-pane');
+  var tabs = document.querySelectorAll('.sg-index-recent-tab');
+
+  panes.forEach(function(pane) {
+    pane.classList.remove('is-active');
+  });
+
+  tabs.forEach(function(tab) {
+    tab.classList.remove('is-active');
+  });
+
+  var targetPane = document.getElementById('ultimos_' + tipo);
+  var targetTab = document.querySelector('.sg-index-recent-tab[data-target="' + tipo + '"]');
+
+  if (targetPane) {
+    targetPane.classList.add('is-active');
+  }
+
+  if (targetTab) {
+    targetTab.classList.add('is-active');
+  }
+}
+</script>
+
+{$footer}
+</body>
+</html>

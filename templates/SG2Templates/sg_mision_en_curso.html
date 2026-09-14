@@ -1,0 +1,451 @@
+<html>
+
+<head>
+    <title>Misiones</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Source+Serif+4:wght@300;400;600;700&family=Zen+Old+Mincho:wght@400;700&display=swap" rel="stylesheet">
+    {$headerinclude}
+    <style>
+        :root {
+            --bg: #0f0c18;
+            --surface: rgba(23, 18, 36, 0.84);
+            --surface-soft: rgba(28, 22, 44, 0.7);
+            --border: rgba(156, 107, 204, 0.12);
+            --ink: #e8dff8;
+            --plum2: #9c6bcc;
+            --plum3: #b890e0;
+            --plum4: #d4b8f0;
+            --stone: #8a7a9a;
+            --fiber: rgba(156, 107, 204, 0.04);
+            --shadow: 0 24px 60px rgba(0, 0, 0, 0.28);
+            --shadow-soft: 0 12px 28px rgba(0, 0, 0, 0.18);
+        }
+
+        body {
+            background:
+                radial-gradient(circle at top left, rgba(123, 74, 184, 0.12), transparent 28%),
+                radial-gradient(circle at bottom right, rgba(192, 88, 42, 0.08), transparent 24%),
+                var(--bg);
+            color: var(--ink);
+            font-family: "Source Serif 4", serif;
+            margin: 0;
+            position: relative;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+            background-image:
+                repeating-linear-gradient(13deg, transparent 0, transparent 24px, var(--fiber) 24px, var(--fiber) 25px),
+                repeating-linear-gradient(82deg, transparent 0, transparent 36px, var(--fiber) 36px, var(--fiber) 37px),
+                repeating-linear-gradient(151deg, transparent 0, transparent 19px, var(--fiber) 19px, var(--fiber) 19.5px);
+        }
+
+        .mission-run-page {
+            max-width: 1060px;
+            margin: 28px auto 44px;
+            padding: 0 18px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .mission-run-shell {
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            background: rgba(19, 15, 30, 0.94);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        .mission-run-head {
+            padding: 22px 26px 18px;
+            border-bottom: 1px solid var(--border);
+            background: rgba(23, 18, 36, 0.82);
+        }
+
+        .mission-run-label,
+        .mission-run-rank,
+        .mission-cancel,
+        .mission-cancel-confirm {
+            font-family: "Cinzel", serif;
+            text-transform: uppercase;
+        }
+
+        .mission-run-label {
+            margin-bottom: 8px;
+            font-size: 10px;
+            letter-spacing: 2.4px;
+            color: var(--plum3);
+        }
+
+        .mission-run-title {
+            margin: 0;
+            font: 900 28px/1.05 "Cinzel", serif;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: var(--ink);
+        }
+
+        .mission-run-copy {
+            margin: 10px 0 0;
+            color: var(--stone);
+            font-size: 14px;
+            line-height: 1.7;
+        }
+
+        .mission-run-body {
+            padding: 20px;
+            display: grid;
+            gap: 16px;
+        }
+
+        .mission-timer {
+            padding: 18px 20px;
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            background: var(--surface);
+            text-align: center;
+            box-shadow: var(--shadow-soft);
+        }
+
+        .mission-timer-title {
+            margin: 0 0 8px;
+            font: 900 18px/1.1 "Cinzel", serif;
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+            color: var(--ink);
+        }
+
+        #countdown {
+            margin: 0;
+            color: var(--plum4);
+            font: 700 26px/1.35 "Cinzel", serif;
+        }
+
+        .mission-run-card {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 300px;
+            gap: 16px;
+            padding: 18px;
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            background: var(--surface);
+            box-shadow: var(--shadow-soft);
+        }
+
+        .mission-run-rank {
+            display: inline-flex;
+            align-items: center;
+            min-height: 28px;
+            width: fit-content;
+            padding: 0 12px;
+            border: 1px solid var(--border);
+            border-radius: 999px;
+            background: rgba(15, 12, 24, 0.22);
+            color: var(--plum3);
+            font-size: 10px;
+            letter-spacing: 2px;
+        }
+
+        .mission-run-name {
+            margin: 12px 0 10px;
+            font: 900 24px/1.1 "Cinzel", serif;
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+            color: var(--ink);
+        }
+
+        .mission-run-description {
+            margin: 0;
+            color: var(--stone);
+            font-size: 15px;
+            line-height: 1.85;
+            text-align: justify;
+        }
+
+        .mission-run-stats {
+            display: grid;
+            gap: 12px;
+        }
+
+        .mission-run-gif {
+            position: relative;
+            overflow: hidden;
+            min-height: 100%;
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            background: #130f1e;
+            box-shadow: var(--shadow-soft);
+        }
+
+        .mission-run-gif img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .mission-run-gif::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            background:
+                linear-gradient(180deg, rgba(15, 12, 24, 0.06), rgba(15, 12, 24, 0.34)),
+                radial-gradient(circle at center, transparent 42%, rgba(15, 12, 24, 0.22) 100%);
+        }
+
+        .mission-run-gif-badge {
+            position: absolute;
+            left: 16px;
+            bottom: 16px;
+            z-index: 1;
+            display: inline-flex;
+            align-items: center;
+            min-height: 30px;
+            padding: 0 12px;
+            border: 1px solid rgba(232, 223, 248, 0.14);
+            border-radius: 999px;
+            background: rgba(19, 15, 30, 0.7);
+            backdrop-filter: blur(6px);
+            color: #fff;
+            font: 700 10px/1 "Cinzel", serif;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .mission-run-stat {
+            padding: 14px 16px;
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            background: var(--surface-soft);
+        }
+
+        .mission-run-stat strong {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--stone);
+            font: 700 10px/1 "Cinzel", serif;
+            letter-spacing: 1.8px;
+            text-transform: uppercase;
+        }
+
+        .mission-run-stat span {
+            display: block;
+            color: var(--plum4);
+            font: 700 18px/1.35 "Cinzel", serif;
+        }
+
+        .mission-cancel-box {
+            text-align: center;
+        }
+
+        .mission-cancel {
+            min-height: 46px;
+            padding: 0 18px;
+            border: 1px solid rgba(156, 107, 204, 0.2);
+            border-radius: 999px;
+            background: rgba(15, 12, 24, 0.28);
+            color: var(--ink);
+            font-size: 10px;
+            letter-spacing: 1.8px;
+            cursor: pointer;
+        }
+
+        #confirmacion {
+            margin-top: 14px;
+            padding: 16px;
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            background: var(--surface);
+            box-shadow: var(--shadow-soft);
+        }
+
+        .mission-cancel-confirm {
+            margin: 0 0 14px;
+            color: var(--plum4);
+            font-size: 11px;
+            letter-spacing: 1.8px;
+        }
+
+        .mission-confirm-actions {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 14px;
+        }
+
+        .mission-confirm-actions .button {
+            min-height: 40px;
+            padding: 0 16px;
+            border: 1px solid rgba(156, 107, 204, 0.2);
+            border-radius: 999px;
+            background: rgba(15, 12, 24, 0.28);
+            color: var(--ink);
+            font: 700 10px/1 "Cinzel", serif;
+            letter-spacing: 1.8px;
+            text-transform: uppercase;
+            box-shadow: none;
+        }
+
+        .mission-confirm-actions .button:first-child {
+            background: linear-gradient(135deg, rgba(61, 31, 110, 0.96), rgba(90, 46, 154, 0.88));
+            color: #fff;
+        }
+
+        .mission-cancel-gif {
+            max-width: 220px;
+            border-radius: 12px;
+        }
+
+        .mission-run-footer {
+            text-align: center;
+        }
+
+        .mission-run-footer img {
+            max-width: 100%;
+            border-radius: 18px;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow-soft);
+        }
+
+        @media (max-width: 860px) {
+            .mission-run-card {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 720px) {
+            .mission-run-page {
+                margin-top: 20px;
+                padding: 0 12px;
+            }
+
+            .mission-run-shell {
+                border-radius: 18px;
+            }
+
+            .mission-run-head {
+                padding: 20px 18px 16px;
+            }
+
+            .mission-run-body,
+            .mission-run-card {
+                padding: 16px;
+            }
+
+            #countdown {
+                font-size: 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    {$header}
+    <div class="mission-run-page">
+        <div class="mission-run-shell">
+            <section class="mission-run-head">
+                <div class="mission-run-label">Misión activa</div>
+                <h1 class="mission-run-title">Misión en Progreso</h1>
+                <p class="mission-run-copy">Tu encargo ya está en marcha. Espera a que termine la cuenta atrás para poder reclamar la recompensa correspondiente.</p>
+            </section>
+
+            <section class="mission-run-body">
+                <div class="mission-timer">
+                    <h2 class="mission-timer-title">Tiempo restante</h2>
+                    <div id="contenedor">
+                        <p id="countdown"></p>
+                    </div>
+                </div>
+
+                <div class="mission-run-card">
+                    <div>
+                        <div class="mission-run-rank">Rango {$mision['rango']}</div>
+                        <h2 class="mission-run-name">{$mision['title']}</h2>
+                        <p class="mission-run-description">{$mision['descripcion']}</p>
+                    </div>
+                    <div class="mission-run-stats">
+                        <div class="mission-run-gif">
+                            <img src="https://narutoversity.files.wordpress.com/2015/07/naruto-versus-kimimaro.gif" alt="Misión en curso">
+                            <div class="mission-run-gif-badge">En ejecución</div>
+                        </div>
+                        <div class="mission-run-stat">
+                            <strong>Pago</strong>
+                            <span>{$mision['ryos']} Ryos</span>
+                        </div>
+                        <div class="mission-run-stat">
+                            <strong>Experiencia</strong>
+                            <span>{$mision['coste']} Puntos</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="display: none">
+                    <form id="cmisform" method="post" action="misiones.php">
+                        <input type="text" name="userid2" id="userid" value="{$userid}">
+                        <input type="text" id="mid2" name="mid2" value="false">
+                    </form>
+                </div>
+
+                <div class="mission-cancel-box">
+                    <div id="confirmacion" style="display: none;">
+                        <p class="mission-cancel-confirm">¿Seguro que quieres cancelar esta misión?</p>
+                        <div class="mission-confirm-actions">
+                            <input type="button" class="button" onclick="javascript: document.getElementById('mid2').value = 'cancel'; document.getElementById('cmisform').submit();" value="Sí">
+                            <input type="button" class="button" onclick="javascript: document.getElementById('confirmacion').style= 'display: none';" value="No">
+                        </div>
+                        <img class="mission-cancel-gif" src="https://media.giphy.com/media/2SviMQehkY0lG/giphy.gif" alt="Cancelar misión">
+                    </div>
+                    <input type="button" class="mission-cancel" onclick="javascript: document.getElementById('confirmacion').style= 'display: block';" value="Cancelar misión">
+                </div>
+
+            </section>
+        </div>
+    </div>
+    {$reload_script}
+    {$footer}
+</body>
+
+<script>
+    var end = new Date({$tiempo});
+
+    var _second = 1000;
+    var _minute = _second * 60;
+    var _hour = _minute * 60;
+    var _day = _hour * 24;
+    var timer;
+
+    function showRemaining() {
+        var now = new Date();
+        var distance = end - now;
+        if (distance < 1000 && distance > 1) {
+            location.reload(true);
+            return;
+        }
+        if (distance < 0) {
+            clearInterval(timer);
+            document.getElementById('countdown').innerHTML = '0 dias, 0 horas, 0 minutos y 0 segundos';
+            location.reload();
+            return;
+        }
+        var days = Math.floor(distance / _day);
+        var hours = Math.floor((distance % _day) / _hour);
+        var minutes = Math.floor((distance % _hour) / _minute);
+        var seconds = Math.floor((distance % _minute) / _second);
+
+        document.getElementById('countdown').innerHTML = days + ' dias, ';
+        document.getElementById('countdown').innerHTML += hours + ' horas, ';
+        document.getElementById('countdown').innerHTML += minutes + ' minutos y ';
+        document.getElementById('countdown').innerHTML += seconds + ' segundos';
+    }
+
+    timer = setInterval(showRemaining, 1000);
+</script>
+
+</html>

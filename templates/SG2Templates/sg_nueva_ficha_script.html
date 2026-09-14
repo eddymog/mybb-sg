@@ -1,0 +1,76 @@
+<script>
+  var clanes = {$clanes};
+  var villas = {$villas};
+  var sinClanKonoha = {$sinClanKonoha};
+  var sinClanKiri = {$sinClanKiri};
+
+  function initializeVilla(villas) {
+    const aldeasQuery = document.querySelector('.listaAldeas');
+
+    for (let i = 0; i < villas.length; i++) {
+      const nombre = villas[i].nombreVilla;
+      const vid = villas[i].vid;
+      const img = villas[i].img;
+
+      if (true) {
+        const input = '<input type="radio" name="villa" value="' + vid + '" onClick="onChangeVilla(' + vid + ')" required>';
+        const lab = document.createElement('label');
+        lab.innerHTML = input + '<img src="/images/char_create/' + img + '.png"><p style = "text-transform:capitalize;">' + nombre + '</p>';
+        aldeasQuery.appendChild(lab);
+      }
+    }
+  }
+
+  function onChangeVilla(villaId) {
+    const clanesQuery = document.querySelector('.listaClanes');
+    clanesQuery.innerHTML = "<legend>Clan</legend>";
+
+	if (villaId != 7) {
+		// $('.listaClanes').append('<p style=" font-size: 19px; margin: 0; padding-top: 0; ">Clanes Exclusivos</p>');  
+	}
+
+    for (let i = 0; i < clanes.length; i++) {
+      const aClan = clanes[i];
+      if ((aClan.vid == villaId && aClan.vid != 7) && aClan.abierto == 1) {
+        const image = '/images/char_create/clan_img.png';
+        const item = '<input type="radio" name="clan" value="' + aClan.cid + '" required>';
+        const lab = document.createElement('label');
+        lab.innerHTML = item + '<img src="' + image + '"><p style = "text-transform:capitalize;">' + aClan.nombreClan + '</p>';
+        clanesQuery.appendChild(lab);
+      }
+    }
+
+	for (let i = 0; i < clanes.length; i++) {
+      const aClan = clanes[i];
+	  let sinClanOpen = false;
+	  if (villaId == 1 && aClan.cid == 1001 && sinClanKonoha == 1) { sinClanOpen = true; }
+	  if (villaId == 3 && aClan.cid == 1001 && sinClanKiri == 1) { sinClanOpen = true; }
+
+      if ((sinClanOpen || aClan.vid == 7) && aClan.abierto == 1) {
+        const image = '/images/char_create/clan_img.png';
+        const item = '<input type="radio" name="clan" value="' + aClan.cid + '" required>';
+        const lab = document.createElement('label');
+        lab.innerHTML = item + '<img src="' + image + '"><p style = "text-transform:capitalize;">' + aClan.nombreClan + '</p>';
+        clanesQuery.appendChild(lab);
+      }
+    }
+
+	for (let i = 0; i < clanes.length; i++) {
+      const aClan = clanes[i];
+
+      if ((aClan.vid == 2) && aClan.abierto == 1) {
+        const image = '/images/char_create/clan_img.png';
+        const item = '<input type="radio" name="clan" value="' + aClan.cid + '" required>';
+        const lab = document.createElement('label');
+        lab.innerHTML = item + '<img src="' + image + '"><p style = "text-transform:capitalize;">' + aClan.nombreClan + '</p>';
+        clanesQuery.appendChild(lab);
+      }
+    }
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function() { initializeVilla(villas); });
+  } else {
+    initializeVilla(villas);
+  }
+</script>

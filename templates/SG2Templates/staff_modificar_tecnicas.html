@@ -1,0 +1,230 @@
+<html>
+
+<head>
+  <title>Modificar Técnicas</title>
+  {$headerinclude}
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Noto+Serif+JP:wght@300;400;700&display=swap" rel="stylesheet">
+  <style>
+    .sg-admin {
+      --bg: #0f0c18; --bg2: #130f1e; --bg3: #171224;
+      --border: rgba(156, 107, 204, 0.12);
+      --border-strong: rgba(156, 107, 204, 0.22);
+      --ink: #e8dff8; --plum: #7b4ab8; --plum2: #9c6bcc; --plum3: #b890e0;
+      --stone: #8a7a9a; --mist: #5a4a6a; --oxide: #c0582a; --lavender: #ede0fa;
+      max-width: 820px;
+      margin: 24px auto 40px;
+      padding: 0 16px;
+      color: var(--ink);
+      font-family: 'Noto Serif JP', serif;
+    }
+
+    .sg-admin-card {
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), transparent 16%), var(--bg2);
+      border: 0.5px solid var(--border);
+      overflow: hidden;
+    }
+
+    .sg-admin-head {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 18px 22px;
+      background: var(--bg3);
+      border-bottom: 0.5px solid var(--border);
+    }
+
+    .sg-admin-head::before {
+      content: '';
+      width: 3px;
+      height: 20px;
+      background: var(--oxide);
+      flex-shrink: 0;
+    }
+
+    .sg-admin-head h1 {
+      margin: 0;
+      font-family: 'Cinzel', serif;
+      font-size: 15px;
+      font-weight: 900;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--ink);
+    }
+
+    .sg-admin-body { padding: 22px; }
+
+    /* Búsqueda por ID */
+    .sg-lookup {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-end;
+      gap: 10px;
+    }
+
+    /* Rejilla de campos */
+    .sg-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .sg-field { display: flex; flex-direction: column; gap: 5px; }
+    .sg-field--full { grid-column: 1 / -1; }
+
+    .sg-label {
+      font-family: 'Cinzel', serif;
+      font-size: 8px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--mist);
+    }
+
+    .sg-label .req { color: var(--oxide); }
+
+    .sg-input, .sg-textarea {
+      width: 100%;
+      padding: 9px 12px;
+      background: var(--bg);
+      border: 0.5px solid var(--border-strong);
+      color: var(--ink);
+      font-family: 'Noto Serif JP', serif;
+      font-size: 14px;
+      box-sizing: border-box;
+      transition: border-color 0.15s;
+    }
+
+    .sg-input:focus, .sg-textarea:focus {
+      outline: none;
+      border-color: var(--plum3);
+    }
+
+    .sg-input:disabled { color: var(--stone); background: var(--bg3); }
+
+    .sg-textarea { resize: vertical; line-height: 1.6; }
+
+    .sg-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      height: 38px;
+      padding: 0 22px;
+      background: var(--plum);
+      border: none;
+      color: var(--lavender);
+      font-family: 'Cinzel', serif;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    .sg-btn:hover { background: var(--plum2); }
+
+    .sg-actions {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 18px;
+      padding-top: 16px;
+      border-top: 0.5px solid var(--border);
+    }
+
+    @media (max-width: 640px) {
+      .sg-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+
+<body>
+  {$header}
+  <main class="sg-admin">
+    <div class="sg-admin-card">
+      <div class="sg-admin-head">
+        <h1>Modificar Técnica</h1>
+      </div>
+      <div class="sg-admin-body">
+
+        <if $tecnica_id == '' then>
+          <div class="sg-lookup">
+            <div class="sg-field" style="flex: 1; min-width: 200px;">
+              <label class="sg-label" for="tecnica_id">Técnica ID <span class="req">*</span></label>
+              <input class="sg-input" type="text" placeholder="HOS602" required id="tecnica_id">
+            </div>
+            <button class="sg-btn" type="button" onclick="onClickTid()">Buscar</button>
+          </div>
+        </if>
+
+        <if $tecnica_id != '' then>
+          <form method="post" action="/sg/admin/modificar_tecnicas.php" name="crear_tecnicas" id="crear_tecnicas">
+            <input type="hidden" name="tecnica_id" value="{$tecnica_id}">
+
+            <div class="sg-grid">
+              <div class="sg-field">
+                <label class="sg-label" for="nombre">Nombre de técnica <span class="req">*</span></label>
+                <input class="sg-input" value="{$tecnica['nombre']}" type="text" name="nombre" id="nombre" required />
+              </div>
+              <div class="sg-field">
+                <label class="sg-label" for="tid">Técnica ID <span class="req">*</span></label>
+                <input class="sg-input" value="{$tecnica['tid']}" type="text" name="tid" id="tid" required />
+              </div>
+              <div class="sg-field">
+                <label class="sg-label" for="arbol">Árbol</label>
+                <input class="sg-input" value="{$tecnica['arbol']}" type="text" name="arbol" id="arbol" />
+              </div>
+              <div class="sg-field">
+                <label class="sg-label" for="rama">Rama</label>
+                <input class="sg-input" value="{$tecnica['rama']}" type="text" name="rama" id="rama" />
+              </div>
+              <div class="sg-field">
+                <label class="sg-label" for="categoria">Categoría</label>
+                <input class="sg-input" value="{$tecnica['categoria']}" type="text" name="categoria" id="categoria" />
+              </div>
+              <div class="sg-field">
+                <label class="sg-label" for="nivel">Nivel</label>
+                <input class="sg-input" value="{$tecnica['nivel']}" type="text" name="nivel" id="nivel" />
+              </div>
+              <div class="sg-field">
+                <label class="sg-label" for="requisito">Requisito</label>
+                <input class="sg-input" value="{$tecnica['requisito']}" type="text" name="requisito" id="requisito" />
+              </div>
+              <div class="sg-field sg-field--full">
+                <label class="sg-label" for="coste">Coste</label>
+                <textarea class="sg-textarea" style="height: 60px;" name="coste" id="coste">{$tecnica['coste']}</textarea>
+              </div>
+              <div class="sg-field sg-field--full">
+                <label class="sg-label" for="efecto">Efecto</label>
+                <textarea class="sg-textarea" style="height: 60px;" name="efecto" id="efecto">{$tecnica['efecto']}</textarea>
+              </div>
+              <div class="sg-field sg-field--full">
+                <label class="sg-label" for="descripcion">Descripción <span class="req">*</span></label>
+                <textarea class="sg-textarea" style="height: 240px;" name="descripcion" id="descripcion" minlength="1" required>{$tecnica['descripcion']}</textarea>
+              </div>
+            </div>
+
+            <div class="sg-actions">
+              <button class="sg-btn" type="submit">Modificar</button>
+            </div>
+          </form>
+        </if>
+
+      </div>
+    </div>
+  </main>
+  {$footer}
+</body>
+<if $log_var != '' then><script>alert(`{$log_var}`);</script></if>
+{$reload_script}
+<script>
+  function onClickTid() {
+    const tecnicaId = document.getElementById('tecnica_id').value;
+    if (tecnicaId) {
+      window.location.href = window.location.pathname + '?tecnica_id=' + tecnicaId;
+    }
+  }
+</script>
+
+</html>

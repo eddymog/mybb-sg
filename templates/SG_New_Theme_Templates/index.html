@@ -1,0 +1,215 @@
+<html>
+<head>
+	<script src="https://kit.fontawesome.com/ba27a46c48.js" crossorigin="anonymous"></script>
+<title>{$mybb->settings['bbname']}</title>
+{$headerinclude}
+<link rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Inter">
+<script type="text/javascript">
+<!--
+	lang.no_new_posts = "{$lang->no_new_posts}";
+	lang.click_mark_read = "{$lang->click_mark_read}";
+// -->
+</script>
+</head>
+<body>
+{$header}
+<div id ="mainBackground">
+	<div id="secondBackground">
+		<div id="thirdBackground">
+<div id="catForum1"></div>
+    <div class="firstSectionRow">
+		<a href="forumdisplay.php?fid=2"><div class="forum1"></div></a>
+      <div class="forumnColumn2">
+		  <a href="forumdisplay.php?fid=51"><div class="forum2"></div></a>
+        <div class="forumRow1">
+			<a href="forumdisplay.php?fid=274"><div class="forum3"></div></a>
+			<a href="forumdisplay.php?fid=25"><div class="forum4"></div></a>
+        </div>
+      </div>
+    </div>
+    <div id="catForum2"></div>
+    <div id="forumSection2">
+		<a href="forumdisplay.php?fid=15"><div class="missionForum"></div></a>
+		<a href="forumdisplay.php?fid=10"><div class="creationForum"></div></a>
+      	<a href="forumdisplay.php?fid=289"><div class="organizationForum"></div></a>
+    </div>
+    <div id="catForum3"></div>
+    <div id="forumSection3">
+		<a href="forumdisplay.php?fid=46"><div class="pFuego"></div></a>
+		<a href="forumdisplay.php?fid=39"><div class="pAgua"></div></a>
+		<a href="forumdisplay.php?fid=47"><div class="pViento"></div></a>
+		<a href="forumdisplay.php?fid=38"><div class="pRayo"></div></a>
+		<a href="forumdisplay.php?fid=48"><div class="pTierra"></div></a>
+		<a href="forumdisplay.php?fid=49"><div class="rMundo"></div></a>
+    </div>
+	<!-- {$index_section_mundo} -->
+	<div id="catForum4"></div>
+	<div id="forumSection4">
+		<a href="forumdisplay.php?fid=52"><div class ="ficsCombates"></div></a>
+		<a href="forumdisplay.php?fid=53"><div class="afiliaciones"></div></a>
+	</div>
+	<!-- {$index_section_offrol} -->
+	<div style=" margin-top: 15px; width: 100%; height: 2px; background-color: #517988; "></div>
+	<div class="firstSectionRow" style="margin-top: 10px;display: flex;flex-direction: row;">
+				
+		<div style="display: flex;flex-direction: row;">
+			<div class="online_div" style="height: 438px;width:299px;background-color: #0e1a28;overflow-y: auto;border: 5px solid #0e2034;box-sizing: border-box;">
+				<div style="padding: 10px 10px 0px;"><span style=" color: white; font-family: InterRegular; letter-spacing: 2px; font-size: 15px; "><a href="/online.php">Conectados</a>:</span></div>
+				<div style="padding-left: 13px;"><span style="color: #dcdbdb;font-family: InterRegular;font-size: 10px;letter-spacing: 1px;">{$onlinemembers}</span></div>
+				<div style="padding: 10px 10px 0px;"><span style=" color: white; font-family: InterRegular; letter-spacing: 2px; font-size: 15px; ">En línea la última semana:</span></div>
+				<div class="online_div_inner" style="padding-top: 0px;"><span style="color: #dcdbdb;font-family: InterRegular;font-size: 10px;letter-spacing: 1px;">{$online_today}</span></div>
+				<br>
+			</div>
+			
+			<div style="display: flex;flex-direction: column;margin-left: 5px;">
+				
+				<div style="position: relative;height: 224px;width: 399px;background-color: #0e2034;border: 5px solid #0e2034;box-sizing: border-box;">
+					<span class="text-moon" style="position: absolute;top: 131px;left: 298px;font-size: 25px;font-family: interRegular;text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;z-index: 1;">Verano</span>
+					<span class="text-moon" style="position: absolute;top: 161px;left: 263px;font-size: 19px;font-family: interRegular;text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;z-index: 1;">~30 de Junio</span>
+					<span class="text-moon" style="position: absolute;top: 185px;left: 280px;font-size: 19px;font-family: interRegular;text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;z-index: 1;">Año 16 D.K.</span>
+					<img style=" width: 100%; height: 100%; " class="temporada_index" src="https://i.ibb.co/kxBKxcp/verano.png">
+				</div>
+				
+<!-- 				<div style="position: relative;height: 224px;width: 399px;background-color: #0e2034;border: 5px solid #0e2034;box-sizing: border-box;">
+					<span class="text-moon" style="position: absolute;top: 138px;left: 292px;font-size: 19px;font-family: interRegular;text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;z-index: 1;">Primavera</span>
+					<span class="text-moon" style="position: absolute;top: 161px;left: 243px;font-size: 19px;font-family: interRegular;text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;z-index: 1;">~29 de Febrero</span>
+					<span class="text-moon" style="position: absolute;top: 187px;left: 282px;font-size: 19px;font-family: interRegular;text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;z-index: 1;">Año 16 D.K.</span>
+					<img style=" width: 100%; height: 100%; " class="temporada_index" src="https://wallpapercave.com/wp/wp5842801.jpg" />
+				</div> -->
+				
+				<div style="position: relative;height: 209px;width: 399px;background-color: #0e1a28;border: 5px solid #0e2034;box-sizing: border-box;margin-top: 5px;padding: 20px 20px 20px;font-family: InterRegular;text-align: center;">
+					<div>Se han escrito {$stats['numposts']} posts en {$stats['numthreads']} temas.</div>
+					<div style=" margin-top: 3px; ">Actualmente tenemos {$stats['numusers']} miembros registrados. </div>
+					<div style=" margin-top: 3px; ">Démosle la bienvenida al miembro más reciente: {$newestmember}.</div>
+					<div style="text-align: center;margin-top: 5px;"><a href="https://discord.gg/ngW7P9uzPV"><button class="discord-button"><i class="fab fa-discord" aria-hidden="true"></i> ¡Únete a nuestro Discord!</button></a></div>
+					<div style="text-align: center;margin-top: 5px;"><a href="/sg/censo.php"><button style=" font-size: 15px; margin-top: 7px; " class="discord-button">Censo y Estadísticas</button></a></div>
+				</div>
+			</div>
+			<div style="margin-left: 5px;border: 5px solid #0e2034;">
+				<div style="width: 290px;height: 29px;" class="barra-op bbox"><span style="top: 3px;font-size: 18px;font-family: InterRegular;letter-spacing: 2px;" class="barra-texto-op"><a href="misc.php?action=recent_threads">Últimos Posts</a></span></div>
+				<div class="ultimos-temas" style="border-left: 1px solid #4e7482;border-right: 1px solid #4e7482;border-bottom: 1px solid #4e7482;width: 290px;height: 369px;overflow: auto;" class="bbox">
+					<div id="ultimos_todo" style="display:block;">{$g_ultimos_post}</div>
+					<div id="ultimos_rol" style="display:none;">{$g_ultimos_post_rol}</div>
+					<div id="ultimos_off" style="display:none;">{$g_ultimos_post_off}</div>
+				</div>
+				<div style="display: flex;flex-direction: row;text-align: center;">
+					<div class="ultimos-post ultimos-post-todo ultimos-active" onClick="clickUltimoPost('todo');">
+						<span>Todo</span>
+					</div>
+					<div class="ultimos-post ultimos-post-rol" onClick="clickUltimoPost('rol');">
+						<span>Rol</span>
+					</div>
+					<div class="ultimos-post ultimos-post-off" onClick="clickUltimoPost('off');">
+						<span>Off</span>
+					</div>
+				</div>
+			</div>
+		</div>	
+	</div>
+	<!-- {$index_section_final} -->
+	
+	<if $g_is_staff then>
+	<div style=" margin-top: 15px; width: 100%; height: 2px; background-color: #517988; "></div>
+	<div style="margin-top: 10px; margin-bottom: 10px;">
+		<div style="display: flex; flex-direction: row;">
+
+			<div style="display: flex; flex-direction: column;">
+				<div style="width: 220px;height: 50px;margin-bottom: 10px;background-color: #0e1a28;text-align: center;font-size: 27px;font-family: 'InterRegular';color: white;text-shadow: 2px 2px 1px black;box-sizing: border-box;border: 3px solid #0e2034;">
+					<span style=" position: relative; top: 4px; ">Foro Hermano</span>
+				</div>
+				<div style="width: 220px;height: 360px;background-color: #0e1a28;box-sizing: border-box;border: 3px solid #0e2034;background: url(https://cdn.discordapp.com/attachments/884606837943582784/1215483465366110278/AfiliadodeSG.png?ex=65fcea30&is=65ea7530&hm=ffd235d69ca52f679445e5087cedef5a3f0253ca2197d309af01e689ca142c56&);background-size: contain;background-repeat: round;"></div>
+			</div>
+
+			<div style="display: flex;flex-direction: column;margin-left: 10px;">
+
+				<div style="width: 770px;height: 50px;margin-bottom: 10px;background-color: #0e1a28;text-align: center;font-size: 27px;font-family: 'InterRegular';color: white;text-shadow: 2px 2px 1px black;box-sizing: border-box;border: 3px solid #0e2034;">
+					<span style=" position: relative; top: 4px; ">Grandes Alianzas Shinobis</span>
+				</div>
+
+				<div style="display: flex; flex-direction: row; margin-bottom: 10px;">
+					<div style="width: 120px;height: 170px;background-color: #0e1a28;box-sizing: border-box;border: 3px solid #0e2034;margin-right: 10px;"></div>
+					<div style="width: 120px;height: 170px;background-color: #0e1a28;box-sizing: border-box;border: 3px solid #0e2034;margin-right: 10px;"></div>
+					<div style="width: 120px;height: 170px;background-color: #0e1a28;box-sizing: border-box;border: 3px solid #0e2034;margin-right: 10px;"></div>
+					<div style="width: 120px;height: 170px;background-color: #0e1a28;box-sizing: border-box;border: 3px solid #0e2034;margin-right: 10px;"></div>
+					<div style="width: 120px;height: 170px;background-color: #0e1a28;box-sizing: border-box;border: 3px solid #0e2034;margin-right: 10px;"></div>
+					<div style="width: 120px;height: 170px;background-color: #0e1a28;box-sizing: border-box;border: 3px solid #0e2034;"></div>
+				</div>
+
+				<div style="width: 770px;height: 50px;margin-bottom: 10px;background-color: #0e1a28;text-align: center;font-size: 27px;font-family: 'InterRegular';color: white;text-shadow: 2px 2px 1px black;box-sizing: border-box;border: 3px solid #0e2034;">
+					<span style=" position: relative; top: 4px; ">Alianzas Shinobis</span>
+				</div>
+
+				<div style="display: flex;flex-direction: row;flex-wrap: wrap;">
+					<div style="width: 55px;height: 55px;background-color: #0e1a28;box-sizing: border-box;border: 3px solid #0e2034;margin-right: 10px;"></div>
+					<div style="width: 55px;height: 55px;background-color: #0e1a28;box-sizing: border-box;border: 3px solid #0e2034;margin-right: 10px;"></div>
+					<div style="width: 55px;height: 55px;background-color: #0e1a28;box-sizing: border-box;border: 3px solid #0e2034;margin-right: 10px;"></div>
+					<div style="width: 55px;height: 55px;background-color: #0e1a28;box-sizing: border-box;border: 3px solid #0e2034;margin-right: 10px;"></div>
+					<div style="width: 55px;height: 55px;background-color: #0e1a28;box-sizing: border-box;border: 3px solid #0e2034;margin-right: 10px;"></div>
+					<div style="width: 55px;height: 55px;background-color: #0e1a28;box-sizing: border-box;border: 3px solid #0e2034;margin-right: 10px;"></div>
+					<div style="width: 55px;height: 55px;background-color: #0e1a28;box-sizing: border-box;border: 3px solid #0e2034;margin-right: 10px;"></div>
+					<div style="width: 55px;height: 55px;background-color: #0e1a28;box-sizing: border-box;border: 3px solid #0e2034;margin-right: 10px;"></div>
+					<div style="width: 55px;height: 55px;background-color: #0e1a28;box-sizing: border-box;border: 3px solid #0e2034;margin-right: 10px;"></div>
+					<div style="width: 55px;height: 55px;background-color: #0e1a28;box-sizing: border-box;border: 3px solid #0e2034;margin-right: 10px;"></div>
+					<div style="width: 55px;height: 55px;background-color: #0e1a28;box-sizing: border-box;border: 3px solid #0e2034;margin-right: 10px;"></div>
+					<div style="width: 55px;height: 55px;background-color: #0e1a28;box-sizing: border-box;border: 3px solid #0e2034;"></div>
+
+				</div>
+
+				<div style="display: flex;flex-direction: row;flex-wrap: wrap;margin-top: 10px;">
+					<div style="width: 55px;height: 55px;background-color: #0e1a28;box-sizing: border-box;border: 3px solid #0e2034;margin-right: 10px;"></div>
+					<div style="width: 55px;height: 55px;background-color: #0e1a28;box-sizing: border-box;border: 3px solid #0e2034;margin-right: 10px;"></div>
+					<div style="width: 55px;height: 55px;background-color: #0e1a28;box-sizing: border-box;border: 3px solid #0e2034;margin-right: 10px;"></div>
+					<div style="width: 55px;height: 55px;background-color: #0e1a28;box-sizing: border-box;border: 3px solid #0e2034;margin-right: 10px;"></div>
+					<div style="width: 55px;height: 55px;background-color: #0e1a28;box-sizing: border-box;border: 3px solid #0e2034;margin-right: 10px;"></div>
+					<div style="width: 55px;height: 55px;background-color: #0e1a28;box-sizing: border-box;border: 3px solid #0e2034;margin-right: 10px;"></div>
+					<div style="width: 55px;height: 55px;background-color: #0e1a28;box-sizing: border-box;border: 3px solid #0e2034;margin-right: 10px;"></div>
+					<div style="width: 55px;height: 55px;background-color: #0e1a28;box-sizing: border-box;border: 3px solid #0e2034;margin-right: 10px;"></div>
+					<div style="width: 55px;height: 55px;background-color: #0e1a28;box-sizing: border-box;border: 3px solid #0e2034;margin-right: 10px;"></div>
+					<div style="width: 55px;height: 55px;background-color: #0e1a28;box-sizing: border-box;border: 3px solid #0e2034;margin-right: 10px;"></div>
+					<div style="width: 55px;height: 55px;background-color: #0e1a28;box-sizing: border-box;border: 3px solid #0e2034;margin-right: 10px;"></div>
+					<div style="width: 55px;height: 55px;background-color: #0e1a28;box-sizing: border-box;border: 3px solid #0e2034;"></div>
+
+				</div>
+
+			</div>
+
+		</div>
+
+	</div>
+	</if>
+			
+  </div>
+</div>
+</div>
+<script>
+	function clickUltimoPost(tipo) {
+		console.log(tipo);
+		$('.ultimos-post').removeClass('ultimos-active');
+		
+		if (tipo == 'todo') {
+			$('#ultimos_todo').css('display', 'block');
+			$('#ultimos_rol').css('display', 'none');
+			$('#ultimos_off').css('display', 'none');
+			$('.ultimos-post-todo').addClass('ultimos-active');
+		}
+		
+		if (tipo == 'rol') {
+			$('#ultimos_todo').css('display', 'none');
+			$('#ultimos_rol').css('display', 'block');
+			$('#ultimos_off').css('display', 'none');
+			$('.ultimos-post-rol').addClass('ultimos-active');
+		}
+		
+		if (tipo == 'off') {
+			$('#ultimos_todo').css('display', 'none');
+			$('#ultimos_rol').css('display', 'none');
+			$('#ultimos_off').css('display', 'block');
+			$('.ultimos-post-off').addClass('ultimos-active');
+		}
+		
+	}	
+</script>
+{$footer}
+</body>
+</html>

@@ -1,0 +1,42 @@
+<html>
+
+<head>
+    <style>
+
+
+    </style>
+    <title>Misiones</title>
+    {$headerinclude}
+</head>
+
+<body>
+    {$header}
+    <div class="fondo-blanco">
+		<div style="width: 380px;margin: auto;padding: 6px;border-radius: 2px;font-family: monospace;font-size: 23px;color: #3498db;border: 2px dotted #3498db;">¡Tienes {$pr} puntos de rol!</div>
+        <div style="display: none">
+            <form id="misform" method="post" action="misiones.php">
+                <input type="text" name="uid" id="userid" value="{$userid}"> 
+                <input type="text" id="mid" name="mid3" value="{$mision['cod']}">
+            </form>
+        </div>
+        <br>
+        <div class="mission">
+			<div style="font-size: 19px;text-align: center;">
+				<p>¡Has completado la misión <strong>{$mision['title']} ({$mision['rango']})</strong>!</p>
+				<p>Tu pago será <strong>{$mision['ryos']} Ryos</strong> y recibirás <strong>{$mision['expt']} Puntos de Habilidad</strong>.</p>
+				<p>Recuerda que esta misión requiere <strong>{$mision['coste']} Puntos de Rol</strong>.</p>
+			</div><br>
+            <div class="boton_mision" style="text-align:center;">
+				<input type="button" style="font-size: 19px;" class="button"
+					onclick="javascript: document.getElementById('misform').submit();"
+					value="Reclamar Misión"><br><br><br>
+				<img src="https://media.tenor.com/bf4vvgp8xIsAAAAC/naruto-naruto-clone.gif" />
+			</div><br>
+        </div>
+        
+    </div>
+    {$reload_script}
+    {$footer}
+</body>
+
+</html>

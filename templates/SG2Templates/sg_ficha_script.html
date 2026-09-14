@@ -1,0 +1,674 @@
+<script>
+var sgFichaTecAprendidas = {$tec_aprendidas};
+// Solo el dueño de la ficha (logueado, viendo su propia ficha) ve el
+// formulario de venta dentro del modal de inventario.
+var sgInvPuedeVender = {$sgInvPuedeVender};
+
+// Toggle "Ver valores reales": el PHP ya calculó tecnica.efecto_parsed (con
+// las stats efectivas de ESTE personaje). Misma clave de localStorage que
+// tecnicas_lista.php -> la preferencia se comparte en todo el sitio.
+var sgFichaEffectsByTid = {};
+var sgFichaParsedMode = false;
+try { sgFichaParsedMode = (localStorage.getItem('sg_tec_parsed_mode') === '1'); } catch (e) {}
+
+function sgFichaEscapeHtml(value) {
+  if (value === null || value === undefined) {
+    return '';
+  }
+
+  return String(value)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function sgFichaNormalizeText(value) {
+  if (!value) {
+    return '';
+  }
+
+  return String(value).toLowerCase().replace(/\s+/g, ' ').replace(/^\s+|\s+$/g, '');
+}
+
+function sgFichaSlugify(value) {
+  return sgFichaNormalizeText(value).replace(/[^a-z0-9]+/g, '-');
+}
+
+function sgFichaCreateTechniqueBadge(icon, text, accent) {
+  if (!text) {
+    return '';
+  }
+
+  return ''
+    + '<div class="sg-technique__badge' + (accent ? ' sg-technique__badge--accent' : '') + '">'
+    +   text
+    + '</div>';
+}
+
+function sgFichaCreateTechniqueCard(tecnica) {
+  var badges = [];
+  var description = tecnica.descripcion ? tecnica.descripcion : 'Sin descripción disponible.';
+  var effectText = tecnica.efecto ? tecnica.efecto : 'No tiene efecto adicional especificado.';
+  var effectParsedText = tecnica.efecto ? (tecnica.efecto_parsed || tecnica.efecto) : effectText;
+  var costText = tecnica.coste ? tecnica.coste : 'Sin coste indicado';
+
+  if (tecnica.tid) {
+    sgFichaEffectsByTid[tecnica.tid] = { raw: effectText, parsed: effectParsedText };
+  }
+  var effectShown = sgFichaParsedMode ? effectParsedText : effectText;
+
+  if (tecnica.rango) {
+    badges.push(sgFichaCreateTechniqueBadge('', 'Rango ' + tecnica.rango, true));
+  }
+
+  if (tecnica.requisito) {
+    badges.push(sgFichaCreateTechniqueBadge('', tecnica.requisito, false));
+  }
+  if (tecnica.tipo) {
+    badges.push(sgFichaCreateTechniqueBadge('', tecnica.tipo, false));
+  }
+  if (tecnica.categoria && tecnica.categoria != tecnica.tipo) {
+    badges.push(sgFichaCreateTechniqueBadge('', tecnica.categoria, false));
+  }
+  if (tecnica.nivel) {
+    badges.push(sgFichaCreateTechniqueBadge('', 'Nivel: ' + tecnica.nivel, false));
+  }
+  if (tecnica.tiempo) {
+    badges.push(sgFichaCreateTechniqueBadge('', 'Aprendida en ' + tecnica.tiempo, false));
+  }
+  badges.push(sgFichaCreateTechniqueBadge('', 'Jutsu Nº ' + tecnica.tid, false));
+
+  return ''
+    + '<div class="sg-technique">'
+    +   '<div class="sg-technique__layout">'
+    +     '<div class="sg-technique__rail">'
+    +       '<div class="sg-technique__badges">' + badges.join('') + '</div>'
+    +       '<div class="sg-technique__side-panels">'
+    +         '<div class="sg-technique__stat">'
+      +         '<div class="sg-technique__stat-label">Coste</div>'
+      +         '<div class="sg-technique__stat-value">' + costText + '</div>'
+    +         '</div>'
+    +       '</div>'
+    +     '</div>'
+    +     '<div class="sg-technique__main">'
+    +       '<div class="sg-technique__section sg-technique__section--reading">'
+    +         '<div class="sg-technique__section-label">Descripción</div>'
+    +         '<p class="sg-technique__text">' + description + '</p>'
+    +       '</div>'
+    +       '<div class="sg-technique__section sg-technique__section--effect">'
+    +         '<div class="sg-technique__section-label">Efecto</div>'
+    +         '<div class="sg-technique__text sg-tec-effect' + (tecnica.efecto ? '' : ' sg-technique__text--muted') + '" data-tid="' + (tecnica.tid || '') + '">' + effectShown + '</div>'
+    +       '</div>'
+    +     '</div>'
+    +   '</div>'
+    + '</div>';
+}
+
+function sgFichaCreateTechniqueSpoiler(tecnica, familyKey) {
+  var searchIndex = sgFichaNormalizeText([
+    tecnica.nombre,
+    tecnica.tid,
+    tecnica.arbol
+  ].join(' '));
+
+  var eyebrowParts = [];
+  if (tecnica.categoria) { eyebrowParts.push(tecnica.categoria); }
+  if (tecnica.rama) { eyebrowParts.push(tecnica.rama); }
+  var eyebrow = sgFichaEscapeHtml(eyebrowParts.join(' · '));
+
+  return ''
+    + '<div class="sg-technique-item" data-family="' + sgFichaEscapeHtml(familyKey) + '" data-search="' + sgFichaEscapeHtml(searchIndex) + '">'
+    + sgCreateSpoiler({
+    classes: 'sg-spoiler--warm',
+    icon: '●',
+    eyebrow: eyebrow,
+    title: sgFichaEscapeHtml(tecnica.nombre),
+    count: sgFichaEscapeHtml(tecnica.tid),
+    open: false,
+    content: sgFichaCreateTechniqueCard(tecnica)
+    })
+    + '</div>';
+}
+
+function sgFichaSortTechniquesByTid(a, b) {
+  var ca = (a.categoria || '').toLowerCase();
+  var cb = (b.categoria || '').toLowerCase();
+  if (ca < cb) { return -1; }
+  if (ca > cb) { return 1; }
+
+  var ra = (a.rama || '').toLowerCase();
+  var rb = (b.rama || '').toLowerCase();
+  if (ra < rb) { return -1; }
+  if (ra > rb) { return 1; }
+
+  if (a.tid < b.tid) { return -1; }
+  if (a.tid > b.tid) { return 1; }
+  return 0;
+}
+
+function sgFichaHumanizeKey(key) {
+  return key.replace(/_/g, ' ');
+}
+
+function sgFichaCreateTechniqueGroup(key, techniques) {
+  var sorted = techniques.slice().sort(sgFichaSortTechniquesByTid);
+  var content = '';
+  var familyLabel = sgFichaHumanizeKey(key);
+  var familySlug = sgFichaSlugify(key);
+  var i = 0;
+
+  for (i = 0; i < sorted.length; i++) {
+    content += sgFichaCreateTechniqueSpoiler(sorted[i], familySlug);
+  }
+
+  return ''
+    + '<div class="sg-technique-family" data-family="' + sgFichaEscapeHtml(familySlug) + '" data-family-label="' + sgFichaEscapeHtml(familyLabel) + '">'
+    + sgCreateSpoiler({
+    classes: '',
+    icon: '◈',
+    eyebrow: 'Capítulo',
+    title: sgFichaEscapeHtml(familyLabel),
+    count: sorted.length + ' tecnicas',
+    open: false,
+    content: content
+    })
+    + '</div>';
+}
+
+function sgFichaCountAllTechniques(data) {
+  var keys = Object.keys(data || {});
+  var total = 0;
+  var i = 0;
+
+  for (i = 0; i < keys.length; i++) {
+    total += (data[keys[i]] || []).length;
+  }
+
+  return total;
+}
+
+function sgFichaPopulateTechniqueFilters() {
+  var familySelect = document.getElementById('sg-profile-technique-family');
+  var families = {};
+  var familyNodes;
+  var i;
+  var familyValue;
+  var familyLabel;
+  var familyKeys;
+
+  if (!familySelect) {
+    return;
+  }
+
+  familyNodes = document.querySelectorAll('.sg-technique-family');
+
+  for (i = 0; i < familyNodes.length; i++) {
+    familyValue = familyNodes[i].getAttribute('data-family');
+    familyLabel = familyNodes[i].getAttribute('data-family-label');
+    if (familyValue && familyLabel) {
+      families[familyValue] = familyLabel;
+    }
+  }
+
+  familySelect.innerHTML = '<option value="">Todos los árboles</option>';
+  familyKeys = Object.keys(families).sort();
+  for (i = 0; i < familyKeys.length; i++) {
+    familySelect.innerHTML += '<option value="' + sgFichaEscapeHtml(familyKeys[i]) + '">' + sgFichaEscapeHtml(families[familyKeys[i]]) + '</option>';
+  }
+}
+
+function sgFichaUpdateTechniqueCount(visibleCount) {
+  var counter = document.getElementById('sg-profile-technique-count');
+  if (!counter) {
+    return;
+  }
+
+  counter.textContent = visibleCount + (visibleCount === 1 ? ' técnica' : ' técnicas');
+}
+
+function sgFichaToggleTechniqueFilters(forceOpen) {
+  var panel = document.getElementById('sg-profile-technique-filters');
+  var button = document.getElementById('sg-profile-filter-toggle');
+  var shouldOpen;
+
+  if (!panel || !button) {
+    return;
+  }
+
+  shouldOpen = typeof forceOpen === 'boolean' ? forceOpen : !panel.classList.contains('is-open');
+  panel.classList.toggle('is-open', shouldOpen);
+  panel.setAttribute('aria-hidden', shouldOpen ? 'false' : 'true');
+  button.classList.toggle('is-active', shouldOpen);
+}
+
+function sgFichaApplyTechniqueFilters() {
+  var searchInput = document.getElementById('sg-profile-technique-search');
+  var familySelect = document.getElementById('sg-profile-technique-family');
+  var familyNodes = document.querySelectorAll('.sg-technique-family');
+  var itemNodes = document.querySelectorAll('.sg-technique-item');
+  var query = sgFichaNormalizeText(searchInput ? searchInput.value : '');
+  var familyValue = familySelect ? familySelect.value : '';
+  var visibleCount = 0;
+  var i;
+  var item;
+  var matches;
+  var familyNode;
+  var visibleInFamily;
+
+  for (i = 0; i < itemNodes.length; i++) {
+    item = itemNodes[i];
+    matches = true;
+
+    if (query && item.getAttribute('data-search').indexOf(query) === -1) {
+      matches = false;
+    }
+    if (matches && familyValue && item.getAttribute('data-family') !== familyValue) {
+      matches = false;
+    }
+
+    item.classList.toggle('is-hidden', !matches);
+
+    if (matches) {
+      visibleCount++;
+    }
+  }
+
+  for (i = 0; i < familyNodes.length; i++) {
+    familyNode = familyNodes[i];
+    visibleInFamily = familyNode.querySelector('.sg-technique-item:not(.is-hidden)');
+    familyNode.classList.toggle('is-hidden', !visibleInFamily);
+  }
+
+  sgFichaUpdateTechniqueCount(visibleCount);
+}
+
+// Aplica sgFichaParsedMode a todos los efectos ya renderizados y sincroniza
+// el texto del botón. No re-renderiza nada, así no se pierde qué spoilers
+// de técnica estaban abiertos/cerrados.
+function sgFichaAplicarModoEfectos() {
+  var els = document.querySelectorAll('.sg-tec-effect');
+  var i = 0;
+
+  for (i = 0; i < els.length; i++) {
+    var tid = els[i].getAttribute('data-tid');
+    var entry = sgFichaEffectsByTid[tid];
+    if (!entry) {
+      continue;
+    }
+    els[i].innerHTML = sgFichaParsedMode ? entry.parsed : entry.raw;
+  }
+
+  var btn = document.getElementById('sg-parse-toggle-ficha');
+  if (btn) {
+    btn.textContent = sgFichaParsedMode ? 'Ver códigos originales' : 'Ver valores reales';
+  }
+}
+
+function sgFichaToggleParsedMode() {
+  sgFichaParsedMode = !sgFichaParsedMode;
+  try { localStorage.setItem('sg_tec_parsed_mode', sgFichaParsedMode ? '1' : '0'); } catch (e) {}
+  sgFichaAplicarModoEfectos();
+}
+
+function sgFichaRenderPrivateTechniques() {
+  var container = document.getElementById('sg-profile-techniques');
+  var keys = Object.keys(sgFichaTecAprendidas || {});
+  var html = '';
+  var i = 0;
+
+  if (!container) {
+    return;
+  }
+
+  if (!keys.length) {
+    container.innerHTML = '<div class="sg-profile-techniques-empty">No hay técnicas aprendidas registradas todavía.</div>';
+    sgFichaUpdateTechniqueCount(0);
+    return;
+  }
+
+  for (i = 0; i < keys.length; i++) {
+    html += sgFichaCreateTechniqueGroup(keys[i], sgFichaTecAprendidas[keys[i]]);
+  }
+
+  container.innerHTML = html;
+  sgFichaPopulateTechniqueFilters();
+  sgFichaUpdateTechniqueCount(sgFichaCountAllTechniques(sgFichaTecAprendidas));
+  sgFichaApplyTechniqueFilters();
+}
+
+window.addEventListener('load', function () {
+  sgFichaRenderPrivateTechniques();
+  sgFichaAplicarModoEfectos();
+});
+
+/* ── Inventario: filtros, búsqueda, vista y modal ── */
+function fxInvImgFallback(img) {
+  if (!img.dataset.fb) { img.dataset.fb = '1'; img.src = '/images/sg/objeto_default.png'; }
+  else { img.style.visibility = 'hidden'; }
+}
+(function () {
+  var modal, mName, mImg, mDetail, grid;
+  var activeTipo = '', total = 0, detailBuilt = false;
+
+  function fxEl(tag, cls, text) {
+    var e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (text != null) e.textContent = text;
+    return e;
+  }
+  function fxMetaRow(k, valueNode) {
+    var row = fxEl('div', 'fx-inv-meta-row');
+    row.appendChild(fxEl('span', 'fx-inv-meta-k', k));
+    var v = fxEl('span', 'fx-inv-meta-v');
+    v.appendChild(valueNode);
+    row.appendChild(v);
+    return row;
+  }
+  // Fuente única: usada por el modal (cuadrícula) y por la vista detalle.
+  function fxRenderDetail(d) {
+    var frag = document.createDocumentFragment();
+
+    var badges = fxEl('div', 'fx-inv-badges');
+    if (d.tipolabel) badges.appendChild(fxEl('span', 'fx-inv-badge', d.tipolabel));
+    if (d.tamano) badges.appendChild(fxEl('span', 'fx-inv-badge fx-inv-badge--soft', d.tamano));
+    frag.appendChild(badges);
+
+    if (d.desc && d.desc.trim() !== '') {
+      var desc = fxEl('div', 'fx-inv-modal-desc', d.desc);
+      frag.appendChild(desc);
+      var toggle = fxEl('button', 'fx-inv-desc-toggle', 'Ver más');
+      toggle.type = 'button';
+      toggle.style.display = 'none';
+      toggle.addEventListener('click', function (ev) {
+        ev.stopPropagation();
+        var exp = desc.classList.toggle('is-expanded');
+        toggle.textContent = exp ? 'Ver menos' : 'Ver más';
+      });
+      frag.appendChild(toggle);
+    }
+
+    [d.ef1, d.ef2, d.ef3].forEach(function (e) {
+      if (e && e.trim() !== '') {
+        var row = fxEl('div', 'fx-inv-eff');
+        row.appendChild(fxEl('span', 'fx-inv-eff-label', 'Efecto'));
+        row.appendChild(document.createTextNode(' ' + e));
+        frag.appendChild(row);
+      }
+    });
+
+    var meta = fxEl('div', 'fx-inv-meta');
+    meta.appendChild(fxMetaRow('Cantidad', document.createTextNode('×' + d.cant)));
+    if (d.municion && d.municion.trim() !== '') {
+      meta.appendChild(fxMetaRow('Munición', document.createTextNode(d.municion)));
+    }
+    frag.appendChild(meta);
+
+    return frag;
+  }
+
+  function fxInvIsDetail() { return !!(grid && grid.classList.contains('is-detail')); }
+
+  // Formulario de venta: se usa tanto dentro del modal (fxInvOpen) como en la
+  // vista detalle de la cuadrícula (fxInvBuildAllDetails), da igual — no
+  // depende del modal. d.sell es el precio unitario ya calculado por PHP
+  // (50% del coste base, o 0 si el objeto no es vendible). Al vender, recarga
+  // la página entera, así que no hace falta que este formulario mantenga su
+  // propio estado sincronizado (cantidad restante, etc.) después del éxito.
+  // Devuelve null si no aplica (no es el dueño, o el objeto no es vendible).
+  function fxInvBuildSell(d, tile) {
+    if (typeof sgInvPuedeVender === 'undefined' || !sgInvPuedeVender) { return null; }
+    var precio = parseInt(d.sell, 10) || 0;
+    var cant = parseInt(d.cant, 10) || 0;
+    if (precio <= 0 || cant <= 0) { return null; }
+
+    var wrap = fxEl('div', 'fx-inv-sell');
+    wrap.appendChild(fxEl('div', 'fx-inv-sell-price', 'Venta: ' + precio + ' ryos c/u'));
+
+    var form = fxEl('div', 'fx-inv-sell-form');
+    var qty = document.createElement('input');
+    qty.type = 'number'; qty.className = 'fx-inv-sell-qty';
+    qty.min = '1'; qty.step = '1'; qty.max = String(cant); qty.value = '1';
+    form.appendChild(qty);
+    var btnVender = fxEl('button', 'fx-inv-sell-btn', 'Vender');
+    btnVender.type = 'button';
+    form.appendChild(btnVender);
+    wrap.appendChild(form);
+
+    var totalLine = fxEl('div', 'fx-inv-sell-total', 'Total: ' + precio + ' ryos');
+    wrap.appendChild(totalLine);
+
+    var okMsg = fxEl('div', 'fx-inv-sell-ok', '');
+    okMsg.style.display = 'none';
+    wrap.appendChild(okMsg);
+    var errMsg = fxEl('div', 'fx-inv-sell-error', '');
+    errMsg.style.display = 'none';
+    wrap.appendChild(errMsg);
+
+    var confirmBox = fxEl('div', 'fx-inv-sell-confirm');
+    confirmBox.style.display = 'none';
+    var confirmMsg = fxEl('div', 'fx-inv-sell-confirm-msg', '');
+    confirmBox.appendChild(confirmMsg);
+    var confirmRow = fxEl('div', 'fx-inv-sell-confirm-row');
+    var btnOk = fxEl('button', 'fx-inv-sell-btn', 'Confirmar');
+    btnOk.type = 'button';
+    var btnCancel = fxEl('button', 'fx-inv-sell-cancel', 'Cancelar');
+    btnCancel.type = 'button';
+    confirmRow.appendChild(btnOk);
+    confirmRow.appendChild(btnCancel);
+    confirmBox.appendChild(confirmRow);
+    wrap.appendChild(confirmBox);
+
+    function clampQty() {
+      var n = parseInt(qty.value, 10);
+      if (!n || n < 1) { n = 1; }
+      if (n > cant) { n = cant; }
+      qty.value = String(n);
+      return n;
+    }
+    qty.addEventListener('input', function () {
+      var n = clampQty();
+      totalLine.textContent = 'Total: ' + (precio * n) + ' ryos';
+    });
+
+    btnVender.addEventListener('click', function () {
+      var n = clampQty();
+      okMsg.style.display = 'none';
+      errMsg.style.display = 'none';
+      confirmMsg.textContent = 'Vender ' + n + ' × ' + d.nombre + ' por ' + (precio * n) + ' ryos. ¿Confirmas?';
+      form.style.display = 'none';
+      totalLine.style.display = 'none';
+      confirmBox.style.display = 'flex';
+    });
+
+    btnCancel.addEventListener('click', function () {
+      confirmBox.style.display = 'none';
+      form.style.display = 'flex';
+      totalLine.style.display = 'block';
+    });
+
+    btnOk.addEventListener('click', function () {
+      var n = clampQty();
+      btnOk.disabled = true;
+      btnCancel.disabled = true;
+
+      fetch('vender.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: 'objeto=' + encodeURIComponent(d.oid) + '&cantidad=' + n
+      })
+        .then(function (r) { return r.json(); })
+        .then(function (res) {
+          btnOk.disabled = false;
+          btnCancel.disabled = false;
+          confirmBox.style.display = 'none';
+
+          if (!res || !res.ok) {
+            form.style.display = 'flex';
+            totalLine.style.display = 'block';
+            errMsg.textContent = (res && res.msg) ? res.msg : 'No se pudo vender.';
+            errMsg.style.display = 'block';
+            return;
+          }
+
+          var ryosEl = document.getElementById('fx-inv-ryos');
+          if (ryosEl) { ryosEl.textContent = res.nuevos_ryos; }
+
+          form.style.display = 'none';
+          totalLine.style.display = 'none';
+          okMsg.textContent = 'Vendiste ' + n + ' × ' + d.nombre + ' por ' + res.total + ' ryos. Actualizando…';
+          okMsg.style.display = 'block';
+
+          // Recarga completa: navegación GET nueva a la misma URL (no
+          // location.reload(), que reenviaría el body si esta página se
+          // hubiera cargado por un POST propio, ej. tras editar avatar/
+          // banner/trasfondo en esta misma ficha.php -> evita el aviso de
+          // "reenviar formulario" del navegador).
+          setTimeout(function () {
+            window.location.href = window.location.href;
+          }, 700);
+        })
+        .catch(function () {
+          btnOk.disabled = false;
+          btnCancel.disabled = false;
+          confirmBox.style.display = 'none';
+          form.style.display = 'flex';
+          totalLine.style.display = 'block';
+          errMsg.textContent = 'Error de conexión. Intenta de nuevo.';
+          errMsg.style.display = 'block';
+        });
+    });
+
+    return wrap;
+  }
+
+  function fxInvOpen(tile) {
+    if (fxInvIsDetail()) return;
+    var d = tile.dataset;
+    mName.textContent = d.nombre;
+    mImg.dataset.fb = '';
+    mImg.style.visibility = '';
+    mImg.onerror = function () { fxInvImgFallback(mImg); };
+    mImg.src = d.img;
+    mImg.alt = d.nombre;
+    mDetail.innerHTML = '';
+    mDetail.appendChild(fxRenderDetail(d));
+    var sellUi = fxInvBuildSell(d, tile);
+    if (sellUi) { mDetail.appendChild(sellUi); }
+    modal.classList.add('is-open');
+    modal.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('fx-inv-modal-open');
+  }
+  window.fxInvClose = function () {
+    if (!modal) return;
+    modal.classList.remove('is-open');
+    modal.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('fx-inv-modal-open');
+  };
+
+  // ── Vista: cuadrícula ↔ detalle ──
+  function fxInvBuildAllDetails() {
+    var tiles = document.querySelectorAll('.fx-inv-tile');
+    for (var i = 0; i < tiles.length; i++) {
+      var cont = tiles[i].querySelector('.fx-inv-detail');
+      if (cont && !cont.dataset.built) {
+        cont.appendChild(fxRenderDetail(tiles[i].dataset));
+        var sellUi = fxInvBuildSell(tiles[i].dataset, tiles[i]);
+        if (sellUi) { cont.appendChild(sellUi); }
+        cont.dataset.built = '1';
+      }
+    }
+  }
+  function fxInvUpdateDescToggles() {
+    var dets = document.querySelectorAll('.fx-inv-grid.is-detail .fx-inv-detail');
+    for (var i = 0; i < dets.length; i++) {
+      var desc = dets[i].querySelector('.fx-inv-modal-desc');
+      var toggle = dets[i].querySelector('.fx-inv-desc-toggle');
+      if (!desc || !toggle) continue;
+      if (!desc.classList.contains('is-expanded')) {
+        toggle.style.display = (desc.scrollHeight > desc.clientHeight + 2) ? '' : 'none';
+      }
+    }
+  }
+  function fxInvSetView(detail) {
+    var btn = document.getElementById('fx-inv-viewbtn');
+    if (detail) {
+      if (!detailBuilt) { fxInvBuildAllDetails(); detailBuilt = true; }
+      window.fxInvClose();
+      grid.classList.add('is-detail');
+      if (btn) btn.textContent = 'Vista cuadrícula';
+      fxInvUpdateDescToggles();
+    } else {
+      grid.classList.remove('is-detail');
+      if (btn) btn.textContent = 'Vista detalle';
+    }
+    try { localStorage.setItem('fxInvView', detail ? 'detail' : 'grid'); } catch (e) {}
+  }
+  window.fxInvToggleView = function () { fxInvSetView(!fxInvIsDetail()); };
+
+  // ── Filtro por categoría + búsqueda ──
+  window.fxInvSetTipo = function (chip) {
+    activeTipo = chip.getAttribute('data-tipo') || '';
+    var chips = document.querySelectorAll('.fx-inv-chip');
+    for (var i = 0; i < chips.length; i++) { chips[i].classList.remove('is-active'); }
+    chip.classList.add('is-active');
+    window.fxInvFilter();
+  };
+  window.fxInvFilter = function () {
+    var input = document.getElementById('fx-inv-search');
+    var q = input ? input.value.trim().toLowerCase() : '';
+    var tiles = document.querySelectorAll('.fx-inv-tile');
+    var visibles = 0;
+    for (var i = 0; i < tiles.length; i++) {
+      var t = tiles[i];
+      var hay = t.getAttribute('data-search') || '';
+      var tipo = t.getAttribute('data-tipo') || '';
+      var match = (activeTipo === '' || tipo === activeTipo) && (q === '' || hay.indexOf(q) !== -1);
+      t.style.display = match ? '' : 'none';
+      if (match) visibles++;
+    }
+    var nores = document.getElementById('fx-inv-noresults');
+    if (nores) { nores.style.display = (visibles === 0) ? 'block' : 'none'; }
+    var count = document.getElementById('fx-inv-count');
+    if (count) {
+      count.textContent = (q === '' && activeTipo === '') ? (total + ' objetos') : (visibles + ' de ' + total + ' objetos');
+    }
+  };
+
+  document.addEventListener('DOMContentLoaded', function () {
+    modal = document.getElementById('fx-inv-modal');
+    grid = document.getElementById('fx-inv-grid');
+    if (!modal || !grid) return;
+    mName = document.getElementById('fx-inv-modal-name');
+    mImg = document.getElementById('fx-inv-modal-img');
+    mDetail = document.getElementById('fx-inv-modal-detail');
+
+    var tiles = document.querySelectorAll('.fx-inv-tile');
+    total = tiles.length;
+    for (var i = 0; i < tiles.length; i++) {
+      (function (tile) {
+        tile.addEventListener('click', function () { fxInvOpen(tile); });
+        tile.addEventListener('keydown', function (ev) {
+          if (ev.target !== tile) return;
+          if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); fxInvOpen(tile); }
+        });
+      })(tiles[i]);
+    }
+
+    modal.addEventListener('click', function (ev) {
+      if (ev.target === modal) { window.fxInvClose(); }
+    });
+    document.addEventListener('keydown', function (ev) {
+      if (ev.key === 'Escape' && modal.classList.contains('is-open')) { window.fxInvClose(); }
+    });
+    window.addEventListener('resize', function () {
+      if (fxInvIsDetail()) { fxInvUpdateDescToggles(); }
+    });
+
+    var saved = 'grid';
+    try { saved = localStorage.getItem('fxInvView') || 'grid'; } catch (e) {}
+    if (saved === 'detail') { fxInvSetView(true); }
+  });
+})();
+</script>

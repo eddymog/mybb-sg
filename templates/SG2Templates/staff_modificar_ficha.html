@@ -1,0 +1,439 @@
+<html>
+
+<head>
+  <title>Modificar Ficha — Staff</title>
+  {$headerinclude}
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Source+Serif+4:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <style>
+
+    #mf-page {
+      max-width: 860px;
+      margin: 24px auto 60px;
+      color: var(--ink);
+      font-family: 'Source Serif 4', serif;
+      text-align: left;
+    }
+
+    .mf-panel { border: 0.5px solid var(--border); background: var(--bg2); overflow: hidden; }
+
+    .mf-panel__head {
+      position: relative;
+      padding: 20px 24px 18px;
+      background: var(--bg3);
+      border-bottom: 0.5px solid var(--border);
+    }
+    .mf-panel__head::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--oxide); }
+    .mf-eyebrow { display: block; font-family: 'Cinzel', serif; font-size: 8px; font-weight: 700; letter-spacing: 2.4px; text-transform: uppercase; color: var(--mist); margin-bottom: 6px; }
+    .mf-title { margin: 0; font-family: 'Cinzel', serif; font-size: 17px; font-weight: 900; letter-spacing: 1.5px; text-transform: uppercase; color: var(--ink); }
+
+    .mf-body { padding: 22px 24px; }
+
+    /* Context */
+    .mf-context {
+      display: flex; flex-wrap: wrap; align-items: center; gap: 10px;
+      padding: 12px 14px; margin-bottom: 22px;
+      border: 0.5px solid var(--border); background: var(--bg3);
+    }
+    .mf-context__uid { font-family: 'Cinzel', serif; font-size: 12px; font-weight: 900; color: var(--ink); }
+    .mf-context__name { font-family: 'Source Serif 4', serif; font-size: 12px; color: var(--stone); }
+    .mf-context__name a { color: var(--plum2); text-decoration: none; }
+    .mf-context__when { margin-left: auto; font-family: 'Cinzel', serif; font-size: 8px; letter-spacing: 1px; text-transform: uppercase; color: var(--mist); }
+
+    /* Section */
+    .mf-section { margin-bottom: 22px; }
+    .mf-section__head { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+    .mf-section__head::before { content: ''; width: 3px; height: 13px; background: var(--oxide); flex-shrink: 0; }
+    .mf-section__head::after { content: ''; flex: 1; height: 0.5px; background: var(--border); }
+    .mf-section__title { font-family: 'Cinzel', serif; font-size: 10px; font-weight: 900; letter-spacing: 1.8px; text-transform: uppercase; color: var(--ink); }
+
+    /* Field grid */
+    .mf-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+    .mf-grid--2 { grid-template-columns: repeat(2, 1fr); }
+    .mf-field { display: flex; flex-direction: column; gap: 5px; }
+    .mf-field--wide { grid-column: 1 / -1; }
+
+    .mf-label { font-family: 'Cinzel', serif; font-size: 8px; font-weight: 700; letter-spacing: 1.4px; text-transform: uppercase; color: var(--mist); }
+
+    .mf-body input[type="text"],
+    .mf-body input[type="number"],
+    .mf-body select,
+    .mf-body textarea {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 8px 10px;
+      background: var(--bg3);
+      border: none;
+      border-bottom: 1.5px solid var(--border);
+      border-left: 1.5px solid var(--border);
+      color: var(--ink);
+      font-family: 'Source Serif 4', serif;
+      font-size: 13px;
+      outline: none;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .mf-body input:focus, .mf-body select:focus, .mf-body textarea:focus {
+      border-bottom-color: var(--plum3); border-left-color: var(--plum3); background: var(--bg2);
+    }
+    .mf-body select { -webkit-appearance: none; appearance: none; cursor: pointer; font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 0.5px; text-transform: uppercase; }
+    .mf-body textarea { min-height: 90px; resize: vertical; line-height: 1.6; }
+
+    .mf-readonly {
+      font-family: 'Source Serif 4', serif;
+      font-size: 13px;
+      color: var(--stone);
+      padding: 8px 10px;
+      background: var(--bg2);
+      border: 0.5px dashed var(--border);
+    }
+
+    /* Buttons */
+    .mf-btn {
+      font-family: 'Cinzel', serif; font-size: 9px; font-weight: 900; letter-spacing: 2.5px; text-transform: uppercase;
+      color: var(--lavender); background: var(--plum); border: none; padding: 0 28px; height: 42px; width: 100%;
+      cursor: pointer; transition: background 0.15s, transform 0.12s; outline: none;
+    }
+    .mf-btn:hover { background: var(--plum2); transform: translateY(-1px); }
+    .mf-btn:active { transform: translateY(0); }
+
+    .mf-divider { height: 0.5px; background: var(--border); margin: 22px 0; }
+    .mf-audit { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+    .mf-section__desc { margin: -4px 0 14px; padding: 10px 12px; border-left: 2px solid var(--oxide); background: var(--bg3); font-size: 12px; line-height: 1.6; color: var(--stone); }
+    .mf-section__desc b { color: var(--plum3); }
+    .mf-help { margin-top: 5px; font-size: 11px; line-height: 1.5; color: var(--mist); }
+
+    @media (max-width: 700px) {
+      .mf-grid, .mf-grid--2, .mf-audit { grid-template-columns: 1fr 1fr; }
+    }
+
+  </style>
+</head>
+
+<body>
+  {$header}
+
+  <div id="mf-page">
+    <div class="mf-panel">
+      <div class="mf-panel__head">
+        <span class="mf-eyebrow">Consola Staff · Súper Secreta</span>
+        <h1 class="mf-title">Modificar Ficha</h1>
+      </div>
+
+      <div class="mf-body">
+
+        <if $fid == '' then>
+          <div class="mf-field" style="max-width:240px;">
+            <label class="mf-label" for="fid">User ID</label>
+            <input type="number" id="fid" min="1" required placeholder="Ej. 482">
+          </div>
+          <div style="margin-top:16px; max-width:240px;">
+            <button class="mf-btn" type="button" onclick="onLoadFicha()">Cargar ficha</button>
+          </div>
+        </if>
+
+        <if $fid != '' then>
+          <div class="mf-context">
+            <span class="mf-context__uid">Usuario #{$fid}</span>
+            <span class="mf-context__name"><a href="/sg/ficha.php?action=profile&uid={$fid}" target="_blank">{$ficha['nombre']}</a></span>
+            <span class="mf-context__when">Creada: {$ficha['tiempo_creacion']}</span>
+          </div>
+
+          <form method="post" action="/sg/admin/modificar_ficha.php" name="modificar_ficha" id="modificar_ficha">
+            <input type="hidden" name="ficha_id" value="{$fid}">
+
+            <!-- Identidad -->
+            <div class="mf-section">
+              <div class="mf-section__head"><span class="mf-section__title">Identidad</span></div>
+              <div class="mf-grid">
+                <div class="mf-field mf-field--wide" style="grid-column: span 2;">
+                  <label class="mf-label">Nombre</label>
+                  <input type="text" name="nombre" value="{$ficha['nombre']}" maxlength="20">
+                </div>
+                <div class="mf-field" style="grid-column: span 2;">
+                  <label class="mf-label">Apodo</label>
+                  <input type="text" name="apodo" value="{$ficha['apodo']}">
+                </div>
+                <div class="mf-field">
+                  <label class="mf-label">Sexo</label>
+                  <select name="sexo">
+                    <option value="Hombre"<if $ficha['sexo'] == 'Hombre' then> selected</if>>Hombre</option>
+                    <option value="Mujer"<if $ficha['sexo'] == 'Mujer' then> selected</if>>Mujer</option>
+                  </select>
+                </div>
+                <div class="mf-field">
+                  <label class="mf-label">Rango</label>
+                  <select name="rango">
+                    <option value="Genin"<if $ficha['rango'] == 'Genin' then> selected</if>>Genin</option>
+                    <option value="Staff"<if $ficha['rango'] == 'Staff' then> selected</if>>Staff</option>
+                    <option value="Chuunin"<if $ficha['rango'] == 'Chuunin' then> selected</if>>Chuunin</option>
+                    <option value="Jounin"<if $ficha['rango'] == 'Jounin' then> selected</if>>Jounin</option>
+                    <option value="ANBU"<if $ficha['rango'] == 'ANBU' then> selected</if>>ANBU</option> 
+                  </select>
+                </div>
+                <div class="mf-field">
+                  <label class="mf-label">Edad</label>
+                  <input type="number" name="edad" value="{$ficha['edad']}">
+                </div>
+                <div class="mf-field">
+                  <label class="mf-label">Temp. nacimiento</label>
+                  <select name="temporada_nacimiento">
+                    <option value="1"<if $ficha['temporada_nacimiento'] == 1 then> selected</if>>Invierno</option>
+                    <option value="2"<if $ficha['temporada_nacimiento'] == 2 then> selected</if>>Primavera</option>
+                    <option value="3"<if $ficha['temporada_nacimiento'] == 3 then> selected</if>>Verano</option>
+                    <option value="4"<if $ficha['temporada_nacimiento'] == 4 then> selected</if>>Otoño</option>
+                  </select>
+                </div>
+                <div class="mf-field">
+                  <label class="mf-label">Villa</label>
+                  <select name="villa">
+                    <option value="1"<if $ficha['villa'] == '1' then> selected</if>>Konoha</option>
+                    <option value="3"<if $ficha['villa'] == '3' then> selected</if>>Kiri</option>
+                    <option value="4"<if $ficha['villa'] == '4' then> selected</if>>Iwa</option>
+                    <option value="5"<if $ficha['villa'] == '5' then> selected</if>>Kumo</option>
+                    <option value="6"<if $ficha['villa'] == '6' then> selected</if>>Renegado</option>
+                    <option value="7"<if $ficha['villa'] == '7' then> selected</if>>Sin Aldea</option>
+                  </select>
+                </div>
+                <div class="mf-field">
+                  <label class="mf-label">Clan</label>
+                  <select name="clan">
+                    <option value="1001"<if $ficha['clan'] == '1001' then> selected</if>>Sin clan</option>
+                    <option value="101"<if $ficha['clan'] == '101' then> selected</if>>Aburame</option>
+                    <option value="102"<if $ficha['clan'] == '102' then> selected</if>>Senju</option>
+                    <option value="103"<if $ficha['clan'] == '103' then> selected</if>>Akimichi</option>
+                    <option value="104"<if $ficha['clan'] == '104' then> selected</if>>Hyuga</option>
+                    <option value="105"<if $ficha['clan'] == '105' then> selected</if>>Nara</option>
+                    <option value="106"<if $ficha['clan'] == '106' then> selected</if>>Uchiha</option>
+                    <option value="108"<if $ficha['clan'] == '108' then> selected</if>>Yamanaka</option>
+                    <option value="109"<if $ficha['clan'] == '109' then> selected</if>>Inuzuka</option>
+                    <option value="110"<if $ficha['clan'] == '110' then> selected</if>>Sarutobi</option>
+                    <option value="301"<if $ficha['clan'] == '301' then> selected</if>>Yuki</option>
+                    <option value="302"<if $ficha['clan'] == '302' then> selected</if>>Kaguya</option>
+                    <option value="304"<if $ficha['clan'] == '304' then> selected</if>>Hozuki</option>
+                    <option value="305"<if $ficha['clan'] == '305' then> selected</if>>Hoshigaki</option>
+                    <option value="306"<if $ficha['clan'] == '306' then> selected</if>>Heizu</option>
+                    <option value="307"<if $ficha['clan'] == '307' then> selected</if>>Terumi</option>
+                    <option value="308"<if $ficha['clan'] == '308' then> selected</if>>Akizu</option>
+                    <option value="309"<if $ficha['clan'] == '309' then> selected</if>>Funato</option>
+                    <option value="310"<if $ficha['clan'] == '310' then> selected</if>>Kodon</option>
+                  </select>
+                </div>
+                <div class="mf-field">
+                  <label class="mf-label">Clan 2 <span style="opacity:.6;">(Híbrido)</span></label>
+                  <select name="clan2">
+                    <option value="">— Ninguno —</option>
+                    <option value="101"<if $ficha['clan2'] == '101' then> selected</if>>Aburame</option>
+                    <option value="102"<if $ficha['clan2'] == '102' then> selected</if>>Senju</option>
+                    <option value="103"<if $ficha['clan2'] == '103' then> selected</if>>Akimichi</option>
+                    <option value="104"<if $ficha['clan2'] == '104' then> selected</if>>Hyuga</option>
+                    <option value="105"<if $ficha['clan2'] == '105' then> selected</if>>Nara</option>
+                    <option value="106"<if $ficha['clan2'] == '106' then> selected</if>>Uchiha</option>
+                    <option value="108"<if $ficha['clan2'] == '108' then> selected</if>>Yamanaka</option>
+                    <option value="109"<if $ficha['clan2'] == '109' then> selected</if>>Inuzuka</option>
+                    <option value="110"<if $ficha['clan2'] == '110' then> selected</if>>Sarutobi</option>
+                    <option value="301"<if $ficha['clan2'] == '301' then> selected</if>>Yuki</option>
+                    <option value="302"<if $ficha['clan2'] == '302' then> selected</if>>Kaguya</option>
+                    <option value="304"<if $ficha['clan2'] == '304' then> selected</if>>Hozuki</option>
+                    <option value="305"<if $ficha['clan2'] == '305' then> selected</if>>Hoshigaki</option>
+                    <option value="306"<if $ficha['clan2'] == '306' then> selected</if>>Heizu</option>
+                    <option value="307"<if $ficha['clan2'] == '307' then> selected</if>>Terumi</option>
+                    <option value="308"<if $ficha['clan2'] == '308' then> selected</if>>Akizu</option>
+                    <option value="309"<if $ficha['clan2'] == '309' then> selected</if>>Funato</option>
+                    <option value="310"<if $ficha['clan2'] == '310' then> selected</if>>Kodon</option>
+                  </select>
+                </div>
+                <div class="mf-field">
+                  <label class="mf-label">Peso</label>
+                  <input type="number" name="peso" value="{$ficha['peso']}">
+                </div>
+                <div class="mf-field">
+                  <label class="mf-label">Altura</label>
+                  <input type="number" name="altura" value="{$ficha['altura']}">
+                </div>
+                <div class="mf-field mf-field--wide">
+                  <label class="mf-label">Físico (face-claim)</label>
+                  <input type="text" name="fisico_de_pj" value="{$ficha['fisico_de_pj']}" maxlength="255" placeholder="Nombre del físico — Serie / Juego de donde proviene">
+                </div>
+              </div>
+            </div>
+
+            <!-- Recursos -->
+            <div class="mf-section">
+              <div class="mf-section__head"><span class="mf-section__title">Recursos</span></div>
+              <div class="mf-grid">
+                <div class="mf-field"><label class="mf-label">Ryos</label><input type="number" name="ryos" value="{$ficha['ryos']}"></div>
+                <div class="mf-field"><label class="mf-label">Bingo</label><input type="number" name="bingo" value="{$ficha['bingo']}"></div>
+                <div class="mf-field"><label class="mf-label">Madara</label><input type="number" name="madara" value="{$ficha['madara']}"></div>
+                <div class="mf-field"><label class="mf-label">Tobi</label><input type="number" name="tobi" value="{$ficha['tobi']}"></div>
+                <div class="mf-field"><label class="mf-label">Rin</label><input type="number" name="rin" value="{$ficha['rin']}"></div>
+              </div>
+            </div>
+
+            <!-- Progresión -->
+            <div class="mf-section">
+              <div class="mf-section__head"><span class="mf-section__title">Progresión</span></div>
+              <div class="mf-grid">
+                <div class="mf-field"><label class="mf-label">Nivel</label><input type="number" name="nivel" value="{$ficha['nivel']}"></div>
+                <div class="mf-field"><label class="mf-label">Puntos de estadística</label><input type="number" name="puntos_estadistica" value="{$ficha['puntos_estadistica']}"></div>
+                <div class="mf-field"><label class="mf-label">Experiencia (PR)</label><input type="number" name="experiencia" value="{$experiencia}" step="any"></div>
+              </div>
+            </div>
+
+            <!-- Estadísticas base -->
+            <div class="mf-section">
+              <div class="mf-section__head"><span class="mf-section__title">Estadísticas base</span></div>
+              <div class="mf-grid">
+                <div class="mf-field"><label class="mf-label">Fuerza</label><input type="number" name="fuerza" value="{$ficha['fuerza']}"></div>
+                <div class="mf-field"><label class="mf-label">Destreza</label><input type="number" name="destreza" value="{$ficha['destreza']}"></div>
+                <div class="mf-field"><label class="mf-label">Ctrl. Chakra</label><input type="number" name="cchakra" value="{$ficha['cchakra']}"></div>
+                <div class="mf-field"><label class="mf-label">Inteligencia</label><input type="number" name="inteligencia" value="{$ficha['inteligencia']}"></div>
+              </div>
+            </div>
+
+            <!-- Multiplicadores -->
+            <div class="mf-section">
+              <div class="mf-section__head"><span class="mf-section__title">Multiplicadores</span></div>
+              <div class="mf-grid">
+                <div class="mf-field"><label class="mf-label">M. Fuerza</label><input type="number" name="mfuerza" value="{$ficha['mfuerza']}"></div>
+                <div class="mf-field"><label class="mf-label">M. Destreza</label><input type="number" name="mdestreza" value="{$ficha['mdestreza']}"></div>
+                <div class="mf-field"><label class="mf-label">M. Ctrl. Chakra</label><input type="number" name="mcchakra" value="{$ficha['mcchakra']}"></div>
+                <div class="mf-field"><label class="mf-label">M. Inteligencia</label><input type="number" name="minteligencia" value="{$ficha['minteligencia']}"></div>
+              </div>
+            </div>
+
+            <!-- Mejoras de cuerpo -->
+            <div class="mf-section">
+              <div class="mf-section__head"><span class="mf-section__title">Mejoras de cuerpo</span></div>
+              <div class="mf-grid">
+                <div class="mf-field"><label class="mf-label">Salud</label><input type="number" name="salud" value="{$ficha['salud']}"></div>
+                <div class="mf-field"><label class="mf-label">Velocidad</label><input type="number" name="velocidad" value="{$ficha['velocidad']}"></div>
+                <div class="mf-field"><label class="mf-label">Tenketsu</label><input type="number" name="tenketsu" value="{$ficha['tenketsu']}"></div>
+                <div class="mf-field"><label class="mf-label">Sigilo</label><input type="number" name="sigilo" value="{$ficha['sigilo']}"></div>
+              </div>
+            </div>
+
+            <!-- Pasivas (invisibles: solo staff / procesos automaticos) -->
+            <div class="mf-section">
+              <div class="mf-section__head"><span class="mf-section__title">Pasivas (ocultas)</span></div>
+              <div class="mf-grid">
+                <div class="mf-field"><label class="mf-label">P. Fuerza</label><input type="number" name="pas_fuerza" value="{$ficha['pas_fuerza']}"></div>
+                <div class="mf-field"><label class="mf-label">P. Destreza</label><input type="number" name="pas_destreza" value="{$ficha['pas_destreza']}"></div>
+                <div class="mf-field"><label class="mf-label">P. Ctrl. Chakra</label><input type="number" name="pas_cchakra" value="{$ficha['pas_cchakra']}"></div>
+                <div class="mf-field"><label class="mf-label">P. Inteligencia</label><input type="number" name="pas_inteligencia" value="{$ficha['pas_inteligencia']}"></div>
+                <div class="mf-field"><label class="mf-label">P. Salud</label><input type="number" name="pas_salud" value="{$ficha['pas_salud']}"></div>
+                <div class="mf-field"><label class="mf-label">P. Velocidad</label><input type="number" name="pas_velocidad" value="{$ficha['pas_velocidad']}"></div>
+                <div class="mf-field"><label class="mf-label">P. Tenketsu</label><input type="number" name="pas_tenketsu" value="{$ficha['pas_tenketsu']}"></div>
+                <div class="mf-field"><label class="mf-label">P. Sigilo</label><input type="number" name="pas_sigilo" value="{$ficha['pas_sigilo']}"></div>
+              </div>
+            </div>
+
+            <!-- Combate -->
+            <div class="mf-section">
+              <div class="mf-section__head"><span class="mf-section__title">Combate</span></div>
+              <div class="mf-grid">
+                <div class="mf-field"><label class="mf-label">Vida</label><input type="number" name="vida" value="{$ficha['vida']}"></div>
+                <div class="mf-field"><label class="mf-label">Chakra</label><input type="number" name="chakra" value="{$ficha['chakra']}"></div>
+                <div class="mf-field"><label class="mf-label">Reg. Chakra</label><input type="number" name="regchakra" value="{$ficha['regchakra']}"></div>
+              </div>
+            </div>
+
+            <!-- Progreso del Dojo (JSON arboles_progreso) -->
+            <div class="mf-section">
+              <div class="mf-section__head"><span class="mf-section__title">Progreso del Dojo (árboles)</span></div>
+              <div class="mf-section__desc">Contadores internos del sistema de árboles. Controlan <b>precios y requisitos</b> del Dojo — <b>no</b> las técnicas que el personaje ya posee (eso se edita en «Modificar técnicas»). Subir un contador encarece la siguiente compra de ese tipo; bajarlo la abarata.</div>
+              <div class="mf-field mf-field--wide" style="margin-bottom:16px;">
+                <label class="mf-label">Acceso al Dojo · puede_usar_dojo</label>
+                <select name="puede_usar_dojo">
+                  <option value="0" <if $ficha['puede_usar_dojo'] == '0' then>selected</if>>0 — Bloqueado (ve la página con alerta, no puede operar)</option>
+                  <option value="1" <if $ficha['puede_usar_dojo'] == '1' then>selected</if>>1 — Habilitado (puede usar el Dojo)</option>
+                </select>
+                <div class="mf-help">Permite a la ficha operar el Dojo. Las fichas antiguas arrancan en 0 y hay que habilitarlas a mano tras revisar que estén bien configuradas; las nuevas ya se crean con 1. Con 0, el jugador ve el Dojo pero con una alerta y sin acciones.</div>
+              </div>
+              <div class="mf-grid--2" style="display:grid; gap:14px;">
+                <div class="mf-field">
+                  <label class="mf-label">Árboles pagados</label>
+                  <input type="number" name="desbloqueo_arboles" min="0" value="{$ficha['desbloqueo_arboles']}">
+                  <div class="mf-help">Veces que ha pagado por un árbol. Cada +1 sube el coste del próximo árbol (15 → 25 → 35…) y el Nivel requerido (1 / 5 / 10 / 15 / 20). No cuenta los árboles iniciales de la ficha.</div>
+                </div>
+                <div class="mf-field">
+                  <label class="mf-label">Ramas pagadas</label>
+                  <input type="number" name="desbloqueo_ramas" min="0" value="{$ficha['desbloqueo_ramas']}">
+                  <div class="mf-help">Veces que ha pagado por una rama. Cada +1 sube el coste de la próxima rama (10 → 15 → 20…). No incluye la rama de clan gratis.</div>
+                </div>
+                <div class="mf-field">
+                  <label class="mf-label">Niveles de rama pagados</label>
+                  <input type="number" name="desbloqueo_nivel_ramas" min="0" value="{$ficha['desbloqueo_nivel_ramas']}">
+                  <div class="mf-help">Veces que ha pagado por subir el nivel de una rama. Cada +1 sube el coste de la próxima subida (5 → 7 → 9…).</div>
+                </div>
+                <div class="mf-field">
+                  <label class="mf-label">Subidas gratis disponibles</label>
+                  <input type="number" name="nivel_rama_disponibles" min="0" value="{$ficha['nivel_rama_disponibles']}">
+                  <div class="mf-help">Créditos para subir nivel de rama sin gastar Tobis. Con más de 0, la próxima subida es gratis y resta 1 por uso. Úsalo para regalar mejoras.</div>
+                </div>
+                <div class="mf-field">
+                  <label class="mf-label">Rama de clan gratis</label>
+                  <select name="clan_rama_usada">
+                    <option value="0" <if $ficha['clan_rama_usada'] == '0' then>selected</if>>0 — No usada (aún puede reclamarla)</option>
+                    <option value="1" <if $ficha['clan_rama_usada'] == '1' then>selected</if>>1 — Ya usada</option>
+                  </select>
+                  <div class="mf-help">Si el personaje ya reclamó su rama de clan gratuita. Mientras sea 0 no puede comprar ramas de su árbol de clan con Tobis (debe reclamar antes la gratis). Ponlo en 0 para devolvérsela.</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Textos -->
+            <div class="mf-section">
+              <div class="mf-section__head"><span class="mf-section__title">Textos</span></div>
+              <div class="mf-grid--2" style="display:grid; gap:12px;">
+                <div class="mf-field"><label class="mf-label">Virtudes</label><textarea name="virtudes">{$ficha['virtudes']}</textarea></div>
+                <div class="mf-field"><label class="mf-label">Defectos</label><textarea name="defectos">{$ficha['defectos']}</textarea></div>
+                <div class="mf-field"><label class="mf-label">Frase</label><textarea name="frase">{$ficha['frase']}</textarea></div>
+                <div class="mf-field"><label class="mf-label">Extra</label><textarea name="extra">{$ficha['extra']}</textarea></div>
+              </div>
+              <div class="mf-field" style="margin-top:12px;">
+                <label class="mf-label">Notas (privadas de staff)</label>
+                <textarea name="notas" style="min-height:120px;">{$ficha['notas']}</textarea>
+              </div>
+            </div>
+
+            <div class="mf-divider"></div>
+
+            <!-- Auditoría -->
+            <div class="mf-audit">
+              <div class="mf-field">
+                <label class="mf-label">Miembro de Staff</label>
+                <input type="text" name="staff" required placeholder="Tu nombre">
+              </div>
+              <div class="mf-field">
+                <label class="mf-label">Razón</label>
+                <input type="text" name="razon" required placeholder="Motivo del cambio">
+              </div>
+            </div>
+
+            <div style="margin-top:18px;">
+              <input class="mf-btn" type="submit" value="Guardar cambios">
+            </div>
+          </form>
+        </if>
+
+      </div>
+    </div>
+  </div>
+
+  {$footer}
+
+  <if $log !='' then><script>alert(`{$log}`);</script></if>
+  {$reload_script}
+
+  <script>
+    function onLoadFicha() {
+      var fid = document.getElementById('fid').value;
+      if (fid) {
+        window.location.href = window.location.pathname + '?fid=' + fid;
+      }
+    }
+  </script>
+
+</body>
+
+</html>

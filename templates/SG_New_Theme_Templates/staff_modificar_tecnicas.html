@@ -1,0 +1,61 @@
+<html>
+
+<head>
+  <title>Modificar Técnicas</title>
+  {$headerinclude}
+</head>
+
+<body>
+  {$header}
+  <div class="fondo-blanco">
+    <if $tecnica_id == '' then>
+      Técnica ID*<br><input type="text" placeholder="HOS602" required id='tecnica_id'><button
+        onclick=onClickTid()>Apachúrrame</button><br><br>
+    </if>
+	<if $tecnica_id !='' then>
+      Técnica ID<br><input type="text" value='{$tecnica_id}' disabled><br>
+        <form method="post" action="/sg/admin/modificar_tecnicas.php" name="crear_tecnicas" id="crear_tecnicas">
+        <div style="display: none">
+           <input type="text" name="tecnica_id" value="{$tecnica_id}">
+        </div><br>
+        Nombre de técnica*: <input value="{$tecnica['nombre']}" type="text" name="nombre" id="nombre" required /><br>
+        Técnica ID*: <input value="{$tecnica['tid']}" type="text" name="tid" id="tid" required /><br>
+		Árbol*: <input value="{$tecnica['arbol']}" type="text" name="arbol" id="arbol"  /><br>
+		Rama*: <input value="{$tecnica['rama']}" type="text" name="rama" id="rama"  /><br>
+        Tipo*: <input value="{$tecnica['tipo']}" type="text" name="tipo" id="tipo"  /><br>
+        Aldea*: <input value="{$tecnica['aldea']}" type="text" name="aldea" id="aldea" /><br>
+        Categoría: <input value="{$tecnica['categoria']}" type="text" name="categoria" id="categoria" /><br>
+        Sellos: <input value="{$tecnica['sellos']}" type="text" name="sellos" id="sellos" /><br>
+        Rango*: <input value="{$tecnica['rango']}" type="text" name="rango" id="rango" placeholder='D,C,B,A,A+,S,S+' /><br>
+        Requisito: <input value="{$tecnica['requisito']}" type="text" name="requisito" id="requisito" /><br>
+		Coste:<br>
+		<textarea style="width: 350px;height: 40px;" name="coste">{$tecnica['coste']}</textarea><br>
+        Efecto:<br>
+		<textarea style="width: 350px;height: 40px;" name="efecto">{$tecnica['efecto']}</textarea><br>	
+        Descripcion*:<br>
+        <textarea style="width: 700px;height: 250px;" name="descripcion" minlength="1" required>{$tecnica['descripcion']}</textarea><br>
+
+        <input type="submit" value="Modificar">
+      </form>
+		<p>Nota: A la hora de modificar una técnica, para que aparezca en el apartado de <a href="/tecnicas.php">Técnicas</a> debe tener tres cosas: tipo, aldea y rango.</p>
+		<p>Ej. AKI201 debe tener tipo: akimichi, aldea: general, rango: C. Mayúsculas no importan. Para revisar qué tipo y aldea se necesitan para una técnica, puedes revisar el URL en el apartado de técnicas</p>
+		<p><a href="/tecnicas_show.php?tipo=Akimichi&aldea=general">tecnicas_show.php?tipo=Akimichi&aldea=general</p>
+		
+	
+    </if>
+
+  </div>
+  {$footer}
+</body>
+<if $log_var !='' then><script>alert(`{$log_var}`);</script></if>
+{$reload_script}
+<script>
+  function onClickTid() {
+    const tecnicaId = document.getElementById('tecnica_id').value;
+    if (tecnicaId) {
+		    window.location.href = window.location.pathname + '?tecnica_id=' + tecnicaId;		
+	}
+  }
+</script>
+
+</html>

@@ -1,0 +1,349 @@
+<html>
+<head>
+  <title>Registro de Personajes</title>
+  {$headerinclude}
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Source+Serif+4:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <style>
+    #rp-page { max-width: 1080px; margin: 24px auto 60px; padding: 0 18px; color: var(--ink); font-family: 'Source Serif 4', serif; text-align: left; }
+
+    .rp-panel { border: 0.5px solid var(--border); background: var(--bg2); overflow: hidden; }
+    .rp-head { position: relative; padding: 22px 26px 20px; border-bottom: 0.5px solid var(--border); background: var(--bg3); }
+    .rp-eyebrow { display: block; font-family: 'Cinzel', serif; font-size: 9px; font-weight: 700; letter-spacing: 2.2px; text-transform: uppercase; color: var(--plum3); margin-bottom: 6px; }
+    .rp-title { margin: 0; font-family: 'Cinzel', serif; font-size: 22px; font-weight: 900; letter-spacing: 1px; text-transform: uppercase; color: var(--ink); }
+    .rp-desc { max-width: 760px; margin: 10px 0 0; font-size: 13.5px; line-height: 1.7; color: var(--stone); }
+
+    .rp-stats { display: flex; gap: 24px; margin-top: 16px; flex-wrap: wrap; }
+    .rp-stat { display: flex; flex-direction: column; gap: 2px; }
+    .rp-stat__v { font-family: 'Cinzel', serif; font-size: 20px; font-weight: 900; color: var(--oxide); }
+    .rp-stat__k { font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 1.4px; text-transform: uppercase; color: var(--mist); }
+
+    .rp-body { padding: 22px 26px; }
+
+    .rp-filters { margin-bottom: 20px; }
+    .rp-filters__row { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 10px; }
+    .rp-filters__row:last-child { margin-bottom: 0; }
+    .rp-filters__label { flex-basis: 100%; font-family: 'Cinzel', serif; font-size: 9px; font-weight: 700; letter-spacing: 1.6px; text-transform: uppercase; color: var(--mist); margin-bottom: 2px; }
+
+    #rp-page input[type="text"], #rp-page select {
+      box-sizing: border-box; padding: 9px 12px;
+      background: var(--bg3); border: none;
+      border-bottom: 1.5px solid var(--border); border-left: 1.5px solid var(--border);
+      color: var(--ink); font-family: 'Source Serif 4', serif; font-size: 13px;
+      outline: none; transition: border-color 0.15s, background 0.15s;
+    }
+    #rp-page input[type="text"] { flex: 1 1 240px; min-width: 200px; }
+    #rp-page select { flex: 0 0 auto; min-width: 150px; -webkit-appearance: none; appearance: none; cursor: pointer; font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 0.5px; text-transform: uppercase; }
+    #rp-page input:focus, #rp-page select:focus { border-bottom-color: var(--plum3); border-left-color: var(--plum3); background: var(--bg2); }
+
+    .rp-filters__row--fisico input[type="text"] { border-left-color: var(--oxide); }
+
+    .rp-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; align-items: stretch; }
+    .rp-empty { display: none; padding: 30px 20px; text-align: center; color: var(--mist); font-size: 14px; border: 0.5px dashed var(--border); }
+    .rp-empty.is-show { display: block; }
+
+    .rp-pagination { display: flex; align-items: center; justify-content: center; gap: 14px; margin-top: 22px; flex-wrap: wrap; }
+    .rp-page-btn {
+      display: inline-flex; align-items: center; justify-content: center; height: 34px; padding: 0 16px;
+      background: var(--bg3); border: 0.5px solid var(--border); color: var(--ink);
+      font-family: 'Cinzel', serif; font-size: 9px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase;
+      cursor: pointer; transition: border-color 0.15s ease, color 0.15s ease;
+    }
+    .rp-page-btn:hover { border-color: var(--plum3); color: var(--plum3); }
+    .rp-page-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+    .rp-page-btn:disabled:hover { border-color: var(--border); color: var(--ink); }
+    .rp-page-info { font-size: 12px; color: var(--stone); white-space: nowrap; }
+
+    .rp-card {
+      position: relative; overflow: hidden; aspect-ratio: 2 / 3;
+      display: flex; flex-direction: column; gap: 8px;
+      border: 0.5px solid var(--border); border-left: 2px solid var(--border);
+      background: var(--bg3); padding: 14px 16px; text-decoration: none; color: inherit;
+      transition: border-color 0.15s ease, background 0.15s ease, transform 0.12s ease;
+    }
+    .rp-card:hover { border-left-color: var(--plum3); background: var(--bg2); transform: translateY(-1px); }
+    .rp-card--activo { border-left-color: var(--oxide); }
+
+    /* Matiz por aldea (mismos colores que --konoha-group-color / --kiri-group-color de sg_global.css) */
+    .rp-card--konoha { background: linear-gradient(135deg, rgba(183, 38, 38, 0.32), var(--bg3) 72%); }
+    .rp-card--kiri { background: linear-gradient(135deg, rgba(103, 155, 209, 0.32), var(--bg3) 72%); }
+    .rp-card--konoha:hover { background: linear-gradient(135deg, rgba(183, 38, 38, 0.4), var(--bg2) 72%); }
+    .rp-card--kiri:hover { background: linear-gradient(135deg, rgba(103, 155, 209, 0.4), var(--bg2) 72%); }
+
+    /* Avatar del personaje de fondo: muy tenue para que el texto siga
+       siendo perfectamente legible, pero se note la apariencia. La URL
+       llega por variable CSS inline (--rp-avatar-url) desde el JS. */
+    .rp-card__avatar {
+      position: absolute; inset: 0; z-index: 0; pointer-events: none;
+      background-image: var(--rp-avatar-url, none);
+      background-size: cover; background-position: center top; background-repeat: no-repeat;
+      opacity: 0.16;
+    }
+
+    .rp-card__main, .rp-card__fisico { position: relative; z-index: 1; }
+
+    .rp-card__nombre { font-family: 'Cinzel', serif; font-size: 15px; font-weight: 900; letter-spacing: 0.5px; color: var(--ink); }
+    .rp-card__apodo { display: block; font-family: 'Source Serif 4', serif; font-weight: 400; font-style: italic; color: var(--plum3); font-size: 13px; }
+
+    .rp-card__chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+    .rp-chip {
+      display: inline-flex; align-items: center;
+      padding: 3px 8px; background: rgba(0, 0, 0, 0.3); border: 0.5px solid var(--border);
+      font-family: 'Cinzel', serif; font-size: 9px; font-weight: 700; letter-spacing: 0.7px; text-transform: uppercase;
+      color: var(--ink); white-space: nowrap;
+    }
+    .rp-chip--activo { border-color: var(--oxide); color: var(--oxide2); background: rgba(192, 88, 42, 0.18); }
+    .rp-chip--inactivo { color: var(--mist); }
+
+    .rp-card__fisico {
+      padding-top: 10px; border-top: 0.5px dashed var(--border);
+      display: flex; flex-direction: column; gap: 3px;
+    }
+    .rp-card__fisico-label { font-family: 'Cinzel', serif; font-size: 9px; font-weight: 900; letter-spacing: 1.6px; text-transform: uppercase; color: var(--oxide); }
+    .rp-card__fisico-value {
+      font-size: 14px; font-weight: 600; color: var(--ink);
+      display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; line-clamp: 3; overflow: hidden;
+    }
+    .rp-card__fisico-value--empty { font-weight: 400; font-style: italic; color: var(--mist); }
+
+    @media (max-width: 900px) {
+      .rp-list { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
+    }
+    @media (max-width: 620px) {
+      .rp-list { grid-template-columns: 1fr; }
+      .rp-body { padding: 18px; }
+      .rp-head { padding: 18px; }
+    }
+
+    .rp-panel { display: none; }
+    .rp-panel.is-ready { display: block; }
+
+    .rp-loading {
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px;
+      padding: 70px 20px; border: 0.5px solid var(--border); background: var(--bg2);
+      font-family: 'Cinzel', serif; font-size: 10px; font-weight: 700; letter-spacing: 1.6px; text-transform: uppercase; color: var(--mist);
+    }
+    .rp-loading.is-hidden { display: none; }
+    .rp-spinner {
+      width: 32px; height: 32px; border: 3px solid var(--border); border-top-color: var(--oxide);
+      border-radius: 50%; animation: rp-spin 0.8s linear infinite;
+    }
+    @keyframes rp-spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+
+<body>
+  {$header}
+
+  <div id="rp-page">
+    <div class="rp-loading" id="rp-loading">
+      <div class="rp-spinner"></div>
+      <span>Cargando registro de personajes…</span>
+    </div>
+
+    <div class="rp-panel" id="rp-panel">
+      <div class="rp-head">
+        <span class="rp-eyebrow">Registro del foro</span>
+        <h1 class="rp-title">Registro de Personajes</h1>
+        <p class="rp-desc">Todos los personajes aprobados del foro, con su físico registrado y su actividad reciente en la zona de rol. Revisa aquí antes de crear tu ficha para no repetir un físico que ya esté en uso.</p>
+        <div class="rp-stats">
+          <div class="rp-stat"><span class="rp-stat__v" id="rp-total">0</span><span class="rp-stat__k">Personajes</span></div>
+          <div class="rp-stat"><span class="rp-stat__v" id="rp-activos">0</span><span class="rp-stat__k">Activos (60 días)</span></div>
+        </div>
+      </div>
+
+      <div class="rp-body">
+        <div class="rp-filters">
+          <div class="rp-filters__row">
+            <span class="rp-filters__label">Filtrar personaje</span>
+            <input type="text" id="rp-search-nombre" placeholder="Buscar por nombre o apodo…">
+            <select id="rp-filter-villa"></select>
+            <select id="rp-filter-clan"></select>
+            <select id="rp-filter-rango"></select>
+          </div>
+          <div class="rp-filters__row rp-filters__row--fisico">
+            <span class="rp-filters__label">Filtrar registro físico</span>
+            <input type="text" id="rp-search-fisico" placeholder="Buscar por físico registrado (actor, modelo, descripción)…">
+          </div>
+        </div>
+
+        <div class="rp-list" id="rp-list"></div>
+        <div class="rp-empty" id="rp-empty">Ningún personaje coincide con la búsqueda.</div>
+        <div class="rp-pagination" id="rp-pagination"></div>
+      </div>
+    </div>
+  </div>
+
+  {$footer}
+</body>
+
+<script>
+var rpPersonajes = {$sgRegistroPersonajesJson};
+var rpVillas = {$sgRegistroVillasJson};
+var rpClanes = {$sgRegistroClanesJson};
+var rpRangos = {$sgRegistroRangosJson};
+
+function rpEscape(s) {
+  return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+function rpPoblarSelect(id, valores, labelTodos) {
+  var sel = document.getElementById(id);
+  if (!sel) { return; }
+  var html = '<option value="">' + labelTodos + '</option>';
+  for (var i = 0; i < valores.length; i++) {
+    html += '<option value="' + rpEscape(valores[i]) + '">' + rpEscape(valores[i]) + '</option>';
+  }
+  sel.innerHTML = html;
+}
+
+function rpClaseVilla(villa) {
+  if (villa === 'Konoha') { return ' rp-card--konoha'; }
+  if (villa === 'Kiri') { return ' rp-card--kiri'; }
+  return '';
+}
+
+function rpCreateCard(p) {
+  var claseActividad = p.activo ? ' rp-card--activo' : '';
+  var claseVilla = rpClaseVilla(p.villa);
+
+  var chips = [];
+  chips.push('<span class="rp-chip">' + rpEscape(p.clan) + '</span>');
+  if (p.clan2) { chips.push('<span class="rp-chip">' + rpEscape(p.clan2) + '</span>'); }
+  chips.push('<span class="rp-chip">Rango ' + rpEscape(p.rango) + '</span>');
+  chips.push('<span class="rp-chip">Nivel ' + p.nivel + '</span>');
+  chips.push('<span class="rp-chip ' + (p.activo ? 'rp-chip--activo' : 'rp-chip--inactivo') + '">' + (p.activo ? 'Activo' : 'Inactivo') + '</span>');
+
+  var tieneFisico = p.fisico && String(p.fisico).trim() !== '';
+  var fisicoTxt = tieneFisico ? p.fisico : 'Sin físico registrado';
+  var fisicoClase = tieneFisico ? 'rp-card__fisico-value' : 'rp-card__fisico-value rp-card__fisico-value--empty';
+
+  var tieneAvatar = p.avatar && String(p.avatar).trim() !== '';
+  var avatarStyle = tieneAvatar ? ' style="--rp-avatar-url:url(\'' + rpEscape(p.avatar) + '\')"' : '';
+  var avatarDiv = tieneAvatar ? '<div class="rp-card__avatar"' + avatarStyle + '></div>' : '';
+
+  return ''
+    + '<a class="rp-card' + claseActividad + claseVilla + '" href="/sg/ficha.php?uid=' + p.fid + '">'
+    +   avatarDiv
+    +   '<div class="rp-card__main">'
+    +     '<span class="rp-card__nombre">' + rpEscape(p.nombre) + '</span>'
+    +     (p.apodo ? ' <span class="rp-card__apodo">&ldquo;' + rpEscape(p.apodo) + '&rdquo;</span>' : '')
+    +     '<div class="rp-card__chips">' + chips.join('') + '</div>'
+    +   '</div>'
+    +   '<div class="rp-card__fisico">'
+    +     '<span class="rp-card__fisico-label">Físico</span>'
+    +     '<span class="' + fisicoClase + '">' + rpEscape(fisicoTxt) + '</span>'
+    +   '</div>'
+    + '</a>';
+}
+
+// Paginación client-side: rpPersonajes ya llega ordenado por última
+// actividad (más reciente primero) desde el backend; el filtro preserva
+// ese orden (Array.filter no reordena), y aquí solo recortamos de a 20.
+var RP_POR_PAGINA = 20;
+var rpFiltrados = [];
+var rpPaginaActual = 1;
+
+function rpAplicarFiltros() {
+  var qNombre = (document.getElementById('rp-search-nombre').value || '').toLowerCase().trim();
+  var qFisico = (document.getElementById('rp-search-fisico').value || '').toLowerCase().trim();
+  var villa = document.getElementById('rp-filter-villa').value;
+  var clan = document.getElementById('rp-filter-clan').value;
+  var rango = document.getElementById('rp-filter-rango').value;
+
+  rpFiltrados = rpPersonajes.filter(function (p) {
+    if (qNombre && (p.nombre + ' ' + (p.apodo || '')).toLowerCase().indexOf(qNombre) === -1) { return false; }
+    if (qFisico && !(p.fisico && String(p.fisico).toLowerCase().indexOf(qFisico) !== -1)) { return false; }
+    if (villa && p.villa !== villa) { return false; }
+    if (clan && p.clan !== clan) { return false; }
+    if (rango && p.rango !== rango) { return false; }
+    return true;
+  });
+
+  rpPaginaActual = 1;
+  rpRenderPagina();
+}
+
+function rpRenderPagina() {
+  var list = document.getElementById('rp-list');
+  var empty = document.getElementById('rp-empty');
+  var total = rpFiltrados.length;
+
+  if (!total) {
+    list.innerHTML = '';
+    empty.classList.add('is-show');
+    rpRenderPaginacion(0, 1);
+    return;
+  }
+  empty.classList.remove('is-show');
+
+  var totalPaginas = Math.max(1, Math.ceil(total / RP_POR_PAGINA));
+  if (rpPaginaActual > totalPaginas) { rpPaginaActual = totalPaginas; }
+  if (rpPaginaActual < 1) { rpPaginaActual = 1; }
+
+  var inicio = (rpPaginaActual - 1) * RP_POR_PAGINA;
+  var pagina = rpFiltrados.slice(inicio, inicio + RP_POR_PAGINA);
+
+  var html = '';
+  for (var i = 0; i < pagina.length; i++) { html += rpCreateCard(pagina[i]); }
+  list.innerHTML = html;
+
+  rpRenderPaginacion(total, totalPaginas);
+}
+
+function rpRenderPaginacion(total, totalPaginas) {
+  var cont = document.getElementById('rp-pagination');
+  if (!cont) { return; }
+
+  if (total <= RP_POR_PAGINA) {
+    cont.innerHTML = '';
+    return;
+  }
+
+  var desde = (rpPaginaActual - 1) * RP_POR_PAGINA + 1;
+  var hasta = Math.min(rpPaginaActual * RP_POR_PAGINA, total);
+
+  var html = '';
+  html += '<button type="button" class="rp-page-btn"' + (rpPaginaActual <= 1 ? ' disabled' : '') + ' onclick="rpCambiarPagina(' + (rpPaginaActual - 1) + ')">&lsaquo; Anterior</button>';
+  html += '<span class="rp-page-info">Mostrando ' + desde + '&ndash;' + hasta + ' de ' + total + ' &middot; página ' + rpPaginaActual + ' de ' + totalPaginas + '</span>';
+  html += '<button type="button" class="rp-page-btn"' + (rpPaginaActual >= totalPaginas ? ' disabled' : '') + ' onclick="rpCambiarPagina(' + (rpPaginaActual + 1) + ')">Siguiente &rsaquo;</button>';
+
+  cont.innerHTML = html;
+}
+
+function rpCambiarPagina(n) {
+  rpPaginaActual = n;
+  rpRenderPagina();
+  var list = document.getElementById('rp-list');
+  if (list && list.scrollIntoView) { list.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+}
+
+function rpInit() {
+  document.getElementById('rp-total').textContent = rpPersonajes.length;
+
+  var activos = 0;
+  for (var i = 0; i < rpPersonajes.length; i++) { if (rpPersonajes[i].activo) { activos++; } }
+  document.getElementById('rp-activos').textContent = activos;
+
+  rpPoblarSelect('rp-filter-villa', rpVillas, 'Todas las aldeas');
+  rpPoblarSelect('rp-filter-clan', rpClanes, 'Todos los clanes');
+  rpPoblarSelect('rp-filter-rango', rpRangos, 'Todos los rangos');
+
+  document.getElementById('rp-search-nombre').addEventListener('input', rpAplicarFiltros);
+  document.getElementById('rp-search-fisico').addEventListener('input', rpAplicarFiltros);
+  document.getElementById('rp-filter-villa').addEventListener('change', rpAplicarFiltros);
+  document.getElementById('rp-filter-clan').addEventListener('change', rpAplicarFiltros);
+  document.getElementById('rp-filter-rango').addEventListener('change', rpAplicarFiltros);
+
+  rpAplicarFiltros();
+
+  var loading = document.getElementById('rp-loading');
+  var panel = document.getElementById('rp-panel');
+  if (loading) { loading.classList.add('is-hidden'); }
+  if (panel) { panel.classList.add('is-ready'); }
+}
+
+window.addEventListener('load', rpInit);
+</script>
+</html>

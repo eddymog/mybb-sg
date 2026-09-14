@@ -1,0 +1,347 @@
+<html>
+<head>
+    <title>Entrenar: Misiones</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Source+Serif+4:wght@300;400;600;700&family=Zen+Old+Mincho:wght@400;700&display=swap" rel="stylesheet">
+    {$headerinclude}
+    <style>
+        :root {
+            --bg: #0f0c18;
+            --surface: rgba(23, 18, 36, 0.84);
+            --surface-soft: rgba(28, 22, 44, 0.7);
+            --border: rgba(156, 107, 204, 0.12);
+            --ink: #e8dff8;
+            --plum2: #9c6bcc;
+            --plum3: #b890e0;
+            --plum4: #d4b8f0;
+            --oxide: #c0582a;
+            --gold: #c09840;
+            --stone: #8a7a9a;
+            --fiber: rgba(156, 107, 204, 0.04);
+            --shadow: 0 24px 60px rgba(0, 0, 0, 0.28);
+            --shadow-soft: 0 12px 28px rgba(0, 0, 0, 0.18);
+        }
+
+        body {
+            background:
+                radial-gradient(circle at top left, rgba(123, 74, 184, 0.12), transparent 28%),
+                radial-gradient(circle at bottom right, rgba(192, 88, 42, 0.08), transparent 24%),
+                var(--bg);
+            color: var(--ink);
+            font-family: "Source Serif 4", serif;
+            margin: 0;
+            position: relative;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+            background-image:
+                repeating-linear-gradient(13deg, transparent 0, transparent 24px, var(--fiber) 24px, var(--fiber) 25px),
+                repeating-linear-gradient(82deg, transparent 0, transparent 36px, var(--fiber) 36px, var(--fiber) 37px),
+                repeating-linear-gradient(151deg, transparent 0, transparent 19px, var(--fiber) 19px, var(--fiber) 19.5px);
+        }
+
+        .missions-page {
+            max-width: 1160px;
+            margin: 28px auto 44px;
+            padding: 0 18px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .missions-shell {
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            background: rgba(19, 15, 30, 0.94);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        .missions-head {
+            padding: 24px 28px 18px;
+            border-bottom: 1px solid var(--border);
+            background: rgba(23, 18, 36, 0.82);
+        }
+
+        .missions-label,
+        .mission-stat-label,
+        .mission-rank,
+        .mission-cta {
+            font-family: "Cinzel", serif;
+            text-transform: uppercase;
+        }
+
+        .missions-label {
+            margin-bottom: 8px;
+            font-size: 10px;
+            letter-spacing: 2.4px;
+            color: var(--plum3);
+        }
+
+        .missions-title {
+            margin: 0;
+            font: 900 clamp(24px, 3.5vw, 34px)/1.05 "Cinzel", serif;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: var(--ink);
+        }
+
+        .missions-subtitle {
+            max-width: 780px;
+            margin: 10px 0 0;
+            color: var(--stone);
+            font-size: 14px;
+            line-height: 1.7;
+        }
+
+        .missions-body {
+            padding: 20px;
+            display: grid;
+            gap: 16px;
+        }
+
+        .mission-pr {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 16px;
+            border: 1px solid var(--border);
+            border-radius: 999px;
+            background: rgba(15, 12, 24, 0.24);
+            color: var(--gold);
+            font: 700 12px/1 "Cinzel", serif;
+            letter-spacing: 1.6px;
+            text-transform: uppercase;
+        }
+
+        .mission-card {
+            display: grid;
+            grid-template-columns: 320px minmax(0, 1fr);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            background: var(--surface);
+            box-shadow: var(--shadow-soft);
+            overflow: hidden;
+        }
+
+        .mission-visual {
+            position: relative;
+            min-height: 100%;
+            background: #130f1e;
+            overflow: hidden;
+        }
+
+        .mission-visual img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            transform: scale(1.02);
+        }
+
+        .mission-visual::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            background:
+                linear-gradient(180deg, rgba(15, 12, 24, 0.08), rgba(15, 12, 24, 0.32)),
+                radial-gradient(circle at center, transparent 40%, rgba(15, 12, 24, 0.24) 100%);
+        }
+
+        .mission-visual-badge {
+            position: absolute;
+            left: 18px;
+            bottom: 18px;
+            z-index: 1;
+            display: inline-flex;
+            align-items: center;
+            min-height: 30px;
+            padding: 0 12px;
+            border: 1px solid rgba(232, 223, 248, 0.14);
+            border-radius: 999px;
+            background: rgba(19, 15, 30, 0.7);
+            backdrop-filter: blur(6px);
+            color: #fff;
+            font: 700 10px/1 "Cinzel", serif;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .mission-panel {
+            padding: 22px;
+            display: grid;
+            gap: 18px;
+        }
+
+        .mission-rank {
+            display: inline-flex;
+            align-items: center;
+            width: fit-content;
+            min-height: 28px;
+            padding: 0 12px;
+            border: 1px solid var(--border);
+            border-radius: 999px;
+            background: rgba(15, 12, 24, 0.22);
+            color: var(--plum3);
+            font-size: 10px;
+            letter-spacing: 2px;
+        }
+
+        .mission-title {
+            margin: 0;
+            font: 900 28px/1.1 "Cinzel", serif;
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+            color: var(--ink);
+        }
+
+        .mission-description {
+            margin: 0;
+            color: var(--stone);
+            font-size: 15px;
+            line-height: 1.85;
+            text-align: justify;
+        }
+
+        .mission-stats {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px;
+        }
+
+        .mission-stat {
+            padding: 14px 16px;
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            background: var(--surface-soft);
+        }
+
+        .mission-stat-label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 10px;
+            letter-spacing: 1.8px;
+            color: var(--stone);
+        }
+
+        .mission-stat-value {
+            display: block;
+            color: var(--plum4);
+            font: 700 18px/1.3 "Cinzel", serif;
+        }
+
+        .mission-cta-wrap {
+            padding-top: 4px;
+        }
+
+        .mission-cta {
+            width: 100%;
+            min-height: 50px;
+            border: 1px solid rgba(156, 107, 204, 0.2);
+            border-radius: 999px;
+            background: linear-gradient(135deg, rgba(61, 31, 110, 0.96), rgba(90, 46, 154, 0.88));
+            color: #fff;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            cursor: pointer;
+        }
+
+        @media (max-width: 860px) {
+            .mission-card {
+                grid-template-columns: 1fr;
+            }
+
+            .mission-visual {
+                max-height: 240px;
+            }
+        }
+
+        @media (max-width: 720px) {
+            .missions-page {
+                margin-top: 20px;
+                padding: 0 12px;
+            }
+
+            .missions-shell {
+                border-radius: 18px;
+            }
+
+            .missions-head {
+                padding: 20px 18px 16px;
+            }
+
+            .missions-body,
+            .mission-panel {
+                padding: 16px;
+            }
+
+            .mission-stats {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    {$header}
+    <div class="missions-page">
+        <div class="missions-shell">
+            <section class="missions-head">
+                <div class="missions-label">Tablón shinobi</div>
+                <h1 class="missions-title">Misiones Disponibles</h1>
+                <p class="missions-subtitle">
+                    Acepta una misión activa, espera a que transcurra el tiempo asignado y reclama después tus recompensas en ryos y experiencia. Cada encargo representa una oportunidad rápida de progreso dentro del sistema.
+                </p>
+            </section>
+
+            <section class="missions-body">
+                <div class="mission-pr">{$pr} Puntos de experiencia</div>
+
+                <div style="display: none">
+                    <form id="misform" method="post" action="misiones.php">
+                        <input type="text" name="uid" id="userid" value="{$userid}">
+                        <input type="text" id="mid" name="mid" value="{$mision['cod']}">
+                    </form>
+                </div>
+
+                <article class="mission-card">
+                    <div class="mission-visual">
+                        <img src="https://i.pinimg.com/originals/1a/e3/0f/1ae30f8c4ef2c68a95695b07b754f32b.gif" alt="Misión shinobi">
+                        <div class="mission-visual-badge">Encargo activo</div>
+                    </div>
+                    <div class="mission-panel">
+                        <div class="mission-rank">Rango {$mision['rango']}</div>
+                        <h2 class="mission-title">{$mision['title']}</h2>
+                        <p class="mission-description">{$mision['descripcion']}</p>
+
+                        <div class="mission-stats">
+                            <div class="mission-stat">
+                                <span class="mission-stat-label">Recompensa</span>
+                                <span class="mission-stat-value">{$mision['ryos']} Ryos</span>
+                            </div>
+                            <div class="mission-stat">
+                                <span class="mission-stat-label">Experiencia</span>
+                                <span class="mission-stat-value">{$mision['coste']} Puntos</span>
+                            </div>
+                        </div>
+
+                        <div class="mission-cta-wrap">
+                            <input class="mission-cta" type="button" onclick="{$comenzar_accion}" value="Comenzar Misión">
+                        </div>
+                    </div>
+                </article>
+            </section>
+        </div>
+    </div>
+    <if $log_var !='' then><script>alert('{$log_var}');</script></if>
+    {$reload_script}
+    {$footer}
+</body>
+
+</html>

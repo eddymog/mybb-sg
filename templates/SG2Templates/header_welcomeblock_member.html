@@ -1,0 +1,46 @@
+<!-- Continuation of div(class="upper") as opened in the header template -->
+	<div class="float_left">
+		<a href="" id="ddnmenu"><span>Welcome back, {$mybb->user['username']}</span> <i class="fa fa-caret-down"></i></a>
+		<a href="{$mybb->settings['bburl']}/private.php" class="panel-pm">{$lang->welcome_pms}</a> <a href="{$mybb->settings['bburl']}/private.php">
+			<span class="pmbg">{$mybb->user['pms_unread']}</span>
+		</a>
+	</div>
+	<ul class="menu top_links float_right">
+		<li><a href="{$mybb->settings['bburl']}/portal.php">{$lang->toplinks_portal}</a></li>
+		<li><a href="{$mybb->settings['bburl']}/index.php">Forums</a></li>
+		<li><a href="{$mybb->settings['bburl']}/search.php">{$lang->toplinks_search}</a></li>
+		<li><a href="{$mybb->settings['bburl']}/memberlist.php">{$lang->toplinks_memberlist}</a></li>
+		<li><a href="{$mybb->settings['bburl']}/calendar.php">{$lang->toplinks_calendar}</a></li>
+		<li><a href="{$mybb->settings['bburl']}/misc.php?action=help" class="help">{$lang->toplinks_help}</a></li>
+	</ul>
+	</div>
+</div>
+<div class="lower">
+	<div class="wrapper">
+		<ul class="menu panel_links">
+			{$usercplink}
+			{$modcplink}
+			{$admincplink}
+		</ul>
+		<ul class="menu user_links">
+			{$buddylink}
+			{$searchlink}
+		</ul>
+	</div>
+	<br class="clear" />
+</div>
+<div id="ddnmenu_popup" class="popup_menu pedit--adj" style="display: none;">
+	<div class="popup_item_container"><a href="{$mybb->settings['bburl']}/usercp.php" class="popup_item"><span>User Panel</span><i class="fa fa-user menuadj"></i></a></div>
+	<div class="popup_item_container"><a href="{$mybb->settings['bburl']}/usercp.php?action=profile" class="popup_item"><span>Edit Profile</span><i class="fa fa-pencil menuadj"></i></a></div>
+	<div class="popup_item_container"><a href="{$mybb->settings['bburl']}/usercp.php?action=options" class="popup_item"><span>Edit Options</span><i class="fa fa-cogs menuadj"></i></a></div>
+	<div class="popup_item_container"><a href="{$mybb->settings['bburl']}/usercp.php?action=avatar" class="popup_item"><span>Edit Avatar</span><i class="fa fa-picture-o menuadj"></i></a></div>
+	<div class="popup_item_container"><a href="{$mybb->settings['bburl']}/usercp.php?action=editsig" class="popup_item"><span>Edit Signature</span><i class="fa fa-paint-brush menuadj"></i></a></div>
+	<div class="popup_item_container"><a href="{$mybb->settings['bburl']}/member.php?action=logout&amp;logoutkey={$mybb->user['logoutkey']}" class="popup_item"><span>{$lang->welcome_logout}!</span><i class="fa fa-power-off menuadj"></i></a></div>	
+</div>
+<script type="text/javascript">
+// <!--
+	if(use_xmlhttprequest == "1"){
+		$("#ddnmenu").popupMenu();
+	}
+// -->
+</script>

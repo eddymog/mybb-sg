@@ -1,0 +1,124 @@
+<html>
+
+<head>
+    <style>
+		.entrenamiento p {
+			font-size: 21px;	
+			text-align: center;
+		}
+
+    </style>
+    <title>Entrenamiento en Curso</title>
+    {$headerinclude}
+</head>
+
+<body>
+    {$header}
+    <div class="fondo-blanco">
+        <br>
+		<div class="entrenamiento"><p>¡Entrenamiento en progreso!</p></div>
+        <div class="entrenamiento" id="contenedor">
+            <p id="countdown" style="color: #3498db;"></p>
+        </div>
+        <script>
+            var end = new Date({$tiempo});
+
+            var _second = 1000;
+            var _minute = _second * 60;
+            var _hour = _minute * 60;
+            var _day = _hour * 24;
+            var timer;
+
+            var progBar = document.getElementById('barracarga');
+            var headBar = document.getElementById('hhead');
+
+            function showRemaining() {
+                var now = new Date();
+                var distance = end - now;
+                if (distance < 1000 && distance > 1) {
+                    location.reload(true);
+                    return;
+                }
+                if (distance < 0) {
+                    clearInterval(timer);
+                    document.getElementById('countdown').innerHTML = '0 dias, 0 horas, 0 minutos y 0 segundos';
+					location.reload();
+                    return;
+                }
+                var days = Math.floor(distance / _day);
+                var hours = Math.floor((distance % _day) / _hour);
+                var minutes = Math.floor((distance % _hour) / _minute);
+                var seconds = Math.floor((distance % _minute) / _second);
+
+                document.getElementById('countdown').innerHTML = days + ' dias, ';
+                document.getElementById('countdown').innerHTML += hours + ' horas, ';
+                document.getElementById('countdown').innerHTML += minutes + ' minutos y ';
+                document.getElementById('countdown').innerHTML += seconds + ' segundos';
+            }
+
+            timer = setInterval(showRemaining, 1000);
+        </script>
+		<div class="tecnica" style="margin: 10px;">
+			<div class="spoiler">
+				<div class="spoiler_title" style="text-align: center;" onclick="javascript: if(parentNode.getElementsByTagName('div')[1].style.display == 'block'){ parentNode.getElementsByTagName('div')[1].style.display = 'none'; } else { parentNode.getElementsByTagName('div')[1].style.display = 'block'; }">
+					<span class="spoiler_button" style="text-transform: uppercase;"><strong>{$tecnica['nombre']}</strong></span>
+				</div>
+				<div class="tecnica_spoiler_content" style="display: block;">
+					<div style='display: flex;flex-direction: column;'>
+						<div style='display: flex;flex-direction: row;justify-content: space-between;margin-bottom: 10px;margin-top: 7px;'>
+							<div class='tecnicaLvl'><span>Rango {$tecnica['rango']}</span></div>
+						</div>
+						<div style='display: flex;flex-direction: row;justify-content: center;margin: 9px 8px 10px;'>
+							<div class='tecnicaId'><span>ID: {$tecnica['tid']}</span></div> 
+							<if $tecnica['sellos'] then><div class='tecnicaType'><span>SELLOS: {$tecnica['sellos']}</span></div></if>
+							<div class='tecnicaType'><span>{$tecnica['tipo']}</span></div> 
+							<if $tecnica['categoria'] && ($tecnica['categoria'] != $tecnica['tipo']) then>
+								<div class='tecnicaType'><span>{$tecnica['categoria']}</span></div></if>
+						</div>  
+						<p class='tecnicaDes'><span>{$tecnica['descripcion']}</span></p>
+						<if $tecnica['coste'] then>
+						  <div class='tecnicaCost'><span class='tecnicaLvl'>Coste:</span> <span class='efectoDescripcion'>{$tecnica['coste']}</span></div>
+						</if>
+						<if $tecnica['efecto'] then>
+						  <div class='tecnicaEfect'><span class='tecnicaLvl'>Efecto:</span> <span class='efectoDescripcion'>{$tecnica['efecto']}</span></div>
+						</if>
+
+					</div>
+				</div>
+			</div>
+		</div>
+        <br>
+        <div style="display: none">
+            <form id="tecform" method="post" action="entrenamientos.php">
+                <input type="text" id="tid_en_curso" name="tid_en_curso" value="false">
+            </form>
+        </div>
+        <div class="boton_mision" style="text-align: center;">
+			<div id="confirmacion" style="display: none;">¿Estás seguro de que quieres cancelar el Entrenamiento?<br><br>
+			<input
+                class="button" type="button"
+                onclick="javascript: document.getElementById('tid_en_curso').value = 'cancel'; document.getElementById('tecform').submit();"
+                value="Sí" style="background-color: #5f6572;"> 
+			<input class="button" type="button"
+                onclick="javascript: document.getElementById('confirmacion').style= 'display: none';" value="No"
+                style="background-color: #5f6572;"><br><br>
+			<img src="https://media.giphy.com/media/uBkXN6p7urWUw/giphy.gif">
+			</div>
+			<input class="button" type="button"
+            onclick="javascript: document.getElementById('confirmacion').style= 'display: block;border: 3px dotted rgb(52, 152, 219);padding: 20px;border-radius: 5px;width: 800px;margin: 20px auto;';"
+            value="Cancelar" style="background-color: #5f6572;"></div><br>
+			
+		<div class="boton_mision" style="text-align: center;">
+			<a href="/sg/entrenamientos.php?modo_vista={$uid}"><button class="button">Ver Técnicas</button></a>
+			<br><br>
+			<img src="https://media.giphy.com/media/eemPC4yhITcTm/giphy.gif">
+		</div>
+		        
+        <br>
+        <br>
+    </div>
+    {$reload_script}
+    {$footer}
+</body>
+
+</html>

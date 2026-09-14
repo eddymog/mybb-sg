@@ -29,7 +29,6 @@
     .rm-field { display: flex; flex-direction: column; gap: 5px; margin-bottom: 14px; }
     .rm-label { font-family: 'Cinzel', serif; font-size: 8px; font-weight: 700; letter-spacing: 1.4px; text-transform: uppercase; color: var(--mist); }
     .rm-row { display: flex; flex-wrap: wrap; gap: 14px; align-items: flex-end; }
-    .rm-row .rm-field { margin-bottom: 0; }
 
     #rm-page input[type="text"], #rm-page input[type="number"], #rm-page select {
       box-sizing: border-box; padding: 9px 11px;
@@ -72,30 +71,22 @@
     .rm-quickrow { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; padding: 10px 14px; border: 0.5px dashed var(--border); background: var(--bg3); }
     .rm-quickrow label { font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 1px; color: var(--mist); text-transform: uppercase; }
 
-    .rm-part { border: 0.5px solid var(--border); border-left: 2px solid var(--border); background: var(--bg3); padding: 12px 14px; margin-bottom: 8px; display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+    .rm-part { border: 0.5px solid var(--border); border-left: 2px solid var(--border); background: var(--bg3); padding: 12px 14px; margin-bottom: 8px; display: grid; grid-template-columns: 1.4fr 1fr auto 0.8fr auto 1.6fr; gap: 10px; align-items: center; }
     .rm-part.rol-narrador { border-left-color: var(--oxide); }
     .rm-part.rol-participante { border-left-color: var(--plum3); }
     .rm-part.rol-excluir { opacity: 0.5; }
-    .rm-part.rc-ganador { border-left-color: var(--oxide); }
-    .rm-part.rc-perdedor { border-left-color: var(--plum3); }
-    .rm-part.rc-empate { border-left-color: var(--stone); }
-    .rm-part.rc-excluir { opacity: 0.5; }
-    .rm-part__name { flex: 1.4 1 200px; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+    .rm-part__name { display: flex; flex-direction: column; gap: 2px; }
     .rm-part__nombre { font-weight: 700; color: var(--ink); font-size: 13px; }
     .rm-part__meta { font-size: 11px; color: var(--mist); }
     .rm-part__badge { display: inline-block; margin-left: 6px; font-family: 'Cinzel', serif; font-size: 7px; letter-spacing: 1px; padding: 1px 5px; border: 0.5px solid var(--plum3); color: var(--plum3); text-transform: uppercase; }
-    .rm-part__posts { flex: 1 1 120px; }
     .rm-part__posts.is-low { color: var(--oxide2); font-weight: 700; }
-    .rm-part__rol, .rm-part__pct { flex: 0 0 auto; }
-    .rm-part__oficial { display: none; flex: 0 0 auto; }
+    .rm-part__oficial { display: none; }
     .rm-part.show-oficial .rm-part__oficial { display: block; }
-    .rm-part__perg { display: none; align-items: center; gap: 5px; font-size: 11px; white-space: nowrap; flex: 0 0 auto; }
+    .rm-part__perg { display: none; align-items: center; gap: 5px; font-size: 11px; white-space: nowrap; }
     .rm-part.show-perg .rm-part__perg { display: flex; }
-    .rm-part__preview { flex: 1.6 1 200px; font-size: 12px; color: var(--stone); text-align: right; }
+    .rm-part__preview { font-size: 12px; color: var(--stone); text-align: right; }
     .rm-part__preview b { color: var(--plum3); }
     .rm-part__sinficha { color: var(--oxide2); font-size: 11px; margin-top: 3px; }
-    .rm-part__removebtn { flex: 0 0 auto; width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; background: transparent; border: 0.5px solid var(--border); color: var(--mist); font-size: 15px; line-height: 1; cursor: pointer; transition: color 0.15s, border-color 0.15s, background 0.15s; }
-    .rm-part__removebtn:hover { color: var(--oxide2); border-color: var(--oxide2); background: var(--bg2); }
 
     .rm-addrow { display: flex; gap: 8px; align-items: center; margin-top: 10px; }
     .rm-addrow input { width: 120px; }
@@ -105,12 +96,6 @@
     .rm-total { display: flex; flex-direction: column; gap: 2px; }
     .rm-total__k { font-family: 'Cinzel', serif; font-size: 8px; letter-spacing: 1.4px; text-transform: uppercase; color: var(--mist); }
     .rm-total__v { font-family: 'Cinzel', serif; font-size: 18px; font-weight: 900; color: var(--ink); }
-
-    /* Post de felicitación (BBCode) */
-    .rm-postcheck { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; font-size: 13px; }
-    .rm-postcheck label { display: flex; align-items: center; gap: 8px; cursor: pointer; }
-    .rm-postpreview { margin-bottom: 18px; }
-    .rm-postpreview__area { width: 100%; box-sizing: border-box; min-height: 200px; padding: 12px 14px; background: var(--bg2); border: 0.5px dashed var(--border); color: var(--stone); font-family: 'Source Serif 4', serif; font-size: 12.5px; line-height: 1.6; white-space: pre-wrap; resize: vertical; }
 
     .rm-result { margin-top: 18px; }
     .rm-result__ok, .rm-result__err { padding: 12px 16px; border: 0.5px solid var(--border); background: var(--bg3); margin-bottom: 10px; }
@@ -125,7 +110,7 @@
 
     @media (max-width: 760px) {
       .rm-tipos { grid-template-columns: repeat(2, 1fr); }
-      .rm-part__name, .rm-part__preview { flex-basis: 100%; }
+      .rm-part { grid-template-columns: 1fr; }
       .rm-part__preview { text-align: left; }
     }
   </style>
@@ -139,7 +124,7 @@
       <div class="rm-panel__head">
         <span class="rm-eyebrow">Consola Staff · Recompensas</span>
         <h1 class="rm-title">Recompensas de Misión</h1>
-        <p class="rm-desc">Carga un tema por TID y confirma la recompensa: para misiones, asigna el rol de cada participante (participante, narrador, autor); para combates, el resultado de cada combatiente (ganador, perdedor, empate). Los montos siempre los calcula el servidor.</p>
+        <p class="rm-desc">Carga un tema por TID, asigna el rol de cada participante (participante, narrador, autor) y confirma. Los montos siempre los calcula el servidor según rango y tipo de misión.</p>
       </div>
 
       <div class="rm-body">
@@ -166,14 +151,12 @@
           <div class="rm-tema" id="rm-tema"></div>
           <div class="rm-flash rm-flash--warn rm-hidden" id="rm-doblepago"></div>
 
-          <div class="rm-field" id="rm-rango-field">
+          <div class="rm-field">
             <label class="rm-label">Rango de la misión</label>
             <div class="rm-rangos" id="rm-rangos"></div>
           </div>
 
-          <div class="rm-flash rm-flash--warn rm-hidden" id="rm-combate-aviso"></div>
-
-          <div class="rm-quickrow" id="rm-quickrow">
+          <div class="rm-quickrow">
             <label>Poner a todos los participantes en:</label>
             <select id="rm-quick-pct"></select>
             <button class="rm-btn rm-btn--sm rm-btn--ghost" type="button" onclick="rmAplicarQuickPct()">Aplicar</button>
@@ -191,15 +174,6 @@
         <div class="rm-section rm-hidden" id="rm-step3">
           <div class="rm-section__head"><span class="rm-section__title">3. Confirmar</span></div>
           <div class="rm-totales" id="rm-totales"></div>
-
-          <div class="rm-postcheck">
-            <label><input type="checkbox" id="rm-publicar-post" checked onchange="rmRenderPostPreview()"> Publicar post de felicitación en el tema (BBCode, firmado por el narrador)</label>
-          </div>
-          <div class="rm-postpreview" id="rm-postpreview-wrap">
-            <label class="rm-label">Vista previa del post</label>
-            <textarea class="rm-postpreview__area" id="rm-postpreview" readonly rows="10"></textarea>
-          </div>
-
           <button class="rm-btn" id="rm-confirmar-btn" type="button" onclick="rmConfirmar()">Confirmar y aplicar</button>
           <a class="rm-btn rm-btn--ghost" href="/sg/admin/recompensas_mision.php">Cancelar / empezar de nuevo</a>
         </div>
@@ -267,18 +241,8 @@
     rmTipoActual = key;
     var chips = document.querySelectorAll('#rm-tipos .rm-tipo');
     for (var i = 0; i < chips.length; i++) { chips[i].className = 'rm-tipo' + (chips[i].getAttribute('data-tipo') === key ? ' is-active' : ''); }
-    rmAplicarVisibilidadTipo();
     // Si ya había un tema cargado, refrescar rangos/rol disponibles.
     if (rmTemaActual) { rmRenderRangos(); rmNormalizarFilasPorTipo(); rmRenderParticipantes(); }
-  }
-
-  // Combate no usa rango de misión ni el control de "% para todos".
-  function rmAplicarVisibilidadTipo() {
-    var esCombate = (rmTipoActual === 'combate');
-    var rangoField = document.getElementById('rm-rango-field');
-    var quickrow = document.getElementById('rm-quickrow');
-    if (rangoField) { rangoField.classList.toggle('rm-hidden', esCombate); }
-    if (quickrow) { quickrow.classList.toggle('rm-hidden', esCombate); }
   }
 
   // ── Paso 2: cargar TID ────────────────────────────────────────────────
@@ -299,11 +263,10 @@
       for (var i = 0; i < r.participantes.length; i++) {
         var p = r.participantes[i];
         rmFilas.push({
-          uid: p.uid, username: p.username, nombre: p.nombre, tiene_ficha: p.tiene_ficha, nivel: p.nivel,
+          uid: p.uid, username: p.username, nombre: p.nombre, tiene_ficha: p.tiene_ficha,
           posts: p.posts, es_creador: p.es_creador,
           rol: (rmTipoActual === 'autonarrada') ? (p.es_creador ? 'autor' : 'excluir') : 'participante',
-          oficial: false, pct: 100, pergamino: false,
-          resultado: 'excluir'
+          oficial: false, pct: 100, pergamino: false
         });
       }
 
@@ -322,7 +285,6 @@
       document.getElementById('rm-step3').classList.remove('rm-hidden');
       document.getElementById('rm-resultado').classList.add('rm-hidden');
 
-      rmAplicarVisibilidadTipo();
       rmRenderRangos();
       rmRenderParticipantes();
     });
@@ -332,7 +294,6 @@
   function rmRenderRangos() {
     var wrap = document.getElementById('rm-rangos'); if (!wrap) { return; }
     var rangos = rmTipos[rmTipoActual].rangos;
-    if (!rangos.length) { rmRangoActual = null; wrap.innerHTML = ''; return; }
     if (rangos.indexOf(rmRangoActual) === -1) { rmRangoActual = rangos[0]; }
     var html = '';
     for (var i = 0; i < rangos.length; i++) {
@@ -363,44 +324,8 @@
     rmRenderRangos();
   }
 
-  // ── Combate: valida que haya exactamente 2 combatientes (ganador+perdedor,
-  // o ambos en empate) — espejo de la validación del confirmar en PHP. ──────
-  function rmCombateValidar() {
-    var activos = [];
-    for (var i = 0; i < rmFilas.length; i++) {
-      var f = rmFilas[i];
-      if (f.resultado && f.resultado !== 'excluir' && f.tiene_ficha) { activos.push(f); }
-    }
-    if (activos.length !== 2) {
-      return { ok: false, mensaje: 'Un combate debe tener exactamente 2 combatientes (ganador+perdedor, o ambos en empate).' };
-    }
-    var a = activos[0], b = activos[1];
-    var parOk = (a.resultado === 'empate' && b.resultado === 'empate')
-             || (a.resultado === 'ganador' && b.resultado === 'perdedor')
-             || (a.resultado === 'perdedor' && b.resultado === 'ganador');
-    if (!parOk) {
-      return { ok: false, mensaje: 'Los resultados no cuadran: debe ser un Ganador y un Perdedor, o ambos en Empate.' };
-    }
-    return { ok: true, combatientes: activos };
-  }
-
-  // Espejo de sg_recompensa_combate(): sin rango, bonus de nivel solo al ganador.
-  function rmCalcularCombate(f) {
-    if (!f.resultado || f.resultado === 'excluir') { return null; }
-    var val = rmCombateValidar();
-    if (!val.ok) { return null; }
-    var oponente = (val.combatientes[0].uid === f.uid) ? val.combatientes[1] : val.combatientes[0];
-    var dif = Math.max(0, (oponente.nivel || 0) - (f.nivel || 0));
-
-    if (f.resultado === 'empate')   { return { ryos: 0, tobi: 10, exp: 10, pergamino: null }; }
-    if (f.resultado === 'ganador')  { return { ryos: 0, tobi: 30 + 2 * dif, exp: 25 + dif, pergamino: null }; }
-    if (f.resultado === 'perdedor') { return { ryos: 0, tobi: 15, exp: 15, pergamino: null }; }
-    return null;
-  }
-
   // ── Cálculo espejo de sg_recompensa_mision() (mismos números vía JSON) ──
   function rmCalcularFila(f) {
-    if (rmTipoActual === 'combate') { return rmCalcularCombate(f); }
     var tipo = rmTipoActual, rango = rmRangoActual;
     if (!rango || f.rol === 'excluir') { return null; }
     var t = null, pergRango = null;
@@ -427,60 +352,8 @@
     return { ryos: ryos, tobi: tobi, exp: exp, pergamino: (f.rol === 'narrador' && f.pergamino) ? pergObjeto : null };
   }
 
-  // ── Render de participantes (combate) ─────────────────────────────────
-  function rmRenderParticipantesCombate() {
-    var wrap = document.getElementById('rm-participantes'); if (!wrap) { return; }
-    var val = rmCombateValidar();
-    var resultOptions = ['ganador', 'perdedor', 'empate', 'excluir'];
-    var resultLabels = { ganador: 'Ganador', perdedor: 'Perdedor', empate: 'Empate', excluir: 'Excluir' };
-
-    var html = '';
-    for (var i = 0; i < rmFilas.length; i++) {
-      var f = rmFilas[i];
-      if (!f.resultado) { f.resultado = 'excluir'; }
-
-      var resultSelect = '<select onchange="rmCambiarCampo(' + i + ',\'resultado\',this.value)">';
-      for (var ro = 0; ro < resultOptions.length; ro++) {
-        var rv = resultOptions[ro];
-        resultSelect += '<option value="' + rv + '"' + (f.resultado === rv ? ' selected' : '') + '>' + resultLabels[rv] + '</option>';
-      }
-      resultSelect += '</select>';
-
-      var calc = val.ok ? rmCalcularFila(f) : null;
-      var previewTxt = calc
-        ? ('<b>' + calc.tobi + '</b> tobi · <b>' + calc.exp + '</b> exp')
-        : '<span style="color:var(--mist)">— sin recompensa —</span>';
-
-      var sinFichaTxt = !f.tiene_ficha ? '<div class="rm-part__sinficha">Sin ficha: se omitirá al confirmar.</div>' : '';
-      var nivelTxt = (f.nivel != null) ? (' · Nivel ' + f.nivel) : '';
-
-      html += '<div class="rm-part rc-' + f.resultado + '">'
-        + '<div class="rm-part__name"><span class="rm-part__nombre">' + rmEscape(f.nombre || f.username) + '</span>'
-        + '<span class="rm-part__meta">' + rmEscape(f.username) + ' · UID ' + f.uid + nivelTxt + '</span>' + sinFichaTxt + '</div>'
-        + '<div class="rm-part__rol">' + resultSelect + '</div>'
-        + '<div class="rm-part__preview">' + previewTxt + '</div>'
-        + '<button type="button" class="rm-part__removebtn" title="Quitar de la lista" onclick="rmRemoveFila(' + i + ')">&times;</button>'
-        + '</div>';
-    }
-    wrap.innerHTML = html || '<div class="rm-flash">No se detectaron participantes en este tema.</div>';
-
-    var aviso = document.getElementById('rm-combate-aviso');
-    if (aviso) {
-      if (!val.ok && rmFilas.length > 0) {
-        aviso.classList.remove('rm-hidden');
-        aviso.textContent = '⚠ ' + val.mensaje;
-      } else {
-        aviso.classList.add('rm-hidden');
-      }
-    }
-
-    rmRenderTotales();
-    rmRenderPostPreview();
-  }
-
   // ── Render de participantes ──────────────────────────────────────────
   function rmRenderParticipantes() {
-    if (rmTipoActual === 'combate') { rmRenderParticipantesCombate(); return; }
     var wrap = document.getElementById('rm-participantes'); if (!wrap) { return; }
     var esNormal = (rmTipoActual === 'normal');
     var esAutonarrada = (rmTipoActual === 'autonarrada');
@@ -524,25 +397,18 @@
         + '<div class="rm-part__name"><span class="rm-part__nombre">' + rmEscape(f.nombre || f.username) + creadorBadge + '</span>'
         + '<span class="rm-part__meta">' + rmEscape(f.username) + ' · UID ' + f.uid + '</span>' + sinFichaTxt + '</div>'
         + '<div class="rm-part__meta rm-part__posts' + (lowPosts ? ' is-low' : '') + '">' + f.posts + ' post(s)' + (postsMin !== null ? (' / mín. ' + postsMin) : '') + '</div>'
-        + '<div class="rm-part__rol">' + rolSelect + '</div>'
+        + '<div>' + rolSelect + '</div>'
         + '<div class="rm-part__oficial"><select onchange="rmCambiarCampo(' + i + ',\'oficial\',this.value)">'
         +   '<option value="0"' + (!f.oficial ? ' selected' : '') + '>No oficial</option>'
         +   '<option value="1"' + (f.oficial ? ' selected' : '') + '>Oficial</option>'
         + '</select></div>'
-        + '<div class="rm-part__pct">' + pctSelect + '</div>'
+        + '<div>' + pctSelect + '</div>'
         + '<div class="rm-part__perg"><label><input type="checkbox" onchange="rmCambiarCampo(' + i + ',\'pergamino\',this.checked)"' + (f.pergamino ? ' checked' : '') + '> Dar pergamino</label></div>'
         + '<div class="rm-part__preview">' + previewTxt + '</div>'
-        + '<button type="button" class="rm-part__removebtn" title="Quitar de la lista" onclick="rmRemoveFila(' + i + ')">&times;</button>'
         + '</div>';
     }
     wrap.innerHTML = html || '<div class="rm-flash">No se detectaron participantes en este tema.</div>';
     rmRenderTotales();
-    rmRenderPostPreview();
-  }
-
-  function rmRemoveFila(idx) {
-    rmFilas.splice(idx, 1);
-    rmRenderParticipantes();
   }
 
   function rmCambiarCampo(idx, campo, valor) {
@@ -551,7 +417,6 @@
     else if (campo === 'oficial') { f.oficial = (valor === '1' || valor === true); }
     else if (campo === 'pergamino') { f.pergamino = !!valor; }
     else if (campo === 'rol') { f.rol = valor; }
-    else if (campo === 'resultado') { f.resultado = valor; }
     rmRenderParticipantes();
   }
 
@@ -583,11 +448,10 @@
     rmAjax({ accion: 'buscar_uid', uid: uid }, function (r) {
       if (!r.ok) { rmToast(r.mensaje || 'No se encontró ese UID.', false); return; }
       rmFilas.push({
-        uid: r.uid, username: r.username, nombre: r.nombre, tiene_ficha: r.tiene_ficha, nivel: r.nivel,
+        uid: r.uid, username: r.username, nombre: r.nombre, tiene_ficha: r.tiene_ficha,
         posts: 0, es_creador: false,
         rol: (rmTipoActual === 'autonarrada') ? 'excluir' : 'participante',
-        oficial: false, pct: 100, pergamino: false,
-        resultado: 'excluir'
+        oficial: false, pct: 100, pergamino: false
       });
       input.value = '';
       rmRenderParticipantes();
@@ -611,98 +475,22 @@
     + '<div class="rm-total"><span class="rm-total__k">Pergaminos</span><span class="rm-total__v">' + tp + '</span></div>';
   }
 
-  // Espejo de sg_post_combate_bbcode().
-  function rmGenerarBBCodeCombate() {
-    if (!rmTemaActual) { return ''; }
-    var val = rmCombateValidar();
-    if (!val.ok) { return ''; }
-    var resultLabels = { ganador: 'Ganador', perdedor: 'Perdedor', empate: 'Empate' };
-    var lineas = [];
-    for (var i = 0; i < val.combatientes.length; i++) {
-      var f = val.combatientes[i];
-      var calc = rmCalcularCombate(f);
-      if (!calc) { continue; }
-      lineas.push('[*][b]' + (f.nombre || f.username) + '[/b] — ' + (resultLabels[f.resultado] || f.resultado) + ': ' + calc.tobi + ' Tobis, ' + calc.exp + ' Exp');
-    }
-    var lista = lineas.join('\n');
-
-    return '[align=center][size=4][b]¡Resultado del Combate![/b][/size][/align]\n'
-      + '[hr]\n'
-      + '[b]Tema:[/b] ' + rmTemaActual.subject + ' (TID ' + rmTemaActual.tid + ')\n\n'
-      + '[list]\n' + lista + '\n[/list]\n'
-      + '[hr]\n'
-      + '[b]¡Buen combate a ambos! Que sigan puliendo su técnica ninja.[/b]';
-  }
-
-  // ── Post de felicitación (BBCode) — espejo de sg_post_recompensas_bbcode() ─
-  function rmGenerarBBCode() {
-    if (rmTipoActual === 'combate') { return rmGenerarBBCodeCombate(); }
-    if (!rmTemaActual || !rmRangoActual) { return ''; }
-    var rolLabels = { participante: 'Participante', narrador: 'Narrador', autor: 'Autor' };
-    var lineas = [];
+  // ── Confirmar (el servidor recalcula todo; aquí solo mandamos intención) ─
+  function rmConfirmar() {
+    if (!rmTemaActual || !rmRangoActual) { rmToast('Carga un tema primero.', false); return; }
+    var filas = [];
     for (var i = 0; i < rmFilas.length; i++) {
       var f = rmFilas[i];
       if (f.rol === 'excluir' || !f.tiene_ficha) { continue; }
-      var calc = rmCalcularFila(f);
-      if (!calc) { continue; }
-      var rolTxt = rolLabels[f.rol] || f.rol;
-      if (f.rol === 'narrador' && rmTipoActual === 'normal') { rolTxt += f.oficial ? ' Oficial' : ' No Oficial'; }
-      var pergTxt = calc.pergamino ? (', Pergamino ' + calc.pergamino) : '';
-      lineas.push('[*][b]' + (f.nombre || f.username) + '[/b] — ' + rolTxt + ' (' + f.pct + '%): ' + calc.ryos + ' Ryos, ' + calc.tobi + ' Tobis, ' + calc.exp + ' Exp' + pergTxt);
+      filas.push({ uid: f.uid, rol: f.rol, oficial: f.oficial ? 1 : 0, pct: f.pct, pergamino: f.pergamino ? 1 : 0 });
     }
-    var lista = lineas.join('\n');
-    var tipoLabel = rmTipos[rmTipoActual] ? rmTipos[rmTipoActual].label : rmTipoActual;
-
-    return '[align=center][size=4][b]¡Recompensas de Misión Entregadas![/b][/size][/align]\n'
-      + '[hr]\n'
-      + '[b]Tema:[/b] ' + rmTemaActual.subject + ' (TID ' + rmTemaActual.tid + ')\n'
-      + '[b]Tipo:[/b] ' + tipoLabel + ' · [b]Rango:[/b] ' + rmRangoActual + '\n\n'
-      + '[list]\n' + lista + '\n[/list]\n'
-      + '[hr]\n'
-      + '[b]¡Felicidades a todos los shinobi involucrados en esta misión! Que sigan forjando su leyenda.[/b]';
-  }
-
-  function rmRenderPostPreview() {
-    var wrap = document.getElementById('rm-postpreview-wrap');
-    var area = document.getElementById('rm-postpreview');
-    var check = document.getElementById('rm-publicar-post');
-    if (!wrap || !area || !check) { return; }
-    if (!check.checked) { wrap.classList.add('rm-hidden'); return; }
-    wrap.classList.remove('rm-hidden');
-    area.value = rmGenerarBBCode();
-  }
-
-  // ── Confirmar (el servidor recalcula todo; aquí solo mandamos intención) ─
-  function rmConfirmar() {
-    if (!rmTemaActual) { rmToast('Carga un tema primero.', false); return; }
-    var esCombate = (rmTipoActual === 'combate');
-    if (!esCombate && !rmRangoActual) { rmToast('Elige un rango.', false); return; }
-
-    var filas = [];
-    if (esCombate) {
-      var val = rmCombateValidar();
-      if (!val.ok) { rmToast(val.mensaje, false); return; }
-      for (var i = 0; i < val.combatientes.length; i++) {
-        var c = val.combatientes[i];
-        filas.push({ uid: c.uid, resultado: c.resultado });
-      }
-    } else {
-      for (var j = 0; j < rmFilas.length; j++) {
-        var f = rmFilas[j];
-        if (f.rol === 'excluir' || !f.tiene_ficha) { continue; }
-        filas.push({ uid: f.uid, rol: f.rol, oficial: f.oficial ? 1 : 0, pct: f.pct, pergamino: f.pergamino ? 1 : 0 });
-      }
-      if (!filas.length) { rmToast('No hay ningún recipiente válido para recompensar.', false); return; }
-    }
+    if (!filas.length) { rmToast('No hay ningún recipiente válido para recompensar.', false); return; }
     if (!confirm('¿Aplicar la recompensa a ' + filas.length + ' recipiente(s) para el TID ' + rmTemaActual.tid + '?')) { return; }
-
-    var publicarPost = document.getElementById('rm-publicar-post');
-    var publicar = (publicarPost && publicarPost.checked) ? 1 : 0;
 
     var btn = document.getElementById('rm-confirmar-btn');
     btn.disabled = true; btn.textContent = 'Aplicando…';
 
-    rmAjax({ accion: 'confirmar', tid: rmTemaActual.tid, tipo: rmTipoActual, rango: (rmRangoActual || ''), filas: JSON.stringify(filas), publicar_post: publicar }, function (r) {
+    rmAjax({ accion: 'confirmar', tid: rmTemaActual.tid, tipo: rmTipoActual, rango: rmRangoActual, filas: JSON.stringify(filas) }, function (r) {
       btn.disabled = false; btn.textContent = 'Confirmar y aplicar';
       if (!r.ok) { rmToast(r.mensaje || 'No se pudo aplicar la recompensa.', false); return; }
       rmToast(r.mensaje, true);
@@ -720,13 +508,6 @@
         html += '<li>UID ' + a.uid + ' (' + rmEscape(a.nombre) + ') [' + rmEscape(a.rol) + ', ' + a.pct + '%]: +' + a.ryos + ' ryos, +' + a.tobi + ' tobi, +' + a.exp + ' exp' + (a.pergamino ? ', pergamino ' + rmEscape(a.pergamino) : '') + '.</li>';
       }
       html += '</ul></div>';
-    }
-    if (typeof r.post_publicado !== 'undefined') {
-      if (r.post_publicado) {
-        html += '<div class="rm-result__ok"><div class="rm-result__title">Post de felicitación</div>Publicado correctamente en el tema.</div>';
-      } else {
-        html += '<div class="rm-result__err"><div class="rm-result__title">Post de felicitación</div>No se pudo publicar: ' + rmEscape(r.post_error || 'error desconocido') + '</div>';
-      }
     }
     if (r.omitidos && r.omitidos.length) {
       html += '<div class="rm-result__err"><div class="rm-result__title">Avisos (' + r.omitidos.length + ')</div><ul>';

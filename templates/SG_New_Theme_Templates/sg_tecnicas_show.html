@@ -1,0 +1,271 @@
+<html>
+
+<head>
+  <style>
+/*     .spoiler {
+      background: #4b4161;
+      margin-bottom: 15px;
+      margin-left: 5px;
+      margin-right: 5px;
+      border-radius: 5px;
+      -moz-border-radius: 5px;
+      -webkit-border-radius: 5px;
+      max-width: 745px;
+      cursor: pointer;
+    }
+
+    .spoiler {
+      border-radius: 5px;
+      -moz-border-radius: 5px;
+      -webkit-border-radius: 5px;
+      margin: 15px auto;
+      cursor: pointer;
+ 	  background-color: #102743  !important;
+    }
+
+    .spoiler_content {
+      padding: 5px;
+      height: auto;
+      display: block;
+      background-color: #1a304c;
+    }
+
+    .spoiler_title {
+      border-bottom: 1px solid #060f19;
+      margin: 0;
+      margin-bottom: 4px;
+      background: #1b549c;
+      padding: 7px 5px;
+      text-align: center;
+      color: #fff;
+      border-radius: 3px;
+      font-family: monospace;
+    } */
+
+    .flex-container {
+      flex-wrap: wrap;
+      display: flex;
+      justify-content: center;
+    }
+
+    .bodycenter {
+      background-color: #0e1a28;
+      margin: 0 auto;
+      min-height: 500px;
+    }
+
+    .bodydesc {
+      padding: 10px;
+      margin: 0 20px;
+      text-align: center;
+      color: white;
+    }
+
+/*     .tecnica_spoiler {
+      background-color: #1b549c;
+      border-radius: 3px;
+      margin: 10px;
+      color: #fff;
+	  border: 1px solid #003477;
+    }
+
+    .tecnica_spoiler_title {
+      padding: 10px;
+      cursor: pointer;
+    }
+
+    .tecnica_spoiler_content {
+      padding: 20px;
+      text-align: left;
+      display: grid;
+      grid-template-columns: 3fr 2fr 3fr;
+      grid-template-rows: 20px 20px 20px 20px 1fr 20px 20px;
+      grid-row-gap: 5px;
+      background-color: #fff;
+      color: #0f1520;
+      border-radius: 0 0 3px 3px;
+      cursor: default;
+    }
+
+    .tecnicaId {
+      grid-row: 1;
+      grid-column: 2;
+      text-align: center;
+    }
+
+    .tecnicaType {
+      grid-row: 2;
+      grid-column: 3;
+      text-align: right;
+    }
+
+    .tecnicaSello {
+      grid-row: 2;
+    }
+
+    .tecnicaReq {
+      grid-row: 3;
+      grid-column: 1 / -1;
+    }
+
+    .tecnicaLvl {
+      grid-row: 3;
+      grid-column: 3;
+      text-align: right;
+    }
+
+    .tecnicaDesTit {
+      grid-row: 4;
+    }
+
+    .tecnicaDes {
+      grid-row: 5;
+      grid-column: 1 / -1;
+      margin-left: 50px;
+      margin-bottom: 20px;
+      text-align: justify;
+    }
+
+    .tecnicaCost {
+      grid-row: 6;
+      grid-column: 1 / -1;
+      text-align: center;
+    }
+
+    .tecnicaEfect {
+      grid-row: 7;
+      grid-column: 1 / -1;
+      text-align: center;
+    }
+
+    .tecnicaReward {
+      grid-row: 6;
+      grid-column: 3;
+      text-align: right;
+    } */
+  </style>
+  <title>Tecnicas</title>
+  {$headerinclude}
+</head>
+
+<body>
+  {$header}
+  <table border="0" cellspacing="{$theme['borderwidth']}" cellpadding="{$theme['tablespace']}" class="tborder">
+    <tr>
+      <td class="thead" colspan="1" style="text-align: center;background: #1b549c;"><strong>Categoria de Técnica</strong></td>
+    </tr>
+    <tr>
+      <td class="trow1" valign="top" style=" background: #06111f; ">
+        <div class="bodycenter">
+          <div class="bodydesc">
+            <h2>{$tipo}</h2>
+          </div>
+
+          <if $clan_desc then>
+            <div style="background-color: #1a304c;padding: 20px;border-radius: 2px;margin: 0px 50px;">
+              <span style="font-size: 15px; color: white;">{$clan_desc}</span>
+            </div>
+          </if>
+
+          <br>
+          <if $tecnicas_templ_e then>
+            <div class="spoiler" style=" width: 80%; margin: auto; ">
+              <div class="spoiler_title"
+                onclick="javascript: if(parentNode.getElementsByTagName('div')[1].style.display == 'block'){ parentNode.getElementsByTagName('div')[1].style.display = 'none'; } else { parentNode.getElementsByTagName('div')[1].style.display = 'block'; }">
+                <span class="spoiler_button"><strong>Rango E</strong></span>
+              </div>
+              <div class="spoiler_content" style="display: block;" align="center">
+                {$tecnicas_templ_e}
+              </div>
+            </div><br>
+          </if>
+          <if $tecnicas_templ_d then>
+            <div class="spoiler" style=" width: 80%; margin: auto; ">
+              <div class="spoiler_title"
+                onclick="javascript: if(parentNode.getElementsByTagName('div')[1].style.display == 'block'){ parentNode.getElementsByTagName('div')[1].style.display = 'none'; } else { parentNode.getElementsByTagName('div')[1].style.display = 'block'; }">
+                <span class="spoiler_button"><strong>Rango D</strong></span>
+              </div>
+              <div class="spoiler_content" style="display: block;" align="center">
+                {$tecnicas_templ_d}
+              </div>
+            </div><br>
+          </if>
+          <if $tecnicas_templ_c then>
+            <div class="spoiler" style=" width: 80%; margin: auto; ">
+              <div class="spoiler_title"
+                onclick="javascript: if(parentNode.getElementsByTagName('div')[1].style.display == 'block'){ parentNode.getElementsByTagName('div')[1].style.display = 'none'; } else { parentNode.getElementsByTagName('div')[1].style.display = 'block'; }">
+                <span class="spoiler_button"><strong>Rango C</strong></span>
+              </div>
+              <div class="spoiler_content" style="display: block;" align="center">
+                {$tecnicas_templ_c}
+              </div>
+            </div><br>
+          </if>
+          <if $tecnicas_templ_b then>
+            <div class="spoiler" style=" width: 80%; margin: auto; ">
+              <div class="spoiler_title"
+                onclick="javascript: if(parentNode.getElementsByTagName('div')[1].style.display == 'block'){ parentNode.getElementsByTagName('div')[1].style.display = 'none'; } else { parentNode.getElementsByTagName('div')[1].style.display = 'block'; }">
+                <span class="spoiler_button"><strong>Rango B</strong></span>
+              </div>
+              <div class="spoiler_content" style="display: block;" align="center">
+                {$tecnicas_templ_b}
+              </div>
+            </div><br>
+          </if>
+          <if $tecnicas_templ_a then>
+            <div class="spoiler" style=" width: 80%; margin: auto; ">
+              <div class="spoiler_title"
+                onclick="javascript: if(parentNode.getElementsByTagName('div')[1].style.display == 'block'){ parentNode.getElementsByTagName('div')[1].style.display = 'none'; } else { parentNode.getElementsByTagName('div')[1].style.display = 'block'; }">
+                <span class="spoiler_button"><strong>Rango A</strong></span>
+              </div>
+              <div class="spoiler_content" style="display: block;" align="center">
+                {$tecnicas_templ_a}
+              </div>
+            </div><br>
+          </if>
+          <if $tecnicas_templ_a_plus then>
+            <div class="spoiler" style=" width: 80%; margin: auto; ">
+              <div class="spoiler_title"
+                onclick="javascript: if(parentNode.getElementsByTagName('div')[1].style.display == 'block'){ parentNode.getElementsByTagName('div')[1].style.display = 'none'; } else { parentNode.getElementsByTagName('div')[1].style.display = 'block'; }">
+                <span class="spoiler_button"><strong>Rango A+</strong></span>
+              </div>
+              <div class="spoiler_content" style="display: block;" align="center">
+                {$tecnicas_templ_a_plus}
+              </div>
+            </div><br>
+          </if>
+
+          <if $tecnicas_templ_s then>
+            <div class="spoiler" style=" width: 80%; margin: auto; ">
+              <div class="spoiler_title"
+                onclick="javascript: if(parentNode.getElementsByTagName('div')[1].style.display == 'block'){ parentNode.getElementsByTagName('div')[1].style.display = 'none'; } else { parentNode.getElementsByTagName('div')[1].style.display = 'block'; }">
+                <span class="spoiler_button"><strong>Rango S</strong></span>
+              </div>
+              <div class="spoiler_content" style="display: block;" align="center">
+                {$tecnicas_templ_s}
+              </div>
+            </div><br>
+          </if>
+
+          <if $tecnicas_templ_s_plus then>
+            <div class="spoiler" style=" width: 80%; margin: auto; ">
+              <div class="spoiler_title"
+                onclick="javascript: if(parentNode.getElementsByTagName('div')[1].style.display == 'block'){ parentNode.getElementsByTagName('div')[1].style.display = 'none'; } else { parentNode.getElementsByTagName('div')[1].style.display = 'block'; }">
+                <span class="spoiler_button"><strong>Rango S+</strong></span>
+              </div>
+              <div class="spoiler_content" style="display: block;" align="center">
+                {$tecnicas_templ_s_plus}
+              </div>
+            </div><br>
+          </if>
+        </div>
+      </td>
+    </tr>
+  </table>
+
+  {$footer}
+</body>
+
+</html>
+
+<style></style>

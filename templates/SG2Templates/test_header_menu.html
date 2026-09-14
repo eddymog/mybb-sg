@@ -1,0 +1,366 @@
+<nav id="main_nav">
+
+    <a href="/"><img src="/images/sg/misc/LogoHeader.png"></a>
+    
+    <div>
+        <div>
+            <button>
+                <i class="fa fa-bars"></i>
+                <i class="fa fa-caret-down" aria-hidden="true"></i>
+                <i class="fa fa-caret-up" aria-hidden="true"></i>
+            </button>
+        </div>
+
+        <if $g_uid == '0' then>
+            <menu>
+                <li><a href="/forumdisplay.php?fid=25">Guías</a></li>
+                <li><a href="/sg/tecnicas.php">Técnicas</a></li>
+                <li class="li_complex">
+                    <a href="#">Información &dtrif;</a>
+                    <ul>
+                        <li><a href="/sg/mapa_mundo.php">Mapa del Mundo</a></li>
+                        <li><a href="/sg/calculadora.php">Calc. de Estadísticas</a></li>
+                        <li><a href="/sg/reaccion.php">Calc. de Reacción</a></li>
+                        <li><a href="/sg/registro_fisicos.php">Registro de PJs</a></li>
+                        <li><a href="/sg/objetos.php">Objetos</a></li>
+                        <li><a href="/sg/censo.php">Censo y Estadísticas</a></li>
+                    </ul>
+                </li>
+                <li class="li_complex">
+                    <a href="#">Rol &dtrif;</a>
+                    <ul>
+                        <li><a href="/sg/entrenamientos.php" id="entrenamientos">Entrenamientos</a></li>
+                        <li><a href="/sg/misiones.php" id="misiones">Misiones</a></li>
+                        <li><a href="/sg/inventario.php">Inventario</a></li>
+                        <li><a href="/sg/tienda.php">Tienda</a></li>
+                    </ul>
+                </li>
+                <li><a href="/member.php?action=login" onclick="$('#quick_login').modal({ fadeDuration: 250, keepelement: true, zIndex: (typeof modal_zindex !== 'undefined' ? modal_zindex : 9999) }); return false;">Iniciar Sesión</a></li>
+                <li><a href="/member.php?action=register">Regístrate</a></li>
+                <li><a href="/showthread.php?tid=1938" style="color: #da9039;">Primeros pasos</a></li>
+            </menu>
+        </if>
+
+        <if $g_uid != '0' then>
+            <menu>
+                <if $g_tiene_ficha then>
+                    <li><a href="/sg/ficha.php?uid={$g_uid}">Ficha</a></li>
+                </if>
+                <li><a href="/forumdisplay.php?fid=25">Guías</a></li>
+                <li><a href="/sg/tecnicas.php">Técnicas</a></li>
+                <li class="li_complex">
+                    <a href="#">Información &dtrif;</a>
+                    <ul>
+                        <li><a href="/sg/mapa_mundo.php">Mapa del Mundo</a></li>
+                        <li><a href="/sg/recompensa_diaria.php" id="recompensas">Recompensa de Posts</a></li>
+                        <li><a href="/sg/promocion.php">Código Promocional</a></li>
+                        <li><a href="/sg/calculadora.php">Calc. de Estadísticas</a></li>
+                        <li><a href="/sg/reaccion.php">Calc. de Reacción</a></li>
+                        <li><a href="/sg/registro_fisicos.php">Registro de PJs</a></li>
+                        <li><a href="/sg/objetos.php">Objetos</a></li>
+                        <li><a href="/sg/censo.php">Censo y Estadísticas</a></li>
+                    </ul>
+                </li>
+                <li class="li_complex">
+                    <a href="#">Rol &dtrif;</a>
+                    <ul>
+                        <li><a href="/sg/entrenamientos.php" id="entrenamientos">Entrenamientos</a></li>
+                        <li><a href="/sg/misiones.php" id="misiones">Misiones</a></li>
+                        <li><a href="/sg/inventario.php">Inventario</a></li>
+                        <li><a href="/sg/tienda.php">Tienda</a></li>
+                    </ul>
+                </li>
+                <if !$g_tiene_ficha then>
+                    <li><a href="/sg/ficha.php?uid={$g_uid}" style="color: #da9039;">Nueva Ficha</a></li>
+                </if>
+                <li class="li_complex">
+                    <a href="#">Usuario &dtrif;</a>
+                    <ul>
+                        <if $g_uid == '196' then>
+                            <li><a href="/admin/index.php">Consola Admin</a></li>
+                        </if>
+                        <if $g_is_staff then>
+                            <li><a href="/sg/admin/consola_mod.php">Consola de Mods</a></li>
+                        </if>
+                        <li><a href="/sg/peticiones.php">Petición Administrativa</a></li>
+                        <li><a href="/private.php">Mensajes Privados</a></li>
+                        <li><a href="/usercp.php">Panel de Usuario</a></li>
+                        <li><a href="/search.php">Búsqueda</a></li>
+                        <li><a href="/usercp.php?action=drafts">Borradores de Posts</a></li>
+                        <li><a href="/usercp.php?action=subscriptions">Temas Suscritos</a></li>
+                        <li><a href="/usercp.php?action=as_edit">Gestión Multicuenta</a></li>
+                        <if $g_is_staff then>
+                            <li><a href="/forumdisplay.php?fid=282">Guarida Secreta</a></li>
+                        </if>
+                    </ul>
+                </li>
+                <li class="li_complex">
+                    <a href="#">{$mybb->user['username']} &dtrif;</a>
+                    <a class="img_avatar" href="/member.php?action=profile&uid={$g_uid}">
+                        <if $mybb->user['avatar'] then>
+                            <img src="{$g_avatar}" style="border: 2px solid var({$g_villa_color});">
+                        </if>
+                        <if !$mybb->user['avatar'] then>
+                            <img src="/images/default_avatar.png" style="border: 2px solid var({$g_villa_color});">
+                        </if>
+                    </a>
+                    <ul>
+						{$as_header_dropdown}
+                        <li><a href="/member.php?action=logout&amp;logoutkey={$mybb->user['logoutkey']}">Desconectarse</a></li>
+                    </ul>
+                </li>
+            </menu>
+        </if>
+    </div>
+
+    <script type="module" class="Desplegar_menu">
+        (() => {
+            let componente = document.querySelector('#main_nav');
+            let boton = componente.querySelector('button');
+            let flecha_abajo = componente.querySelector('.fa-caret-down');
+            let flecha_arriba = componente.querySelector('.fa-caret-up');
+            let menu = componente.querySelector('menu');
+
+            boton.addEventListener('click', () => {
+                menu.style.display = menu.style.display == 'flex' ? '' : 'flex';
+                flecha_abajo.style.display = flecha_abajo.style.display == 'none' ? '' : 'none';
+                flecha_arriba.style.display = flecha_arriba.style.display == 'block' ? '' : 'block';
+            })
+        })()
+    </script>
+
+    <script type="module" class="Desplegar_submenus">
+        (() => {
+            let componente = document.querySelector('#main_nav');
+
+            let submenus = componente.querySelectorAll('.li_complex');
+
+            for(let submenu of submenus){
+                let submenu_ul = submenu.querySelector('ul')
+                submenu.addEventListener('click', () => {
+                    submenu_ul.style.display = submenu_ul.style.display == 'block' ? '' : 'block';
+                })
+            }
+        })()
+    </script>
+    
+    <style>
+        #main_nav{
+            width: 100%;
+            height: 50px;
+            display: flex;
+            background: #0e1a28;
+            box-shadow: 0px 1px 4px black;
+            z-index: 500;
+
+            > a{
+                padding: 5px 15px;
+                border-right: 1px solid #000;
+                img{
+                    height: 100%;
+                    border-radius: 20px;
+                }
+
+                &:hover{
+                    background-color: #2d82c9;
+                }
+            }
+
+            > div{
+                width: 100%;
+                display: flex;
+                
+                > div{
+                    display: none;
+                }
+
+                menu{
+                    width: 100%;
+                    height: 100%;
+                    padding: 0;
+                    margin: 0;
+                    display: flex;
+                    font-family: Helvetica;
+                    font-size: 15px;
+                    list-style-type: none;
+					z-index: 500;
+
+                    > li{
+                        width: 100%;
+                        position: relative;
+
+                        a{
+                            color: #fff;
+                            font-size: 17px;
+                            font-family: InterRegular;
+                            width: 100%;
+                            height: 100%;
+                            display: flex;
+                            justify-content: center;
+                            align-items: center;
+                        }
+                    }
+
+                    .li_complex:last-child{
+                        display: flex;
+						width: 150%;
+                        
+                        > a{
+                            height: 100%;
+                            
+                            &:first-child{
+                                width: 70%;
+                                justify-content: flex-end;
+                                padding-right: 10%;
+								white-space: pre;
+                            }
+
+                            &.img_avatar{
+                                width: 30%;
+                                justify-content: flex-start;
+
+                                img{
+                                    height: 100%;
+                                }
+                            }
+                        }
+
+                        ul{
+                            right: 10px;
+                        }
+
+                        @media (width < 992px){
+                            height: 70px;
+                            
+                            > a{
+                                &:first-child{
+                                    width: 65%;
+                                    padding: 0;
+                                    padding-right: 10px;
+                                }
+
+                                &.img_avatar{
+                                    width: 35%;
+                                    justify-content: center;
+                                    padding: 0;
+                                }   
+                            }
+
+                            ul{
+                                width: 100%;
+                                position: absolute;
+                                right: 100%;
+                                top: 0px;
+                            }
+                        }
+                    }
+
+                    li{
+                        transition: 0.5s;
+                        border-left: 1px solid #1f2f34;
+                        border-right: 1px solid #000;
+
+                        &:hover{
+                            background-color: #2d82c9;
+                        }
+                    }
+
+                    ul{
+                        width: 20vw;
+                        position: absolute;
+                        top: 57px;
+                        right: 0px;
+                        display: none;
+                        list-style-type: none;
+                        background: #0e1a28;
+						z-index: 500;
+
+                        li{
+                            padding: 5px 0px;
+                        }
+                    }
+
+					li.as_head_drop img{
+                        width: 100%;
+					}
+                }
+            }
+
+            @media (width <992px){
+
+                > a{
+                    border: none;
+                }
+
+                > div{
+                    display: flex;
+                    position: relative;
+                    flex-direction: column;
+                    align-items: flex-end;
+
+                    > div{
+                        height: 100%;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        aspect-ratio: 1;
+
+                        button{
+                            height: 80%;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            padding: 5px;
+                            margin-right: 10px;
+                            background: none;
+                            border-radius: 5px !important;
+                            border: 1px solid transparent !important;
+                            &:hover{
+                                border: 1px solid slategray !important;
+                            }
+                        }
+                    }
+
+                    i{
+                        display: block;
+                        font-size: 15px;
+                        color: slategray;
+
+                        &.fa-caret-up{
+                            display: none;
+                        }
+                        
+                        &:first-child{
+                            margin: 0px 5px;
+                            font-size: 20px;
+                        }
+                    }
+
+                    menu{
+                        width: 40%;
+                        position: absolute;
+                        top: 55px;
+                        right: 2%;
+                        flex-direction: column;
+                        background: #0e1a28;
+                        height: auto;
+                        display: none;
+
+                        li{
+                            > a{
+                                padding: 5px 0px;
+                            }
+
+                            ul{
+                                width: 160%;
+                                position: absolute;
+                                right: 100%;
+                                top: 0px;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    </style>
+</nav>

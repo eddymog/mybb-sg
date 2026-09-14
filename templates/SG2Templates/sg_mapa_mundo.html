@@ -1,0 +1,811 @@
+<html>
+	<head>
+		<style>
+.mapContainer {
+    overflow: hidden;
+    width: 992px;
+    height: 1233px;
+    margin: 0 auto;
+    position: relative;
+    margin: 0 54px;
+}
+
+button {
+    position: absolute;
+    z-index: 1;
+    padding: 5px;
+    opacity: 0.9;
+    filter: grayscale(30%);
+    font-family: Lemon Milk
+}
+
+button:hover {
+    opacity: 1;
+    filter: grayscale(0%);
+    transform: scale(1.1)
+}
+
+#buttonParent img {
+    z-index: 1;
+    position: absolute;
+    top: -70px
+}
+
+#mapImage {
+    position: absolute;
+    left: 0px;
+    top: 0px
+}
+
+#rayNat {
+    left: 650px;
+    top: 250px;
+    background-color: #e0da1c !important;
+    color: #000
+}
+
+#rayNat img {
+    left: 19px
+}
+
+#groNat {
+    left: 200px;
+    top: 250px;
+    background-color: #963 !important
+}
+
+#groNat img {
+    left: 30px
+}
+
+#windNat {
+    left: 100px;
+    top: 610px;
+    background-color: #ffb366 !important;
+    color: #000
+}
+
+#windNat img {
+    left: 25px
+}
+
+#watNat {
+    top: 470px;
+    left: 780px;
+    background-color: #80bfff !important
+}
+
+#watNat img {
+    left: 20px
+}
+
+#fireNat {
+    top: 460px;
+    left: 400px;
+    background-color: #20a720 !important
+}
+
+#fireNat img {
+    left: 24px
+}
+
+#SNat {
+    top: 1000px;
+    left: 200px;
+    background-color: #3e1861 !important
+}
+
+#SNat img {
+    left: 24px
+}
+
+#ESNat {
+    top: 800px;
+    left: 550px;
+    background-color: #8795fb !important
+}
+
+#ESNat img {
+    left: 99px
+}
+
+#ENNat {
+    top: 350px;
+    left: 750px;
+    background-color: #080080 !important
+}
+
+#ENNat img {
+    left: 90px
+}
+
+#NNat {
+    top: 170px;
+    left: 400px;
+    background-color: #aa46b1 !important
+}
+
+#NNat img {
+    left: 60px
+}
+
+#WNat {
+    top: 400px;
+    left: 100px;
+    background-color: #880015 !important
+}
+
+#WNat img {
+    left: 68px
+}
+
+#world {
+    top: 20px;
+    left: 20px;
+    display: none;
+    padding: 10px 15px;
+    font-size: 16px;
+    font-weight: normal;
+    font-family: Lemon Milk
+}
+
+#konoha {
+    top: 425px;
+    left: 451px;
+    background-color: #fff;
+    color: #004c7f
+}
+
+#ciudadMoeru {
+    top: 300px;
+    left: 310px;
+    font-size: 16px;
+    padding: 5px 10px
+}
+
+#temploFuego {
+    top: 790px;
+    left: 650px
+}
+
+#ciudadShukuba {
+    top: 635px;
+    left: 553px
+}
+
+#bosqueMuerte {
+    top: 525px;
+    left: 420px
+}
+
+#aldeaKisaragi {
+    top: 415px;
+    left: 280px
+}
+
+#puebloMotoyoshi {
+    top: 235px;
+    left: 600px
+}
+
+#valleFin {
+    top: 170px;
+    left: 460px
+}
+
+#kiri {
+    top: 490px;
+    left: 492px;
+    background-color: #fff;
+    color: #004c7f
+}
+
+#islaAgua {
+    top: 430px;
+    left: 537px;
+    font-size: 16px;
+    padding: 5px 10px
+}
+
+#fortalezaShoseki {
+    top: 320px;
+    left: 350px
+}
+
+#bahiaNaufragio {
+    top: 660px;
+    left: 712px
+}
+
+#islaOeste {
+    top: 480px;
+    left: 297px
+}
+
+#islaSur {
+    top: 700px;
+    left: 453px
+}
+
+#islaEste {
+    top: 510px;
+    left: 813px
+}
+
+#islaNorte {
+    top: 250px;
+    left: 530px
+}
+
+#suna {
+    top: 525px;
+    left: 480px;
+    background-color: #fff;
+    color: #004c7f
+}
+
+#temploViento {
+    top: 1030px;
+    left: 45px
+}
+
+#oasisVida {
+    top: 330px;
+    left: 595px
+}
+
+#desiertoInfernal {
+    top: 530px;
+    left: 593px
+}
+
+#aldeaBenparo {
+    left: 0px;
+    top: 650px
+}
+
+#puebloYoshira {
+    top: 770px;
+    left: 430px
+}
+
+#ciudadSoyokaze {
+    top: 420px;
+    left: 196px;
+    font-size: 16px;
+    padding: 5px 10px
+}
+
+#ciudadPashubo {
+    top: 218px;
+    left: 440px
+}
+
+#iwa {
+    top: 640px;
+    left: 634px;
+    background-color: #fff;
+    color: #004c7f
+}
+
+#costaNorte {
+    top: 460px;
+    left: 697px
+}
+
+#estadioManana {
+    top: 580px;
+    left: 260px
+}
+
+#aldeaShinsen {
+    top: 980px;
+    left: 325px
+}
+
+#puebloRyushi {
+    top: 330px;
+    left: 198px
+}
+
+#ciudadIo {
+    top: 770px;
+    left: 480px
+}
+
+#temploHeiwa {
+    top: 325px;
+    left: 525px
+}
+
+#ciudadJigoku {
+    top: 620px;
+    left: 30px;
+    font-size: 16px;
+    padding: 5px 10px
+}
+
+#kumo {
+    top: 610px;
+    left: 310px;
+    background-color: #fff;
+    color: #004c7f
+}
+
+#caboMuri {
+    top: 60px;
+    left: 850px
+}
+
+#islaTortuga {
+    top: 780px;
+    left: 460px
+}
+
+#aldeaIchida {
+    top: 485px;
+    left: 380px
+}
+
+#puebloUnkai {
+    top: 740px;
+    left: 156px
+}
+
+#ciudadGunryo {
+    top: 760px;
+    left: 335px
+}
+
+#temploRayo {
+    top: 580px;
+    left: 498px
+}
+
+#ciudadKouten {
+    top: 595px;
+    left: 375px;
+    font-size: 16px;
+    padding: 5px 10px
+}
+
+#tani {
+    top: 780px;
+    left: 808px
+}
+
+#rios {
+    top: 650px;
+    left: 760px;
+    background-color: #fff;
+    color: #004c7f
+}
+
+#kusa {
+    top: 390px;
+    left: 702px
+}
+
+#hierba {
+    top: 260px;
+    left: 670px;
+    background-color: #fff;
+    color: #004c7f
+}
+
+#ame {
+    top: 495px;
+    left: 652px
+}
+
+#lluvia {
+    top: 420px;
+    left: 610px;
+    background-color: #fff;
+    color: #004c7f
+}
+
+#ishi {
+    top: 440px;
+    left: 404px
+}
+
+#pajaros {
+    top: 400px;
+    left: 450px;
+    background-color: #fff;
+    color: #004c7f
+}
+
+#hoshi {
+    top: 380px;
+    left: 111px
+}
+
+#osos {
+    top: 300px;
+    left: 150px;
+    background-color: #fff;
+    color: #004c7f
+}
+
+#yuki {
+    top: 315px;
+    left: 30px
+}
+
+#nieve {
+    top: 250px;
+    left: 10px;
+    background-color: #fff;
+    color: #004c7f
+}
+
+#shimo {
+    top: 750px;
+    left: 729px
+}
+
+#helado {
+    top: 670px;
+    left: 670px;
+    background-color: #fff;
+    color: #004c7f
+}
+
+#yu {
+    top: 865px;
+    left: 650px
+}
+
+#termales {
+    top: 900px;
+    left: 670px;
+    background-color: #fff;
+    color: #004c7f
+}
+
+#oto {
+    top: 845px;
+    left: 444px
+}
+
+#arroz {
+    top: 760px;
+    left: 390px;
+    background-color: #fff;
+    color: #004c7f
+}
+
+#fideos {
+    top: 580px;
+    left: 355px;
+    background-color: #fff;
+    color: #004c7f
+}
+
+#taki {
+    top: 760px;
+    left: 131px
+}
+
+#cascada {
+    top: 670px;
+    left: 150px;
+    background-color: #fff;
+    color: #004c7f
+}
+
+#ozu {
+    top: 1120px;
+    left: 640px
+}
+
+#nagi {
+    top: 765px;
+    left: 502px
+}
+
+#garra {
+    top: 560px;
+    left: 240px;
+    background-color: #fff;
+    color: #004c7f
+}
+
+#pantanos {
+    top: 220px;
+    left: 830px;
+    background-color: #fff;
+    color: #004c7f
+}
+
+#montana {
+    top: 330px;
+    left: 390px;
+    background-color: #fff;
+    color: #004c7f
+}
+
+#olas {
+    top: 490px;
+    left: 217px;
+    background-color: #fff;
+    color: #004c7f
+}
+
+#getsu {
+    top: 1205px;
+    left: 501px
+}
+
+#luna {
+    top: 1130px;
+    left: 450px;
+    background-color: #fff;
+    color: #004c7f
+}
+
+#mar {
+    top: 830px;
+    left: 329px;
+    background-color: #fff;
+    color: #004c7f
+}
+
+#te {
+    top: 350px;
+    left: 150px;
+    background-color: #fff;
+    color: #004c7f
+}
+
+#jungla {
+    top: 1200px;
+    left: 720px;
+    background-color: #fff;
+    color: #004c7f
+}
+
+#acantilado {
+    top: 610px;
+    left: 300px;
+    background-color: #fff;
+    color: #004c7f
+}
+
+#cobre {
+    top: 690px;
+    left: 100px;
+    background-color: #fff;
+    color: #004c7f
+}
+
+#marfil {
+    top: 385px;
+    left: 258px;
+    background-color: #fff;
+    color: #004c7f
+}
+
+#chToS {
+    top: 1100px;
+    left: 300px;
+    background-color: #8795fb
+}
+
+#chToS img {
+    position: absolute;
+    top: -70px;
+    left: 99px
+}
+
+#chToN {
+    top: 200px;
+    left: 600px;
+    background-color: #080080
+}
+
+#chToN img {
+    position: absolute;
+    top: -70px;
+    left: 108px
+}
+
+#te2 {
+    top: 1000px;
+    left: 50px;
+    background-color: #fff;
+    color: #004c7f
+}
+
+#ozu2 {
+    top: 490px;
+    left: 856px
+}
+
+#nagi2 {
+    top: 65px;
+    left: 686px
+}
+
+
+		</style>
+		<title>Mapa del Mundo</title>
+		{$headerinclude}
+	</head>
+	<body>
+		{$header}
+		<br>
+		<div class="mapContainer">
+			<button id="world" type="button" onclick="zoomout()" style="display: none;"> ← Atras</button>
+			<div id="buttonParent">
+				<button class="worldBut" id="fireNat" type="button" onclick="zoomin(0)" style="display: block;"> <img src="./../images/map/fireBut.png"> País del Fuego</button>
+				<button class="worldBut" id="watNat" type="button" onclick="zoomin(1)" style="display: block;"> <img src="./../images/map/waterBut.png"> País del Agua</button>
+				<button class="worldBut" id="windNat" type="button" onclick="zoomin(2)" style="display: block;"> <img src="./../images/map/windBut.png"> País del Viento</button>
+				<button class="worldBut" id="groNat" type="button" onclick="zoomin(3)" style="display: block;"> <img src="./../images/map/iwaBut.png"> País de la Tierra</button>
+				<button class="worldBut" id="rayNat" type="button" onclick="zoomin(4)" style="display: block;"> <img src="./../images/map/rayoBut.png"> País del Rayo</button>
+				<button class="worldBut" id="WNat" type="button" onclick="zoomin(5)" style="display: block;"> <img src="./../images/map/wBut.png"> Gran Cordillera del Oeste</button>
+				<button class="worldBut" id="NNat" type="button" onclick="zoomin(6)" style="display: block;"> <img src="./../images/map/nBut.png"> Paises del Mar del Norte</button>
+				<button class="worldBut" id="ENNat" type="button" onclick="zoomin(7)" style="display: block;"> <img src="./../images/map/enBut.png"> Paises del Mar del Este - Región Norte</button>
+				<button class="worldBut" id="ESNat" type="button" onclick="zoomin(8)" style="display: block;"> <img src="./../images/map/esBut.png"> Paises del Mar del Este - Región Sur</button>
+				<button class="worldBut" id="SNat" type="button" onclick="zoomin(9)" style="display: block;"> <img src="./../images/map/sBut.png"> Reinos del Sur</button>
+			</div>
+			<div id="buttonChild"></div>
+			<img id="mapImage" src="./../images/map/worldMapSmall.jpeg" alt="Mapamundi">
+		</div>
+		<br>
+	</body>
+	{$footer}
+	<script>
+		function zoomin(id) {
+			var myImg = document.getElementById("mapImage");
+			var buttons = document.getElementById("buttonParent");
+			var buttonsChild = document.getElementById("buttonChild");
+			var butHtml="";
+			switch(id)
+			{
+				case 0: myImg.src="./../images/map/fireNation.png";
+					butHtml= "<button id='valleFin' onclick='window.open(\"./../forumdisplay.php?fid=88\",\"_blank\")'>Valle del Fin</button>"; 
+//					butHtml+= "<button id='puebloMotoyoshi' onclick='window.open(\"./forumdisplay.php?fid=37\",\"_blank\")'>Pueblo Motoyoshi</button>"; 
+//					butHtml+= "<button id='aldeaKisaragi' onclick='window.open(\"./forumdisplay.php?fid=38\",\"_blank\")'>Aldea Kisaragi</button>"; 
+					butHtml+= "<button id='bosqueMuerte' onclick='window.open(\"./../forumdisplay.php?fid=87\",\"_blank\")'>Bosque de la Muerte</button>"; 
+//					butHtml+= "<button id='ciudadShukuba' onclick='window.open(\"./forumdisplay.php?fid=36\",\"_blank\")'>Ciudad Shukuba</button>"; 
+//					butHtml+= "<button id='temploFuego' onclick='window.open(\"./forumdisplay.php?fid=35\",\"_blank\")'>Templo del Fuego</button>"; 
+//					butHtml+= "<button id='ciudadMoeru' onclick='window.open(\"./forumdisplay.php?fid=34\",\"_blank\")'>Ciudad Moeru</button>"; 
+					butHtml+= "<button id='konoha' onclick='window.open(\"./../forumdisplay.php?fid=55\",\"_blank\")'>Konoha</button>"; 
+					break; //myImg.style.left=-600+"px"; myImg.style.top=-600+"px"; 
+				case 1: myImg.src="./../images/map/waterNation.png"; 
+					//butHtml= "<button id='islaAgua' onclick='window.open(\"./forumdisplay.php?fid=90\",\"_blank\")'>Isla del Agua</button>"; 
+					butHtml+= "<button id='islaNorte' onclick='window.open(\"./../forumdisplay.php?fid=99\",\"_blank\")'>Isla del Norte</button>"; 
+					//butHtml+= "<button id='islaEste' onclick='window.open(\"./forumdisplay.php?fid=92\",\"_blank\")'>Isla del Este</button>"; 
+					//butHtml+= "<button id='islaSur' onclick='window.open(\"./forumdisplay.php?fid=93\",\"_blank\")'>Isla del Sur</button>"; 
+					butHtml+= "<button id='islaOeste' onclick='window.open(\"./../forumdisplay.php?fid=102\",\"_blank\")'>Isla del Oeste</button>"; 
+					//butHtml+= "<button id='bahiaNaufragio' onclick='window.open(\"./forumdisplay.php?fid=95\",\"_blank\")'>Bahía de los Naufragios</button>"; 
+					butHtml+= "<button id='fortalezaShoseki' onclick='window.open(\"./../forumdisplay.php?fid=104\",\"_blank\")'>Fortaleza Shoseki</button>"; 
+					butHtml+= "<button id='kiri' onclick='window.open(\"./../forumdisplay.php?fid=304\",\"_blank\")'>Kiri</button>"; 
+					break; // 1610 800
+				case 2: myImg.src="./../images/map/windNation.png"; 
+					//butHtml= "<button id='ciudadSoyokaze' onclick='window.open(\"./forumdisplay.php?fid=61\",\"_blank\")'>Ciudad Soyokaze</button>"; 
+					//butHtml+= "<button id='temploViento' onclick='window.open(\"./forumdisplay.php?fid=62\",\"_blank\")'>Templo del Viento</button>"; 
+					//butHtml+= "<button id='ciudadPashubo' onclick='window.open(\"./forumdisplay.php?fid=63\",\"_blank\")'>Ciudad Pashubo</button>"; 
+					//butHtml+= "<button id='puebloYoshira' onclick='window.open(\"./forumdisplay.php?fid=64\",\"_blank\")'>Pueblo Yoshira</button>"; 
+					//butHtml+= "<button id='aldeaBenparo' onclick='window.open(\"./forumdisplay.php?fid=65\",\"_blank\")'>Aldea Benparo</button>"; 
+					butHtml+= "<button id='desiertoInfernal' onclick='window.open(\"./../forumdisplay.php?fid=96\",\"_blank\")'>Desierto Infernal</button>"; 
+					//butHtml+= "<button id='oasisVida' onclick='window.open(\"./forumdisplay.php?fid=67\",\"_blank\")'>Oasis de la Vida</button>"; 
+					butHtml+= "<button id='suna' onclick='window.open(\"./../forumdisplay.php?fid=303\",\"_blank\")'>Ciudad en Ruínas</button>"; 
+					break; // 0 1060
+				case 3: myImg.src="./../images/map/grounNation.png"; 
+					//butHtml= "<button id='ciudadJigoku' onclick='window.open(\"./forumdisplay.php?fid=117\",\"_blank\")'>Ciudad Jigoku</button>"; 
+					//butHtml+= "<button id='temploHeiwa' onclick='window.open(\"./forumdisplay.php?fid=118\",\"_blank\")'>Templo Heiwa</button>"; 
+					butHtml+= "<button id='ciudadIo' onclick='window.open(\"./../forumdisplay.php?fid=313\",\"_blank\")'>Ciudad Iō</button>"; 
+					butHtml+= "<button id='puebloRyushi' onclick='window.open(\"./../forumdisplay.php?fid=312\",\"_blank\")'>Pueblo Ryūshi</button>"; 
+					//butHtml+= "<button id='aldeaShinsen' onclick='window.open(\"./../forumdisplay.php?fid=121\",\"_blank\")'>Aldea Shinsen</button>"; 
+					//butHtml+= "<button id='estadioManana' onclick='window.open(\"./forumdisplay.php?fid=122\",\"_blank\")'>Estadio del Mañana</button>"; 
+					butHtml+= "<button id='costaNorte' onclick='window.open(\"./../forumdisplay.php?fid=311\",\"_blank\")'>Costa Norte</button>"; 
+					butHtml+= "<button id='iwa' onclick='window.open(\"./../forumdisplay.php?fid=58\",\"_blank\")'>Nueva Iwa</button>"; 
+					break;//0 0
+				case 4: myImg.src="./../images/map/rayNation.png"; 
+					butHtml= "<button id='ciudadKouten' onclick='window.open(\"./../forumdisplay.php?fid=114\",\"_blank\")'>Ciudad Kouten</button>"; 
+					butHtml+= "<button id='temploRayo' onclick='window.open(\"./../forumdisplay.php?fid=115\",\"_blank\")'>Templo del Rayo</button>"; 
+					//butHtml+= "<button id='ciudadGunryo' onclick='window.open(\"./sg/forumdisplay.php?fid=197\",\"_blank\")'>Ciudad Gunryo</button>"; 
+					//butHtml+= "<button id='puebloUnkai' onclick='window.open(\"./sg/forumdisplay.php?fid=198\",\"_blank\")'>Pueblo Unkai</button>"; 
+					//butHtml+= "<button id='aldeaIchida' onclick='window.open(\"./sg/forumdisplay.php?fid=199\",\"_blank\")'>Aldea Ichida</button>"; 
+					butHtml+= "<button id='islaTortuga' onclick='window.open(\"./../forumdisplay.php?fid=119\",\"_blank\")'>Isla Tortuga</button>"; 
+					//butHtml+= "<button id='caboMuri' onclick='window.open(\"./sg/forumdisplay.php?fid=200\",\"_blank\")'>Cabo Muri</button>"; 
+					butHtml+= "<button id='kumo' onclick='window.open(\"./../forumdisplay.php?fid=59\",\"_blank\")'>Kumo</button>"; 
+					break; // 1500 0
+				case 5: myImg.src="./../images/map/westNation.png"; 
+					butHtml= "<button id='nieve' onclick='window.open(\"./../forumdisplay.php?fid=171\",\"_blank\")'>País de la Nieve</button>"; 
+					butHtml+= "<button id='yuki' onclick='window.open(\"./../forumdisplay.php?fid=172\",\"_blank\")'>Yuki</button>"; 
+					butHtml+= "<button id='osos' onclick='window.open(\"./../forumdisplay.php?fid=170\",\"_blank\")'>País de los Osos</button>"; 
+					butHtml+= "<button id='hoshi' onclick='window.open(\"./../forumdisplay.php?fid=173\",\"_blank\")'>Hoshi</button>"; 
+					butHtml+= "<button id='pajaros' onclick='window.open(\"./../forumdisplay.php?fid=169\",\"_blank\")'>País de los Pajaros</button>"; 
+					butHtml+= "<button id='ishi' onclick='window.open(\"./../forumdisplay.php?fid=174\",\"_blank\")'>Ishi</button>"; 
+					butHtml+= "<button id='lluvia' onclick='window.open(\"./../forumdisplay.php?fid=168\",\"_blank\")'>País de la Lluvia</button>"; 
+					butHtml+= "<button id='ame' onclick='window.open(\"./../forumdisplay.php?fid=175\",\"_blank\")'>Ame</button>"; 
+					butHtml+= "<button id='hierba' onclick='window.open(\"./../forumdisplay.php?fid=167\",\"_blank\")'>País de la Hierba</button>"; 
+					butHtml+= "<button id='kusa' onclick='window.open(\"./../forumdisplay.php?fid=178\",\"_blank\")'>Kusa</button>"; 
+					butHtml+= "<button id='rios' onclick='window.open(\"./../forumdisplay.php?fid=166\",\"_blank\")'>País de los Ríos</button>"; 
+					butHtml+= "<button id='tani' onclick='window.open(\"./../forumdisplay.php?fid=179\",\"_blank\")'>Tani</button>"; 
+					break;
+				case 6: myImg.src="./../images/map/northNation.png"; 
+					butHtml= "<button id='cascada' onclick='window.open(\"./../forumdisplay.php?fid=157\",\"_blank\")'>País de la Cascada</button>"; 
+					butHtml+= "<button id='taki' onclick='window.open(\"./../forumdisplay.php?fid=161\",\"_blank\")'>Taki</button>"; 
+					butHtml+= "<button id='fideos' onclick='window.open(\"./../forumdisplay.php?fid=156\",\"_blank\")'>País de los Fideos</button>"; 
+					butHtml+= "<button id='arroz' onclick='window.open(\"./../forumdisplay.php?fid=155\",\"_blank\")'>País de los Campos de Arroz</button>"; 
+					butHtml+= "<button id='oto' onclick='window.open(\"./../forumdisplay.php?fid=160\",\"_blank\")'>Oto</button>"; 
+					butHtml+= "<button id='termales' onclick='window.open(\"./../forumdisplay.php?fid=154\",\"_blank\")'>País de las Aguas Termales</button>"; 
+					butHtml+= "<button id='yu' onclick='window.open(\"./../forumdisplay.php?fid=159\",\"_blank\")'>Yu</button>"; 
+					butHtml+= "<button id='helado' onclick='window.open(\"./../forumdisplay.php?fid=153\",\"_blank\")'>País Helado</button>"; 
+					butHtml+= "<button id='shimo' onclick='window.open(\"./../forumdisplay.php?fid=158\",\"_blank\")'>Shimo</button>"; 
+					break;
+				case 7: myImg.src="./../images/map/eastNNation.png"; 
+					butHtml= "<button id='olas' onclick='window.open(\"./../forumdisplay.php?fid=152\",\"_blank\")'>País de las Olas</button>"; 
+					butHtml+= "<button id='montana' onclick='window.open(\"./../forumdisplay.php?fid=151\",\"_blank\")'>País de las Montañas</button>"; 
+					butHtml+= "<button id='pantanos' onclick='window.open(\"./../forumdisplay.php?fid=150\",\"_blank\")'>País de los Pantanos</button>"; 
+					butHtml+= "<button id='garra' onclick='window.open(\"./../forumdisplay.php?fid=149\",\"_blank\")'>Países del Colmillo y la Garra</button>"; 
+					butHtml+= "<button id='nagi' onclick='window.open(\"./../forumdisplay.php?fid=146\",\"_blank\")'>Isla Nagi</button>"; 
+					butHtml+= "<button id='ozu' onclick='window.open(\"./../forumdisplay.php?fid=145\",\"_blank\")'>Isla O'uzu</button>"; 
+					butHtml+= "<button id='te2' onclick='window.open(\"./../forumdisplay.php?fid=148\",\"_blank\")'>País del Té</button>"; 
+					butHtml+= "<button id='chToS' onclick='changeSide(true);'> <img src='./../images/map/esBut.png' /> Paises del Mar del Este - Región Sur</button>"; 
+					break;
+				case 8: myImg.src="./../images/map/eastSNation.png"; 
+					butHtml= "<button id='te' onclick='window.open(\"./../forumdisplay.php?fid=148\",\"_blank\")'>País del Té</button>"; 
+					butHtml+= "<button id='mar' onclick='window.open(\"./../forumdisplay.php?fid=144\",\"_blank\")'>País del Mar</button>"; 
+					butHtml+= "<button id='luna' onclick='window.open(\"./../forumdisplay.php?fid=142\",\"_blank\")'>País de la Luna</button>"; 
+					butHtml+= "<button id='getsu' onclick='window.open(\"./../forumdisplay.php?fid=143\",\"_blank\")'>Getsu</button>"; 
+					butHtml+= "<button id='nagi2' onclick='window.open(\"./../forumdisplay.php?fid=146\",\"_blank\")'>Isla Nagi</button>"; 
+					butHtml+= "<button id='ozu2' onclick='window.open(\"./../forumdisplay.php?fid=145\",\"_blank\")'>Isla O'uzu</button>"; 
+					butHtml+= "<button id='chToN' onclick='changeSide(false);'> <img src='./../images/map/enBut.png' /> Paises del Mar del Este - Región Norte</button>"; 
+					break;
+				case 9: myImg.src="./../images/map/southNation.png"; 
+					butHtml= "<button id='marfil' onclick='window.open(\"./../forumdisplay.php?fid=130\",\"_blank\")'>Reino del Marfil</button>"; 
+					butHtml+= "<button id='cobre' onclick='window.open(\"./../forumdisplay.php?fid=129\",\"_blank\")'>Reino del Cobre</button>"; 
+					butHtml+= "<button id='acantilado' onclick='window.open(\"./../forumdisplay.php?fid=128\",\"_blank\")'>Reino de los Acantilados</button>"; 
+					butHtml+= "<button id='jungla' onclick='window.open(\"./../forumdisplay.php?fid=127\",\"_blank\")'>País de las Junglas</button>"; 
+					break;
+			}
+			var back = document.getElementById("world");
+			back.style.display = "block";
+			var subs = buttons.getElementsByClassName('worldBut');
+			for(var i = 0; i < subs.length; i++){
+				var a = subs[i];
+				a.style.display = 'none';
+			}
+
+			buttonsChild.innerHTML=butHtml;
+
+		}
+
+		function changeSide(boo)
+		{
+			deleteButtons();
+
+			if(boo)
+				zoomin(8);
+			else
+				zoomin(7);
+		}
+
+		function zoomout() {
+			var myImg = document.getElementById("mapImage");
+			myImg.src="./../images/map/worldMapSmall.jpeg";
+			var back = document.getElementById("world");
+			back.style.display = "none";
+			var buttons = document.getElementById("buttonParent");
+			var subs = buttons.getElementsByClassName('worldBut');
+			for(var i = 0; i < subs.length; i++){
+				var a = subs[i];
+				a.style.display = 'block';
+			}
+			deleteButtons();
+		}
+
+		function deleteButtons()
+		{
+			var buttonsChild = document.getElementById("buttonChild");
+			buttonsChild.innerHTML="";
+		}
+	</script>
+</html>

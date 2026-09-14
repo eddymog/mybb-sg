@@ -1,0 +1,108 @@
+<html>
+
+<head>
+  <title>Crear Técnica</title>
+  {$headerinclude}
+</head>
+
+<body>
+  {$header}
+  <div class="fondo-blanco">
+<if $accion=='' then>
+     Accion:<br>
+      <select id="accion" onchange="onClickAccion()">
+		<option value=""></option>
+        <option value="Agregar">Agregar</option>
+        <option value="Remover">Remover</option>
+      </select><br><br>
+      <br><br>
+    </if>
+    <if $accion == 'Agregar' then>
+      <form method="post" action="/sg/admin/crear_tecnicas.php" name="crear_tecnicas" id="crear_tecnicas">
+        <div style="display: none">
+           <input type="text" id="fid" name="accion" value="{$accion}">
+        </div>
+        Accion:<br>
+        <select id="accion" disabled>
+          <option value="{$accion}">{$accion}</option>
+        </select><br>
+        Nombre de técnica*: <input placeholder="Amaterasu" type="text" name="nombre" id="nombre" required /><br>
+        Técnica ID*: <input placeholder="UCH502" type="text" name="tid" id="tid" required /><br>
+		Árbol*: <input placeholder="uchiha" type="text" name="arbol" id="arbol" /><br>
+        Rama*: <input placeholder="general" type="text" name="rama" id="rama" /><br>
+        Tipo*: <input placeholder="uchiha" type="text" name="tipo" id="tipo" /><br>
+        Aldea*: <input placeholder="general" type="text" name="aldea" id="aldea" /><br>
+        Categoría: <input placeholder="Ninjutsu a distancia" type="text" name="categoria" id="categoria" /><br>
+        Sellos: <input placeholder="No" type="text" name="sellos" id="sellos" placholder="A+" /><br>
+        Rango*: <input placeholder="A+" type="text" name="rango" id="rango" /><br>
+        Requisito: <input placeholder="Requiere Sharingan (tercera fase) aprendido" type="text" name="requisito" id="requisito" /><br>
+		Coste:<br>
+		<textarea placeholder="Activación 80 Chakra . Apagar llamas propias: 0 Chakra . Apagar llamas que no sean propias: 40 Chakra" style="width: 350px;height: 40px;" name="coste"></textarea><br>
+        Efecto:<br>
+		<textarea placeholder="80 Vida por turno" style="width: 350px;height: 40px;" name="efecto"></textarea><br>  
+        Descripcion*:<br>
+        <textarea placeholder="El usuario cierra uno de sus ojos para concentrar chakra durante un turno completo. Blablabla. Ya sabes el resto de la mamada." style="width: 700px;height: 300px;" name="descripcion" minlength="1" required placeholder=""></textarea><br>
+<!--         Miembro de Staff: <input type="text" name="staff" required><br>
+        Razon: <input type="text" name="razon" required><br><br> -->
+        <input type="submit" value="Crear">
+      </form>
+		<p>Nota: A la hora de crear una técnica, para que aparezca en el apartado de <a href="/tecnicas.php">Técnicas</a> debe tener tres cosas: tipo, aldea y rango.</p>
+		<p>Ej. AKI201 debe tener tipo: akimichi, aldea: general, rango: C. Mayúsculas no importan. Para revisar qué tipo y aldea se necesitan para una técnica, puedes revisar el URL en el apartado de técnicas</p>
+		<p><a href="/tecnicas_show.php?tipo=Akimichi&aldea=general">tecnicas_show.php?tipo=Akimichi&aldea=general</p>
+	    <p>Para que una técnica vaya al apartado de Personaje en la ficha privada, al crearla debe tener como mínimo tipo: personaje y Aldea: general</p>
+		
+	
+    </if>
+    <if $accion == 'Remover' && $tecnica_id == '' then>
+        Accion: {$tid}<br>
+        <select id="accion" disabled>
+          <option value="{$accion}">{$accion}</option>
+        </select><br>
+		Técnica ID:<br><input type="text" name="tid" required id='tid'><br>
+		<button onclick=onClickAccion()>Apachúrrame papi</button><br><br>
+    </if>
+	<if $accion == 'Remover' && $tecnica_id != '' then>
+        Accion:<br>
+        <select id="accion" disabled>
+          <option value="{$accion}">{$accion}</option>
+        </select><br>
+		Técnica ID:<br><input type="text" name="tid" required id='tid' value='{$tid}' disabled><br><br>
+		<span>Tecnica ID: {$tecnica['tid']} | Nombre: {$tecnica['nombre']} | Tipo: {$tecnica['tipo']}</span><br>
+		<span>Aldea: {$tecnica['aldea']} | Categoria: {$tecnica['categoria']} | Sellos: {$tecnica['sellos']}</span><br>
+		<span>Rango: {$tecnica['rango']}</span><br>
+		<span>Puntuación: {$tecnica['puntuacion']}</span><br>
+		<span>Coste: {$tecnica['coste']}</span><br>
+		<span>Efecto: {$tecnica['efecto']}</span><br>
+		<span>Requisito: {$tecnica['requisito']}</span><br>
+		<span>Balanceado: {$balance}</span><br>
+		<span>Notas de balanceo: {$notas_balance}</span><br>
+		<span>Descripcion: {$tecnica['descripcion']}</span><br><br>
+		<form method="post" action="/sg/admin/crear_tecnicas.php" name="crear_tecnicas" id="crear_tecnicas">
+			<div style="display: none">
+           		<input type="text" name="tecnica_id" value="{$tecnica_id}">
+				<input type="text" name="accion" value="{$accion}">
+				<input type="text" name="nombre" value="{$tecnica['nombre']}">
+        	</div><br>
+			Miembro de Staff: <input type="text" name="staff" required><br>
+        	Razon: <input type="text" name="razon" required><br><br>
+			<input type="submit" value="Remover"><br><br>
+		</form>
+    </if>
+  </div>
+  {$footer}
+</body>
+<if $log_var !='' then><script>alert(`{$log_var}`);</script></if>
+{$reload_script}
+<script>
+  function onClickAccion() {
+    const accion = document.getElementById('accion').value;
+	const tid = document.getElementById('tid')?.value;
+	if (accion && tid) {
+      window.location.href = window.location.pathname + '?accion=' + accion + '&tecnica_id=' + tid;
+    } else if (accion) {
+      window.location.href = window.location.pathname + '?accion=' + accion;
+    }
+  }
+</script>
+
+</html>

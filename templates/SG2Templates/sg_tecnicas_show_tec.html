@@ -1,0 +1,268 @@
+<div class="spoiler tecnica-spoiler">
+  <div class="spoiler_title" onclick="toggleTechniqueSpoiler(this)">
+    <span class="spoiler_button">
+      <span class="tecnica-header">
+        <span class="tecnica-section-label">Técnica</span>
+        <strong>{$tecnica['nombre']}</strong>
+      </span>
+      <span class="tecnica-toggle">+</span>
+    </span>
+  </div>
+
+  <div class="tecnica_spoiler_content">
+    <div class="tecnica-card">
+      <div class="tecnica-layout">
+        <div class="tecnica-side">
+          <div class="tecnica-badges">
+            <div class="tecnica-badge tecnica-badge-rango">Rango {$tecnica['rango']}</div>
+            <div class="tecnica-badge">{$tecnica['requisito']}</div>
+            <div class="tecnica-badge">{$tecnica['tipo']}</div>
+            <if $tecnica['categoria'] && ($tecnica['categoria'] != $tecnica['tipo']) then>
+              <div class="tecnica-badge">{$tecnica['categoria']}</div>
+            </if>
+            <if $tecnica['sellos'] then><div class="tecnica-badge">Sellos: {$tecnica['sellos']}</div></if>
+            <if $g_is_staff then>
+              <div class="tecnica-badge">ID: <a href="/sg/admin/modificar_tecnicas.php?tecnica_id={$tecnica['tid']}">{$tecnica['tid']}</a></div>
+            </if>
+            <if !$g_is_staff then>
+              <div class="tecnica-badge">ID: {$tecnica['tid']}</div>
+            </if>
+            <if $tecnica['balance'] == 1 then>
+              <div class="tecnica-badge tecnica-badge-balance balance_positive">Balance positivo ✓</div>
+            </if>
+            <if $tecnica['balance'] == 2 then>
+              <div class="tecnica-badge tecnica-badge-balance balance_negative">Balance negativo ✖</div>
+            </if>
+          </div>
+
+          <div class="tecnica-side-panels">
+            <if $tecnica['coste'] then>
+              <div class="tecnica-data-block">
+                <span class="tecnica-data-label">Coste</span>
+                <span class="tecnica-data-value">{$tecnica['coste']}</span>
+              </div>
+            </if>
+            <if !$tecnica['coste'] then>
+              <div class="tecnica-data-block">
+                <span class="tecnica-data-label">Coste</span>
+                <span class="tecnica-data-value tecnica-data-muted">Sin coste indicado</span>
+              </div>
+            </if>
+          </div>
+        </div>
+
+        <div class="tecnica-main">
+          <div class="tecnica-reading">
+            <div class="tecnica-reading-label">Descripción</div>
+            <p class="tecnica-description">{$tecnica['descripcion']}</p>
+          </div>
+
+          <if $tecnica['efecto'] then>
+            <div class="tecnica-effect-box">
+              <div class="tecnica-reading-label">Efecto</div>
+              <div class="tecnica-effect-text">{$tecnica['efecto']}</div>
+            </div>
+          </if>
+
+          <if !$tecnica['efecto'] then>
+            <div class="tecnica-effect-box tecnica-effect-box-empty">
+              <div class="tecnica-reading-label">Efecto</div>
+              <div class="tecnica-effect-text tecnica-data-muted">No tiene efecto adicional especificado.</div>
+            </div>
+          </if>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.tecnica-spoiler {
+  margin: 0 0 8px;
+  background: #120e1d;
+  border-color: rgba(156, 107, 204, 0.1);
+}
+
+.tecnica-spoiler .spoiler_title {
+  cursor: pointer;
+}
+
+.tecnica-spoiler .spoiler_button {
+  min-height: 48px;
+  padding: 0 16px;
+  justify-content: space-between;
+  background: #1a1527;
+  color: var(--ink);
+  text-shadow: none;
+}
+
+.tecnica-header {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  text-align: left;
+}
+
+.tecnica-header strong {
+  font-size: 12px;
+  letter-spacing: 1.2px;
+  font-weight: 700;
+}
+
+.tecnica-section-label {
+  color: var(--mist);
+  font-size: 9px;
+  letter-spacing: 2px;
+}
+
+.tecnica-toggle {
+  color: var(--plum3);
+  font-size: 15px;
+  line-height: 1;
+  transition: transform 0.22s ease, color 0.22s ease;
+}
+
+.tecnica-spoiler.is-open .tecnica-toggle {
+  transform: rotate(45deg);
+  color: var(--plum4);
+}
+
+.tecnica_spoiler_content {
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  background: rgba(8, 7, 13, 0.96);
+  transition: max-height 0.28s ease, opacity 0.22s ease, padding 0.22s ease;
+}
+
+.tecnica-card {
+  padding: 14px;
+  display: grid;
+  gap: 12px;
+}
+
+.tecnica-layout {
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr);
+  gap: 14px;
+  align-items: start;
+}
+
+.tecnica-side,
+.tecnica-main {
+  display: grid;
+  gap: 10px;
+}
+
+.tecnica-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-content: start;
+}
+
+.tecnica-badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 0 10px;
+  border: 1px solid rgba(156, 107, 204, 0.12);
+  background: rgba(20, 16, 31, 0.88);
+  color: var(--plum4);
+  font: 700 9px/1 "Cinzel", serif;
+  letter-spacing: 1.3px;
+  box-sizing: border-box;
+}
+
+.tecnica-badge-rango {
+  border-color: rgba(192, 88, 42, 0.18);
+  color: #f0c1ac;
+}
+
+.tecnica-badge a {
+  color: var(--plum4);
+  text-decoration: underline;
+  text-decoration-color: rgba(212, 184, 240, 0.28);
+}
+
+.tecnica-side-panels {
+  display: grid;
+  gap: 10px;
+}
+
+.tecnica-reading,
+.tecnica-effect-box {
+  padding: 14px 16px;
+  border: 1px solid rgba(156, 107, 204, 0.08);
+  background: #ece5f6;
+}
+
+.tecnica-reading-label {
+  display: block;
+  margin-bottom: 8px;
+  color: #715968;
+  font: 700 10px/1 "Cinzel", serif;
+  letter-spacing: 1.8px;
+  text-transform: uppercase;
+}
+
+.tecnica-description {
+  margin: 0;
+  color: #20192d;
+  font-size: 14px;
+  line-height: 1.82;
+  text-align: justify;
+}
+
+.tecnica-data-block {
+  padding: 12px 14px;
+  border: 1px solid rgba(156, 107, 204, 0.1);
+  background: rgba(20, 16, 31, 0.88);
+  box-sizing: border-box;
+}
+
+.tecnica-data-label {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--stone);
+  font: 700 10px/1 "Cinzel", serif;
+  letter-spacing: 1.6px;
+  text-transform: uppercase;
+}
+
+.tecnica-data-value {
+  display: block;
+  color: var(--ink);
+  font: 700 14px/1.55 "Source Serif 4", serif;
+}
+
+.tecnica-data-text {
+  line-height: 1.7;
+}
+
+.tecnica-effect-text {
+  color: #20192d;
+  font-size: 14px;
+  line-height: 1.78;
+  text-align: justify;
+}
+
+.tecnica-data-muted {
+  color: #7e6a89;
+}
+
+@media (max-width: 720px) {
+  .tecnica-card {
+    padding: 12px;
+  }
+
+  .tecnica-spoiler .spoiler_button {
+    padding: 0 12px;
+  }
+
+  .tecnica-layout {
+    grid-template-columns: 1fr;
+  }
+}
+</style>

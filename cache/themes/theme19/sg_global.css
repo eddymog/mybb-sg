@@ -146,10 +146,61 @@ table {
     margin: auto;
     padding: 0;
     box-sizing: border-box;
+    position: relative;
+    overflow: hidden;
 }
 
 #logo img {
     width: 100%;
+    transition: all 1s ease-out;
+}
+
+/* Chakra glow: aura pulsante en el acento oxide del sitio al pasar el mouse */
+#logo:hover {
+    animation: sgChakraPulse 1.6s ease-in-out infinite;
+}
+
+/* --sg-hue la fija el JS de header.html (mouseenter) a un valor aleatorio
+   1-360deg en cada hover; 0deg (sin cambio de color) es el respaldo. */
+#logo:hover img {
+    transform: scale(1.015);
+    filter: brightness(1.05) hue-rotate(var(--sg-hue, 0deg));
+}
+
+@keyframes sgChakraPulse {
+    0%, 100% {
+        box-shadow:
+            0 0 18px 4px rgba(192, 88, 42, 0.24),
+            0 0 42px 10px rgba(192, 88, 42, 0.10);
+    }
+    50% {
+        box-shadow:
+            0 0 26px 6px rgba(192, 88, 42, 0.42),
+            0 0 56px 14px rgba(192, 88, 42, 0.20);
+    }
+}
+
+/* Barrido tipo kunai: una franja diagonal de luz que cruza una sola vez al entrar el hover */
+#logo::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(115deg, transparent 42%, rgba(255,255,255,0.55) 50%, transparent 58%);
+    transform: translateX(-140%);
+    opacity: 0;
+    z-index: 2;
+}
+
+#logo:hover::after {
+    animation: sgKunaiSweep 0.7s ease-out 1;
+}
+
+@keyframes sgKunaiSweep {
+    0%   { transform: translateX(-140%); opacity: 0; }
+    12%  { opacity: 1; }
+    88%  { opacity: 1; }
+    100% { transform: translateX(140%); opacity: 0; }
 }
 
 #content {
@@ -1562,11 +1613,13 @@ a:hover, a:active {
 }
 
 .temporada_index {
-    transition: all 2.5s ease-out;
+    transition: all 1s ease-out;
 }
 
+/* --sg-hue la fija el JS de header.html (mouseenter) a un valor aleatorio
+   1-360deg en cada hover; 180deg es el respaldo si el JS no llegó a correr. */
 .temporada_index:hover {
-    filter: hue-rotate(180deg);
+    filter: hue-rotate(var(--sg-hue, 180deg));
 }
 
 .username_bright {
@@ -2231,4 +2284,18 @@ span.toggle-container {
     border-color: var(--plum3);
     background: var(--bg3);
     color: var(--plum3);
+}
+
+
+/* ----------------------------------------------------------
+   28. TÉCNICAS — VALOR PARSEADO ([CCKx1]/[MDES-10]/etc.)
+   Global a propósito: lo usan tecnicas_lista.php, ficha.php y los
+   posts del foro (tag [tecnica=TID] en inc/plugins/tecnicatag.php).
+   ---------------------------------------------------------- */
+
+.sg-tec-parsed {
+    color: var(--oxide);
+    font-weight: 700;
+    border-bottom: 1px dotted var(--oxide);
+    cursor: help;
 }

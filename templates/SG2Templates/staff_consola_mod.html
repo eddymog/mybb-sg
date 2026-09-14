@@ -1,0 +1,362 @@
+<html>
+<head>
+    <title>Consola Súper Secreta</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Source+Serif+4:wght@300;400;600;700&family=Zen+Old+Mincho:wght@400;700&display=swap" rel="stylesheet">
+    {$headerinclude}
+    <style>
+        :root {
+            --bg: #0f0c18;
+            --bg2: #130f1e;
+            --bg3: #171224;
+            --surface: rgba(23, 18, 36, 0.84);
+            --surface-soft: rgba(28, 22, 44, 0.7);
+            --border: rgba(156, 107, 204, 0.12);
+            --ink: #e8dff8;
+            --plum: #7b4ab8;
+            --plum2: #9c6bcc;
+            --plum3: #b890e0;
+            --oxide: #c0582a;
+            --stone: #8a7a9a;
+            --fiber: rgba(156, 107, 204, 0.04);
+            --shadow: 0 24px 60px rgba(0, 0, 0, 0.28);
+            --shadow-soft: 0 12px 28px rgba(0, 0, 0, 0.18);
+            --radius-xl: 24px;
+            --radius-lg: 18px;
+            --radius-md: 14px;
+        }
+
+        body {
+            background:
+                radial-gradient(circle at top left, rgba(123, 74, 184, 0.12), transparent 28%),
+                radial-gradient(circle at bottom right, rgba(192, 88, 42, 0.08), transparent 24%),
+                var(--bg);
+            color: var(--ink);
+            font-family: "Source Serif 4", serif;
+            margin: 0;
+            position: relative;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+            background-image:
+                repeating-linear-gradient(13deg, transparent 0, transparent 24px, var(--fiber) 24px, var(--fiber) 25px),
+                repeating-linear-gradient(82deg, transparent 0, transparent 36px, var(--fiber) 36px, var(--fiber) 37px),
+                repeating-linear-gradient(151deg, transparent 0, transparent 19px, var(--fiber) 19px, var(--fiber) 19.5px);
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        .staff-page {
+            max-width: 1220px;
+            margin: 28px auto 44px;
+            padding: 0 18px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .staff-shell {
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            background: rgba(19, 15, 30, 0.94);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        .staff-header {
+            padding: 24px 28px 18px;
+            border-bottom: 1px solid var(--border);
+            background: rgba(23, 18, 36, 0.82);
+        }
+
+        .staff-label,
+        .staff-card-eyebrow,
+        .staff-link-tag {
+            font-family: "Cinzel", serif;
+            text-transform: uppercase;
+        }
+
+        .staff-label {
+            margin-bottom: 8px;
+            font-size: 10px;
+            letter-spacing: 2.4px;
+            color: var(--plum3);
+        }
+
+        .staff-title {
+            margin: 0;
+            font: 900 clamp(24px, 3.5vw, 34px)/1.05 "Cinzel", serif;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: var(--ink);
+        }
+
+        .staff-subtitle {
+            max-width: 760px;
+            margin: 10px 0 0;
+            color: var(--stone);
+            font-size: 14px;
+            line-height: 1.7;
+        }
+
+        .staff-body {
+            padding: 20px;
+            display: grid;
+            gap: 16px;
+        }
+
+        .staff-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 16px;
+        }
+
+        .staff-card {
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            background: var(--surface);
+            box-shadow: var(--shadow-soft);
+            overflow: hidden;
+        }
+
+        .staff-card-head {
+            padding: 18px 20px 14px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .staff-card-eyebrow {
+            margin-bottom: 6px;
+            font-size: 10px;
+            letter-spacing: 2px;
+            color: var(--plum2);
+        }
+
+        .staff-card-title {
+            margin: 0;
+            font: 900 18px/1.1 "Cinzel", serif;
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+            color: var(--ink);
+        }
+
+        .staff-card-body {
+            padding: 14px;
+        }
+
+        .staff-links {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: grid;
+            gap: 10px;
+        }
+
+        .staff-links li {
+            margin: 0;
+            padding: 0;
+        }
+
+        .staff-link {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+            min-height: 52px;
+            padding: 12px 14px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            background: rgba(15, 12, 24, 0.22);
+            transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+        }
+
+        .staff-link:hover {
+            transform: translateY(-1px);
+            border-color: rgba(156, 107, 204, 0.24);
+            background: rgba(28, 22, 44, 0.42);
+        }
+
+        .staff-link-name {
+            color: var(--ink);
+            font-size: 15px;
+            line-height: 1.5;
+        }
+
+        .staff-link-tag {
+            flex-shrink: 0;
+            font-size: 9px;
+            letter-spacing: 1.8px;
+            color: var(--stone);
+        }
+
+        .staff-footer-card {
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            background: var(--surface-soft);
+            padding: 16px 18px;
+        }
+
+        .staff-footer-card .staff-link {
+            background: transparent;
+        }
+
+        @media (max-width: 900px) {
+            .staff-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 720px) {
+            .staff-page {
+                margin-top: 20px;
+                padding: 0 12px;
+            }
+
+            .staff-shell {
+                border-radius: 18px;
+            }
+
+            .staff-header {
+                padding: 20px 18px 16px;
+            }
+
+            .staff-body {
+                padding: 16px;
+            }
+
+            .staff-link {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    {$header}
+    <div class="staff-page">
+        <div class="staff-shell">
+            <section class="staff-header">
+                <div class="staff-label">Panel de moderación</div>
+                <h1 class="staff-title">Consola de Mods</h1>
+                <p class="staff-subtitle">
+                    Acceso rápido a las herramientas principales de gestión del sistema. La estructura está pensada para encontrar cada módulo con rapidez, sin ruido visual y con una lectura clara por categorías.
+                </p>
+            </section>
+
+            <section class="staff-body">
+                <div class="staff-grid">
+                    <article class="staff-card">
+                        <div class="staff-card-head">
+                            <div class="staff-card-eyebrow">Inventario</div>
+                            <h2 class="staff-card-title">Objetos</h2>
+                        </div>
+                        <div class="staff-card-body">
+                            <ul class="staff-links">
+                                <li><a class="staff-link" href="/sg/admin/gestionar_objetos.php"><span class="staff-link-name">Gestionar objetos</span><span class="staff-link-tag">Editar</span></a></li>
+                                <li><a class="staff-link" href="/sg/admin/ficha_objetos.php"><span class="staff-link-name">Modificar objetos de fichas</span><span class="staff-link-tag">Fichas</span></a></li>
+                                <li><a class="staff-link" href="/sg/admin/gestionar_pergaminos.php"><span class="staff-link-name">Pergaminos (Gacha)</span><span class="staff-link-tag">Editar</span></a></li>
+                                <li><a class="staff-link" href="/sg/admin/gestionar_pasivas_tobis.php"><span class="staff-link-name">Pasivas de Tobis</span><span class="staff-link-tag">Editar</span></a></li>
+                            </ul>
+                        </div>
+                    </article>
+
+                    <article class="staff-card">
+                        <div class="staff-card-head">
+                            <div class="staff-card-eyebrow">Sistema</div>
+                            <h2 class="staff-card-title">Técnicas</h2>
+                        </div>
+                        <div class="staff-card-body">
+                            <ul class="staff-links">
+                                <li><a class="staff-link" href="/sg/admin/crear_tecnicas.php"><span class="staff-link-name">Crear técnicas únicas</span><span class="staff-link-tag">Crear</span></a></li>
+                                <li><a class="staff-link" href="/sg/admin/modificar_tecnicas.php"><span class="staff-link-name">Modificar técnicas</span><span class="staff-link-tag">Editar</span></a></li>
+                                <li><a class="staff-link" href="/sg/admin/ficha_tecnicas.php"><span class="staff-link-name">Modificar técnicas de fichas</span><span class="staff-link-tag">Fichas</span></a></li>
+                            </ul>
+                        </div>
+                    </article>
+
+                    <article class="staff-card">
+                        <div class="staff-card-head">
+                            <div class="staff-card-eyebrow">Sistema</div>
+                            <h2 class="staff-card-title">Virtudes y Defectos</h2>
+                        </div>
+                        <div class="staff-card-body">
+                            <ul class="staff-links">
+                                <li><a class="staff-link" href="/sg/admin/gestionar_virtudes.php"><span class="staff-link-name">Gestionar virtudes y defectos</span><span class="staff-link-tag">Editar</span></a></li>
+                                <li><a class="staff-link" href="/sg/admin/ficha_virtudes.php"><span class="staff-link-name">Modificar virtudes de fichas</span><span class="staff-link-tag">Fichas</span></a></li>
+                                <li><a class="staff-link" href="/sg/registro_virtudes.php"><span class="staff-link-name">Registro de virtudes y defectos</span><span class="staff-link-tag">Registro</span></a></li>
+                            </ul>
+                        </div>
+                    </article>
+
+                    <article class="staff-card">
+                        <div class="staff-card-head">
+                            <div class="staff-card-eyebrow">Personajes</div>
+                            <h2 class="staff-card-title">Usuarios</h2>
+                        </div>
+                        <div class="staff-card-body">
+                            <ul class="staff-links">
+                                <li><a class="staff-link" href="/sg/admin/modificar_ficha.php"><span class="staff-link-name">Modificar ficha</span><span class="staff-link-tag">Ficha</span></a></li>
+                                <li><a class="staff-link" href="/sg/admin/recompensas_staff.php"><span class="staff-link-name">Recompensas al staff</span><span class="staff-link-tag">Recompensas</span></a></li>
+                                <li><a class="staff-link" href="/sg/admin/recompensas_mision.php"><span class="staff-link-name">Recompensas de misión</span><span class="staff-link-tag">Recompensas</span></a></li>
+                            </ul>
+                        </div>
+                    </article>
+
+                    <article class="staff-card">
+                        <div class="staff-card-head">
+                            <div class="staff-card-eyebrow">Gestión</div>
+                            <h2 class="staff-card-title">NPCs</h2>
+                        </div>
+                        <div class="staff-card-body">
+                            <ul class="staff-links">
+                                <li><a class="staff-link" href="/sg/admin/gestionar_npcs.php"><span class="staff-link-name">Gestionar NPCs</span><span class="staff-link-tag">Editar</span></a></li>
+                            </ul>
+                        </div>
+                    </article>
+
+                    <article class="staff-card">
+                        <div class="staff-card-head">
+                            <div class="staff-card-eyebrow">Utilidades</div>
+                            <h2 class="staff-card-title">Herramientas</h2>
+                        </div>
+                        <div class="staff-card-body">
+                            <ul class="staff-links">
+                                <li><a class="staff-link" href="/sg/admin/fichas_en_cola.php"><span class="staff-link-name">Fichas en cola</span><span class="staff-link-tag">Cola</span></a></li>
+                                <li><a class="staff-link" href="/sg/admin/peticiones_admin.php"><span class="staff-link-name">Peticiones Administrativas</span><span class="staff-link-tag">Peticiones</span></a></li>
+                                <li><a class="staff-link" href="/sg/admin/sabiasque_modificar.php"><span class="staff-link-name">Modificar Sabías Qué</span><span class="staff-link-tag">Contenido</span></a></li>
+                                <li><a class="staff-link" href="/sg/admin/subir_imagenes.php"><span class="staff-link-name">Subir imágenes</span><span class="staff-link-tag">Imágenes</span></a></li>
+                                <li><a class="staff-link" href="/sg/admin/gestionar_banners.php"><span class="staff-link-name">Banners rotativos</span><span class="staff-link-tag">Imágenes</span></a></li>
+                                <li><a class="staff-link" href="/sg/admin/gestionar_afiliados.php"><span class="staff-link-name">Afiliados</span><span class="staff-link-tag">Índice</span></a></li>
+                            </ul>
+                        </div>
+                    </article>
+
+                    <article class="staff-card">
+                        <div class="staff-card-head">
+                            <div class="staff-card-eyebrow">Registro</div>
+                            <h2 class="staff-card-title">Logs</h2>
+                        </div>
+                        <div class="staff-card-body">
+                            <ul class="staff-links">
+                                <li><a class="staff-link" href="/sg/admin/log_tecnicas_mod.php"><span class="staff-link-name">Log de técnicas asignadas a fichas</span><span class="staff-link-tag">Log</span></a></li>
+                                <li><a class="staff-link" href="/sg/admin/log_consola_mod.php"><span class="staff-link-name">Log de cambios de consola</span><span class="staff-link-tag">Log</span></a></li>
+                                <li><a class="staff-link" href="/sg/admin/log_historial.php"><span class="staff-link-name">Historial de cambios de ficha</span><span class="staff-link-tag">Log</span></a></li>
+                            </ul>
+                        </div>
+                    </article>
+                </div>
+            </section>
+        </div>
+    </div>
+    {$footer}
+</body>
+
+</html>

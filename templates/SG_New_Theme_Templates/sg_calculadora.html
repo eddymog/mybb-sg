@@ -1,0 +1,211 @@
+<html>
+
+<head>
+   <style>
+	.statscalculator {
+		background-color: #083875;
+		width: 400px;
+		height: 370px;
+		margin-right: 5px;
+		margin-top: -10px;
+		border-radius: 3px;
+		margin-bottom: 20px;
+		text-align: center
+	}
+	   
+	.fichastats {
+		padding-bottom: 5px;
+		margin: 10px auto
+	}
+	   
+    .upperblackbar {
+		height: 40px;
+		background-color: #0e1a28;
+		padding-bottom: 2px;
+		border-radius: 3px 3px 0 0
+	}
+	   
+	.upperbartittle {
+		padding-top: 5px;
+		color: #fff;
+		font-size: 24px;
+		font-family: Lemon Milk,Impact,Haettenschweiler,"Franklin Gothic Bold",Charcoal,"Helvetica Inserat","Bitstream Vera Sans Bold","Arial Black","sans serif"
+	}
+	   
+	.cstats {
+		width: 150px;
+		display: inline-block;
+		padding: 10px;
+		margin-left: 10px
+	}
+
+	.cstat {
+		height: 20px;
+		font-size: 14px;
+		font-family: Lemon Milk,Impact,Haettenschweiler,"Franklin Gothic Bold",Charcoal,"Helvetica Inserat","Bitstream Vera Sans Bold","Arial Black","sans serif";
+		text-align: right;
+		color: white;
+	}
+	   
+	.calcstatsedit {
+		width: 200px;
+		float: right;
+		margin: 10px
+	}
+
+	.calcstatsedit input {
+		width: 200px;
+		height: 16px;
+		border: 1px solid #083875;
+		background: #245a9e;
+		color: #FFF;
+		text-align: center;
+		font-weight: bold;
+	}
+	   
+	.personaje_stats {
+		font-weight: bold;
+		color: #ff8700
+	}
+
+	.personaje_vida {
+		font-weight: bold;
+		color: #c80514
+	}
+
+	.personaje_chakra {
+		font-weight: bold;
+		color: #338bce
+	}
+
+
+
+   </style>
+  <title>Shinobi Gaiden</title>
+  {$headerinclude}
+</head>
+
+<body>
+  {$header}
+  <div class="fondo-blanco" style="text-align: center;">
+  <table class="tripanel" style=" margin: auto; ">
+    <tbody>
+      <tr>
+        <td>
+          <div class="statscalculator">
+            <div class="fichastats">
+              <div class="upperblackbar">
+                <div class="upperbartittle">Calculadora de Estadísticas</div>
+              </div>
+              <div class="cstats">
+                <div class="cstat">Fuerza:</div>
+                <div class="cstat">Resistencia:</div>
+                <div class="cstat">Velocidad:</div>
+                <div class="cstat">Agilidad:</div>
+                <div class="cstat">Destreza:</div>
+                <div class="cstat">Presencia:</div>
+                <div class="cstat">Inteligencia:</div>
+                <div class="cstat">Ctrl. de Chakra:</div>
+              </div>
+              <div class="calcstatsedit">
+                <input onchange="statsvalue();" type="number" id="f" min="1" value="1">
+                <input onchange="statsvalue();" type="number" id="r" min="1" value="1">
+                <input onchange="statsvalue();" type="number" id="v" min="1" value="1">
+                <input onchange="statsvalue();" type="number" id="a" min="1" value="1">
+                <input onchange="statsvalue();" type="number" id="d" min="1" value="1">
+                <input onchange="statsvalue();" type="number" id="p" min="1" value="1">
+                <input onchange="statsvalue();" type="number" id="i" min="1" value="1">
+                <input onchange="statsvalue();" type="number" id="c" min="1" value="1">
+              </div>
+            </div>
+			  <br>
+			<div style=" color: white; text-align: center; ">
+			Vida: <span class="personaje_vida" id="hp">0</span> <img title="Vida" style="width: 9px;top: -1px;position: relative;" src="/images/sg/icons/vida.png"><br>
+			Chakra: <span class="personaje_chakra" id="mp">0</span> <img title="Chakra" style=" width: 9px; top: -1px; position: relative; " src="/images/sg/icons/chakra.png"><br>
+			Reg. Chakra: <span class="personaje_chakra" id="regc">0</span><br>
+			Nivel: <span id="n">0</span><br>
+			Estadísticas necesarias: <span id="h">8</span><br>
+		</div>
+
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <table class="buttonstable" style=" margin: auto; ">
+    <tbody>
+      <tr>
+        <td>
+          <div class="editstatsbutton" style="text-align: center;"><input class="button" type="button" value="Resetear" onclick="reset()"></div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+	</div>
+  {$footer}
+</body>
+<script>
+  /* Función para calcular vida del personaje */
+  /*
+  */
+  function calcHp(str, res) {
+    return str * 3 + res * 4;
+  }
+	
+  function calcCh(str, res, vel, agi, des, pre, int, cc) {
+	return (str * 1) + (res * 0.5) + (vel * 2) + (agi * 0.5) + (des * 2) + (pre * 2) + (int * 2) + (cc * 2.5);
+  }
+
+  function calcRegCh(str, res, vel, agi, des, pre, int, cc, niv) {
+    return Math.round((((str + res + vel + agi + des + pre + int + cc) * 2) / 40) + 1);
+  }
+
+  function statsvalue() {
+    nivelvalue();
+    vida.innerHTML = calcHp(parseInt(frz.value), parseInt(res.value));
+	chakra.innerHTML = Math.round(calcCh(parseInt(frz.value), parseInt(res.value), parseInt(vel.value), parseInt(agi.value), parseInt(dex.value), parseInt(pres.value), parseInt(int.value), parseInt(ctrl.value)));
+
+	regchakra.innerHTML = Math.round(calcRegCh(parseInt(frz.value), parseInt(res.value), parseInt(vel.value), parseInt(agi.value), parseInt(dex.value), parseInt(pres.value), parseInt(int.value), parseInt(ctrl.value), parseInt(nivelida.value)));
+  }
+
+  var frz = document.getElementById('f');
+  var res = document.getElementById('r');
+  var vel = document.getElementById('v');
+  var agi = document.getElementById('a');
+  var dex = document.getElementById('d');
+  var pres = document.getElementById('p');
+  var int = document.getElementById('i');
+  var ctrl = document.getElementById('c');
+  var hab = document.getElementById('h');
+
+  var vida = document.getElementById('hp');
+  var aguante = document.getElementById('sp');
+  var chakra = document.getElementById('mp');
+  var regaguante = document.getElementById('regr');
+  var regchakra = document.getElementById('regc');
+  var nivelida = document.getElementById('n');
+  var hab = document.getElementById('h');
+
+  function nivelvalue() {
+    var prom = (((parseInt(frz.value) + parseInt(res.value) + parseInt(vel.value) + parseInt(agi.value) + parseInt(dex.value) + parseInt(pres.value) + parseInt(int.value) + parseInt(ctrl.value)) / 40));
+    nivelida.innerHTML = Math.floor(prom);
+    hab.innerHTML = (parseInt(frz.value) + parseInt(res.value) + parseInt(vel.value) + parseInt(agi.value) + parseInt(dex.value) + parseInt(pres.value) + parseInt(int.value) + parseInt(ctrl.value));
+  }
+
+  function reset() {
+    frz.value = 0;
+    res.value = 0;
+    vel.value = 0;
+    agi.value = 0;
+    dex.value = 0;
+    pres.value = 0;
+    int.value = 0;
+    ctrl.value = 0;
+    nivelida.innerHTML = 0;
+    hab.innerHTML = 0;
+    statsvalue()
+  }
+</script>
+
+</html>

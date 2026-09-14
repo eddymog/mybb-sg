@@ -1,0 +1,43 @@
+<html>
+<head>
+  <title>Consola Súper Secreta</title>
+  {$headerinclude}
+</head>
+<body>
+  {$header}
+  <div class="fondo-blanco">
+    <if $fid=='' then>
+      User ID*<br><input type="number" name="name" min="100" max="2000" required id='fid'><button
+        onclick=onClickUid()>Apachúrrame</button><br><br>
+    </if>
+    <if $fid !='' then>
+      <form method="post" action="/sg/admin/ficha_atributos.php" name="ficha_atributos" id="ficha_atributos">
+      <div style="display: none">
+              <input type="text" id="fid" name="ficha_id" value="{$fid}">
+       </div>
+        User ID<br><input type="number" value='{$fid}' disabled><br>
+        <p>Nombre de cuenta: <a href="/sg/ficha.php?action=profile&uid={$fid}" target="_blank">{$ficha['nombre']}</a></p>
+        Puntos de Habilidad (PH): <br><input type="number" name="puntos_habilidad" min="0" max="2000" value="{$ficha['puntos_habilidad']}"><br>
+        Ryos: <br><input type="number" name="ryos" min="0" max="2000000" value="{$ficha['ryos']}"><br>
+        Puntos de Rol (PR): <br><input type="number" name="puntos_rol" min="0" max="5000" value="{$puntos_rol}" step="0.01"><br><br>
+		Puntos de Experiencia (PE): <br><input type="number" name="puntos_experiencia" min="0" max="2000" value="{$ficha['pe']}"><br><br>
+		Reputación: <br><input type="number" name="reputacion" min="0" max="5000" value="{$ficha['reputacion']}"><br><br>
+        Miembro de Staff: <input type="text" name="staff" required><br>
+        Razon: <input type="text" name="razon" required><br><br>
+       <input id="guardar_ficha" type="submit" value="Guardar">
+      </form>
+    </if>
+  </div>
+  <if $log_var !='' then><script>alert(`{$log_var}`);</script></if>
+
+  {$footer}
+</body>
+{$reload_script}
+<script>
+  function onClickUid() {
+    const fid = document.getElementById('fid').value;
+    window.location.href = window.location.pathname + '?fid=' + document.getElementById('fid').value;
+  }
+</script>
+
+</html>

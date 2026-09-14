@@ -1,0 +1,1757 @@
+<html>
+<head>
+  <title>Ficha</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Noto+Serif+JP:wght@300;400;700&display=swap" rel="stylesheet">
+  {$headerinclude}
+  <style>
+    :root {
+      /* Fondo basado en el color de la aldea (superficies inyectadas por ficha.php) */
+      --bg:            {$sgFichaSurface};
+      --bg2:           {$sgFichaSurface2};
+      --card:          {$sgFichaCard};
+      --card2:         {$sgFichaCardSoft};
+      --panel:         {$sgFichaPanel};
+      --border:        {$sgFichaBorder};
+      --border-strong: {$sgFichaBorderStrong};
+      --ink:           #f3edf3;
+      --stone:         #c6bacf;
+      --mist:          #cac0d6;
+      --fiber:         rgba(255, 255, 255, 0.03);
+      --paper:         {$sgFichaPaper};
+      --paper-ink:     {$sgFichaPaperText};
+      /* Acento = color de la aldea */
+      --accent:        {$sgFichaAccent};
+      --accent-2:      {$sgFichaAccentStrong};
+      --accent-soft:   {$sgFichaAccentSoft};
+    }
+
+    .fx *, .fx *::before, .fx *::after { box-sizing: border-box; }
+
+    body.sg-profile-theme-{$sgFichaTheme} {
+      background: var(--bg);
+      color: var(--ink);
+      font-family: 'Noto Serif JP', serif;
+    }
+
+    .fx {
+      position: relative;
+      max-width: 1080px;
+      margin: 26px auto 60px;
+      padding: 0 18px;
+      font-family: 'Noto Serif JP', serif;
+      color: var(--ink);
+    }
+    .fx::before { /* textura washi */
+      content: '';
+      position: absolute; inset: 0;
+      pointer-events: none; z-index: 0;
+      background-image:
+        repeating-linear-gradient(13deg,  transparent 0, transparent 24px, var(--fiber) 24px, var(--fiber) 25px),
+        repeating-linear-gradient(82deg,  transparent 0, transparent 36px, var(--fiber) 36px, var(--fiber) 37px),
+        repeating-linear-gradient(151deg, transparent 0, transparent 19px, var(--fiber) 19px, var(--fiber) 19.5px);
+    }
+    .fx-shell { position: relative; z-index: 1; }
+    .fx a { text-decoration: none; color: inherit; }
+
+    /* Tipografía base */
+    .fx-eyebrow {
+      font-family: 'Cinzel', serif; text-transform: uppercase;
+      font-size: 10px; letter-spacing: 2px; color: var(--accent);
+    }
+    .fx-h {
+      font-family: 'Cinzel', serif; font-weight: 900; letter-spacing: 2px;
+      text-transform: uppercase; color: var(--ink); margin: 0;
+    }
+
+    /* ── HERO ─────────────────────────────────────────── */
+    .fx-hero {
+      position: relative;
+      border: 0.5px solid var(--border);
+      background: var(--bg2);
+      overflow: hidden;
+    }
+    .fx-hero__banner {
+      height: 190px; background-size: cover; background-position: center;
+      filter: saturate(1.05);
+    }
+    .fx-hero__banner.sg-profile-editable { cursor: pointer; }
+    .fx-hero__scrim {
+      position: absolute; top: 0; left: 0; right: 0; height: 190px;
+      background: linear-gradient(180deg, rgba(15,10,20,0.05), rgba(15,10,20,0.55));
+      pointer-events: none;
+    }
+    .fx-hero__body {
+      position: relative;
+      display: grid; grid-template-columns: 1fr auto; gap: 20px;
+      align-items: flex-end;
+      padding: 0 24px 20px; margin-top: -48px;
+    }
+
+    .fx-identity { min-width: 0; padding-bottom: 4px; }
+    .fx-identity__village {
+      font-family: 'Cinzel', serif; text-transform: uppercase;
+      font-size: 11px; letter-spacing: 3px; color: var(--accent);
+      margin-bottom: 4px;
+    }
+    .fx-identity__accent { display:inline-block; width: 32px; height: 2px; background: var(--accent); margin-bottom: 8px; }
+    .fx-identity__name { font-family: 'Cinzel', serif; font-weight: 900; font-size: clamp(24px, 4vw, 34px); letter-spacing: 1px; line-height: 1.05; margin: 0; color: var(--ink); }
+    .fx-identity__alias { font-family: 'Noto Serif JP', serif; font-weight: 300; font-style: italic; color: var(--accent); font-size: 15px; margin: 4px 0 0; }
+
+    .fx-week { position: relative; cursor: help; }
+    .fx-week .fx-row__v { color: var(--accent); }
+    .fx-week__tip {
+      position: absolute; left: 50%; bottom: calc(100% + 8px); transform: translateX(-50%);
+      white-space: nowrap; padding: 6px 10px; background: var(--ink); color: var(--bg);
+      font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 1px;
+      opacity: 0; visibility: hidden; transition: opacity .15s ease; z-index: 20;
+    }
+    .fx-week:hover .fx-week__tip { opacity: 1; visibility: visible; }
+
+    .fx-actions { display: flex; flex-direction: column; gap: 6px; align-items: stretch; padding-bottom: 4px; }
+    .fx-action {
+      font-family: 'Cinzel', serif; text-transform: uppercase; letter-spacing: 1.5px;
+      font-size: 11px; font-weight: 700; color: var(--stone);
+      border: 0.5px solid var(--border); padding: 8px 14px; text-align: center;
+      background: var(--card); transition: border-color .15s ease, color .15s ease;
+    }
+    .fx-action:hover { border-color: var(--accent); color: var(--ink); }
+
+    /* ── CABECERA DE EXPEDIENTE ───────────────────────── */
+    .fx-hero__file {
+      position: absolute; top: 12px; left: 14px; z-index: 5;
+      font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
+      color: #fff; background: rgba(20,12,36,0.55); border: 0.5px solid rgba(255,255,255,0.25);
+      padding: 4px 10px;
+    }
+    .fx-hero__stamp {
+      position: absolute; top: 14px; right: 16px; z-index: 5; text-align: center;
+      transform: rotate(7deg); padding: 6px 14px 5px;
+      border: 2px solid var(--accent); border-radius: 5px; color: var(--accent);
+      background: var(--accent-soft);
+    }
+    .fx-hero__stamp span { display: block; font-family: 'Cinzel', serif; letter-spacing: 2px; text-transform: uppercase; }
+    .fx-hero__stamp-k { font-size: 8px; opacity: 0.85; }
+    .fx-hero__stamp strong { display: block; font-family: 'Cinzel', serif; font-weight: 900; font-size: 16px; letter-spacing: 1px; line-height: 1.15; }
+    .fx-hero__stamp-e { font-size: 9px; margin-top: 1px; }
+    .fx-hero__tate {
+      position: absolute; right: 18px; bottom: -8px; z-index: 0; pointer-events: none;
+      writing-mode: vertical-rl; font-family: 'Noto Serif JP', serif; font-weight: 700;
+      font-size: 88px; line-height: 1; color: var(--accent); opacity: 0.06; letter-spacing: 4px;
+    }
+
+    /* ── PESTAÑAS ─────────────────────────────────────── */
+    .fx input.fx-radio { position: absolute; width: 1px; height: 1px; opacity: 0; overflow: hidden; }
+    .fx-tabs {
+      display: flex; gap: 4px; margin: 14px 0 0; padding-left: 4px;
+      border-bottom: 0.5px solid var(--border);
+      position: sticky; top: 0; z-index: 15; background: var(--bg2);
+    }
+    .fx-tab {
+      display: flex; align-items: center; gap: 8px;
+      font-family: 'Cinzel', serif; text-transform: uppercase; letter-spacing: 1.5px;
+      font-size: 12px; font-weight: 700; color: var(--stone);
+      padding: 13px 20px; cursor: pointer; user-select: none;
+      border: 0.5px solid transparent; border-bottom: none;
+      transition: color .15s ease, background .15s ease;
+    }
+    .fx-tab:hover { color: var(--ink); }
+    .fx-tab__gem { width: 5px; height: 5px; background: var(--accent); clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%); flex-shrink: 0; opacity: 0; transition: opacity .15s ease; }
+
+    #fx-dossier:checked ~ .fx-tabs .fx-tab[for="fx-dossier"],
+    #fx-inventario:checked ~ .fx-tabs .fx-tab[for="fx-inventario"],
+    #fx-pasivas:checked ~ .fx-tabs .fx-tab[for="fx-pasivas"],
+    #fx-tecnicas:checked ~ .fx-tabs .fx-tab[for="fx-tecnicas"],
+    #fx-perfil:checked ~ .fx-tabs .fx-tab[for="fx-perfil"],
+    #fx-stats:checked ~ .fx-tabs .fx-tab[for="fx-stats"],
+    #fx-historial:checked ~ .fx-tabs .fx-tab[for="fx-historial"] {
+      color: var(--ink); background: var(--card);
+      border-color: var(--border); border-bottom-color: var(--card);
+      margin-bottom: -0.5px;
+    }
+    #fx-dossier:checked ~ .fx-tabs .fx-tab[for="fx-dossier"] .fx-tab__gem,
+    #fx-inventario:checked ~ .fx-tabs .fx-tab[for="fx-inventario"] .fx-tab__gem,
+    #fx-pasivas:checked ~ .fx-tabs .fx-tab[for="fx-pasivas"] .fx-tab__gem,
+    #fx-tecnicas:checked ~ .fx-tabs .fx-tab[for="fx-tecnicas"] .fx-tab__gem,
+    #fx-perfil:checked ~ .fx-tabs .fx-tab[for="fx-perfil"] .fx-tab__gem,
+    #fx-stats:checked ~ .fx-tabs .fx-tab[for="fx-stats"] .fx-tab__gem,
+    #fx-historial:checked ~ .fx-tabs .fx-tab[for="fx-historial"] .fx-tab__gem { opacity: 1; }
+
+    .fx-radio:focus-visible ~ .fx-tabs .fx-tab { outline: none; }
+    #fx-dossier:focus-visible ~ .fx-tabs .fx-tab[for="fx-dossier"],
+    #fx-inventario:focus-visible ~ .fx-tabs .fx-tab[for="fx-inventario"],
+    #fx-pasivas:focus-visible ~ .fx-tabs .fx-tab[for="fx-pasivas"],
+    #fx-tecnicas:focus-visible ~ .fx-tabs .fx-tab[for="fx-tecnicas"],
+    #fx-perfil:focus-visible ~ .fx-tabs .fx-tab[for="fx-perfil"],
+    #fx-stats:focus-visible ~ .fx-tabs .fx-tab[for="fx-stats"],
+    #fx-historial:focus-visible ~ .fx-tabs .fx-tab[for="fx-historial"] { outline: 2px solid var(--accent); outline-offset: -2px; }
+
+    /* ── PANELES ──────────────────────────────────────── */
+    .fx-panels {
+      position: relative;
+      border: 0.5px solid var(--border); border-top: none;
+      background: var(--card); padding: 24px 26px 30px;
+      perspective: 1400px;
+    }
+    /* Pliegue central + sombra de lomo */
+    .fx-panels::before {
+      content: ''; position: absolute; top: 0; bottom: 0; left: 50%; width: 40px;
+      transform: translateX(-50%); z-index: 0; pointer-events: none;
+      background: linear-gradient(90deg, transparent, rgba(20,12,36,0.05) 45%, rgba(20,12,36,0.08) 50%, rgba(20,12,36,0.05) 55%, transparent);
+    }
+    /* Esquina doblada (dog-ear) */
+    .fx-panels::after {
+      content: ''; position: absolute; right: 0; bottom: 0; z-index: 3; pointer-events: none;
+      border-width: 0 0 20px 20px; border-style: solid;
+      border-color: transparent transparent var(--bg2) transparent;
+      box-shadow: -2px -2px 0 rgba(20,12,36,0.06);
+    }
+    .fx-panel { display: none; position: relative; }
+    #fx-dossier:checked ~ .fx-panels .fx-panel--dossier,
+    #fx-inventario:checked ~ .fx-panels .fx-panel--inventario,
+    #fx-pasivas:checked ~ .fx-panels .fx-panel--pasivas,
+    #fx-tecnicas:checked ~ .fx-panels .fx-panel--tecnicas,
+    #fx-perfil:checked ~ .fx-panels .fx-panel--perfil,
+    #fx-stats:checked ~ .fx-panels .fx-panel--stats,
+    #fx-historial:checked ~ .fx-panels .fx-panel--historial { display: block; animation: fxPageIn .4s cubic-bezier(.2,.7,.3,1) both; }
+    /* Page-flip: la hoja entra girando desde el lomo (izquierda) */
+    @keyframes fxPageIn { from { opacity: 0; transform: rotateY(-7deg) translateX(-10px); transform-origin: left center; } to { opacity: 1; transform: none; } }
+    @media (prefers-reduced-motion: reduce) {
+      #fx-dossier:checked ~ .fx-panels .fx-panel--dossier,
+      #fx-inventario:checked ~ .fx-panels .fx-panel--inventario,
+      #fx-pasivas:checked ~ .fx-panels .fx-panel--pasivas,
+      #fx-tecnicas:checked ~ .fx-panels .fx-panel--tecnicas,
+      #fx-perfil:checked ~ .fx-panels .fx-panel--perfil,
+      #fx-stats:checked ~ .fx-panels .fx-panel--stats,
+      #fx-historial:checked ~ .fx-panels .fx-panel--historial { animation: none; }
+    }
+
+    /* Kanji watermark por pestaña */
+    .fx-panel::before {
+      position: absolute; top: 8px; right: 12px; z-index: 0; pointer-events: none;
+      font-family: 'Noto Serif JP', serif; font-weight: 700; font-size: 128px; line-height: 1;
+      color: var(--accent); opacity: 0.05;
+    }
+    .fx-panel--dossier::before { content: '記'; }
+    .fx-panel--tecnicas::before { content: '術'; }
+    .fx-panel--perfil::before  { content: '魂'; }
+    .fx-panel--inventario::before { content: '蔵'; }
+    .fx-panel--pasivas::before { content: '能'; }
+    .fx-panel--stats::before { content: '暦'; }
+    .fx-panel--historial::before { content: '録'; }
+
+    /* Folio (número de página) por pestaña */
+    .fx-panel::after {
+      position: absolute; bottom: -6px; right: 4px; z-index: 2; pointer-events: none;
+      font-family: 'Cinzel', serif; font-size: 12px; letter-spacing: 2px; color: var(--mist);
+    }
+    .fx-panel--dossier::after  { content: 'Folio i'; }
+    .fx-panel--perfil::after   { content: 'Folio ii'; }
+    .fx-panel--tecnicas::after { content: 'Folio iii'; }
+    .fx-panel--inventario::after { content: 'Folio iv'; }
+    .fx-panel--pasivas::after { content: 'Folio v'; }
+    .fx-panel--stats::after { content: 'Folio vi'; }
+    .fx-panel--historial::after { content: 'Folio vii'; }
+
+    .fx-layout { position: relative; z-index: 1; display: grid; grid-template-columns: 260px 1fr; gap: 26px; align-items: start; }
+    @media (max-width: 760px){ .fx-layout { grid-template-columns: 1fr; } }
+
+    /* ── FOTO (ficha oficial: marcas de registro + hanko) ─ */
+    .fx-photo { position: relative; }
+    .fx-photo__rod { height: 3px; background: var(--accent); }
+    .fx-photo__rod--b { margin-top: 0; }
+    .fx-photo__frame {
+      position: relative; margin: 6px 8px; border: 0.5px solid var(--border);
+      background: var(--paper); overflow: hidden; aspect-ratio: 3 / 4;
+    }
+    .fx-photo__frame img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    /* Etiqueta "FOTO" (esquina) */
+    .fx-photo__frame::before {
+      content: 'FOTO'; position: absolute; top: 0; left: 0; z-index: 3;
+      font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 2px; color: #fff;
+      background: var(--accent); padding: 3px 8px;
+    }
+    /* Marcas de registro en las 4 esquinas */
+    .fx-photo__frame::after {
+      content: ''; position: absolute; inset: 6px; z-index: 2; pointer-events: none;
+      background:
+        linear-gradient(var(--accent),var(--accent)) top left/13px 2px no-repeat,
+        linear-gradient(var(--accent),var(--accent)) top left/2px 13px no-repeat,
+        linear-gradient(var(--accent),var(--accent)) top right/13px 2px no-repeat,
+        linear-gradient(var(--accent),var(--accent)) top right/2px 13px no-repeat,
+        linear-gradient(var(--accent),var(--accent)) bottom left/13px 2px no-repeat,
+        linear-gradient(var(--accent),var(--accent)) bottom left/2px 13px no-repeat,
+        linear-gradient(var(--accent),var(--accent)) bottom right/13px 2px no-repeat,
+        linear-gradient(var(--accent),var(--accent)) bottom right/2px 13px no-repeat;
+    }
+    .fx-photo__empty {
+      position: absolute; inset: 0; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 4px; text-align: center;
+      color: var(--stone);
+    }
+    .fx-photo__empty::before {
+      content: '影'; font-family: 'Noto Serif JP', serif; font-size: 78px; font-weight: 700;
+      color: var(--accent); opacity: 0.08; position: absolute; line-height: 1;
+    }
+    .fx-photo__empty span { position: relative; font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; }
+    .fx-photo--edit .fx-photo__frame { cursor: pointer; }
+    .fx-photo--edit:hover .fx-photo__hint { opacity: 1; }
+    .fx-photo__hint {
+      position: absolute; left: 8px; right: 8px; bottom: 6px; z-index: 5;
+      font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase;
+      color: #fff; background: rgba(20,12,36,0.7); padding: 6px; text-align: center;
+      opacity: 0; transition: opacity .15s ease;
+    }
+    .fx-photo__seal {
+      position: absolute; right: 14px; bottom: 12px; z-index: 6;
+      width: 40px; height: 40px; border: 1.5px solid var(--accent); border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Noto Serif JP', serif; font-size: 15px; font-weight: 700; color: var(--accent);
+      background: var(--accent-soft);
+    }
+    .fx-photo__cap { text-align: center; font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--mist); margin-top: 8px; }
+
+    /* Sticker: washi-tape + leve rotación (distinta por pestaña) */
+    .fx-photo { transition: transform .2s ease; }
+    .fx-photo::before {
+      content: ''; position: absolute; top: -9px; left: 50%; z-index: 7;
+      transform: translateX(-50%) rotate(-3deg);
+      width: 74px; height: 20px; background: var(--accent-soft);
+      border-left: 1px dashed var(--accent); border-right: 1px dashed var(--accent);
+    }
+    .fx-photo:hover { transform: rotate(0deg) !important; }
+
+    /* Colocación por pestaña */
+    /* Expediente: retrato a la IZQUIERDA */
+    .fx-panel--dossier .fx-layout  { grid-template-columns: 300px 1fr; }
+    .fx-panel--dossier .fx-photo   { transform: rotate(-2deg); }
+    /* Técnicas: foto a la IZQUIERDA */
+    .fx-panel--tecnicas .fx-layout { grid-template-columns: 190px 1fr; }
+    .fx-panel--tecnicas .fx-photo  { transform: rotate(-1.5deg); }
+    /* Expediente = retrato oficial/cover: más grande y con caption destacada */
+    .fx-panel--dossier .fx-photo__cap { font-size: 11px; letter-spacing: 3px; color: var(--accent); }
+    /* Expediente: columna de identidad (foto + datos + recursos apilados) */
+    .fx-side { display: grid; gap: 20px; align-content: start; }
+    .fx-side .fx-data { grid-template-columns: 1fr; }
+    @media (max-width: 760px) { .fx-side { grid-template-columns: 1fr; } }
+
+    /* Trasfondo: retrato flotante con la biografía envolviéndolo */
+    .fx-trasfondo::after { content: ''; display: block; clear: both; }
+    .fx-trasfondo .fx-photo { float: right; width: 230px; margin: 2px 0 16px 24px; transform: rotate(2deg); }
+    .fx-clear { clear: both; }
+    .fx-bio { margin-bottom: 20px; }
+    .fx-bio-head { display: flex; align-items: center; gap: 10px; margin: 2px 0 12px; }
+    .fx-bio-head::before { content: ''; width: 3px; height: 15px; background: var(--accent); flex-shrink: 0; }
+    .fx-bio-head::after { content: ''; flex: 1; height: 0.5px; background: var(--border); }
+    .fx-bio-head .fx-card__title { white-space: nowrap; }
+    @media (max-width: 620px) { .fx-trasfondo .fx-photo { float: none; width: 100%; margin: 0 0 16px; } }
+
+    /* Biografía larga: colapsar con "Leer más" */
+    .fx-bio-toggle-input { position: absolute; width: 1px; height: 1px; opacity: 0; overflow: hidden; }
+    .fx-bio-content--clamped { max-height: 280px; overflow: hidden; position: relative; }
+    .fx-bio-content--clamped::after {
+      content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 64px;
+      background: linear-gradient(180deg, transparent, var(--card)); pointer-events: none;
+    }
+    .fx-bio-toggle-input:checked ~ .fx-bio-content--clamped { max-height: none; }
+    .fx-bio-toggle-input:checked ~ .fx-bio-content--clamped::after { display: none; }
+    .fx-bio-more {
+      display: inline-flex; margin-top: 10px; cursor: pointer;
+      font-family: 'Cinzel', serif; font-size: 11px; letter-spacing: 1.5px;
+      text-transform: uppercase; color: var(--accent);
+    }
+    .fx-bio-more:hover { text-decoration: underline; }
+    .fx-bio-more__less { display: none; }
+    .fx-bio-toggle-input:checked ~ .fx-bio-more .fx-bio-more__more { display: none; }
+    .fx-bio-toggle-input:checked ~ .fx-bio-more .fx-bio-more__less { display: inline; }
+
+    /* ── CARDS ────────────────────────────────────────── */
+    .fx-stack { display: grid; gap: 20px; }
+    .fx-card { border: 0.5px solid var(--border); background: var(--card); }
+    .fx-card__head { display: flex; align-items: center; gap: 10px; padding: 14px 16px 0; }
+    .fx-card__head::before { content:''; width: 3px; height: 15px; background: var(--accent); flex-shrink: 0; }
+    .fx-card__head::after { content:''; flex: 1; height: 0.5px; background: var(--border); }
+    .fx-card__title { font-family: 'Cinzel', serif; font-size: 14px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; color: var(--ink); }
+    .fx-card__body { padding: 14px 16px 18px; }
+
+    /* Datos: label izq / valor der */
+    .fx-data { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 0 24px; }
+    @media (max-width: 480px){ .fx-data { grid-template-columns: 1fr; } }
+    .fx-row { display: flex; justify-content: space-between; gap: 10px; padding: 8px 0; border-bottom: 0.5px solid var(--border); }
+    .fx-row:last-child { border-bottom: none; }
+    .fx-row__k { font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--mist); align-self: center; }
+    .fx-row__v { font-family: 'Noto Serif JP', serif; font-weight: 700; font-size: 15px; color: var(--ink); text-align: right; font-variant-numeric: tabular-nums; }
+    /* Filas clicables (Mensajes / Temas → buscador) */
+    .fx-row--action { text-decoration: none; margin: 0 -8px; padding-left: 8px; padding-right: 8px; border-radius: 5px; cursor: pointer; transition: background .15s ease; }
+    .fx-row--action:hover { background: var(--accent-soft); }
+    .fx-row--action:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+    .fx-row__v--action { color: var(--accent); display: inline-flex; align-items: center; gap: 6px; }
+    .fx-row__go { width: 12px; height: 12px; flex-shrink: 0; opacity: .6; transition: transform .15s ease, opacity .15s ease; }
+    .fx-row--action:hover .fx-row__v--action { text-decoration: underline; text-underline-offset: 2px; }
+    .fx-row--action:hover .fx-row__go { opacity: 1; transform: translate(1px, -1px); }
+
+    /* Recursos como celdas */
+    .fx-res { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; }
+    .fx-res__cell { text-align: center; border: 0.5px solid var(--border); padding: 12px 6px; background: var(--card2); }
+    .fx-res__v { font-family: 'Cinzel', serif; font-weight: 700; font-size: 20px; color: var(--accent); font-variant-numeric: tabular-nums; }
+    .fx-res__k { font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--mist); margin-top: 2px; }
+
+    /* Barras (constantes) */
+    .fx-gauges { display: grid; gap: 14px; }
+    .fx-gauge__top { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px; }
+    .fx-gauge__k { font-family: 'Cinzel', serif; font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--stone); }
+    .fx-gauge__v { font-family: 'Cinzel', serif; font-size: 16px; font-weight: 700; color: var(--ink); font-variant-numeric: tabular-nums; }
+    .fx-gauge__v small { color: var(--mist); font-size: 12px; font-weight: 400; }
+    .fx-bar { height: 10px; border: 0.5px solid var(--border); background: var(--card2); position: relative; overflow: hidden; }
+    .fx-bar::before { content:''; position: absolute; inset: 0; width: var(--fill, 50%); background: linear-gradient(90deg, var(--accent), var(--accent-2)); transition: width 1.1s cubic-bezier(.22,1,.36,1); }
+    @media (prefers-reduced-motion: reduce) { .fx-bar::before { transition: none; } }
+    .fx-bar--vida::before   { background: linear-gradient(90deg, #a8321f, #e0533a); }
+    .fx-bar--chakra::before { background: linear-gradient(90deg, #2f6fd0, #58a6ff); }
+
+    /* Estadísticas */
+    .fx-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+    @media (max-width: 640px){ .fx-stats { grid-template-columns: repeat(2, 1fr); } }
+    .fx-stat { position: relative; text-align: center; border: 0.5px solid var(--border); padding: 14px 6px 12px; background: var(--card2); }
+    .fx-stat__v { font-family: 'Cinzel', serif; font-weight: 900; font-size: 24px; color: var(--ink); font-variant-numeric: tabular-nums; line-height: 1; }
+    .fx-stat__k { font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: var(--mist); margin-top: 6px; }
+    .fx-stat__mod { position: absolute; top: 7px; right: 9px; font-family: 'Cinzel', serif; font-size: 12px; font-weight: 700; color: var(--accent); }
+    .fx-stat__mod::before { content: 'M '; font-size: 9px; }
+
+    /* Estadísticas: cada radar emparejado con sus 4 stats */
+    .fx-statgroups { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+    @media (max-width: 640px){ .fx-statgroups { grid-template-columns: 1fr; } }
+    .fx-statgroup { display: grid; justify-items: center; gap: 12px; }
+    .fx-radar { display: block; cursor: crosshair; margin: 0 auto; }
+    .fx-radar-cap { font-family: 'Cinzel', serif; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--accent); }
+    .fx-stats--pair { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; width: 100%; }
+    .fx-radar-tip {
+      position: absolute; z-index: 60; pointer-events: none; opacity: 0; transition: opacity .1s ease;
+      background: var(--ink); color: var(--bg); padding: 4px 9px; white-space: nowrap;
+      font-family: 'Cinzel', serif; font-size: 11px; letter-spacing: 1px; font-weight: 700;
+    }
+
+    /* Barra de progreso al siguiente nivel (hero) — grande + animada */
+    .fx-levelbar { margin-top: 16px; }
+    .fx-levelbar__head { display: flex; align-items: baseline; gap: 10px; margin-bottom: 7px; }
+    .fx-levelbar__lvl { font-family: 'Cinzel', serif; font-weight: 900; font-size: 15px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--ink); }
+    .fx-levelbar__next { font-family: 'Cinzel', serif; font-size: 12px; letter-spacing: 1px; color: var(--mist); }
+    .fx-levelbar__pct { margin-left: auto; font-family: 'Cinzel', serif; font-weight: 900; font-size: 20px; color: var(--accent); font-variant-numeric: tabular-nums; }
+    .fx-levelbar__track { height: 16px; border: 0.5px solid var(--border-strong); background: var(--card2); position: relative; overflow: hidden; }
+    .fx-levelbar__fill { position: absolute; top: 0; left: 0; bottom: 0; width: 0; background: linear-gradient(90deg, var(--accent), var(--accent-2)); transition: width 1.1s cubic-bezier(.22,1,.36,1); animation: fxLevelPulse 2.6s ease-in-out infinite; }
+    .fx-levelbar__meta { margin-top: 6px; font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: var(--mist); }
+    .fx-levelbar--max span { font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--accent); }
+    @keyframes fxLevelPulse { 0%, 100% { box-shadow: inset 0 0 6px rgba(255,255,255,0.08); filter: brightness(1); } 50% { box-shadow: inset 0 0 16px rgba(255,255,255,0.30); filter: brightness(1.12); } }
+    @media (prefers-reduced-motion: reduce) { .fx-levelbar__fill { transition: none; animation: none; } }
+
+    /* Aviso de puntos sin asignar (solo dueño) */
+    .fx-assign {
+      display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; margin-top: 12px;
+      padding: 9px 14px; border: 1px solid #d9b35c; background: rgba(217, 179, 92, 0.12);
+      font-family: 'Cinzel', serif; font-size: 12px; font-weight: 700; letter-spacing: 0.8px;
+      text-transform: uppercase; color: #e6c877; line-height: 1.4;
+      animation: fxAssignPulse 2s ease-in-out infinite;
+    }
+    .fx-assign:hover { background: rgba(217, 179, 92, 0.2); border-color: #e6c877; }
+    .fx-assign__i { color: #e6c877; font-size: 10px; }
+    .fx-assign__go { margin-left: auto; color: var(--ink); opacity: 0.8; }
+    @keyframes fxAssignPulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(217,179,92,0.0); } 50% { box-shadow: 0 0 0 3px rgba(217,179,92,0.18); } }
+    @media (prefers-reduced-motion: reduce) { .fx-assign { animation: none; } }
+
+    /* Barra de herramientas de staff (bajo las pestañas) */
+    .fx-staffbar {
+      border: 0.5px solid #d9b35c; border-top: none; background: rgba(217, 179, 92, 0.06);
+      padding: 12px 26px; display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px;
+    }
+    .fx-staffbar__label {
+      font-family: 'Cinzel', serif; font-size: 10px; font-weight: 700; letter-spacing: 2px;
+      text-transform: uppercase; color: #e6c877; flex-shrink: 0;
+    }
+    .fx-staffbar__link {
+      font-family: 'Cinzel', serif; font-size: 11px; font-weight: 700; letter-spacing: 0.6px;
+      text-transform: uppercase; color: var(--stone);
+      border: 0.5px solid var(--border); padding: 7px 12px; background: var(--card);
+      transition: border-color .15s ease, color .15s ease;
+    }
+    .fx-staffbar__link:hover { border-color: #d9b35c; color: #e6c877; }
+
+    /* Inventario (placeholder) */
+    .fx-inv-empty { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 12px; min-height: 300px; }
+    .fx-inv-empty__k { font-family: 'Noto Serif JP', serif; font-weight: 700; font-size: 88px; line-height: 1; color: var(--accent); opacity: 0.18; }
+    .fx-inv-empty__t { font-family: 'Cinzel', serif; font-weight: 900; font-size: 20px; letter-spacing: 2px; text-transform: uppercase; color: var(--ink); }
+    .fx-inv-empty__p { margin: 0; color: var(--stone); font-size: 15px; max-width: 320px; line-height: 1.6; }
+
+    /* Estampado del sello de rango al cargar */
+    @keyframes fxStampIn { 0% { opacity: 0; transform: rotate(7deg) scale(1.6); } 60% { opacity: 1; } 100% { opacity: 1; transform: rotate(7deg) scale(1); } }
+    .fx-hero__stamp { animation: fxStampIn .5s cubic-bezier(.2,1.3,.4,1) both .25s; }
+    @media (prefers-reduced-motion: reduce) { .fx-hero__stamp { animation: none; } }
+
+    /* Prosa */
+    .fx-prose { font-family: 'Noto Serif JP', serif; font-weight: 300; font-size: 15px; line-height: 1.9; color: var(--ink); text-align: justify; }
+    .fx-prose p { margin: 0 0 12px; }
+    .fx-prose--lead { font-weight: 400; }
+    .fx-traits { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    @media (max-width: 560px){ .fx-traits { grid-template-columns: 1fr; } }
+    .fx-origin { margin-top: 18px; font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--mist); }
+
+    /* Balance neto de puntos entre virtudes y defectos */
+    .fx-vt-balance {
+      display: flex; flex-wrap: wrap; gap: 10px 20px; align-items: center;
+      margin-bottom: 14px; padding: 10px 14px; border: 0.5px solid var(--border); background: var(--card2);
+    }
+    .fx-vt-balance__item {
+      font-family: 'Cinzel', serif; font-size: 11px; letter-spacing: 1px; text-transform: uppercase; color: var(--stone);
+    }
+    .fx-vt-balance__item b { font-size: 14px; letter-spacing: 0; margin-left: 5px; }
+    .fx-vt-balance__total { margin-left: auto; color: var(--ink); }
+    .fx-vt-balance__total b { color: var(--accent); font-size: 15px; }
+
+    /* Virtudes/Defectos asignados (catálogo real) — lista con scroll */
+    .fx-vt-note {
+      margin: 2px 0 10px; font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 1px;
+      text-transform: uppercase; color: var(--mist); font-style: italic;
+    }
+    .fx-vt-list {
+      max-height: 260px; overflow-y: auto; display: grid; gap: 8px; padding-right: 4px;
+      scrollbar-width: thin; scrollbar-color: var(--accent-soft) transparent;
+    }
+    .fx-vt-list::-webkit-scrollbar { width: 7px; }
+    .fx-vt-list::-webkit-scrollbar-track { background: transparent; }
+    .fx-vt-list::-webkit-scrollbar-thumb { background: var(--accent-soft); }
+    .fx-vt-item { border: 0.5px solid var(--border); background: var(--card2); padding: 10px 12px; }
+    .fx-traits .fx-card--virtues .fx-vt-item {
+      background: linear-gradient(180deg, rgba(79, 157, 105, 0.16), rgba(79, 157, 105, 0.05) 60%), var(--card2);
+      border-color: rgba(79, 157, 105, 0.3);
+    }
+    .fx-traits .fx-card--defects .fx-vt-item {
+      background: linear-gradient(180deg, rgba(200, 60, 45, 0.16), rgba(200, 60, 45, 0.05) 60%), var(--card2);
+      border-color: rgba(200, 60, 45, 0.3);
+    }
+    .fx-vt-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+    .fx-vt-name { margin: 0; flex: 1; font-family: 'Cinzel', serif; font-size: 13px; font-weight: 700; color: var(--ink); line-height: 1.3; }
+    .fx-vt-cost { flex-shrink: 0; padding: 2px 8px; font-family: 'Cinzel', serif; font-size: 12px; font-weight: 700; border: 0.5px solid var(--border-strong); }
+    .fx-vt-cost--v { color: #6fcb8f; border-color: rgba(79, 157, 105, 0.5); background: rgba(79, 157, 105, 0.12); }
+    .fx-vt-cost--d { color: #e0776a; border-color: rgba(200, 60, 45, 0.5); background: rgba(200, 60, 45, 0.12); }
+    .fx-vt-meta { display: flex; flex-wrap: wrap; gap: 5px; margin: 6px 0; }
+    .fx-vt-badge {
+      padding: 2px 8px; border: 0.5px solid var(--border-strong); background: var(--panel); color: var(--mist);
+      font-family: 'Cinzel', serif; font-size: 9px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase;
+    }
+    .fx-vt-badge--excl { color: #d9b35c; border-color: rgba(217, 179, 92, 0.5); background: rgba(217, 179, 92, 0.14); }
+    .fx-vt-desc { margin: 0; color: var(--stone); font-size: 13.5px; line-height: 1.55; }
+    .fx-vt-empty { padding: 14px; text-align: center; color: var(--mist); font-size: 13.5px; border: 0.5px dashed var(--border); }
+
+    /* Pasivas de Tobis */
+    .fx-pas-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 12px; }
+    .fx-pas-item { border: 0.5px solid var(--border); background: var(--card2); padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; }
+    .fx-pas-name { margin: 0; font-family: 'Cinzel', serif; font-size: 13px; font-weight: 700; color: var(--ink); line-height: 1.3; }
+    .fx-pas-desc { margin: 0; color: var(--stone); font-size: 13px; line-height: 1.55; }
+
+    /* Notas de staff */
+    .fx-notes textarea {
+      width: 100%; min-height: 120px; resize: vertical;
+      border: 0.5px solid var(--border); background: var(--card2); color: var(--ink);
+      font-family: 'Noto Serif JP', serif; font-size: 14px; line-height: 1.7; padding: 12px;
+    }
+    .fx-pill { font-family:'Cinzel',serif; font-size:8px; letter-spacing:2px; text-transform:uppercase; color: var(--accent); border:0.5px solid var(--accent); padding:2px 8px; }
+
+    /* Técnicas: dejamos el estilo del tema; solo ajustamos el hueco */
+    .fx-tecnicas-host { min-width: 0; }
+    .fx-tecnicas-host .sg-profile-private { margin: 0; }
+    /* Reparar layout 2 columnas de cada técnica (rail | main) dentro del panel.
+       Con !important para ganarle a la CSS del tema. */
+    .fx-tecnicas-host .sg-technique,
+    .fx-tecnicas-host .sg-technique__layout,
+    .fx-tecnicas-host .sg-technique__main,
+    .fx-tecnicas-host .sg-technique__section,
+    .fx-tecnicas-host .sg-technique__text { width: auto !important; max-width: none !important; }
+    .fx-tecnicas-host .sg-technique { display: block !important; }
+    .fx-tecnicas-host .sg-technique__layout {
+      display: grid !important; grid-template-columns: 240px minmax(0, 1fr) !important;
+      gap: 18px !important; align-items: start !important; width: 100% !important;
+    }
+    .fx-tecnicas-host .sg-technique__rail { display: grid !important; gap: 10px; min-width: 0; align-content: start; }
+    .fx-tecnicas-host .sg-technique__main { min-width: 0; }
+    .fx-tecnicas-host .sg-technique__text { column-count: auto !important; }
+    @media (max-width: 760px) {
+      .fx-tecnicas-host .sg-technique__layout { grid-template-columns: 1fr !important; }
+    }
+
+    @media (max-width: 620px) {
+      .fx-hero__body { grid-template-columns: 1fr; margin-top: -52px; }
+      .fx-actions { flex-direction: row; flex-wrap: wrap; }
+      .fx-tabs { overflow-x: auto; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .fx-action, .fx-tab, .fx-photo__hint, .fx-week__tip { transition: none; }
+    }
+
+    /* ── Inventario (pestaña) ─────────────────────────────────── */
+    .fx-inv { position: relative; z-index: 1; }
+    .fx-inv-head { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 14px; margin-bottom: 16px; }
+    .fx-inv-eyebrow { font-family: 'Cinzel', serif; font-size: 12px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; color: var(--accent); }
+    .fx-inv-count { font-family: 'Cinzel', serif; font-size: 9px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: var(--mist); }
+    .fx-inv-viewbtn {
+      margin-left: auto; height: 34px; padding: 0 14px;
+      background: var(--card); border: 1px solid var(--border-strong); color: var(--accent);
+      font-family: 'Cinzel', serif; font-size: 9px; font-weight: 700; letter-spacing: 1.4px; text-transform: uppercase;
+      cursor: pointer; white-space: nowrap; transition: color .15s ease, border-color .15s ease, background .15s ease;
+    }
+    .fx-inv-viewbtn:hover { color: var(--ink); border-color: var(--accent); background: var(--accent-soft); }
+    .fx-inv-search {
+      width: 220px; max-width: 100%; height: 34px; padding: 0 12px;
+      background: var(--card); border: 1px solid var(--border-strong); color: var(--ink);
+      font-family: 'Noto Serif JP', serif; font-size: 14px; box-sizing: border-box;
+    }
+    .fx-inv-search:focus { outline: none; border-color: var(--accent); }
+
+    .fx-inv-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
+    .fx-inv-chip {
+      padding: 6px 12px; background: var(--card); border: 1px solid var(--border-strong); color: var(--stone);
+      font-family: 'Cinzel', serif; font-size: 9px; font-weight: 700; letter-spacing: 1.3px; text-transform: uppercase;
+      cursor: pointer; transition: color .15s ease, border-color .15s ease, background .15s ease;
+    }
+    .fx-inv-chip:hover { color: var(--ink); border-color: var(--accent); }
+    .fx-inv-chip.is-active { color: var(--ink); background: var(--accent-soft); border-color: var(--accent); }
+    .fx-inv-chip-n { margin-left: 5px; padding: 1px 5px; font-size: 8px; color: var(--mist); background: rgba(0,0,0,0.22); }
+    .fx-inv-chip.is-active .fx-inv-chip-n { color: var(--accent); }
+
+    .fx-inv-noresults { display: none; margin-top: 12px; padding: 30px 20px; text-align: center; color: var(--mist); font-size: 14px; border: 1px solid var(--border); background: var(--card); }
+
+    .fx-inv-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 16px; }
+
+    .fx-inv-main { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+    .fx-inv-detail { display: none; }
+
+    /* Vista detalle: menos columnas, todos los campos visibles */
+    .fx-inv-grid.is-detail { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+    .fx-inv-grid.is-detail .fx-inv-tile { cursor: default; background: var(--card); border: 1px solid var(--border); padding: 12px; }
+    .fx-inv-grid.is-detail .fx-inv-thumb { max-width: 200px; align-self: center; }
+    .fx-inv-grid.is-detail .fx-inv-tile:hover .fx-inv-thumb, .fx-inv-grid.is-detail .fx-inv-tile:focus-visible .fx-inv-thumb {
+      transform: none; box-shadow: none; border-color: var(--border);
+    }
+    .fx-inv-grid.is-detail .fx-inv-name { -webkit-line-clamp: unset; line-clamp: unset; overflow: visible; font-size: 14px; }
+    .fx-inv-grid.is-detail .fx-inv-detail { display: flex; flex-direction: column; gap: 10px; }
+    /* Descripción colapsable (solo en vista detalle) */
+    .fx-inv-grid.is-detail .fx-inv-modal-desc {
+      display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; line-clamp: 3; overflow: hidden; white-space: normal;
+    }
+    .fx-inv-grid.is-detail .fx-inv-modal-desc.is-expanded { -webkit-line-clamp: unset; line-clamp: unset; overflow: visible; white-space: pre-wrap; }
+    .fx-inv-desc-toggle {
+      align-self: flex-start; margin-top: -4px; padding: 0; background: none; border: none; cursor: pointer;
+      font-family: 'Cinzel', serif; font-size: 8px; font-weight: 700; letter-spacing: 1.3px; text-transform: uppercase; color: var(--accent);
+    }
+    @media (max-width: 760px) { .fx-inv-grid.is-detail { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+    @media (max-width: 520px) { .fx-inv-grid.is-detail { grid-template-columns: 1fr; } }
+
+    /* Vender (dentro del modal) */
+    .fx-inv-sell { margin-top: 2px; padding-top: 12px; border-top: 1px solid var(--border); display: flex; flex-direction: column; gap: 8px; }
+    .fx-inv-sell-price { font-family: 'Cinzel', serif; font-size: 10px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: var(--accent); }
+    .fx-inv-sell-form { display: flex; gap: 8px; }
+    .fx-inv-sell-qty {
+      width: 64px; height: 38px; padding: 4px 8px; background: var(--card); border: 1px solid var(--border-strong);
+      color: var(--ink); font-family: 'Noto Serif JP', serif; font-size: 14px; text-align: center; box-sizing: border-box;
+    }
+    .fx-inv-sell-qty:focus { outline: none; border-color: var(--accent); }
+    .fx-inv-sell-btn {
+      flex: 1; display: inline-flex; align-items: center; justify-content: center; height: 38px; padding: 0 16px;
+      background: var(--accent); border: none; color: #fff; font-family: 'Cinzel', serif; font-size: 9px; font-weight: 700;
+      letter-spacing: 1.5px; text-transform: uppercase; cursor: pointer; transition: opacity .15s ease;
+    }
+    .fx-inv-sell-btn:hover { opacity: 0.9; }
+    .fx-inv-sell-btn:disabled { opacity: 0.6; cursor: default; }
+    .fx-inv-sell-total { font-size: 12px; color: var(--stone); }
+    .fx-inv-sell-confirm { display: flex; flex-direction: column; gap: 10px; }
+    .fx-inv-sell-confirm-msg { font-size: 13px; color: var(--ink); line-height: 1.5; }
+    .fx-inv-sell-confirm-row { display: flex; gap: 8px; }
+    .fx-inv-sell-cancel {
+      flex: 1; height: 38px; background: none; border: 1px solid var(--border-strong); color: var(--stone);
+      font-family: 'Cinzel', serif; font-size: 9px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; cursor: pointer;
+    }
+    .fx-inv-sell-cancel:hover { color: var(--ink); border-color: var(--accent); }
+    .fx-inv-sell-ok { font-size: 13px; font-weight: 700; color: var(--accent); }
+    .fx-inv-sell-error { font-size: 13px; color: #e08a7a; }
+
+    .fx-inv-tile {
+      display: flex; flex-direction: column; gap: 8px;
+      background: none; border: none; padding: 0; margin: 0;
+      text-align: left; color: inherit; font-family: inherit; cursor: pointer;
+    }
+    .fx-inv-thumb {
+      position: relative; width: 100%; aspect-ratio: 1 / 1;
+      background: var(--card); border: 1px solid var(--border); overflow: hidden;
+      transition: border-color .15s ease, transform .12s ease, box-shadow .15s ease;
+    }
+    .fx-inv-thumb::before {
+      content: '蔵'; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+      font-family: 'Noto Serif JP', serif; font-size: 44px; color: var(--accent); opacity: 0.12; pointer-events: none;
+    }
+    .fx-inv-img { position: relative; z-index: 1; width: 100%; height: 100%; object-fit: contain; display: block; }
+    .fx-inv-tile:hover .fx-inv-thumb, .fx-inv-tile:focus-visible .fx-inv-thumb {
+      border-color: var(--accent); transform: translateY(-2px); box-shadow: 0 10px 24px rgba(0,0,0,0.28);
+    }
+    .fx-inv-tile:focus { outline: none; }
+    .fx-inv-qty {
+      position: absolute; z-index: 2; bottom: 6px; right: 6px; padding: 2px 8px;
+      background: rgba(0,0,0,0.72); border: 1px solid var(--accent); color: var(--ink);
+      font-family: 'Cinzel', serif; font-size: 11px; font-weight: 700;
+    }
+    .fx-inv-name {
+      font-family: 'Cinzel', serif; font-size: 12px; font-weight: 700; color: var(--ink); line-height: 1.35;
+      display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; overflow: hidden;
+    }
+
+    /* Modal de inventario */
+    .fx-inv-modal-backdrop {
+      position: fixed; inset: 0; z-index: 9999; background: rgba(0,0,0,0.72);
+      display: flex; align-items: center; justify-content: center; padding: 20px;
+      opacity: 0; visibility: hidden; transition: opacity .18s ease, visibility .18s ease;
+    }
+    .fx-inv-modal-backdrop.is-open { opacity: 1; visibility: visible; }
+    .fx-inv-modal {
+      position: relative; width: 100%; max-width: 440px; max-height: 88vh; overflow-y: auto;
+      background: var(--panel); border: 1px solid var(--border-strong); box-shadow: 0 24px 60px rgba(0,0,0,0.5);
+      transform: translateY(10px) scale(.98); transition: transform .18s ease;
+    }
+    .fx-inv-modal-backdrop.is-open .fx-inv-modal { transform: none; }
+    .fx-inv-modal-close {
+      position: absolute; top: 8px; right: 8px; z-index: 3; width: 32px; height: 32px;
+      display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.5);
+      border: 1px solid var(--border-strong); color: var(--stone); font-size: 20px; line-height: 1; cursor: pointer;
+      transition: color .15s ease, border-color .15s ease;
+    }
+    .fx-inv-modal-close:hover { color: var(--ink); border-color: var(--accent); }
+    .fx-inv-modal-media {
+      width: 100%; height: 240px; background: var(--card); border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center; position: relative;
+    }
+    .fx-inv-modal-media img { max-width: 100%; max-height: 100%; object-fit: contain; }
+    .fx-inv-modal-body { padding: 18px 20px 22px; display: flex; flex-direction: column; gap: 12px; }
+    #fx-inv-modal-detail { display: flex; flex-direction: column; gap: 12px; }
+    .fx-inv-modal-name { margin: 0; font-family: 'Cinzel', serif; font-size: 18px; font-weight: 900; letter-spacing: .5px; color: var(--ink); line-height: 1.2; }
+    .fx-inv-badges { display: flex; flex-wrap: wrap; gap: 6px; }
+    .fx-inv-badge {
+      padding: 2px 8px; border: 1px solid var(--border-strong); color: var(--accent);
+      font-family: 'Cinzel', serif; font-size: 8px; font-weight: 700; letter-spacing: 1.3px; text-transform: uppercase;
+    }
+    .fx-inv-badge--soft { color: var(--stone); border-color: var(--border); }
+    .fx-inv-modal-desc { color: var(--stone); font-size: 13.5px; line-height: 1.65; white-space: pre-wrap; }
+    .fx-inv-eff { font-size: 13px; line-height: 1.6; color: var(--ink); white-space: pre-wrap; }
+    .fx-inv-eff-label { font-family: 'Cinzel', serif; font-size: 8px; font-weight: 700; letter-spacing: 1.3px; text-transform: uppercase; color: var(--mist); margin-right: 6px; }
+    .fx-inv-meta { display: flex; flex-direction: column; border-top: 1px solid var(--border); margin-top: 2px; }
+    .fx-inv-meta-row { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 9px 0; border-bottom: 1px solid var(--border); }
+    .fx-inv-meta-row:last-child { border-bottom: none; }
+    .fx-inv-meta-k { font-family: 'Cinzel', serif; font-size: 9px; font-weight: 700; letter-spacing: 1.4px; text-transform: uppercase; color: var(--mist); }
+    .fx-inv-meta-v { font-size: 14px; color: var(--ink); text-align: right; }
+    body.fx-inv-modal-open { overflow: hidden; }
+
+    /* ── Edición inline de trasfondo (dueño / staff) ── */
+    .fx-editable { cursor: pointer; border-radius: 12px; transition: box-shadow .18s ease, background .18s ease; }
+    .fx-editable:hover { box-shadow: inset 0 0 0 1px var(--accent-soft), 0 8px 20px rgba(0,0,0,.18); }
+    .fx-edit-tag { flex-shrink: 0; white-space: nowrap; font-family: 'Cinzel', serif; font-size: 9px; font-weight: 700; letter-spacing: 1.4px; text-transform: uppercase; color: var(--accent-2); opacity: 0; transition: opacity .18s ease; }
+    .fx-editable:hover .fx-edit-tag { opacity: 1; }
+
+    .fx-edit-modal { display: none; position: fixed; inset: 0; z-index: 1000; background: rgba(8,6,12,.72); backdrop-filter: blur(4px); }
+    .fx-edit-modal.is-open { display: grid; place-items: center; padding: 16px; }
+    .fx-edit-modal__dialog { width: min(680px, calc(100vw - 24px)); overflow: hidden; border: 1px solid var(--border-strong); border-radius: 14px; background: var(--panel); box-shadow: 0 28px 60px rgba(0,0,0,.45); }
+    .fx-edit-modal__head { display: flex; align-items: center; justify-content: space-between; min-height: 52px; padding: 0 16px; border-bottom: 1px solid var(--border); background: var(--bg2); }
+    .fx-edit-modal__head h3 { margin: 0; font-family: 'Cinzel', serif; font-size: 12px; font-weight: 700; letter-spacing: 1.8px; text-transform: uppercase; color: var(--ink); }
+    .fx-edit-modal__close { border: 0; background: transparent; color: var(--stone); font-size: 24px; line-height: 1; cursor: pointer; }
+    .fx-edit-modal__body { display: grid; gap: 12px; padding: 16px; margin: 0; }
+    .fx-edit-modal__body textarea { width: 100%; min-height: 280px; padding: 14px; border: 1px solid var(--border); border-radius: 10px; background: var(--paper); color: var(--paper-ink); font-family: 'Noto Serif JP', serif; font-size: 14px; line-height: 1.7; resize: vertical; box-sizing: border-box; }
+    .fx-edit-modal__actions { display: flex; justify-content: flex-end; gap: 10px; }
+    .fx-edit-btn { display: inline-flex; align-items: center; min-height: 40px; padding: 0 18px; border: 1px solid var(--border); border-radius: 10px; background: var(--card); color: var(--ink); font-family: 'Cinzel', serif; font-size: 9px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; cursor: pointer; transition: border-color .18s ease, transform .18s ease; }
+    .fx-edit-btn:hover { transform: translateY(-1px); border-color: var(--accent); }
+    .fx-edit-btn--primary { border-color: var(--accent); background: linear-gradient(180deg, var(--accent-soft), transparent), var(--card); }
+
+    /* Aviso de ficha en moderación (solo dueño) */
+    .fx-modnotice {
+      display: flex; align-items: flex-start; gap: 12px;
+      margin-bottom: 14px; padding: 13px 18px;
+      border: 1px solid #d9b35c; background: rgba(217, 179, 92, 0.1);
+    }
+    .fx-modnotice__i { font-size: 18px; line-height: 1.5; flex-shrink: 0; }
+    .fx-modnotice__txt { font-family: 'Noto Serif JP', serif; font-size: 13.5px; line-height: 1.6; color: var(--ink); }
+    .fx-modnotice__txt strong {
+      display: block; margin-bottom: 2px; font-family: 'Cinzel', serif; font-size: 12px;
+      font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: #e6c877;
+    }
+
+    /* ── Historial ── */
+    .fx-hist { position: relative; z-index: 1; }
+    .fx-hist-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; }
+    .fx-hist-eyebrow { font-family: 'Cinzel', serif; font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--mist); }
+    .fx-hist-filters { display: flex; gap: 6px; }
+    .fx-hist-fbtn {
+      padding: 5px 12px; background: var(--bg2); border: 1px solid var(--border); color: var(--stone);
+      font-family: 'Cinzel', serif; font-size: 9px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
+      cursor: pointer; transition: color .15s, border-color .15s, background .15s;
+    }
+    .fx-hist-fbtn:hover { color: var(--ink); }
+    .fx-hist-fbtn.is-active { color: var(--ink); border-color: var(--accent); background: var(--card); }
+
+    .fx-hist-feed { display: flex; flex-direction: column; gap: 10px; }
+    .fx-hist-event {
+      border: 0.5px solid var(--border); border-left: 2px solid var(--border);
+      background: var(--card); padding: 12px 14px;
+    }
+    .fx-hist-event[data-tipo="staff"] { border-left-color: var(--accent); }
+    .fx-hist-event__head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 8px; }
+    .fx-hist-event__date { font-family: 'Cinzel', serif; font-size: 11px; letter-spacing: 0.5px; color: var(--stone); }
+    .fx-hist-badge {
+      display: inline-flex; align-items: center; padding: 2px 7px;
+      font-family: 'Cinzel', serif; font-size: 8px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
+      border: 0.5px solid var(--border);
+    }
+    .fx-hist-badge--staff { color: var(--accent); border-color: var(--accent); }
+    .fx-hist-badge--usuario { color: var(--mist); }
+    .fx-hist-event__origen { font-family: 'Noto Serif JP', serif; font-size: 12.5px; font-weight: 600; color: var(--ink); }
+    .fx-hist-event__detalle { font-family: 'Noto Serif JP', serif; font-size: 12px; color: var(--stone); font-style: italic; }
+    .fx-hist-event__link { margin-left: auto; font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 1px; text-transform: uppercase; color: var(--accent); text-decoration: none; }
+    .fx-hist-event__link:hover { text-decoration: underline; }
+
+    .fx-hist-changes { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
+    .fx-hist-change { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; font-size: 13px; }
+    .fx-hist-change__k { font-family: 'Cinzel', serif; font-size: 10px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; color: var(--mist); }
+    .fx-hist-change__k--pos { color: #4f9d69; }
+    .fx-hist-change__k--neg { color: #b5544b; }
+    .fx-hist-change__v { color: var(--ink); }
+    .fx-hist-delta { font-family: 'Cinzel', serif; font-size: 11px; font-weight: 700; }
+    .fx-hist-delta--pos { color: #4f9d69; }
+    .fx-hist-delta--neg { color: #b5544b; }
+
+    /* Campos de trasfondo (Biografía, Apariencia, etc.): bloques Antes/Después
+       apilados, cada uno colapsable si es largo (mismo patrón que .fx-bio-*). */
+    .fx-hist-change--texto { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; }
+    .fx-hist-text-block { width: 100%; margin-top: 2px; }
+    .fx-hist-text-label {
+      display: block; margin-bottom: 3px; font-family: 'Cinzel', serif; font-size: 8px; font-weight: 700;
+      letter-spacing: 1.2px; text-transform: uppercase; color: var(--stone);
+    }
+    .fx-hist-text { font-family: 'Noto Serif JP', serif; font-size: 13px; line-height: 1.6; color: var(--ink); white-space: pre-wrap; word-break: break-word; }
+    .fx-hist-text-empty { font-size: 13px; font-style: italic; color: var(--mist); }
+    .fx-hist-text-toggle-input { position: absolute; width: 1px; height: 1px; opacity: 0; overflow: hidden; }
+    .fx-hist-text--clamped { max-height: 96px; overflow: hidden; position: relative; }
+    .fx-hist-text--clamped::after {
+      content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 32px;
+      background: linear-gradient(180deg, transparent, var(--card)); pointer-events: none;
+    }
+    .fx-hist-text-toggle-input:checked ~ .fx-hist-text--clamped { max-height: none; }
+    .fx-hist-text-toggle-input:checked ~ .fx-hist-text--clamped::after { display: none; }
+    .fx-hist-text-more {
+      display: inline-flex; margin-top: 6px; cursor: pointer;
+      font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 1px; text-transform: uppercase; color: var(--accent);
+    }
+    .fx-hist-text-more:hover { text-decoration: underline; }
+    .fx-hist-text-more__less { display: none; }
+    .fx-hist-text-toggle-input:checked ~ .fx-hist-text-more .fx-hist-text-more__more { display: none; }
+    .fx-hist-text-toggle-input:checked ~ .fx-hist-text-more .fx-hist-text-more__less { display: inline; }
+
+    .fx-hist-noresults { display: none; padding: 24px 16px; text-align: center; color: var(--mist); font-size: 13px; border: 0.5px dashed var(--border); }
+    .fx-hist-noresults.is-show { display: block; }
+
+    .fx-hist-select {
+      height: 28px; padding: 0 8px; background: var(--bg2); border: 1px solid var(--border); color: var(--stone);
+      font-family: 'Cinzel', serif; font-size: 9px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase;
+      cursor: pointer;
+    }
+    .fx-hist-select:focus { outline: none; border-color: var(--accent); color: var(--ink); }
+
+    .fx-hist-pagination { display: flex; align-items: center; justify-content: center; gap: 12px; margin-top: 14px; }
+    .fx-hist-pagination:empty { display: none; }
+    .fx-hist-pbtn {
+      display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px;
+      background: var(--bg2); border: 1px solid var(--border); color: var(--ink);
+      font-family: 'Cinzel', serif; font-size: 14px; cursor: pointer; transition: border-color .15s, color .15s;
+    }
+    .fx-hist-pbtn:hover { border-color: var(--accent); color: var(--accent); }
+    .fx-hist-pbtn:disabled { opacity: 0.35; cursor: not-allowed; }
+    .fx-hist-pbtn:disabled:hover { border-color: var(--border); color: var(--ink); }
+    .fx-hist-pinfo { font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 1px; color: var(--stone); }
+  </style>
+</head>
+
+<body class="sg-profile-theme-{$sgFichaTheme}">
+  {$header}
+
+  <main class="fx">
+    <div class="fx-shell">
+
+      <if $sgEnModeracion then>
+        <div class="fx-modnotice">
+          <span class="fx-modnotice__i" aria-hidden="true">⏳</span>
+          <div class="fx-modnotice__txt">
+            <strong>Tu ficha está en moderación</strong>
+            Puedes visualizarla mientras el staff la revisa. Además puedes editar tu trasfondo —biografía, apariencia, personalidad, frase y extras— desde la pestaña Trasfondo.
+          </div>
+        </div>
+      </if>
+
+      <!-- ═══ HERO ═══ -->
+      <section class="fx-hero">
+        <div class="fx-hero__banner <if $is_owner then>sg-profile-editable</if>" style="background-image: url({$ficha['banner']});" <if $is_owner then>onclick="openProfileAssetModal('banner')"</if>></div>
+        <div class="fx-hero__scrim"></div>
+        <div class="fx-hero__file">Exp. Nº {$ficha['fid']} · Clasificado</div>
+        <div class="fx-hero__stamp" aria-hidden="true">
+          <span class="fx-hero__stamp-k">Rango</span>
+          <strong>{$ficha['rango']}</strong>
+          <span class="fx-hero__stamp-e">{$sgEstado}</span>
+        </div>
+        <div class="fx-hero__tate" aria-hidden="true">忍</div>
+        <div class="fx-hero__body">
+          <div class="fx-identity">
+            <div class="fx-identity__village">{$sgFichaThemeLabel}</div>
+            <span class="fx-identity__accent"></span>
+            <h1 class="fx-identity__name">{$ficha['nombre']}</h1>
+            <if $ficha['apodo'] then><p class="fx-identity__alias">{$ficha['apodo']}</p></if>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ═══ PESTAÑAS ═══ -->
+      <input class="fx-radio" type="radio" name="fxtab" id="fx-dossier" checked>
+      <input class="fx-radio" type="radio" name="fxtab" id="fx-inventario">
+      <input class="fx-radio" type="radio" name="fxtab" id="fx-pasivas">
+      <input class="fx-radio" type="radio" name="fxtab" id="fx-tecnicas">
+      <input class="fx-radio" type="radio" name="fxtab" id="fx-perfil">
+      <input class="fx-radio" type="radio" name="fxtab" id="fx-stats">
+      <input class="fx-radio" type="radio" name="fxtab" id="fx-historial">
+
+      <nav class="fx-tabs" role="tablist" aria-label="Secciones de la ficha">
+        <label class="fx-tab" for="fx-dossier"><span class="fx-tab__gem"></span>Expediente</label>
+        <label class="fx-tab" for="fx-perfil"><span class="fx-tab__gem"></span>Trasfondo</label>
+        <label class="fx-tab" for="fx-tecnicas"><span class="fx-tab__gem"></span>Técnicas</label>
+        <label class="fx-tab" for="fx-inventario"><span class="fx-tab__gem"></span>Inventario</label>
+        <label class="fx-tab" for="fx-pasivas"><span class="fx-tab__gem"></span>Pasivas</label>
+        <label class="fx-tab" for="fx-stats"><span class="fx-tab__gem"></span>Estadísticas</label>
+        <label class="fx-tab" for="fx-historial"><span class="fx-tab__gem"></span>Historial</label>
+      </nav>
+
+      <div class="fx-panels">
+
+        <!-- ── DOSSIER ── -->
+        <section class="fx-panel fx-panel--dossier" role="tabpanel">
+          <div class="fx-layout">
+            <div class="fx-side">
+            <div class="fx-photo <if $is_owner then>fx-photo--edit</if>" <if $is_owner then>onclick="openProfileAssetModal('avatar')"</if>>
+              <div class="fx-photo__rod"></div>
+              <div class="fx-photo__frame">
+                <if $avatar then><img src="{$avatar}" alt="Retrato de {$ficha['nombre']}">
+                <else><div class="fx-photo__empty"><span>Sin retrato</span></div></if>
+                <if $is_owner then><div class="fx-photo__hint">Pulsa para cambiar</div></if>
+                <div class="fx-photo__seal">忍</div>
+              </div>
+              <div class="fx-photo__rod fx-photo__rod--b"></div>
+              <div class="fx-photo__cap">Retrato oficial</div>
+            </div>
+
+              <div class="fx-card">
+                <div class="fx-card__head"><span class="fx-card__title">Datos personales</span></div>
+                <div class="fx-card__body">
+                  <div class="fx-data">
+                    <div class="fx-row"><span class="fx-row__k">Edad</span><span class="fx-row__v">{$ficha['edad']} años</span></div>
+                    <div class="fx-row"><span class="fx-row__k">Sexo</span><span class="fx-row__v">{$ficha['sexo']}</span></div>
+                    <div class="fx-row"><span class="fx-row__k">Aldea</span><span class="fx-row__v">{$villa['nombreVilla']}</span></div>
+                    <div class="fx-row"><span class="fx-row__k">Clan</span><span class="fx-row__v">{$sgClanLabel}</span></div>
+                    <div class="fx-row"><span class="fx-row__k">Peso</span><span class="fx-row__v">{$ficha['peso']}</span></div>
+                    <div class="fx-row"><span class="fx-row__k">Altura</span><span class="fx-row__v">{$ficha['altura']}</span></div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="fx-card">
+                <div class="fx-card__head"><span class="fx-card__title">Recursos</span></div>
+                <div class="fx-card__body">
+                  <div class="fx-res">
+                    <div class="fx-res__cell"><div class="fx-res__v">{$ficha['rin']}</div><div class="fx-res__k">Rins</div></div>
+                    <div class="fx-res__cell"><div class="fx-res__v">{$ficha['tobi']}</div><div class="fx-res__k">Tobis</div></div>
+                    <div class="fx-res__cell"><div class="fx-res__v" id="fx-inv-ryos">{$ficha['ryos']}</div><div class="fx-res__k">Ryos</div></div>
+                    <div class="fx-res__cell"><div class="fx-res__v">{$ficha['madara']}</div><div class="fx-res__k">Madara</div></div>
+                    <div class="fx-res__cell"><div class="fx-res__v">{$sgBingoShow}</div><div class="fx-res__k">Bingo</div></div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="fx-card">
+                <div class="fx-card__head"><span class="fx-card__title">Actividad en el foro</span></div>
+                <div class="fx-card__body">
+                  <div class="fx-data">
+                    <a class="fx-row fx-row--action" href="/search.php?action=finduser&uid={$ficha['fid']}" title="Ver sus mensajes en el buscador"><span class="fx-row__k">Mensajes</span><span class="fx-row__v fx-row__v--action">{$sgPostnum}<svg class="fx-row__go" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5.5 10.5l5-5"/><path d="M6.5 5.5h4v4"/></svg></span></a>
+                    <a class="fx-row fx-row--action" href="/search.php?action=finduserthreads&uid={$ficha['fid']}" title="Ver sus temas en el buscador"><span class="fx-row__k">Temas</span><span class="fx-row__v fx-row__v--action">{$sgThreadnum}<svg class="fx-row__go" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5.5 10.5l5-5"/><path d="M6.5 5.5h4v4"/></svg></span></a>
+                    <div class="fx-row"><span class="fx-row__k">Ingresó</span><span class="fx-row__v">{$sgRegdateFmt}</span></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="fx-stack">
+              <div class="fx-card">
+                <div class="fx-card__head"><span class="fx-card__title">Progreso</span></div>
+                <div class="fx-card__body">
+                  <div class="fx-data">
+                    <div class="fx-row"><span class="fx-row__k">Nivel</span><span class="fx-row__v">{$ficha['nivel']}</span></div>
+                    <div class="fx-row"><span class="fx-row__k">Rango</span><span class="fx-row__v">{$ficha['rango']}</span></div>
+                    <div class="fx-row"><span class="fx-row__k">Experiencia</span><span class="fx-row__v">{$puntos_rol}</span></div>
+                    <div class="fx-row fx-week" id="sg-week-chip" data-end="{$fin_semana_ts}">
+                      <span class="fx-row__k">Exp · Sem {$semana_display}</span>
+                      <span class="fx-row__v">{$exp_semanal} / 100</span>
+                      <span class="fx-week__tip" id="sg-week-tip">Calculando…</span>
+                    </div>
+                  </div>
+                  <if $sgNivelMax then>
+                    <div class="fx-levelbar fx-levelbar--max"><span>Nivel máximo alcanzado</span></div>
+                  <else>
+                    <div class="fx-levelbar">
+                      <div class="fx-levelbar__head">
+                        <span class="fx-levelbar__lvl">Nivel {$ficha['nivel']}</span>
+                        <span class="fx-levelbar__next">→ Nivel {$sgNivelSig}</span>
+                        <span class="fx-levelbar__pct">{$sgNivelPct}%</span>
+                      </div>
+                      <div class="fx-levelbar__track"><div class="fx-levelbar__fill" data-pct="{$sgNivelPct}" style="width:0"></div></div>
+                      <div class="fx-levelbar__meta">Faltan {$sgXpFaltan} XP para subir de nivel</div>
+                    </div>
+                  </if>
+                  <if $sgPuntosAviso then>
+                    <a class="fx-assign" href="{$mybb->settings['bburl']}/sg/editar_ficha.php?uid={$ficha['fid']}">
+                      <span class="fx-assign__i">▲</span>{$sgPuntosMsg}<span class="fx-assign__go">Asignar →</span>
+                    </a>
+                  </if>
+                </div>
+              </div>
+
+              <div class="fx-card">
+                <div class="fx-card__head"><span class="fx-card__title">Constantes</span></div>
+                <div class="fx-card__body">
+                  <div class="fx-gauges">
+                    <div class="fx-gauge">
+                      <div class="fx-gauge__top"><span class="fx-gauge__k">Vida</span><span class="fx-gauge__v">{$ficha['vida']}</span></div>
+                      <div class="fx-bar fx-bar--vida" data-fill="{$sgVidaBar}" style="--fill:0%"></div>
+                    </div>
+                    <div class="fx-gauge">
+                      <div class="fx-gauge__top"><span class="fx-gauge__k">Chakra</span><span class="fx-gauge__v">{$ficha['chakra']}</span></div>
+                      <div class="fx-bar fx-bar--chakra" data-fill="{$sgChakraBar}" style="--fill:0%"></div>
+                    </div>
+                    <div class="fx-gauge">
+                      <div class="fx-gauge__top"><span class="fx-gauge__k">Reg. de Chakra</span><span class="fx-gauge__v">{$regC}</span></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="fx-card">
+                <div class="fx-card__head"><span class="fx-card__title">Estadísticas</span></div>
+                <div class="fx-card__body">
+                  <div class="fx-statgroups">
+                    <div class="fx-statgroup">
+                      <div class="fx-radar-cap">Principales</div>
+                      <canvas class="fx-radar" width="190" height="190"
+                        data-vals="{$ficha['fuerza']},{$ficha['destreza']},{$ficha['cchakra']},{$ficha['inteligencia']}"
+                        data-labels="FUE,DES,CHK,INT" aria-label="Radar de estadísticas principales"></canvas>
+                      <div class="fx-stats fx-stats--pair">
+                        <div class="fx-stat"><span class="fx-stat__mod">{$ficha['mfuerza']}</span><div class="fx-stat__v">{$ficha['fuerza']}</div><div class="fx-stat__k">Fuerza</div></div>
+                        <div class="fx-stat"><span class="fx-stat__mod">{$ficha['mdestreza']}</span><div class="fx-stat__v">{$ficha['destreza']}</div><div class="fx-stat__k">Destreza</div></div>
+                        <div class="fx-stat"><span class="fx-stat__mod">{$ficha['mcchakra']}</span><div class="fx-stat__v">{$ficha['cchakra']}</div><div class="fx-stat__k">Ctrl. Chakra</div></div>
+                        <div class="fx-stat"><span class="fx-stat__mod">{$ficha['minteligencia']}</span><div class="fx-stat__v">{$ficha['inteligencia']}</div><div class="fx-stat__k">Inteligencia</div></div>
+                      </div>
+                    </div>
+                    <div class="fx-statgroup">
+                      <div class="fx-radar-cap">Secundarias</div>
+                      <canvas class="fx-radar" width="190" height="190"
+                        data-vals="{$ficha['salud']},{$ficha['velocidad']},{$ficha['tenketsu']},{$ficha['sigilo']}"
+                        data-labels="SAL,VEL,TEN,SIG" aria-label="Radar de estadísticas secundarias"></canvas>
+                      <div class="fx-stats fx-stats--pair">
+                        <div class="fx-stat"><div class="fx-stat__v">{$ficha['salud']}</div><div class="fx-stat__k">Salud</div></div>
+                        <div class="fx-stat"><div class="fx-stat__v">{$ficha['velocidad']}</div><div class="fx-stat__k">Velocidad</div></div>
+                        <div class="fx-stat"><div class="fx-stat__v">{$ficha['tenketsu']}</div><div class="fx-stat__k">Tenketsu</div></div>
+                        <div class="fx-stat"><div class="fx-stat__v">{$ficha['sigilo']}</div><div class="fx-stat__k">Sigilo</div></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="fx-vt-balance">
+                <span class="fx-vt-balance__item">Virtudes <b class="fx-vt-cost--v">{$sgBalanceVFmt}</b></span>
+                <span class="fx-vt-balance__item">Defectos <b class="fx-vt-cost--d">{$sgBalanceDFmt}</b></span>
+                <span class="fx-vt-balance__item fx-vt-balance__total">Balance <b>{$sgBalanceTFmt}</b></span>
+              </div>
+
+              <div class="fx-traits">
+                <div class="fx-card fx-card--virtues">
+                  <div class="fx-card__head"><span class="fx-card__title">Virtudes</span></div>
+                  <div class="fx-card__body">
+                    <!-- Texto libre: en desuso, se eliminará cuando la lista de abajo lo reemplace por completo -->
+                    <div class="fx-prose">{$virtudes}</div>
+                    <div class="fx-vt-note">Asignadas ({$nVirtudesAuto})</div>
+                    <div class="fx-vt-list">{$virtudesAutoHtml}</div>
+                  </div>
+                </div>
+                <div class="fx-card fx-card--defects">
+                  <div class="fx-card__head"><span class="fx-card__title">Defectos</span></div>
+                  <div class="fx-card__body">
+                    <!-- Texto libre: en desuso, se eliminará cuando la lista de abajo lo reemplace por completo -->
+                    <div class="fx-prose">{$defectos}</div>
+                    <div class="fx-vt-note">Asignados ({$nDefectosAuto})</div>
+                    <div class="fx-vt-list">{$defectosAutoHtml}</div>
+                  </div>
+                </div>
+              </div>
+
+              <if $sgFichaCanViewStaffNotes then>
+              <div class="fx-card">
+                <div class="fx-card__head"><span class="fx-card__title">Anotaciones de Staff</span><span class="fx-pill">Privado</span></div>
+                <div class="fx-card__body">
+                  <div class="fx-notes"><textarea disabled>{$ficha['notas']}</textarea></div>
+                </div>
+              </div>
+              </if>
+            </div>
+          </div>
+        </section>
+
+        <!-- ── INVENTARIO (próximamente) ── -->
+        <section class="fx-panel fx-panel--inventario" role="tabpanel">
+          <if $sgInventarioCount != 0 then>
+            <div class="fx-inv">
+              <div class="fx-inv-head">
+                <span class="fx-inv-eyebrow">Inventario</span>
+                <span class="fx-inv-count" id="fx-inv-count">{$sgInventarioCount} objetos</span>
+                <button class="fx-inv-viewbtn" id="fx-inv-viewbtn" type="button" onclick="fxInvToggleView()">Vista detalle</button>
+                <input class="fx-inv-search" id="fx-inv-search" type="text" placeholder="Buscar objeto, tipo o efecto…" oninput="fxInvFilter()">
+              </div>
+              <div class="fx-inv-chips" id="fx-inv-chips">{$sgInvChipsHtml}</div>
+              <div class="fx-inv-grid" id="fx-inv-grid">{$sgInventarioHtml}</div>
+              <div class="fx-inv-noresults" id="fx-inv-noresults">Ningún objeto coincide con la búsqueda.</div>
+            </div>
+          <else>
+            <div class="fx-inv-empty">
+              <div class="fx-inv-empty__k" aria-hidden="true">蔵</div>
+              <div class="fx-inv-empty__t">Inventario</div>
+              <p class="fx-inv-empty__p">Este personaje no tiene objetos en su inventario.</p>
+            </div>
+          </if>
+        </section>
+
+        <!-- ── PASIVAS (Tienda de Tobis) ── -->
+        <section class="fx-panel fx-panel--pasivas" role="tabpanel">
+          <if $sgPasivasCount != 0 then>
+            <div class="fx-pas-grid">{$sgPasivasHtml}</div>
+          <else>
+            <div class="fx-inv-empty">
+              <div class="fx-inv-empty__k" aria-hidden="true">能</div>
+              <div class="fx-inv-empty__t">Pasivas</div>
+              <p class="fx-inv-empty__p">Este personaje todavía no adquirió ninguna pasiva en la Tienda de Tobis.</p>
+            </div>
+          </if>
+        </section>
+
+        <!-- ── TÉCNICAS ── -->
+        <section class="fx-panel fx-panel--tecnicas" role="tabpanel">
+          <div class="fx-tecnicas-host">
+              <section class="sg-profile-private">
+                <div class="sg-profile-panel sg-profile-panel--techniques">
+                  <div class="sg-profile-panel__head">
+                    <h2>Técnicas y Progreso</h2>
+                    <span class="sg-profile-meta-pill">Sección pública</span>
+                  </div>
+                  <div class="sg-profile-panel__body sg-profile-private-stack">
+
+                    <div class="sg-profile-panel sg-profile-panel--inner">
+                      <div class="sg-profile-panel__head">
+                        <h3>Técnicas Aprendidas</h3>
+                      </div>
+                      <div class="sg-profile-panel__body">
+                        <div class="sg-profile-techniques-toolbar">
+                          <div class="sg-profile-techniques-toolbar__meta">
+                            <span class="sg-profile-techniques-toolbar__eyebrow">Biblioteca</span>
+                            <strong id="sg-profile-technique-count">0 técnicas</strong>
+                          </div>
+                          <button type="button" id="sg-parse-toggle-ficha" class="sg-profile-filter-toggle" onclick="sgFichaToggleParsedMode()">
+                            Ver valores reales
+                          </button>
+                          <button type="button" id="sg-profile-filter-toggle" class="sg-profile-filter-toggle" onclick="sgFichaToggleTechniqueFilters()">
+                            Filtro
+                          </button>
+                        </div>
+                        <div id="sg-profile-technique-filters" class="sg-profile-technique-filters" aria-hidden="true">
+                          <div class="sg-profile-technique-filters__grid">
+                            <input type="text" id="sg-profile-technique-search" class="sg-profile-technique-search" placeholder="Buscar por nombre, ID o árbol" oninput="sgFichaApplyTechniqueFilters()">
+                            <select id="sg-profile-technique-family" class="sg-profile-technique-select" onchange="sgFichaApplyTechniqueFilters()">
+                              <option value="">Todos los árboles</option>
+                            </select>
+                          </div>
+                        </div>
+                        <div id="sg-profile-techniques" class="sg-profile-techniques"></div>
+                      </div>
+                    </div>
+
+                    {$ficha_script}
+                  </div>
+                </div>
+              </section>
+            </div>
+        </section>
+
+        <!-- ── PERFIL / TRASFONDO ── -->
+        <section class="fx-panel fx-panel--perfil" role="tabpanel">
+          <div class="fx-trasfondo">
+            <div class="fx-photo <if $is_owner then>fx-photo--edit</if>" <if $is_owner then>onclick="openProfileAssetModal('foto_perfil')"</if>>
+              <div class="fx-photo__rod"></div>
+              <div class="fx-photo__frame">
+                <if $sgFotoPerfil then><img src="{$sgFotoPerfil}" alt="Retrato de {$ficha['nombre']}">
+                <else><div class="fx-photo__empty"><span>Sin retrato</span></div></if>
+                <if $is_owner then><div class="fx-photo__hint">Pulsa para cambiar</div></if>
+                <div class="fx-photo__seal">魂</div>
+              </div>
+              <div class="fx-photo__rod fx-photo__rod--b"></div>
+              <div class="fx-photo__cap"></div>
+            </div>
+
+            <div class="fx-bio<if $sgPuedeEditar then> fx-editable</if>" <if $sgPuedeEditar then>onclick="sgFieldEdit(event,'historia','Biografía')" title="Pulsa para editar"</if>>
+              <div class="fx-bio-head"><span class="fx-card__title">Biografía</span><if $sgPuedeEditar then><span class="fx-edit-tag">✎ Editar</span></if></div>
+              <if $sgHistoriaLarga then>
+                <input type="checkbox" id="fx-bio-toggle" class="fx-bio-toggle-input">
+                <div class="fx-bio-content fx-bio-content--clamped">
+                  <div class="fx-prose">{$historia}</div>
+                </div>
+                <label class="fx-bio-more" for="fx-bio-toggle">
+                  <span class="fx-bio-more__more">Leer más ↓</span>
+                  <span class="fx-bio-more__less">Leer menos ↑</span>
+                </label>
+              <else>
+                <div class="fx-prose">{$historia}</div>
+              </if>
+            </div>
+
+            <div class="fx-clear"></div>
+
+            <div class="fx-stack">
+              <div class="fx-card<if $sgPuedeEditar then> fx-editable</if>" <if $sgPuedeEditar then>onclick="sgFieldEdit(event,'apariencia','Apariencia')" title="Pulsa para editar"</if>>
+                <div class="fx-card__head"><span class="fx-card__title">Apariencia</span><if $sgPuedeEditar then><span class="fx-edit-tag">✎ Editar</span></if></div>
+                <div class="fx-card__body"><div class="fx-prose">{$apariencia}</div></div>
+              </div>
+
+              <div class="fx-card<if $sgPuedeEditar then> fx-editable</if>" <if $sgPuedeEditar then>onclick="sgFieldEdit(event,'personalidad','Personalidad')" title="Pulsa para editar"</if>>
+                <div class="fx-card__head"><span class="fx-card__title">Personalidad</span><if $sgPuedeEditar then><span class="fx-edit-tag">✎ Editar</span></if></div>
+                <div class="fx-card__body"><div class="fx-prose">{$personalidad}</div></div>
+              </div>
+
+              <div class="fx-traits">
+                <div class="fx-card<if $sgPuedeEditar then> fx-editable</if>" <if $sgPuedeEditar then>onclick="sgFieldEdit(event,'frase','Frase')" title="Pulsa para editar"</if>>
+                  <div class="fx-card__head"><span class="fx-card__title">Frase</span><if $sgPuedeEditar then><span class="fx-edit-tag">✎ Editar</span></if></div>
+                  <div class="fx-card__body">
+                    <div class="fx-prose">
+                      <if $frase then><p class="fx-prose--lead">{$frase}</p></if>
+                    </div>
+                  </div>
+                </div>
+                <div class="fx-card<if $sgPuedeEditar then> fx-editable</if>" <if $sgPuedeEditar then>onclick="sgFieldEdit(event,'extra','Extras')" title="Pulsa para editar"</if>>
+                  <div class="fx-card__head"><span class="fx-card__title">Extras</span><if $sgPuedeEditar then><span class="fx-edit-tag">✎ Editar</span></if></div>
+                  <div class="fx-card__body">
+                    <div class="fx-prose">
+                      <if $extra then><p>{$extra}</p></if>
+                    </div>
+                    <if $ficha['fisico_de_pj'] then><div class="fx-origin">Origen físico del personaje: {$ficha['fisico_de_pj']}</div></if>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ── ESTADÍSTICAS ── -->
+        <section class="fx-panel fx-panel--stats" role="tabpanel">
+          <div class="fx-stack">
+            <div class="fx-card">
+              <div class="fx-card__head"><span class="fx-card__title">Misiones jugadas</span></div>
+              <div class="fx-card__body">
+                <div class="fx-data">
+                  <div class="fx-row"><span class="fx-row__k">Total</span><span class="fx-row__v">{$sgStatsJugadasTotal}</span></div>
+                  {$sgStatsJugadasHtml}
+                </div>
+              </div>
+            </div>
+
+            <div class="fx-card">
+              <div class="fx-card__head"><span class="fx-card__title">Misiones narradas</span></div>
+              <div class="fx-card__body">
+                <div class="fx-data">
+                  <div class="fx-row"><span class="fx-row__k">Total</span><span class="fx-row__v">{$sgStatsNarradasTotal}</span></div>
+                  {$sgStatsNarradasHtml}
+                </div>
+              </div>
+            </div>
+
+            <div class="fx-card">
+              <div class="fx-card__head"><span class="fx-card__title">Combate 1v1</span></div>
+              <div class="fx-card__body">
+                <div class="fx-data">
+                  <div class="fx-row"><span class="fx-row__k">Total</span><span class="fx-row__v">{$sgCombate1v1Total}</span></div>
+                  <div class="fx-row"><span class="fx-row__k">Victorias</span><span class="fx-row__v">{$sgCombate1v1Ganador}</span></div>
+                  <div class="fx-row"><span class="fx-row__k">Empates</span><span class="fx-row__v">{$sgCombate1v1Empate}</span></div>
+                  <div class="fx-row"><span class="fx-row__k">Derrotas</span><span class="fx-row__v">{$sgCombate1v1Perdedor}</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ── HISTORIAL ── -->
+        <section class="fx-panel fx-panel--historial" role="tabpanel">
+          <if $sgHistorialCount != 0 then>
+            <div class="fx-hist">
+              <div class="fx-hist-head">
+                <span class="fx-hist-eyebrow">Historial de cambios</span>
+                <div class="fx-hist-filters" id="fx-hist-filters">
+                  <button type="button" class="fx-hist-fbtn is-active" data-filter="all" onclick="fxHistSetTipo(this,'all')">Todos</button>
+                  <button type="button" class="fx-hist-fbtn" data-filter="staff" onclick="fxHistSetTipo(this,'staff')">Staff</button>
+                  <button type="button" class="fx-hist-fbtn" data-filter="usuario" onclick="fxHistSetTipo(this,'usuario')">Usuario</button>
+                  <select class="fx-hist-select" id="fx-hist-origen" onchange="fxHistSetOrigen(this)">
+                    <option value="all">Todos los orígenes</option>
+                    {$sgHistorialOrigenesHtml}
+                  </select>
+                </div>
+              </div>
+              <div class="fx-hist-feed" id="fx-hist-feed">{$sgHistorialHtml}</div>
+              <div class="fx-hist-noresults" id="fx-hist-noresults">No hay cambios que coincidan con el filtro.</div>
+              <div class="fx-hist-pagination" id="fx-hist-pagination"></div>
+            </div>
+          <else>
+            <div class="fx-inv-empty">
+              <div class="fx-inv-empty__k" aria-hidden="true">録</div>
+              <div class="fx-inv-empty__t">Historial</div>
+              <p class="fx-inv-empty__p">Todavía no hay cambios registrados para este personaje.</p>
+            </div>
+          </if>
+        </section>
+
+      </div>
+
+      <if $g_is_staff then>
+        <div class="fx-staffbar">
+          <span class="fx-staffbar__label">Staff</span>
+          <a class="fx-staffbar__link" href="{$mybb->settings['bburl']}/sg/admin/ficha_tecnicas.php?fid={$ficha['fid']}">Modificar técnicas</a>
+          <a class="fx-staffbar__link" href="{$mybb->settings['bburl']}/sg/admin/modificar_ficha.php?fid={$ficha['fid']}">Modificar ficha</a>
+          <a class="fx-staffbar__link" href="{$mybb->settings['bburl']}/sg/admin/ficha_virtudes.php?fid={$ficha['fid']}">Modificar virtudes</a>
+          <a class="fx-staffbar__link" href="{$mybb->settings['bburl']}/sg/admin/ficha_objetos.php?fid={$ficha['fid']}">Modificar objetos</a>
+        </div>
+      </if>
+
+    </div>
+  </main>
+
+  <form id="sg-profile-asset-form" method="post" action="{$mybb->settings['bburl']}/sg/ficha.php?uid={$ficha['fid']}" style="display:none;">
+    <input type="hidden" id="in-avatar" name="cambiar_avatar1" value="">
+    <input type="hidden" id="in-banner" name="cambiar_avatar2" value="">
+    <input type="hidden" id="in-foto_perfil" name="cambiar_foto_perfil" value="">
+  </form>
+
+  <div id="sg-profile-modal" class="sg-profile-modal" aria-hidden="true">
+    <div class="sg-profile-modal__dialog">
+      <div class="sg-profile-modal__head">
+        <h3 id="sg-profile-modal-title">Editar recurso</h3>
+        <button type="button" class="sg-profile-modal__close" onclick="closeProfileAssetModal()">×</button>
+      </div>
+      <div class="sg-profile-modal__body">
+        <div id="sg-profile-modal-copy" class="sg-profile-modal__copy"></div>
+        <input type="text" id="sg-profile-modal-input" placeholder="URL de la imagen">
+        <div class="sg-profile-modal__actions">
+          <button type="button" class="sg-profile-button" onclick="closeProfileAssetModal()">Cancelar</button>
+          <button type="button" class="sg-profile-button sg-profile-button--primary" onclick="saveProfileAsset()">Guardar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="fx-radar-tip" class="fx-radar-tip" aria-hidden="true"></div>
+
+  <if $sgPuedeEditar then>
+  <div id="fx-edit-store" hidden>
+    <textarea data-campo="historia">{$sgRawHistoria}</textarea>
+    <textarea data-campo="apariencia">{$sgRawApariencia}</textarea>
+    <textarea data-campo="personalidad">{$sgRawPersonalidad}</textarea>
+    <textarea data-campo="frase">{$sgRawFrase}</textarea>
+    <textarea data-campo="extra">{$sgRawExtra}</textarea>
+  </div>
+
+  <div id="fx-edit-modal" class="fx-edit-modal" aria-hidden="true">
+    <div class="fx-edit-modal__dialog">
+      <div class="fx-edit-modal__head">
+        <h3 id="fx-edit-modal-title">Editar</h3>
+        <button type="button" class="fx-edit-modal__close" onclick="sgCloseEditModal()">×</button>
+      </div>
+      <form class="fx-edit-modal__body" method="post" action="{$mybb->settings['bburl']}/sg/ficha.php?uid={$ficha['fid']}">
+        <input type="hidden" name="sg_edit_campo" id="fx-edit-campo" value="">
+        <textarea name="sg_edit_valor" id="fx-edit-valor" rows="14" placeholder="Escribe aquí..."></textarea>
+        <div class="fx-edit-modal__actions">
+          <button type="button" class="fx-edit-btn" onclick="sgCloseEditModal()">Cancelar</button>
+          <button type="submit" class="fx-edit-btn fx-edit-btn--primary">Guardar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  </if>
+
+  {$footer}
+
+  <script>
+    // Historial: filtros (tipo Staff/Usuario + origen) y paginación client-side
+    // sobre los eventos ya renderizados en servidor.
+    var fxHistState = { tipo: 'all', origen: 'all', page: 1, perPage: 15 };
+
+    function fxHistSetTipo(btn, t) {
+      var cont = document.getElementById('fx-hist-filters');
+      if (cont) {
+        var botones = cont.getElementsByClassName('fx-hist-fbtn');
+        for (var i = 0; i < botones.length; i++) { botones[i].classList.remove('is-active'); }
+      }
+      if (btn) { btn.classList.add('is-active'); }
+      fxHistState.tipo = t;
+      fxHistState.page = 1;
+      fxHistApply();
+    }
+
+    function fxHistSetOrigen(sel) {
+      fxHistState.origen = sel ? sel.value : 'all';
+      fxHistState.page = 1;
+      fxHistApply();
+    }
+
+    function fxHistGoPage(n) {
+      fxHistState.page = n;
+      fxHistApply();
+      var feed = document.getElementById('fx-hist-feed');
+      if (feed && feed.scrollIntoView) { feed.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+    }
+
+    function fxHistApply() {
+      var feed = document.getElementById('fx-hist-feed');
+      if (!feed) { return; }
+      var eventos = feed.getElementsByClassName('fx-hist-event');
+
+      // 1) Qué eventos pasan los filtros
+      var coinciden = [];
+      for (var i = 0; i < eventos.length; i++) {
+        var e = eventos[i];
+        var okTipo = (fxHistState.tipo === 'all') || (e.getAttribute('data-tipo') === fxHistState.tipo);
+        var okOrig = (fxHistState.origen === 'all') || (e.getAttribute('data-origen') === fxHistState.origen);
+        if (okTipo && okOrig) { coinciden.push(e); } else { e.style.display = 'none'; }
+      }
+
+      // 2) Paginar los que coinciden
+      var total = coinciden.length;
+      var totalPaginas = Math.max(1, Math.ceil(total / fxHistState.perPage));
+      if (fxHistState.page > totalPaginas) { fxHistState.page = totalPaginas; }
+      if (fxHistState.page < 1) { fxHistState.page = 1; }
+      var inicio = (fxHistState.page - 1) * fxHistState.perPage;
+      var fin = inicio + fxHistState.perPage;
+      for (var j = 0; j < coinciden.length; j++) {
+        coinciden[j].style.display = (j >= inicio && j < fin) ? '' : 'none';
+      }
+
+      var nores = document.getElementById('fx-hist-noresults');
+      if (nores) { nores.classList.toggle('is-show', total === 0); }
+
+      fxHistRenderPagination(total, totalPaginas);
+    }
+
+    function fxHistRenderPagination(total, totalPaginas) {
+      var cont = document.getElementById('fx-hist-pagination');
+      if (!cont) { return; }
+      if (total <= fxHistState.perPage) { cont.innerHTML = ''; return; }
+      var desde = (fxHistState.page - 1) * fxHistState.perPage + 1;
+      var hasta = Math.min(fxHistState.page * fxHistState.perPage, total);
+      var html = '';
+      html += '<button type="button" class="fx-hist-pbtn"' + (fxHistState.page <= 1 ? ' disabled' : '') + ' onclick="fxHistGoPage(' + (fxHistState.page - 1) + ')">&lsaquo;</button>';
+      html += '<span class="fx-hist-pinfo">' + desde + '&ndash;' + hasta + ' de ' + total + '</span>';
+      html += '<button type="button" class="fx-hist-pbtn"' + (fxHistState.page >= totalPaginas ? ' disabled' : '') + ' onclick="fxHistGoPage(' + (fxHistState.page + 1) + ')">&rsaquo;</button>';
+      cont.innerHTML = html;
+    }
+
+    // Inicializa la paginación al cargar (primera página).
+    if (document.getElementById('fx-hist-feed')) { fxHistApply(); }
+
+    var sgProfileState = { currentAsset: '' };
+
+    var sgAssetCopy = {
+      avatar:  ['Editar avatar', 'La imagen del avatar debe funcionar bien en formato vertical o cuadrado. Se recomienda una composición clara y centrada.'],
+      banner:  ['Editar banner', 'Formato panorámico para la cabecera de la ficha. Tamaño recomendado: 1200 × 300 px.'],
+      foto_perfil:   ['Semblanza', 'Imagen vertical de retrato. Tamaño recomendado: 400 × 520 px (proporción 3:4).']
+    };
+
+    function sgCreateSpoiler(config) {
+      var openClass = config.open ? ' is-open' : '';
+      var countMarkup = config.count ? '<span class="sg-spoiler__count">' + config.count + '</span>' : '';
+      var eyebrowMarkup = config.eyebrow ? '<span class="sg-spoiler__eyebrow">' + config.eyebrow + '</span>' : '';
+      var contentHtml = config.content || '';
+
+      return ''
+        + '<div class="sg-spoiler ' + config.classes + openClass + '">'
+        +   '<button class="sg-spoiler__toggle" type="button" onclick="sgToggleSpoiler(this)" aria-expanded="' + (config.open ? 'true' : 'false') + '">'
+        +     '<span class="sg-spoiler__lead">'
+        +       '<span class="sg-spoiler__titles">'
+        +         eyebrowMarkup
+        +         '<span class="sg-spoiler__title">' + config.title + '</span>'
+        +       '</span>'
+        +     '</span>'
+        +     '<span class="sg-spoiler__aside">'
+        +       countMarkup
+        +       '<span class="sg-spoiler__caret">+</span>'
+        +     '</span>'
+        +   '</button>'
+        +   '<div class="sg-spoiler__panel">'
+        +     '<div class="sg-spoiler__body">'
+        +       '<div class="sg-spoiler__content">' + contentHtml + '</div>'
+        +     '</div>'
+        +   '</div>'
+        + '</div>';
+    }
+
+    function sgToggleSpoiler(button) {
+      var wrapper = button.parentNode;
+      if (!wrapper || !wrapper.classList.contains('sg-spoiler')) { return; }
+      var isOpen = wrapper.classList.contains('is-open');
+      wrapper.classList.toggle('is-open', !isOpen);
+      button.setAttribute('aria-expanded', !isOpen ? 'true' : 'false');
+    }
+
+    function openProfileAssetModal(type) {
+      <if !$is_owner then>return;</if>
+      var modal = document.getElementById('sg-profile-modal');
+      var title = document.getElementById('sg-profile-modal-title');
+      var copy = document.getElementById('sg-profile-modal-copy');
+      var input = document.getElementById('sg-profile-modal-input');
+
+      sgProfileState.currentAsset = type;
+      var texts = sgAssetCopy[type] || ['Editar imagen', 'Introduce la URL de la imagen.'];
+      title.textContent = texts[0];
+      copy.textContent = texts[1];
+
+      input.value = '';
+      modal.classList.add('is-open');
+      modal.setAttribute('aria-hidden', 'false');
+      input.focus();
+    }
+
+    function closeProfileAssetModal() {
+      var modal = document.getElementById('sg-profile-modal');
+      modal.classList.remove('is-open');
+      modal.setAttribute('aria-hidden', 'true');
+      sgProfileState.currentAsset = '';
+    }
+
+    function saveProfileAsset() {
+      var form = document.getElementById('sg-profile-asset-form');
+      var urlInput = document.getElementById('sg-profile-modal-input');
+      var value = urlInput.value.replace(/^\s+|\s+$/g, '');
+      if (!value) { return; }
+
+      var ids = ['avatar','banner','foto_perfil'];
+      for (var i = 0; i < ids.length; i++) {
+        var el = document.getElementById('in-' + ids[i]);
+        if (el) { el.value = ''; }
+      }
+      var target = document.getElementById('in-' + sgProfileState.currentAsset);
+      if (target) { target.value = value; }
+      form.submit();
+    }
+
+    window.addEventListener('click', function(event) {
+      var modal = document.getElementById('sg-profile-modal');
+      if (event.target === modal) { closeProfileAssetModal(); }
+      var editModal = document.getElementById('fx-edit-modal');
+      if (editModal && event.target === editModal) { sgCloseEditModal(); }
+    });
+
+    // ── Edición inline de trasfondo (dueño o staff) ──
+    var sgEditLabels = {
+      historia: 'Biografía', apariencia: 'Apariencia',
+      personalidad: 'Personalidad', frase: 'Frase', extra: 'Extras'
+    };
+
+    // Abre el modal salvo que el click nazca en un elemento interactivo
+    // (enlaces del texto, el botón "Leer más", inputs, etc.).
+    function sgFieldEdit(ev, campo, label) {
+      var node = ev.target;
+      while (node && node !== ev.currentTarget) {
+        var tag = node.tagName;
+        if (tag === 'A' || tag === 'BUTTON' || tag === 'LABEL' || tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') { return; }
+        node = node.parentNode;
+      }
+      sgOpenEditModal(campo, label);
+    }
+
+    function sgOpenEditModal(campo, label) {
+      var modal = document.getElementById('fx-edit-modal');
+      if (!modal) { return; }
+      var title = document.getElementById('fx-edit-modal-title');
+      var campoInput = document.getElementById('fx-edit-campo');
+      var valor = document.getElementById('fx-edit-valor');
+      var src = document.querySelector('#fx-edit-store textarea[data-campo="' + campo + '"]');
+
+      campoInput.value = campo;
+      title.textContent = 'Editar ' + (label || sgEditLabels[campo] || '');
+      valor.value = src ? src.value : '';
+
+      modal.classList.add('is-open');
+      modal.setAttribute('aria-hidden', 'false');
+      valor.focus();
+    }
+
+    function sgCloseEditModal() {
+      var modal = document.getElementById('fx-edit-modal');
+      if (!modal) { return; }
+      modal.classList.remove('is-open');
+      modal.setAttribute('aria-hidden', 'true');
+    }
+
+    window.addEventListener('keydown', function(event) {
+      if (event.key === 'Escape') { sgCloseEditModal(); }
+    });
+
+    function sgWeekCountdown() {
+      var chip = document.getElementById('sg-week-chip');
+      var tip = document.getElementById('sg-week-tip');
+      if (!chip || !tip) { return; }
+      var end = parseInt(chip.getAttribute('data-end'), 10);
+      if (!end) { tip.textContent = 'Sin datos de cierre'; return; }
+
+      function tick() {
+        var left = end - Math.floor(Date.now() / 1000);
+        if (left <= 0) { tip.textContent = 'Nueva semana disponible'; return; }
+        var d = Math.floor(left / 86400);
+        var h = Math.floor((left % 86400) / 3600);
+        var m = Math.floor((left % 3600) / 60);
+        var s = left % 60;
+        tip.textContent = 'Cierra en ' + d + 'd ' + h + 'h ' + m + 'm ' + s + 's';
+      }
+      tick();
+      setInterval(tick, 1000);
+    }
+
+    window.addEventListener('load', sgWeekCountdown);
+
+    function sgFichaSetupRadar(c) {
+      if (!c || !c.getContext) { return; }
+      var raw = (c.getAttribute('data-vals') || '').split(',').map(function (x) { return parseFloat(x) || 0; });
+      if (raw.length < 3) { return; }
+      var labels = (c.getAttribute('data-labels') || '').split(',');
+      var n = raw.length;
+      var size = parseInt(c.getAttribute('width'), 10) || 200;
+      var dpr = window.devicePixelRatio || 1;
+      c.width = size * dpr; c.height = size * dpr;
+      c.style.width = size + 'px'; c.style.height = size + 'px';
+      var ctx = c.getContext('2d');
+
+      var cx = size / 2, cy = size / 2, R = size / 2 - 26;
+      var cs = getComputedStyle(document.documentElement);
+      var accent = (cs.getPropertyValue('--accent') || '#8e3145').trim();
+      var ink = (cs.getPropertyValue('--ink') || '#333').trim();
+      var grid = (cs.getPropertyValue('--mist') || '#aaa').trim();
+      var maxv = Math.max.apply(null, raw); if (maxv < 1) { maxv = 1; }
+
+      function pt(i, r) {
+        var a = -Math.PI / 2 + i * (2 * Math.PI / n);
+        return [cx + Math.cos(a) * r, cy + Math.sin(a) * r];
+      }
+
+      // Guardar vértices (en px CSS) para el hover
+      var verts = [];
+      for (var v = 0; v < n; v++) { var pv = pt(v, R * (raw[v] / maxv)); verts.push({ x: pv[0], y: pv[1], label: labels[v] || '', value: raw[v] }); }
+      c._verts = verts;
+
+      function frame(prog) {
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        ctx.clearRect(0, 0, size, size);
+        ctx.strokeStyle = grid; ctx.lineWidth = 0.5; ctx.globalAlpha = 0.35;
+        for (var g = 1; g <= 3; g++) {
+          ctx.beginPath();
+          for (var i = 0; i < n; i++) { var p = pt(i, R * g / 3); if (i === 0) { ctx.moveTo(p[0], p[1]); } else { ctx.lineTo(p[0], p[1]); } }
+          ctx.closePath(); ctx.stroke();
+        }
+        for (var i = 0; i < n; i++) { var pe = pt(i, R); ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(pe[0], pe[1]); ctx.stroke(); }
+        ctx.globalAlpha = 1;
+
+        ctx.beginPath();
+        for (var i = 0; i < n; i++) { var pp = pt(i, R * (raw[i] / maxv) * prog); if (i === 0) { ctx.moveTo(pp[0], pp[1]); } else { ctx.lineTo(pp[0], pp[1]); } }
+        ctx.closePath();
+        ctx.fillStyle = accent; ctx.globalAlpha = 0.18 * prog; ctx.fill();
+        ctx.globalAlpha = 1; ctx.strokeStyle = accent; ctx.lineWidth = 1.5; ctx.stroke();
+
+        ctx.fillStyle = accent;
+        for (var i = 0; i < n; i++) { var pd = pt(i, R * (raw[i] / maxv) * prog); ctx.beginPath(); ctx.arc(pd[0], pd[1], 2, 0, Math.PI * 2); ctx.fill(); }
+
+        ctx.fillStyle = ink; ctx.font = '10px Cinzel, serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        for (var i = 0; i < n; i++) { var pl = pt(i, R + 13); ctx.fillText(labels[i] || '', pl[0], pl[1]); }
+      }
+
+      var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (reduce) { frame(1); }
+      else {
+        var start = null, dur = 650;
+        (function step(ts) {
+          if (!start) { start = ts; }
+          var prog = Math.min(1, (ts - start) / dur);
+          frame(prog);
+          if (prog < 1) { requestAnimationFrame(step); }
+        })(performance.now());
+      }
+
+      // Hover: tooltip con label + valor
+      var tip = document.getElementById('fx-radar-tip');
+      c.addEventListener('mousemove', function (e) {
+        var found = null, best = 220;
+        for (var i = 0; i < c._verts.length; i++) {
+          var dx = c._verts[i].x - e.offsetX, dy = c._verts[i].y - e.offsetY;
+          var d = dx * dx + dy * dy;
+          if (d < best) { best = d; found = c._verts[i]; }
+        }
+        if (found && tip) {
+          tip.textContent = found.label + ': ' + found.value;
+          tip.style.left = (e.pageX + 12) + 'px';
+          tip.style.top = (e.pageY - 6) + 'px';
+          tip.style.opacity = '1';
+        } else if (tip) { tip.style.opacity = '0'; }
+      });
+      c.addEventListener('mouseleave', function () { if (tip) { tip.style.opacity = '0'; } });
+    }
+
+    function sgFichaRadars() {
+      var list = document.querySelectorAll('.fx-radar');
+      for (var i = 0; i < list.length; i++) { sgFichaSetupRadar(list[i]); }
+    }
+    window.addEventListener('load', sgFichaRadars);
+
+    function sgFichaBars() {
+      var bars = document.querySelectorAll('.fx-levelbar__fill, .fx-bar[data-fill]');
+      requestAnimationFrame(function () {
+        requestAnimationFrame(function () {
+          for (var i = 0; i < bars.length; i++) {
+            var b = bars[i];
+            if (b.classList.contains('fx-levelbar__fill')) {
+              b.style.width = (parseFloat(b.getAttribute('data-pct')) || 0) + '%';
+            } else {
+              b.style.setProperty('--fill', (parseFloat(b.getAttribute('data-fill')) || 0) + '%');
+            }
+          }
+        });
+      });
+    }
+    window.addEventListener('load', sgFichaBars);
+  </script>
+
+  <!-- Modal de inventario -->
+  <div class="fx-inv-modal-backdrop" id="fx-inv-modal" aria-hidden="true">
+    <div class="fx-inv-modal" role="dialog" aria-modal="true" aria-labelledby="fx-inv-modal-name">
+      <button class="fx-inv-modal-close" type="button" onclick="fxInvClose()" aria-label="Cerrar">&times;</button>
+      <div class="fx-inv-modal-media"><img id="fx-inv-modal-img" src="" alt=""></div>
+      <div class="fx-inv-modal-body">
+        <h2 class="fx-inv-modal-name" id="fx-inv-modal-name"></h2>
+        <div id="fx-inv-modal-detail"></div>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>

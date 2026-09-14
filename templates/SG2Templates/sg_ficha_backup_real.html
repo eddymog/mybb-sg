@@ -1,0 +1,246 @@
+<html>
+
+<head>
+  <title>Ficha</title>
+  {$headerinclude}
+</head>
+
+<body>
+  {$header}
+   <main>
+            <div id="mainBackground">
+                <div id="secondBackground">
+                    <div id="thirdFichaBackground">
+						<div id="fichaBox"><div id="seccionIzquierda">
+                            <div class="fichaTab tabPuntosRol">
+                                <div class="parteIzq izquierdaPR" style="background-color: var({$villaVarColor});">
+                                    <span>Puntos de Rol!!</span>
+                                </div>
+                                <div class="parteDer derechaPR" style="background-color: {$sombra1};">
+                                    <span>{$puntos_rol}</span>
+                                </div>
+                            </div>
+							<div class="fichaTab tabPuntosRol">
+                                <div class="parteIzq izquierdaPR" style="background-color: var({$villaVarColor});">
+                                    <span>Reputación</span>
+                                </div>
+                                <div class="parteDer derechaPR" style="background-color: {$sombra1};">
+                                    <span>{$ficha['reputacion']}</span>
+                                </div>
+                            </div>
+                            <div class="fichaTab tabPuntosExperiencia">
+                                <div class="parteIzq izquierdaPE" style="background-color: var({$villaVarColor});">
+                                    <span>Puntos de Experiencia</span>
+                                </div>
+                                <div class="parteDer derechaPE" style="background-color: {$sombra1};">
+                                    <span>{$ficha['pe']}</span>
+                                </div>
+                            </div>
+                            <div class="avatarBox" style="background-color: var({$villaVarColor});">
+                                <div class="avatarPic"><img src="{$user_avatar}"></div>
+                            </div>
+                            <div class="filaTab">
+                                <div class="fichaTab tabEdad">
+                                    <div class="parteIzq izquierdaEdad" style="background-color: {$sombra1};">
+                                        <span>歳</span>
+                                    </div>
+                                    <div class="parteDer derechaEdad" style="background-color: var({$villaVarColor});">
+                                        <span>{$ficha['edad']} Años</span>
+                                    </div>
+                                </div>
+                                <div class="fichaTab tabRango">
+                                    <div class="parteIzq izquierdaRango" style="background-color: {$sombra1};">
+                                        <span>位</span>
+                                    </div>
+                                    <div class="parteDer derechaRango" style="background-color: var({$villaVarColor});">
+                                        <span>{$ficha['rango']}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="filaTab">
+                                <div class="fichaTab tabAldea">
+                                    <div class="parteIzq izquierdaAldea" style="background-color: {$sombra1};">
+                                        <span>里</span>
+                                    </div>
+                                    <div class="parteDer derechaAldea" style="background-color: var({$villaVarColor});">
+                                        <span>{$villa['nombreVilla']}</span>
+                                    </div>
+                                </div>
+                                <div class="fichaTab tabFaccion">
+                                    <div class="parteIzq izquierdaFaccion" style="background-color: {$sombra2};">
+                                        <span>Rebelde</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="fichaTab tabClan">
+                                <div class="parteIzq izquierdaClan" style="background-color: {$sombra1};">
+                                    <span>族</span>
+                                </div>
+                                <div class="parteDer derechaClan" style="background-color: var({$villaVarColor});">
+                                    <span>{$nClan}</span>
+                                </div>
+                            </div>
+                            <div class="fichaTab tabClase">
+                                <div class="parteIzq izquierdaClase" style="background-color: {$sombra1};">
+                                    <span style="
+    font-size: 20px;
+">授</span>
+                                </div>
+                                <div class="parteDer derechaClase" style="background-color: var({$villaVarColor});">
+                                    <span>Shinobi Clase S+</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="seccionDerecha">
+                            <div id="bannerFicha" style="border: 3px solid var({$villaVarColor});">
+                                <div id="gradient" style="background: linear-gradient(to left,var({$villaVarColor}) 0%,transparent 100%);"></div>
+                                <div id="bannerFichaImagen">
+                                </div>
+                                <div id="userInfo">
+                                    <span class="userNombre">{$ficha['nombre']}</span><br>
+                                    <span class="userApodo">{$ficha['apodo']}</span>
+                                </div>
+                            </div>
+							<div class=divisorInformacion style=" background-color: {$sombra2}">INFORMACION DE PERSONAJE</div>
+                            <div class="content" style="background-color: var({$villaVarColor}); border: 2px solid {$sombra1};box-sizing: border-box;">
+                                <div class="content-text" id="content-info">
+                                    <div class="boxHistoria" style="background-color: {$sombra1}; border: 5px solid {$sombra2}" >
+                                        <div class="titleH">Historia</div>
+                                        <div class="boxTexto">
+                                            <div class="texto">{$historia}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="boxFisico" style="background-color: {$sombra1}; border: 5px solid {$sombra2}" >
+                                        <div class="titleA">Apariencia</div>
+                                        <div class="boxTexto">
+                                            <div class="texto">{$apariencia}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="boxPersonalidad" style="background-color: {$sombra1}; border: 5px solid {$sombra2}">
+                                        <div class="titleP">Personalidad</div>
+                                        <div class="boxTexto">
+                                            <div class="texto">{$personalidad}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="boxExtra" style="background-color: {$sombra1}; border: 5px solid {$sombra2}">
+                                        <div class="titleE">Extras</div>
+                                        <div class="boxTexto">
+                                            <div class="texto">{$frase}
+                                            </div>
+                                        </div>
+                                    </div>					
+                                </div>
+                        </div><div id="cajaPB" style="background-color: {$sombra1};">{$ficha['fisico_de_pj']}</div></div>
+                    </div><div class="privatezone">
+						<div class="divisortecnicas" style="background-color: {$sombra2}">Zona Privada</div>
+						<div class="cajaTecnicas" style="background-color: var({$villaVarColor})">
+<div class="tecscontainer">
+    <div style="display: flex;gap: 10px;margin: 10px;">
+		      <div class="tecselector">
+				  <div class=tecselectorBox>
+					  <div class="kanjiBox" id="ninKanji"><span>忍</span></div> 
+				  	<input type="button" id="ninbutton" value="Ninjutsu" onclick="showBlock('ninblock')"></div>
+				  
+			<div class=tecselectorBox>  
+				<div class="kanjiBox" id="taiKanji"><span>体</span></div>
+				<input type="button" id="taibutton" value="Taijutsu" onclick="showBlock('taiblock')"></div>
+        <div class="tecselectorBox">
+			<div class="kanjiBox" id="genKanji"><span>幻</span></div>
+			<input type="button" id="genbutton" value="Genjutsu" onclick="showBlock('genblock')"></div>
+      </div>
+      <div id="tecDiv">
+        <div class="tecblock ninjutsu ninjutsu_general" id="ninblock" style="display: inline-block;"></div>
+        <div class="tecblock taijutsu taijutsu_general" id="taiblock" style="display: none;"></div>
+        <div class="tecblock genjutsu genjutsu_general" id="genblock" style="display: none;"></div>
+      </div>
+
+    </div>
+  </div>
+						</div>	
+						</div>
+        </main>
+   {$footer}
+				
+<script>
+function changeTab(tabIndex) {
+  const tabs = document.querySelectorAll('.tab');
+  const contentInfo = document.getElementById('content-info');
+  const contentInventory = document.getElementById('content-inventory');
+  const contentTechniques = document.getElementById('content-techniques');
+
+  tabs.forEach(tab => {
+    tab.classList.remove('active-tab');
+    tab.classList.add('inactive-tab');
+  });
+
+  tabs[tabIndex].classList.remove('inactive-tab');
+  tabs[tabIndex].classList.add('active-tab');
+
+  // Ocultar todos los contenidos
+  contentInfo.style.position = 'absolute';
+  contentInfo.style.visibility = 'hidden';
+  contentInventory.style.position = 'absolute';
+  contentInventory.style.visibility = 'hidden';
+  contentTechniques.style.position = 'absolute';
+  contentTechniques.style.visibility = 'hidden';
+
+  // Mostrar contenido correspondiente al tab activo
+  if (tabIndex === 0) {
+    contentInfo.style.position = 'relative';
+    contentInfo.style.visibility = 'visible';
+  } else if (tabIndex === 1) {
+    contentInventory.style.position = 'relative';
+    contentInventory.style.visibility = 'visible';
+  } else if (tabIndex === 2) {
+    contentTechniques.style.position = 'relative';
+    contentTechniques.style.visibility = 'visible';
+  }
+}
+</script>
+					
+					<script>
+const limiteNivel = Math.round({$nivel_limite} / 2);
+const sumaStats = {$suma_stats};
+let clase = 'E';
+if (limiteNivel == 8 && sumaStats >= 560) {
+  clase = 'S+';
+} else if (limiteNivel >= 7 && sumaStats >= 480) {
+  clase = 'S';
+} else if (limiteNivel >= 6 && sumaStats >= 400) {
+  clase = 'A+';
+} else if (sumaStats >= 320) {
+  clase = 'A';
+} else if (sumaStats >= 240) {
+  clase = 'B';
+} else if (sumaStats >= 160) {
+  clase = 'C';
+} else if (sumaStats >= 80) {
+  clase = 'D';
+}
+document.getElementById('clase').innerHTML = clase;
+</script>
+<script>
+		let limiteClase = 'E';
+		if (limiteNivel == 8) {
+		  limiteClase = 'S+';
+		} else if (limiteNivel == 7) {
+		  limiteClase = 'S';
+		} else if (limiteNivel == 6) {
+		  limiteClase = 'A+';
+		} else if (sumaStats >= 320) {
+		  limiteClase = 'A';
+		} else if (sumaStats >= 240) {
+		  limiteClase = 'B';
+		} else if (sumaStats >= 160) {
+		  limiteClase = 'C';
+		} else if (sumaStats >= 80) {
+		  limiteClase = 'D';
+		}
+		document.getElementById('limite_clase').innerHTML = limiteClase;
+	</script>
+	{$fichaprivate_script}				
+</body>
+</html>

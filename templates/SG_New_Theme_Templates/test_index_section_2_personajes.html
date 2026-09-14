@@ -1,0 +1,42 @@
+<section id="section2-personajes">
+    <img src="https://i.ibb.co/z2x3KyQ/Zona-de-Personajes.png" alt="Seccion Personajes">
+    <div id="forumSection2">
+        <a href="forumdisplay.php?fid=15">
+            <img src="https://i.ibb.co/dQ7CCH0/Misiones.png" alt="Misiones">
+        </a>
+        <a href="forumdisplay.php?fid=10">
+            <img src="https://i.ibb.co/6F0rG6D/Creaciones.png" alt="Perfiles y Creaciones">
+        </a>
+        <a href="forumdisplay.php?fid=289">
+            <img src="/images/sg/subforos/registros.png" alt="Registros">
+        </a>
+    </div>
+
+    <style>
+        #section2-personajes{
+            margin-top: 10px;
+
+            img{
+                width: 100%;
+            }
+
+            #forumSection2{
+                margin-top: 10px;
+                display: flex;
+                flex-flow: row wrap;
+                gap: 10px;
+                justify-content: space-between;
+
+                a{
+                    width: 32%;
+                }
+
+                @media (width < 576px){
+                    a{
+                        width: 100%;
+                    }
+                }
+            }
+        }
+    </style>
+</section>

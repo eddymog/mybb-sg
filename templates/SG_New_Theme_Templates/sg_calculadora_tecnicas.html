@@ -1,0 +1,153 @@
+<html>
+
+<head>
+  <title>Calculadora</title>
+  {$headerinclude}
+</head>
+
+<body>
+  {$header}
+  <div class="fondo-blanco">
+	  
+	¿Es técnica única?:
+	<select name="unica" id="es_unica">
+	  <option value="1">Sí</option>
+	  <option value="0">No</option>
+	</select><br>
+	 
+	¿Tiene sellos?:
+	<select name="sellos" id="sellos">
+	  <option value="2">Sí</option>
+	  <option value="1">Uno</option>
+	  <option value="0">No</option>
+	</select><br>  
+	  
+    ¿Cuerpo a cuerpo?:
+	<select name="cuerpo_cuerpo" id="cuerpo_cuerpo">
+	  <option value="0">No</option>
+	  <option value="1">Si</option>
+	</select><br>
+	<br>
+	Rango:
+	<select name="rango" id="rango">
+	  <option value="D">D</option>
+	  <option value="C">C</option>
+	  <option value="B">B</option>
+	  <option value="A">A</option>
+	  <option value="A+">A+</option>	
+	  <option value="S">S</option>	
+	  <option value="S+">S+</option>	
+	</select><span id="rango_numeros"> | Puntuación: Máximo: 120 - Máximo única: 144 - Mínimo: 80 | Eficiencia: 2</span><br><br>
+	    
+	  
+	Daño: <input type="text" id="vida" name="vida" value="0"><br>
+	Chakra: <input type="text" id="chakra" name="chakra" value="0"><span id="chakra_por_turno"></span><br>
+	Diferencia de Potencia: <input type="text" id="difPotencia" name="difPotencia" value="0"><br>
+	<br>
+	Potencia: <input type="text" id="potencia" name="potencia" value="0" disabled><br>
+	Eficiencia: <input type="text" id="eficiencia" name="eficiencia" value="0" disabled><br>
+	Puntuación: <input type="text" id="puntuacion" name="puntuacion"  value="0" disabled><br>
+	<br>
+	<!-- <button id="configuracion">Guardar configuracion</button>  -->
+	<!-- <button id="textoBoton">Crear texto</button>  -->
+	<span id="texto"></span>
+	</div>
+  {$footer}
+</body>
+<script>		
+  function calcularPotencia() {
+	  const sellos = parseInt($("#sellos").val());
+	  const cuerpoCuerpoNumero = parseInt($("#cuerpo_cuerpo").val()) ? 0.75 : 1;
+	  const vida = parseInt($("#vida").val());
+	  const difPotencia = parseInt($("#difPotencia").val()); 
+	  
+	  let sellosNumero = 1;
+	  if (sellos == 1) { sellosNumero = 1.2; } else if (sellos == 0) { sellosNumero = 1.4; }
+	  
+	  return (vida * cuerpoCuerpoNumero) * sellosNumero + difPotencia;
+  }
+					
+  function calcularLimiteDeRangos() {
+  	const rango = $("#rango").val();
+	const esUnica = $("#es_unica").val();
+	const puntuacion = $('#puntuacion').val();
+	const eficiencia = $('#eficiencia').val();
+	let maxP = 0; let minP = 0; let maxEf = 0;
+	if (rango == 'D') { maxP = esUnica == 1 ? 144 : 120; minP = 80; maxEf = 2; } 
+	if (rango == 'C') { maxP = esUnica == 1 ? 192 : 160; minP = 110; maxEf = 1.9; } 
+	if (rango == 'B') { maxP = (esUnica == 1 ? 252 : 210); minP = 150; maxEf = 2.1; } 
+	if (rango == 'A') { maxP = esUnica == 1 ? 324 : 270; minP = 200; maxEf = 2.25; } 
+	if (rango == 'A+') { maxP = esUnica == 1 ? 396 : 330; minP = 260; maxEf = 2.4; } 
+	if (rango == 'S') { maxP = esUnica == 1 ? 480 : 400; minP = 320; maxEf = 2.5; } 
+	if (rango == 'S+') { maxP = esUnica == 1 ? 720 : 600; minP = 500; maxEf = 2.75; } 
+	  
+	console.log(esUnica);
+	console.log(maxP);
+	if (eficiencia <= maxEf) { $('#eficiencia').css('color', 'green'); } else { $('#eficiencia').css('color', 'red'); }
+	if (puntuacion <= maxP && puntuacion >= minP) { $('#puntuacion').css('color', 'green'); } else { $('#puntuacion').css('color', 'red'); }
+  }
+	
+  function campoChanges() {
+	const chakra = parseInt($("#chakra").val());
+	const potencia = calcularPotencia().toFixed(2);
+	const eficiencia = (potencia / chakra).toFixed(2);
+	const puntuacion = (potencia * eficiencia).toFixed(2);
+	$("#potencia").val(potencia);	
+	$("#eficiencia").val(eficiencia);
+	$("#puntuacion").val(puntuacion);
+	calcularLimiteDeRangos();
+  }
+	
+  $("#rango").change(function() {
+	const rango = $("#rango").val();
+	if (rango == 'D') { $('#rango_numeros').text(' | Puntuación: Máximo: 120 - Máximo única: 144 - Mínimo: 80 | Eficiencia: 2'); }
+	if (rango == 'C') { $('#rango_numeros').text(' | Puntuación: Máximo: 160 - Máximo única: 192 - Mínimo: 110 | Eficiencia: 1.9'); }
+	if (rango == 'B') { $('#rango_numeros').text(' | Puntuación: Máximo: 210 - Máximo única: 252 - Mínimo: 150 | Eficiencia: 2.1'); }
+	if (rango == 'A') { $('#rango_numeros').text(' | Puntuación: Máximo: 270 - Máximo única: 324 - Mínimo: 200 | Eficiencia: 2.25'); }
+	if (rango == 'A+') { $('#rango_numeros').text(' | Puntuación: Máximo: 330 - Máximo única: 396 - Mínimo: 260 | Eficiencia: 2.4'); }
+	if (rango == 'S') { $('#rango_numeros').text(' | Puntuación: Máximo: 400 - Máximo única: 480 - Mínimo: 320 | Eficiencia: 2.5'); }	  
+	if (rango == 'S+') { $('#rango_numeros').text(' | Puntuación: Máximo: 600 - Máximo única: 720 - Mínimo: 500 | Eficiencia: 2.75'); }	 
+	campoChanges();
+  });
+	  
+  $("#sellos").change(function() { campoChanges(); } );
+  $("#es_unica").change(function() { campoChanges(); } );
+  $("#cuerpo_cuerpo").change(function() { campoChanges(); } );	
+	
+  $("#vida").keyup(function() {
+	  campoChanges();
+  });	
+	
+  $("#chakra").keyup(function() {
+	   const chakraPorTurno = parseInt($("#chakra").val()) * 0.75;
+	   $("#chakra_por_turno").html(" | Por turno: " + chakraPorTurno);
+	  campoChanges();
+  });	
+	
+  $("#difPotencia").keyup(function() {
+	  campoChanges();
+  });	
+	
+  $("#textoBoton").on( "click", function() {
+	  let myTexto = "";
+	  const rango = $("#rango").val();
+	  const potencia = $("#potencia").val();
+	  const eficiencia = $("#eficiencia").val();
+	  const puntuacion = $("#puntuación").val();
+	  
+	  myTexto = "<br><br>Estás calculando una técnica de rango " + rango;
+	  myTexto += "La potencia de la técnica es: " + potencia + ". La eficiencia es: " + eficiencia + ". La puntuación es: " + puntuacion
+	  myTexto += "<br>";
+	  myTexto += "La potencia fue calculada a través de la siguiente formula: <br>";
+	  
+	  const sellos = parseInt($("#sellos").val());
+	  const cuerpoCuerpoNumero = parseInt($("#cuerpo_cuerpo").val()) ? 0.75 : 1;
+	  const vida = parseInt($("#vida").val());
+	  const difPotencia = parseInt($("#difPotencia").val()); 
+	  
+	  $("#texto").html(myTexto);
+  });	
+
+</script>
+
+</html>

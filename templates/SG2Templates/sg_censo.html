@@ -1,0 +1,713 @@
+<html>
+  <head>
+    <title>Censo</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Source+Serif+4:wght@300;400;600;700&family=Zen+Old+Mincho:wght@400;700&display=swap" rel="stylesheet">
+    {$headerinclude}
+    <style>
+      :root {
+        --bg: #0f0c18;
+        --bg2: #130f1e;
+        --bg3: #171224;
+        --bg4: #1c162c;
+        --surface: rgba(28, 22, 44, 0.68);
+        --surface-strong: rgba(24, 18, 36, 0.88);
+        --border: rgba(156, 107, 204, 0.12);
+        --ink: #e8dff8;
+        --plum: #7b4ab8;
+        --plum2: #9c6bcc;
+        --plum3: #b890e0;
+        --plum4: #d4b8f0;
+        --oxide: #c0582a;
+        --stone: #8a7a9a;
+        --mist: #5a4a6a;
+        --fiber: rgba(156, 107, 204, 0.04);
+        --shadow: 0 24px 60px rgba(0, 0, 0, 0.32);
+        --shadow-soft: 0 14px 32px rgba(0, 0, 0, 0.22);
+        --radius-xl: 28px;
+        --radius-lg: 22px;
+        --radius-md: 16px;
+        --radius-sm: 12px;
+      }
+
+      body {
+        background:
+          radial-gradient(circle at top left, rgba(123, 74, 184, 0.12), transparent 28%),
+          radial-gradient(circle at bottom right, rgba(192, 88, 42, 0.08), transparent 24%),
+          var(--bg);
+        color: var(--ink);
+        font-family: "Source Serif 4", serif;
+        margin: 0;
+        position: relative;
+      }
+
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        z-index: 0;
+        background-image:
+          repeating-linear-gradient(13deg, transparent 0, transparent 24px, var(--fiber) 24px, var(--fiber) 25px),
+          repeating-linear-gradient(82deg, transparent 0, transparent 36px, var(--fiber) 36px, var(--fiber) 37px),
+          repeating-linear-gradient(151deg, transparent 0, transparent 19px, var(--fiber) 19px, var(--fiber) 19.5px);
+      }
+
+      .sg-censo-page {
+        max-width: 1220px;
+        margin: 32px auto 48px;
+        padding: 0 18px;
+        position: relative;
+        z-index: 1;
+      }
+
+      .sg-censo-shell {
+        overflow: hidden;
+        border: 1px solid var(--border);
+        border-radius: 34px;
+        background: linear-gradient(180deg, rgba(19, 15, 30, 0.92), rgba(23, 18, 36, 0.96));
+        box-shadow: var(--shadow);
+        backdrop-filter: blur(8px);
+      }
+
+      .sg-censo-hero {
+        display: grid;
+        grid-template-columns: minmax(0, 1.2fr) minmax(280px, 0.8fr);
+        min-height: 190px;
+        border-bottom: 1px solid var(--border);
+        background:
+          linear-gradient(135deg, rgba(28, 22, 44, 0.7), rgba(19, 15, 30, 0.96)),
+          var(--bg2);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .sg-censo-hero::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        background:
+          radial-gradient(circle at top right, rgba(123, 74, 184, 0.12), transparent 34%),
+          radial-gradient(circle at bottom left, rgba(192, 88, 42, 0.09), transparent 28%);
+      }
+
+      .sg-censo-main,
+      .sg-censo-side {
+        position: relative;
+        z-index: 1;
+      }
+
+      .sg-censo-main {
+        padding: 28px 32px 24px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
+
+      .sg-kicker {
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 12px;
+        font: 700 10px/1 "Cinzel", serif;
+        letter-spacing: 3px;
+        text-transform: uppercase;
+        color: var(--oxide);
+      }
+
+      .sg-kicker::before {
+        content: "";
+        width: 48px;
+        height: 1px;
+        background: var(--oxide);
+      }
+
+      .sg-heading-wrap {
+        display: grid;
+        grid-template-columns: 40px minmax(0, 1fr);
+        gap: 14px;
+        align-items: start;
+      }
+
+      .sg-kanji {
+        font: 700 32px/0.8 "Zen Old Mincho", serif;
+        color: rgba(212, 184, 240, 0.16);
+        writing-mode: vertical-rl;
+        letter-spacing: 6px;
+        user-select: none;
+      }
+
+      .sg-title {
+        margin: 0;
+        font: 900 clamp(28px, 4vw, 42px)/1 "Cinzel", serif;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        color: var(--ink);
+      }
+
+      .sg-subtitle {
+        max-width: 680px;
+        margin: 10px 0 0;
+        font-size: 15px;
+        line-height: 1.75;
+        color: var(--stone);
+        text-align: justify;
+      }
+
+      .sg-censo-side {
+        padding: 24px 24px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        background: linear-gradient(180deg, rgba(61, 31, 110, 0.96), rgba(61, 31, 110, 0.9));
+        color: #ede0fa;
+      }
+
+      .sg-side-label,
+      .sg-filter label,
+      .sg-section-eyebrow,
+      .sg-block-title,
+      .sg-village-state {
+        font-family: "Cinzel", serif;
+        text-transform: uppercase;
+      }
+
+      .sg-side-label {
+        margin-bottom: 10px;
+        font-size: 10px;
+        letter-spacing: 3px;
+        color: rgba(237, 224, 250, 0.72);
+      }
+
+      .sg-side-copy {
+        margin: 0;
+        font-size: 13px;
+        line-height: 1.75;
+        color: rgba(237, 224, 250, 0.84);
+        text-align: justify;
+      }
+
+      .sg-censo-body {
+        padding: 24px;
+        display: grid;
+        gap: 22px;
+        background: linear-gradient(180deg, rgba(15, 12, 24, 0.68), rgba(15, 12, 24, 0.96));
+      }
+
+      .sg-card {
+        position: relative;
+        overflow: hidden;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-xl);
+        background:
+          linear-gradient(180deg, rgba(28, 22, 44, 0.84), rgba(19, 15, 30, 0.96)),
+          var(--surface);
+        box-shadow: var(--shadow-soft);
+      }
+
+      .sg-card::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        background:
+          radial-gradient(circle at top right, rgba(123, 74, 184, 0.1), transparent 34%),
+          linear-gradient(120deg, transparent 0%, rgba(192, 88, 42, 0.06) 100%);
+      }
+
+      .sg-card-head,
+      .sg-card-body {
+        position: relative;
+        z-index: 1;
+      }
+
+      .sg-card-head {
+        padding: 24px 26px 18px;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .sg-section-eyebrow {
+        margin-bottom: 10px;
+        font-size: 10px;
+        letter-spacing: 3px;
+        color: var(--oxide);
+      }
+
+      .sg-card-title {
+        margin: 0;
+        font: 900 24px/1.1 "Cinzel", serif;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        color: var(--ink);
+      }
+
+      .sg-card-copy {
+        margin: 12px 0 0;
+        color: var(--stone);
+        line-height: 1.85;
+        text-align: justify;
+      }
+
+      .sg-card-body {
+        padding: 22px;
+      }
+
+      .sg-filters {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 16px;
+      }
+
+      .sg-filter {
+        display: grid;
+        gap: 8px;
+      }
+
+      .sg-filter label {
+        font-size: 11px;
+        letter-spacing: 1.8px;
+        color: var(--plum3);
+      }
+
+      .sg-filter select {
+        width: 100%;
+        min-height: 48px;
+        border: 1px solid rgba(156, 107, 204, 0.2);
+        border-radius: 12px;
+        background: rgba(15, 12, 24, 0.9);
+        color: var(--ink);
+        padding: 0 14px;
+        font: 700 14px/1 "Cinzel", serif;
+        outline: none;
+      }
+
+      .sg-results {
+        display: grid;
+        gap: 18px;
+      }
+
+      .sg-block {
+        padding: 20px 22px;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        background: rgba(28, 22, 44, 0.72);
+      }
+
+      .sg-block + .sg-block {
+        margin-top: 0;
+      }
+
+      .sg-block-title {
+        margin: 0 0 10px;
+        font-size: 14px;
+        letter-spacing: 1.4px;
+        color: var(--ink);
+      }
+
+      .sg-block-subtitle {
+        margin: 0 0 14px;
+        color: var(--stone);
+        font-size: 15px;
+        line-height: 1.8;
+      }
+
+      .sg-dynamic {
+        color: var(--plum4);
+        line-height: 1.9;
+      }
+
+      .sg-dynamic h3,
+      .sg-dynamic h4,
+      .sg-dynamic h5,
+      .sg-dynamic h6 {
+        margin: 0 0 12px;
+        color: var(--ink);
+        font-family: "Cinzel", serif;
+        font-weight: 700;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+      }
+
+      .sg-dynamic div,
+      .sg-dynamic span {
+        max-width: 100%;
+      }
+
+      .sg-censo-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 16px;
+      }
+
+      .sg-village {
+        padding: 18px;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-md);
+        background: rgba(15, 12, 24, 0.32);
+      }
+
+      .sg-village-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 10px;
+      }
+
+      .sg-village-name {
+        margin: 0;
+        font: 900 18px/1.1 "Cinzel", serif;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        color: var(--ink);
+      }
+
+      .sg-village-state {
+        font-size: 9px;
+        letter-spacing: 2px;
+        color: var(--oxide);
+      }
+
+      .sg-village-meta {
+        margin: 0 0 12px;
+        color: var(--stone);
+        line-height: 1.7;
+      }
+
+      @media (max-width: 980px) {
+        .sg-censo-hero,
+        .sg-filters,
+        .sg-censo-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      @media (max-width: 720px) {
+        .sg-censo-page {
+          margin-top: 20px;
+          padding: 0 12px;
+        }
+
+        .sg-censo-shell {
+          border-radius: 24px;
+        }
+
+        .sg-censo-main,
+        .sg-censo-side,
+        .sg-censo-body,
+        .sg-card-head,
+        .sg-card-body {
+          padding-left: 18px;
+          padding-right: 18px;
+        }
+
+        .sg-heading-wrap {
+          grid-template-columns: 1fr;
+        }
+
+        .sg-kanji {
+          display: none;
+        }
+
+        .sg-village-head {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    {$header}
+
+    <div class="sg-censo-page">
+      <div class="sg-censo-shell">
+        <section class="sg-censo-hero">
+          <div class="sg-censo-main">
+            <div class="sg-kicker">Registro Shinobi</div>
+            <div class="sg-heading-wrap">
+              <div class="sg-kanji">記録</div>
+              <div>
+                <h1 class="sg-title">Censo y Estadísticas</h1>
+                <p class="sg-subtitle">
+                  Consulta la actividad del foro desde una sola interfaz: distribución de personajes por aldea, rankings temporales, recompensas, posts, PRs y métricas personales. Esta página funciona como panel de lectura del movimiento general del rol y como archivo rápido de tendencias recientes e históricas.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <aside class="sg-censo-side">
+            <div class="sg-side-label">Visión general</div>
+            <p class="sg-side-copy">
+              Cambia la acción y el rango temporal para alternar entre censo, tops y estadísticas concretas. El contenido inferior se reorganiza automáticamente según la vista elegida, manteniendo la misma navegación dentro del panel.
+            </p>
+          </aside>
+        </section>
+
+        <section class="sg-censo-body">
+          <article class="sg-card">
+            <div class="sg-card-head">
+              <div class="sg-section-eyebrow">Filtros</div>
+              <h2 class="sg-card-title">Consulta del panel</h2>
+              <p class="sg-card-copy">
+                Selecciona qué bloque quieres revisar y ajusta la duración para analizar la actividad del foro con más precisión.
+              </p>
+            </div>
+            <div class="sg-card-body">
+              <div class="sg-filters">
+                <div class="sg-filter">
+                  <label for="select-accion">Acción</label>
+                  <select id="select-accion" onchange="onChangeAccion(this)">
+                    <option value='censo'>Censo</option>
+                    <option value='top-10'>Top 10 Usuarios actual</option>
+                    <option value='top-10-historico'>Top 10 Usuarios histórico</option>
+                    <option value='posts'>Posts de Usuarios</option>
+                    <option value='puntos-rol'>PRs de Usuarios</option>
+                    <option value='recompensas'>Recompensas Diarias</option>
+                    <if $uid != '0' then><option value='personales'>Estadísticas Personales</option></if>
+                    <option value='extras'>Extras</option>
+                  </select>
+                </div>
+                <div class="sg-filter">
+                  <label for="select-tiempo">Duración</label>
+                  <select id="select-tiempo" onchange="onChangeTiempo(this)">
+                    <option value='1'>24 horas</option>
+                    <option value='2'>48 horas</option>
+                    <option value='7'>1 semana</option>
+                    <option value='14'>2 semanas</option>
+                    <option value='28'>4 semanas</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <div class="sg-results">
+            <if $accion == 'posts' then>
+              <article class="sg-card">
+                <div class="sg-card-head">
+                  <div class="sg-section-eyebrow">Actividad</div>
+                  <h2 class="sg-card-title">Posts de usuarios</h2>
+                  <p class="sg-card-copy">Usuarios que han posteado en <span class="duracion"></span>.</p>
+                </div>
+                <div class="sg-card-body sg-dynamic">
+                  {$pjNombresTopPosts}
+                </div>
+              </article>
+            </if>
+
+            <if $accion == 'puntos-rol' then>
+              <article class="sg-card">
+                <div class="sg-card-head">
+                  <div class="sg-section-eyebrow">Actividad</div>
+                  <h2 class="sg-card-title">PRs de usuarios</h2>
+                  <p class="sg-card-copy">Usuarios que han ganado PR en <span class="duracion"></span>.</p>
+                </div>
+                <div class="sg-card-body sg-dynamic">
+                  {$pjNombresTopPrs}
+                </div>
+              </article>
+            </if>
+
+            <if $accion == 'top-10' then>
+              <article class="sg-card">
+                <div class="sg-card-head">
+                  <div class="sg-section-eyebrow">Ranking actual</div>
+                  <h2 class="sg-card-title">Top 10 del período</h2>
+                  <p class="sg-card-copy">Resumen de usuarios destacados en <span class="duracion"></span>.</p>
+                </div>
+                <div class="sg-card-body">
+                  <div class="sg-results">
+                    <div class="sg-block">
+                      <h3 class="sg-block-title">Posts</h3>
+                      <p class="sg-block-subtitle">Top 10 de usuarios que más han posteado.</p>
+                      <div class="sg-dynamic">{$pjNombresTop10Posts}</div>
+                    </div>
+                    <div class="sg-block">
+                      <h3 class="sg-block-title">Puntos de Rol</h3>
+                      <p class="sg-block-subtitle">Top 10 de usuarios que más PR han ganado.</p>
+                      <div class="sg-dynamic">{$pjNombresTop10Prs}</div>
+                    </div>
+                    <div class="sg-block">
+                      <h3 class="sg-block-title">Temas creados</h3>
+                      <p class="sg-block-subtitle">Top 10 de usuarios que más temas han abierto.</p>
+                      <div class="sg-dynamic">{$pjNombresTop10Temas}</div>
+                    </div>
+                  </div>
+                </div>
+              </article>
+            </if>
+
+            <if $accion == 'top-10-historico' then>
+              <article class="sg-card">
+                <div class="sg-card-head">
+                  <div class="sg-section-eyebrow">Histórico</div>
+                  <h2 class="sg-card-title">Top 10 de todos los tiempos</h2>
+                  <p class="sg-card-copy">Comparativa de actividad acumulada desde el inicio del foro.</p>
+                </div>
+                <div class="sg-card-body">
+                  <div class="sg-results">
+                    <div class="sg-block">
+                      <h3 class="sg-block-title">Posts históricos</h3>
+                      <div class="sg-dynamic">{$pjNombresTop10PostsTotal}</div>
+                    </div>
+                    <div class="sg-block">
+                      <h3 class="sg-block-title">PRs históricos</h3>
+                      <div class="sg-dynamic">{$pjNombresTop10PrsTotal}</div>
+                    </div>
+                    <div class="sg-block">
+                      <h3 class="sg-block-title">Temas históricos</h3>
+                      <div class="sg-dynamic">{$pjNombresTop10TemasTotal}</div>
+                    </div>
+                  </div>
+                </div>
+              </article>
+            </if>
+
+            <if $accion == 'recompensas' then>
+              <article class="sg-card">
+                <div class="sg-card-head">
+                  <div class="sg-section-eyebrow">Recompensas</div>
+                  <h2 class="sg-card-title">Rachas y reclamos</h2>
+                  <p class="sg-card-copy">Seguimiento de las recompensas diarias y sus mejores marcas.</p>
+                </div>
+                <div class="sg-card-body">
+                  <div class="sg-results">
+                    <div class="sg-block">
+                      <h3 class="sg-block-title">Total reclamado</h3>
+                      <p class="sg-block-subtitle">Se han reclamado en total unas {$totalRecompensasReclamadas} recompensas diarias.</p>
+                      <div class="sg-dynamic">{$pjNombresTop10Posts}</div>
+                    </div>
+                    <div class="sg-block">
+                      <h3 class="sg-block-title">Racha actual más alta</h3>
+                      <p class="sg-block-subtitle">Top 10 de usuarios con la mejor racha en <span class="duracion"></span>.</p>
+                      <div class="sg-dynamic">{$topRecompensasActual}</div>
+                    </div>
+                    <div class="sg-block">
+                      <h3 class="sg-block-title">Racha histórica más alta</h3>
+                      <div class="sg-dynamic">{$topUsuariosRecompensas}</div>
+                    </div>
+                  </div>
+                </div>
+              </article>
+            </if>
+
+            <if $uid != '0' then>
+            <if $accion == 'personales' then>
+              <article class="sg-card">
+                <div class="sg-card-head">
+                  <div class="sg-section-eyebrow">Personal</div>
+                  <h2 class="sg-card-title">Estadísticas personales</h2>
+                  <p class="sg-card-copy">Resumen directo de tu actividad y métricas individuales.</p>
+                </div>
+                <div class="sg-card-body sg-dynamic">
+                  {$texto_extra}
+                </div>
+              </article>
+            </if>
+            </if>
+
+            <if $accion == 'extras' then>
+              <article class="sg-card">
+                <div class="sg-card-head">
+                  <div class="sg-section-eyebrow">Extras</div>
+                  <h2 class="sg-card-title">Información adicional</h2>
+                  <p class="sg-card-copy">Bloque complementario con datos extra del sistema.</p>
+                </div>
+                <div class="sg-card-body sg-dynamic">
+                  {$texto_extra}
+                </div>
+              </article>
+            </if>
+
+            <if $accion == 'censo' then>
+              <article class="sg-card">
+                <div class="sg-card-head">
+                  <div class="sg-section-eyebrow">Distribución</div>
+                  <h2 class="sg-card-title">Censo general</h2>
+                  <p class="sg-card-copy">
+                    {$totalPjs} personajes han posteado en la zona de rol {$numeroPosts} veces en <span class="duracion"></span>.
+                  </p>
+                </div>
+                <div class="sg-card-body">
+                  <div class="sg-censo-grid">
+                    <div class="sg-village">
+                      <div class="sg-village-head">
+                        <h3 class="sg-village-name">Konoha</h3>
+                        <if $konohaCerrada then><span class="sg-village-state">Cerrada</span></if>
+                      </div>
+                      <p class="sg-village-meta">{$clanesKonoha} personas</p>
+                      <div class="sg-dynamic">{$clanesKonohaStr}</div>
+                    </div>
+
+                    <div class="sg-village">
+                      <div class="sg-village-head">
+                        <h3 class="sg-village-name">Kiri</h3>
+                        <if $kiriCerrada then><span class="sg-village-state">Cerrada</span></if>
+                      </div>
+                      <p class="sg-village-meta">{$clanesKiri} personas</p>
+                      <div class="sg-dynamic">{$clanesKiriStr}</div>
+                    </div>
+
+                    <div class="sg-village">
+                      <div class="sg-village-head">
+                        <h3 class="sg-village-name">Iwa</h3>
+                        <if $iwaCerrada then><span class="sg-village-state">Cerrada</span></if>
+                      </div>
+                      <p class="sg-village-meta">{$clanesIwa} personas</p>
+                      <div class="sg-dynamic">{$clanesIwaStr}</div>
+                    </div>
+
+                    <div class="sg-village">
+                      <div class="sg-village-head">
+                        <h3 class="sg-village-name">Kumo</h3>
+                        <if $kumoCerrada then><span class="sg-village-state">Cerrada</span></if>
+                      </div>
+                      <p class="sg-village-meta">{$clanesKumo} personas</p>
+                      <div class="sg-dynamic">{$clanesKumoStr}</div>
+                    </div>
+
+                    <div class="sg-village">
+                      <div class="sg-village-head">
+                        <h3 class="sg-village-name">Sin Aldea</h3>
+                        <if $sinAldeaCerrada then><span class="sg-village-state">Cerrada</span></if>
+                      </div>
+                      <p class="sg-village-meta">{$clanesSinAldea} personas</p>
+                      <div class="sg-dynamic">{$clanesSinAldeaStr}</div>
+                    </div>
+
+                    <div class="sg-village">
+                      <div class="sg-village-head">
+                        <h3 class="sg-village-name">Renegados</h3>
+                      </div>
+                      <p class="sg-village-meta">{$clanesRenegados} personas</p>
+                      <div class="sg-dynamic">{$clanesRenegadosStr}</div>
+                    </div>
+                  </div>
+                </div>
+              </article>
+            </if>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    {$footer}
+  </body>
+  <script>
+    function onChangeTiempo(tiempo) {
+      window.location.href = window.location.pathname + '?accion={$accion}&tiempo=' + tiempo.value;
+    }
+
+    function onChangeAccion(accion) {
+      window.location.href = window.location.pathname + '?accion=' + accion.value + '&tiempo={$tiempo}';
+    }
+
+    document.getElementById("select-tiempo").value = "{$tiempo}";
+    document.getElementById("select-accion").value = "{$accion}";
+    $('.duracion').map((i) => {
+      $('.duracion')[i].innerHTML = $("#select-tiempo").find("option[value='{$tiempo}']").text();
+    });
+  </script>
+</html>

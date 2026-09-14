@@ -1,0 +1,1787 @@
+<html>
+
+<head>
+  <title>Nueva Ficha — Shinobi Gaiden</title>
+  {$headerinclude}
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300&family=Zen+Old+Mincho:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+
+    /* ─── Page wrapper ─────────────────────────────────────────── */
+    #nf-page {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 0 0 60px;
+      color: var(--ink);
+      font-family: 'Source Serif 4', serif;
+    }
+
+    /* ─── Banner ────────────────────────────────────────────────── */
+    .nf-banner {
+      position: relative;
+      overflow: hidden;
+      background: var(--bg2);
+      border-bottom: 0.5px solid var(--border);
+      padding: 40px 40px 32px;
+      display: flex;
+      align-items: flex-end;
+      gap: 24px;
+      min-height: 140px;
+    }
+
+    /* Washi fiber texture */
+    .nf-banner::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        repeating-linear-gradient(13deg,  transparent 0, transparent 24px, var(--fiber) 24px, var(--fiber) 25px),
+        repeating-linear-gradient(82deg,  transparent 0, transparent 36px, var(--fiber) 36px, var(--fiber) 37px),
+        repeating-linear-gradient(151deg, transparent 0, transparent 19px, var(--fiber) 19px, var(--fiber) 19.5px);
+    }
+
+    /* Corner washes */
+    .nf-banner::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background:
+        radial-gradient(ellipse at 100% 0%,  rgba(123,74,184,0.07) 0%, transparent 55%),
+        radial-gradient(ellipse at 0%  100%, rgba(192,88,42,0.05)  0%, transparent 40%);
+    }
+
+    /* Large watermark kanji */
+    .nf-banner-kanji {
+      position: absolute;
+      right: 28px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-family: 'Zen Old Mincho', serif;
+      font-size: 160px;
+      font-weight: 700;
+      line-height: 1;
+      color: var(--plum);
+      opacity: 0.05;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    /* Hanko seal */
+    .nf-hanko {
+      position: relative;
+      z-index: 1;
+      width: 60px;
+      height: 60px;
+      border: 1.5px solid var(--oxide);
+      border-radius: 50%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: rgba(192,88,42,0.07);
+      flex-shrink: 0;
+    }
+
+    .nf-hanko-kanji {
+      font-family: 'Zen Old Mincho', serif;
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--oxide);
+      line-height: 1;
+    }
+
+    .nf-hanko-sub {
+      font-family: 'Cinzel', serif;
+      font-size: 7px;
+      letter-spacing: 1.5px;
+      color: var(--oxide);
+      text-transform: uppercase;
+      margin-top: 2px;
+    }
+
+    /* Title block */
+    .nf-banner-text {
+      position: relative;
+      z-index: 1;
+    }
+
+    .nf-banner-label {
+      font-family: 'Cinzel', serif;
+      font-size: 9px;
+      font-weight: 400;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--mist);
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .nf-banner-label::before {
+      content: '';
+      display: inline-block;
+      width: 32px;
+      height: 1.5px;
+      background: var(--oxide);
+    }
+
+    .nf-banner-title {
+      font-family: 'Cinzel', serif;
+      font-size: 28px;
+      font-weight: 900;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--ink);
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+
+    .nf-banner-subtitle {
+      font-family: 'Cinzel', serif;
+      font-size: 9px;
+      font-weight: 400;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      color: var(--stone);
+    }
+
+    /* ─── Progress strip ─────────────────────────────────────────── */
+    .nf-progress {
+      background: var(--bg3);
+      border-bottom: 0.5px solid var(--border);
+      display: flex;
+      align-items: center;
+      padding: 0 40px;
+      height: 38px;
+      gap: 0;
+      overflow-x: auto;
+    }
+
+    .nf-progress-step {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 0 16px;
+      flex-shrink: 0;
+    }
+
+    .nf-progress-step:first-child { padding-left: 0; }
+    .nf-progress-step:last-child  { padding-right: 0; }
+
+    .nf-progress-num {
+      font-family: 'Cinzel', serif;
+      font-size: 9px;
+      font-weight: 900;
+      letter-spacing: 1px;
+      color: var(--oxide);
+    }
+
+    .nf-progress-label {
+      font-family: 'Cinzel', serif;
+      font-size: 8px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--mist);
+    }
+
+    .nf-progress-sep {
+      width: 20px;
+      height: 0.5px;
+      background: var(--border);
+      flex-shrink: 0;
+    }
+
+    /* ─── Form ───────────────────────────────────────────────────── */
+    #newfichaform {
+      padding: 0;
+    }
+
+    /* ─── Section ────────────────────────────────────────────────── */
+    .nf-section {
+      border-bottom: 0.5px solid var(--border);
+      padding: 32px 40px;
+      background: var(--bg2);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .nf-section:nth-child(odd) {
+      background: var(--bg);
+    }
+
+    /* Ghost step number behind section */
+    .nf-section::before {
+      content: attr(data-step);
+      position: absolute;
+      right: 24px;
+      top: 16px;
+      font-family: 'Cinzel', serif;
+      font-size: 72px;
+      font-weight: 900;
+      line-height: 1;
+      color: var(--plum);
+      opacity: 0.04;
+      pointer-events: none;
+      user-select: none;
+      letter-spacing: -2px;
+    }
+
+    /* Section header */
+    .nf-section-head {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .nf-step-badge {
+      font-family: 'Cinzel', serif;
+      font-size: 9px;
+      font-weight: 900;
+      letter-spacing: 1px;
+      color: var(--oxide);
+      flex-shrink: 0;
+      line-height: 1;
+      padding: 4px 8px;
+      border: 0.5px solid var(--oxide);
+      background: rgba(192,88,42,0.06);
+    }
+
+    .nf-step-name {
+      font-family: 'Cinzel', serif;
+      font-size: 15px;
+      font-weight: 900;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      color: var(--ink);
+      line-height: 1;
+    }
+
+    .nf-section-head::after {
+      content: '';
+      flex: 1;
+      height: 0.5px;
+      background: var(--border);
+    }
+
+    /* ─── Field grid ─────────────────────────────────────────────── */
+    .nf-fields {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 20px 24px;
+    }
+
+    .nf-fields-wide {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px 24px;
+    }
+
+    .nf-field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .nf-field-label {
+      font-family: 'Cinzel', serif;
+      font-size: 8px;
+      font-weight: 700;
+      letter-spacing: 2.2px;
+      text-transform: uppercase;
+      color: var(--mist);
+    }
+
+    .nf-field-label .nf-required {
+      color: var(--oxide);
+      margin-left: 2px;
+    }
+
+    .nf-field input.textbox,
+    .nf-field select.textbox {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 9px 12px;
+      background: var(--bg3);
+      border: none;
+      border-bottom: 1.5px solid var(--border);
+      border-left: 1.5px solid var(--border);
+      color: var(--ink);
+      font-family: 'Source Serif 4', serif;
+      font-size: 13px;
+      font-weight: 400;
+      transition: border-color 0.15s, background 0.15s;
+      outline: none;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+
+    .nf-field input.textbox:focus,
+    .nf-field select.textbox:focus {
+      border-bottom-color: var(--plum3);
+      border-left-color: var(--plum3);
+      background: var(--bg2);
+    }
+
+    .nf-field input.textbox::placeholder {
+      color: var(--mist);
+      font-style: italic;
+      font-size: 12px;
+    }
+
+    /* ─── Sex toggle ─────────────────────────────────────────────── */
+    .nf-sex-group {
+      display: flex;
+      gap: 3px;
+      margin-top: 2px;
+    }
+
+    .nf-sex-option {
+      flex: 1;
+      position: relative;
+    }
+
+    .nf-sex-option input[type="radio"] {
+      position: absolute;
+      opacity: 0;
+      width: 0; height: 0;
+    }
+
+    .nf-sex-option label {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 38px;
+      background: var(--bg3);
+      border: 0.5px solid var(--border);
+      font-family: 'Cinzel', serif;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--stone);
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s, color 0.15s;
+    }
+
+    .nf-sex-option input[type="radio"]:checked + label {
+      background: rgba(123,74,184,0.12);
+      border-color: var(--plum3);
+      color: var(--ink);
+    }
+
+    .nf-sex-option label:hover {
+      background: rgba(123,74,184,0.08);
+      color: var(--ink);
+    }
+
+    /* ─── Selector containers ───────────────────────────────────── */
+    #selectors-column {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    #selectors-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 3px;
+      margin-bottom: 12px;
+      min-height: 0;
+    }
+
+    #selectors-row:empty {
+      display: none;
+    }
+
+    /* Common fieldset base */
+    #newfichaform fieldset.listaSeason,
+    #newfichaform fieldset.listaAldeas,
+    #newfichaform fieldset.listaClanes {
+      border: 0.5px solid var(--border);
+      background: var(--bg3);
+      padding: 14px 12px 12px;
+      box-sizing: border-box;
+      text-align: center;
+      position: relative;
+      transition: background 0.15s;
+    }
+
+    #newfichaform fieldset.listaSeason:hover,
+    #newfichaform fieldset.listaAldeas:hover,
+    #newfichaform fieldset.listaClanes:hover {
+      background: var(--bg2);
+    }
+
+    /* Clans: 3-column grid */
+    #newfichaform fieldset.listaClanes {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 4px;
+    }
+
+    #newfichaform fieldset.listaClanes.expanded {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    /* Fieldset legend (clickable toggle) */
+    #newfichaform fieldset legend {
+      font-family: 'Cinzel', serif;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      padding: 0 10px;
+      margin-bottom: 12px;
+      color: var(--plum2);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      user-select: none;
+    }
+
+    #newfichaform fieldset.listaClanes legend {
+      grid-column: 1 / -1;
+    }
+
+    #newfichaform fieldset.listaSeason legend::after,
+    #newfichaform fieldset.listaAldeas legend::after,
+    #newfichaform fieldset.listaClanes legend::after {
+      content: '▼';
+      font-size: 7px;
+      opacity: 0.6;
+      color: var(--oxide);
+      transition: transform 0.25s ease;
+    }
+
+    #newfichaform fieldset.listaSeason.expanded legend::after,
+    #newfichaform fieldset.listaAldeas.expanded legend::after,
+    #newfichaform fieldset.listaClanes.expanded legend::after,
+    #newfichaform fieldset.listaSeason:not(.collapsed) legend::after,
+    #newfichaform fieldset.listaAldeas:not(.collapsed) legend::after,
+    #newfichaform fieldset.listaClanes:not(.collapsed) legend::after {
+      transform: rotate(180deg);
+    }
+
+    /* Clan section sub-titles */
+    #newfichaform fieldset.listaClanes .clan-section-title,
+    #newfichaform fieldset.listaClanes .clan-category,
+    #newfichaform fieldset.listaClanes h3,
+    #newfichaform fieldset.listaClanes h4 {
+      grid-column: 1 / -1;
+      text-align: left;
+      font-family: 'Cinzel', serif;
+      font-size: 8px;
+      font-weight: 700;
+      letter-spacing: 1.8px;
+      text-transform: uppercase;
+      color: var(--plum2);
+      margin: 8px 0 4px;
+      padding: 4px 0;
+      border-bottom: 0.5px solid var(--border);
+      display: block;
+    }
+
+    #newfichaform fieldset.listaClanes > div:not(label):not(.selected-item) {
+      grid-column: 1 / -1;
+      text-align: left;
+      font-family: 'Cinzel', serif;
+      font-size: 8px;
+      font-weight: 700;
+      letter-spacing: 1.8px;
+      text-transform: uppercase;
+      color: var(--plum2);
+      margin: 8px 0 4px;
+      padding: 4px 0;
+      border-bottom: 0.5px solid var(--border);
+      display: block;
+    }
+
+    #newfichaform fieldset.listaClanes.expanded > div:not(label):not(.selected-item),
+    #newfichaform fieldset.listaClanes.expanded > p:not(label p),
+    #newfichaform fieldset.listaClanes.expanded > span:not(label span) {
+      grid-column: 1 / -1 !important;
+      text-align: left !important;
+      font-family: 'Cinzel', serif !important;
+      font-size: 8px !important;
+      font-weight: 700 !important;
+      letter-spacing: 1.8px !important;
+      text-transform: uppercase !important;
+      color: var(--plum2) !important;
+      margin: 8px 0 4px !important;
+      display: block !important;
+    }
+
+    /* Collapsed state */
+    #newfichaform fieldset.listaSeason.collapsed label:not(.selected-item),
+    #newfichaform fieldset.listaAldeas.collapsed label:not(.selected-item),
+    #newfichaform fieldset.listaClanes.collapsed label:not(.selected-item) {
+      display: none;
+    }
+
+    #newfichaform fieldset.listaClanes.collapsed > div:not(.selected-item):not(label),
+    #newfichaform fieldset.listaClanes.collapsed > p:not(label p),
+    #newfichaform fieldset.listaClanes.collapsed > span:not(label span),
+    #newfichaform fieldset.listaClanes.collapsed > h3,
+    #newfichaform fieldset.listaClanes.collapsed > h4,
+    #newfichaform fieldset.listaClanes.collapsed > .clan-section-title,
+    #newfichaform fieldset.listaClanes.collapsed > .clan-category {
+      display: none !important;
+    }
+
+    #newfichaform fieldset.listaSeason.collapsed,
+    #newfichaform fieldset.listaAldeas.collapsed {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #newfichaform fieldset.listaClanes.collapsed {
+      grid-template-columns: 1fr;
+      justify-items: center;
+    }
+
+    #newfichaform fieldset.listaClanes.collapsed label.selected-item {
+      flex-direction: column-reverse;
+      align-items: center;
+      justify-content: flex-end;
+    }
+
+    #newfichaform fieldset.listaClanes.collapsed label.selected-item input[type="radio"],
+    #newfichaform fieldset.listaClanes.collapsed label.selected-item input[type="checkbox"] {
+      order: 100;
+      position: absolute;
+      opacity: 0;
+      width: 0; height: 0;
+      pointer-events: none;
+    }
+
+    #newfichaform fieldset.listaClanes.collapsed label.selected-item p {
+      font-family: 'Cinzel', serif;
+      font-size: 8px;
+      font-weight: 400;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin: 0 0 6px 0 !important;
+      color: var(--ink);
+      display: block !important;
+    }
+
+    #newfichaform fieldset.listaClanes.collapsed label.selected-item img {
+      margin: 0 auto !important;
+      display: block !important;
+    }
+
+    /* Season / Aldeas layout */
+    #newfichaform fieldset.listaSeason,
+    #newfichaform fieldset.listaAldeas {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #newfichaform fieldset.listaSeason.expanded,
+    #newfichaform fieldset.listaAldeas.expanded {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+    }
+
+    /* Selected item highlight */
+    #newfichaform fieldset.listaSeason label.selected-item,
+    #newfichaform fieldset.listaAldeas label.selected-item,
+    #newfichaform fieldset.listaClanes label.selected-item {
+      padding: 8px;
+      background: rgba(192,88,42,0.06);
+      border: 0.5px solid var(--oxide);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #newfichaform fieldset.listaClanes label.selected-item {
+      order: -1;
+      grid-column: 1 / -1;
+      margin-bottom: 8px;
+      width: 100%;
+      max-width: 200px;
+    }
+
+    /* Label images */
+    #newfichaform fieldset label img {
+      display: block;
+      margin: 0 auto 4px;
+      max-width: 50px;
+      max-height: 50px;
+      width: auto;
+      height: auto;
+      border-radius: 50%;
+      border: 1.5px solid transparent;
+      transition: border-color 0.15s;
+    }
+
+    #newfichaform fieldset label input[type="radio"]:checked + img,
+    #newfichaform fieldset label input[type="checkbox"]:checked + img {
+      border-color: var(--oxide);
+    }
+
+    /* Label text */
+    #newfichaform fieldset label p {
+      margin: 0;
+      font-family: 'Cinzel', serif;
+      font-size: 8px;
+      font-weight: 400;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--stone);
+      line-height: 1.3;
+      text-align: center;
+      word-break: break-word;
+      max-width: 100%;
+    }
+
+    /* Generic label container */
+    #newfichaform fieldset label {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      margin: 3px;
+      cursor: pointer;
+      padding: 6px;
+      transition: background 0.15s;
+      position: relative;
+    }
+
+    #newfichaform fieldset.listaClanes label {
+      min-height: 70px;
+      justify-content: center;
+    }
+
+    #newfichaform fieldset label:hover {
+      background: rgba(123,74,184,0.06);
+    }
+
+    #newfichaform fieldset label input[type="radio"],
+    #newfichaform fieldset label input[type="checkbox"] {
+      position: absolute;
+      opacity: 0;
+      width: 0; height: 0;
+    }
+
+    /* Selects inside fieldsets */
+    #newfichaform fieldset select {
+      width: 100%;
+      padding: 7px 10px;
+      border: 0.5px solid var(--border);
+      background: var(--bg);
+      color: var(--ink);
+      font-family: 'Cinzel', serif;
+      font-size: 9px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      cursor: pointer;
+      outline: none;
+    }
+
+    #newfichaform fieldset select:focus {
+      border-color: var(--plum3);
+    }
+
+    /* ─── Hint / validation note ─────────────────────────────────── */
+    .nf-field-hint {
+      font-family: 'Cinzel', serif;
+      font-size: 8px;
+      letter-spacing: 1px;
+      color: var(--mist);
+      margin-top: 2px;
+    }
+
+    /* ─── Textarea groups ────────────────────────────────────────── */
+    .nf-textarea-group {
+      margin-bottom: 20px;
+    }
+
+    .nf-textarea-label {
+      display: block;
+      font-family: 'Cinzel', serif;
+      font-size: 8px;
+      font-weight: 700;
+      letter-spacing: 2.2px;
+      text-transform: uppercase;
+      color: var(--mist);
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .nf-textarea-label::before {
+      content: '';
+      display: inline-block;
+      width: 3px;
+      height: 10px;
+      background: var(--oxide);
+      flex-shrink: 0;
+    }
+
+    .nf-textarea-label .nf-required {
+      color: var(--oxide);
+    }
+
+    #newfichaform textarea {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 12px 14px;
+      background: var(--bg3);
+      border: none;
+      border-bottom: 1.5px solid var(--border);
+      border-left: 1.5px solid var(--border);
+      color: var(--ink);
+      font-family: 'Source Serif 4', serif;
+      font-size: 13px;
+      font-weight: 300;
+      line-height: 1.9;
+      text-align: justify;
+      resize: vertical;
+      transition: border-color 0.15s, background 0.15s;
+      outline: none;
+    }
+
+    #newfichaform textarea:focus {
+      border-bottom-color: var(--plum3);
+      border-left-color: var(--plum3);
+      background: var(--bg2);
+    }
+
+    #newfichaform textarea::placeholder {
+      color: var(--mist);
+      font-style: italic;
+      font-size: 12px;
+    }
+
+    #newfichaform textarea.nf-ta-small {
+      height: 72px;
+      min-height: 72px;
+    }
+
+    #newfichaform textarea.nf-ta-large {
+      height: 140px;
+      min-height: 140px;
+    }
+
+    /* ─── Submit strip ───────────────────────────────────────────── */
+    .nf-submit-section {
+      background: var(--bg2);
+      border-top: 0.5px solid var(--border);
+      padding: 32px 40px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 20px;
+    }
+
+    .nf-submit-lore {
+      font-family: 'Cinzel', serif;
+      font-size: 9px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--mist);
+      flex: 1;
+    }
+
+    .nf-submit-lore strong {
+      color: var(--stone);
+      display: block;
+      font-size: 11px;
+      margin-bottom: 3px;
+    }
+
+    /* Decorative horizontal rule before button */
+    .nf-submit-rule {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .nf-submit-rule::before,
+    .nf-submit-rule::after {
+      content: '';
+      width: 24px;
+      height: 0.5px;
+      background: var(--oxide);
+      opacity: 0.6;
+    }
+
+    #guardar_ficha {
+      font-family: 'Cinzel', serif;
+      font-size: 10px;
+      font-weight: 900;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--lavender);
+      background: var(--plum);
+      border: none;
+      padding: 0 32px;
+      height: 42px;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.12s;
+      position: relative;
+      outline: none;
+    }
+
+    #guardar_ficha:hover {
+      background: var(--plum2);
+      transform: translateY(-1px);
+    }
+
+    #guardar_ficha:active {
+      transform: translateY(0);
+    }
+
+    /* ─── Responsive ─────────────────────────────────────────────── */
+    @media (max-width: 700px) {
+      .nf-banner          { padding: 24px 20px 20px; min-height: 100px; }
+      .nf-banner-title    { font-size: 20px; }
+      .nf-section         { padding: 24px 20px; }
+      .nf-progress        { padding: 0 20px; }
+      .nf-fields          { grid-template-columns: 1fr 1fr; }
+      .nf-fields-wide     { grid-template-columns: 1fr; }
+      .nf-submit-section  { padding: 24px 20px; flex-direction: column; align-items: flex-start; }
+      #selectors-column   { grid-template-columns: 1fr 1fr; }
+    }
+
+    @media (max-width: 440px) {
+      .nf-fields          { grid-template-columns: 1fr; }
+      .nf-banner-kanji    { display: none; }
+    }
+
+    /* ─── Season fieldset standalone (section 01) ───────────────── */
+    #newfichaform fieldset.listaSeason.nf-season-standalone {
+      border: none;
+      background: none;
+      padding: 0;
+      display: flex;
+      flex-direction: row;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 20px;
+    }
+
+    #newfichaform fieldset.listaSeason.nf-season-standalone legend {
+      display: none;
+    }
+
+    #newfichaform fieldset.listaSeason.nf-season-standalone label {
+      flex: 1;
+      min-width: 90px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 16px 8px;
+      margin: 0;
+      background: var(--bg3);
+      border: 0.5px solid var(--border);
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s;
+    }
+
+    #newfichaform fieldset.listaSeason.nf-season-standalone label:hover {
+      background: var(--bg2);
+      border-color: var(--plum);
+    }
+
+    #newfichaform fieldset.listaSeason.nf-season-standalone label img {
+      max-width: 48px;
+      max-height: 48px;
+      border: 1.5px solid transparent;
+      border-radius: 50%;
+      display: block;
+      margin: 0;
+    }
+
+    #newfichaform fieldset.listaSeason.nf-season-standalone label p {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      color: var(--stone);
+      margin: 0;
+      text-align: center;
+    }
+
+    #newfichaform fieldset.listaSeason.nf-season-standalone label:has(input:checked) {
+      background: rgba(123,74,184,0.1);
+      border-color: var(--plum3);
+    }
+
+    #newfichaform fieldset.listaSeason.nf-season-standalone label input[type="radio"]:checked + img {
+      border-color: var(--plum3);
+    }
+
+    /* ─── Village cards (listaAldeas) ────────────────────────────── */
+    #newfichaform fieldset.listaAldeas.nf-village-fieldset {
+      border: none;
+      background: none;
+      padding: 0;
+      display: flex;
+      flex-direction: row;
+      gap: 12px;
+    }
+
+    #newfichaform fieldset.listaAldeas.nf-village-fieldset legend {
+      display: none;
+    }
+
+    #newfichaform fieldset.listaAldeas.nf-village-fieldset label {
+      flex: 1;
+      min-height: 130px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      padding: 28px 16px;
+      margin: 0;
+      background: var(--bg3);
+      border: 0.5px solid var(--border);
+      cursor: pointer;
+      transition: background 0.2s, border-color 0.2s, transform 0.15s;
+    }
+
+    #newfichaform fieldset.listaAldeas.nf-village-fieldset label:hover {
+      background: var(--bg2);
+      border-color: var(--plum);
+      transform: translateY(-2px);
+    }
+
+    #newfichaform fieldset.listaAldeas.nf-village-fieldset label:has(input:checked) {
+      background: rgba(192,88,42,0.08);
+      border-color: var(--oxide);
+    }
+
+    #newfichaform fieldset.listaAldeas.nf-village-fieldset label img {
+      max-width: 72px;
+      max-height: 72px;
+      border: 1.5px solid transparent;
+      border-radius: 50%;
+      display: block;
+      margin: 0;
+    }
+
+    #newfichaform fieldset.listaAldeas.nf-village-fieldset label input[type="radio"]:checked + img {
+      border-color: var(--oxide);
+    }
+
+    #newfichaform fieldset.listaAldeas.nf-village-fieldset label p {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 2.5px;
+      color: var(--ink);
+      margin: 0;
+    }
+
+    /* ─── Origin cascading panels ────────────────────────────────── */
+    .nf-panel-hidden {
+      display: none;
+    }
+
+    .nf-origin-panel {
+      margin-top: 28px;
+      padding-top: 28px;
+      border-top: 0.5px solid var(--border);
+      animation: nf-fade-in 0.25s ease;
+    }
+
+    .nf-origin-panel-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: 'Cinzel', serif;
+      font-size: 8px;
+      font-weight: 700;
+      letter-spacing: 2.2px;
+      text-transform: uppercase;
+      color: var(--mist);
+      margin-bottom: 14px;
+    }
+
+    .nf-origin-panel-label::before {
+      content: '';
+      display: inline-block;
+      width: 3px;
+      height: 10px;
+      background: var(--oxide);
+      flex-shrink: 0;
+    }
+
+    /* ─── Active progress step ──────────────────────────────────── */
+    .nf-progress-step {
+      position: relative;
+      cursor: default;
+    }
+
+    .nf-progress-step--active .nf-progress-num {
+      color: var(--plum2);
+    }
+
+    .nf-progress-step--active .nf-progress-label {
+      color: var(--ink);
+    }
+
+    .nf-progress-step--active::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 16px;
+      right: 16px;
+      height: 1.5px;
+      background: var(--plum3);
+      opacity: 0.8;
+    }
+
+    .nf-progress-step:first-child.nf-progress-step--active::after { left: 0; }
+    .nf-progress-step:last-child.nf-progress-step--active::after  { right: 0; }
+
+    /* ─── Section entrance animation ────────────────────────────── */
+    .nf-section {
+      animation: nf-fade-in 0.3s ease both;
+    }
+
+    .nf-section:nth-child(2) { animation-delay: 0.04s; }
+    .nf-section:nth-child(3) { animation-delay: 0.08s; }
+    .nf-section:nth-child(4) { animation-delay: 0.12s; }
+    .nf-section:nth-child(5) { animation-delay: 0.16s; }
+
+    @keyframes nf-fade-in {
+      from { opacity: 0; transform: translateY(6px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ─── Fieldset legend toggle indicator ──────────────────────── */
+    #newfichaform fieldset legend {
+      user-select: none;
+    }
+
+    #newfichaform fieldset legend:hover {
+      color: var(--ink);
+    }
+
+    /* ─── Cascade step (clan aparece debajo de aldea) ───────────── */
+    #nf-clan-step {
+      margin-top: 28px;
+    }
+
+    #nf-clan-step:not(.nf-panel-hidden) {
+      animation: nf-cascade-reveal 0.3s ease;
+    }
+
+    @keyframes nf-cascade-reveal {
+      from { opacity: 0; transform: translateY(-10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .nf-cascade-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+      padding-top: 24px;
+      border-top: 0.5px solid var(--border);
+    }
+
+    .nf-cascade-header-label {
+      font-family: 'Cinzel', serif;
+      font-size: 8px;
+      font-weight: 700;
+      letter-spacing: 2.2px;
+      text-transform: uppercase;
+      color: var(--mist);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .nf-cascade-header-label::before {
+      content: '';
+      display: inline-block;
+      width: 3px;
+      height: 10px;
+      background: var(--oxide);
+      flex-shrink: 0;
+    }
+
+    .nf-cascade-header::after {
+      content: '';
+      flex: 1;
+      height: 0.5px;
+      background: var(--border);
+    }
+
+    /* Clan grid dentro del cascade */
+    #nf-clan-step fieldset.listaClanes {
+      border: none;
+      background: none;
+      padding: 0;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+      gap: 6px;
+    }
+
+    #nf-clan-step fieldset.listaClanes legend {
+      display: none;
+    }
+
+    #nf-clan-step fieldset.listaClanes label {
+      min-height: 80px;
+      background: var(--bg3);
+      border: 0.5px solid var(--border);
+      margin: 0;
+      padding: 10px 6px;
+    }
+
+    #nf-clan-step fieldset.listaClanes label:hover {
+      background: var(--bg2);
+      border-color: var(--plum);
+    }
+
+    #nf-clan-step fieldset.listaClanes label:has(input:checked) {
+      background: rgba(192,88,42,0.08);
+      border-color: var(--oxide);
+    }
+
+    @media (max-width: 700px) {
+      #nf-clan-step fieldset.listaClanes {
+        grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+      }
+    }
+
+    /* ─── Virtudes y Defectos (selección) ───────────────────────── */
+    .nf-vd-intro {
+      margin: 0 0 16px;
+      font-size: 13px;
+      line-height: 1.6;
+      color: var(--stone);
+    }
+    .nf-vd-intro strong { color: var(--ink); }
+
+    .nf-vd-balance {
+      position: sticky;
+      top: 8px;
+      z-index: 5;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 22px;
+      padding: 12px 18px;
+      margin-bottom: 20px;
+      background: var(--bg3);
+      border: 0.5px solid var(--border);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.28);
+    }
+    .nf-vd-balance-item { display: flex; flex-direction: column; gap: 2px; }
+    .nf-vd-balance-label {
+      font-family: 'Cinzel', serif; font-size: 8px; font-weight: 700;
+      letter-spacing: 1.8px; text-transform: uppercase; color: var(--mist);
+    }
+    .nf-vd-balance-val {
+      font-family: 'Cinzel', serif; font-size: 17px; font-weight: 900; color: var(--ink);
+    }
+    .nf-vd-pts--v { color: #4f9d69; }
+    .nf-vd-pts--d { color: var(--oxide); }
+    .nf-vd-balance-warn {
+      margin-left: auto;
+      font-size: 11px; font-style: italic; color: var(--oxide);
+      opacity: 0; transition: opacity 0.2s;
+    }
+    .nf-vd-balance.is-invalid { border-color: var(--oxide); }
+    .nf-vd-balance.is-invalid .nf-vd-balance-warn { opacity: 1; }
+
+    .nf-vd-cols {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    .nf-vd-col-head {
+      padding: 8px 12px; margin-bottom: 10px;
+      font-family: 'Cinzel', serif; font-size: 9px; font-weight: 700;
+      letter-spacing: 2px; text-transform: uppercase;
+      background: var(--bg3); border-left: 3px solid var(--border);
+    }
+    .nf-vd-col-head--v { border-left-color: #4f9d69; color: #7cc493; }
+    .nf-vd-col-head--d { border-left-color: var(--oxide); color: var(--oxide); }
+
+    .nf-vd-list { display: flex; flex-direction: column; gap: 8px; max-height: 620px; overflow-y: auto; padding-right: 4px; }
+
+    .nf-vd-card {
+      position: relative;
+      display: block;
+      padding: 11px 13px;
+      background: var(--bg3);
+      border: 0.5px solid var(--border);
+      cursor: pointer;
+      transition: border-color 0.15s, box-shadow 0.15s, opacity 0.15s, transform 0.1s;
+    }
+    .nf-vd-card > input[type="checkbox"] { position: absolute; opacity: 0; width: 0; height: 0; }
+
+    /* Degradado por tipo (como en el registro de virtudes) */
+    .nf-vd-col--v .nf-vd-card {
+      background: linear-gradient(180deg, rgba(79, 157, 105, 0.14), rgba(79, 157, 105, 0.05) 60%), var(--bg3);
+      border-color: rgba(79, 157, 105, 0.28);
+    }
+    .nf-vd-col--d .nf-vd-card {
+      background: linear-gradient(180deg, rgba(192, 88, 42, 0.14), rgba(192, 88, 42, 0.05) 60%), var(--bg3);
+      border-color: rgba(192, 88, 42, 0.28);
+    }
+
+    .nf-vd-card:hover { transform: translateY(-1px); }
+    .nf-vd-col--v .nf-vd-card:hover { border-color: rgba(79, 157, 105, 0.6); }
+    .nf-vd-col--d .nf-vd-card:hover { border-color: rgba(192, 88, 42, 0.6); }
+
+    /* Seleccionada: anillo plum sobre el degradado */
+    .nf-vd-card:has(input:checked) {
+      border-color: var(--plum3);
+      box-shadow: inset 0 0 0 1px var(--plum3), 0 4px 14px rgba(123, 74, 184, 0.25);
+    }
+
+    .nf-vd-card.is-disabled {
+      opacity: 0.38;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+    .nf-vd-card.is-disabled::after {
+      content: 'Incompatible';
+      position: absolute; top: 8px; right: 10px;
+      font-family: 'Cinzel', serif; font-size: 7px; font-weight: 700;
+      letter-spacing: 1.2px; text-transform: uppercase; color: var(--oxide);
+    }
+
+    .nf-vd-card-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; margin-bottom: 6px; }
+    .nf-vd-card-name { font-family: 'Cinzel', serif; font-size: 12px; font-weight: 700; color: var(--ink); }
+    .nf-vd-pts { font-family: 'Cinzel', serif; font-size: 13px; font-weight: 900; flex-shrink: 0; }
+    .nf-vd-card-id {
+      display: inline-block; margin: 0 0 8px;
+      padding: 3px 10px;
+      font-family: 'Cinzel', serif; font-size: 9px; font-weight: 700;
+      letter-spacing: 1.6px; text-transform: uppercase;
+      color: var(--plum3); background: rgba(123, 74, 184, 0.18);
+      border: 0.5px solid rgba(156, 107, 204, 0.45);
+    }
+    .nf-vd-card-desc { display: block; font-size: 11.5px; line-height: 1.55; color: var(--stone); }
+
+    .nf-vd-empty { padding: 16px; text-align: center; color: var(--mist); font-size: 12px; }
+
+    @media (max-width: 720px) {
+      .nf-vd-cols { grid-template-columns: 1fr; }
+      .nf-vd-list { max-height: none; }
+    }
+
+    /* ─── Creación deshabilitada ────────────────────────────────── */
+    .nf-disabled {
+      max-width: 560px;
+      margin: 40px auto;
+      padding: 48px 32px;
+      text-align: center;
+      background: var(--bg2);
+      border: 0.5px solid var(--border);
+      position: relative;
+      overflow: hidden;
+    }
+    .nf-disabled-kanji {
+      font-family: 'Zen Old Mincho', serif;
+      font-size: 120px; line-height: 1; color: var(--oxide);
+      opacity: 0.12; margin-bottom: -20px;
+    }
+    .nf-disabled-label {
+      font-family: 'Cinzel', serif; font-size: 9px; font-weight: 700;
+      letter-spacing: 3px; text-transform: uppercase; color: var(--oxide);
+      margin-bottom: 10px;
+    }
+    .nf-disabled-title {
+      margin: 0 0 14px;
+      font-family: 'Cinzel', serif; font-size: 22px; font-weight: 900;
+      letter-spacing: 1px; color: var(--ink);
+    }
+    .nf-disabled-text { margin: 0; font-size: 14px; line-height: 1.7; color: var(--stone); }
+
+  </style>
+</head>
+
+<body>
+  {$header}
+
+  <div id="nf-page">
+
+    <!-- ── Banner ───────────────────────────────────────────────────── -->
+    <div class="nf-banner">
+      <div class="nf-banner-kanji">忍</div>
+      <div class="nf-hanko">
+        <span class="nf-hanko-kanji">忍</span>
+        <span class="nf-hanko-sub">SG</span>
+      </div>
+      <div class="nf-banner-text">
+        <div class="nf-banner-label">Shinobi Gaiden · Foro Rol</div>
+        <div class="nf-banner-title">Crear Personaje</div>
+        <div class="nf-banner-subtitle">Registro de nuevo shinobi — completa todos los campos</div>
+      </div>
+    </div>
+
+    <if $sgPuedeCrear == 1 then>
+    <!-- ── Progress strip ───────────────────────────────────────────── -->
+    <div class="nf-progress">
+      <div class="nf-progress-step">
+        <span class="nf-progress-num">01</span>
+        <span class="nf-progress-label">Identidad</span>
+      </div>
+      <div class="nf-progress-sep"></div>
+      <div class="nf-progress-step">
+        <span class="nf-progress-num">02</span>
+        <span class="nf-progress-label">Origen</span>
+      </div>
+      <div class="nf-progress-sep"></div>
+      <div class="nf-progress-step">
+        <span class="nf-progress-num">03</span>
+        <span class="nf-progress-label">Descripción</span>
+      </div>
+      <div class="nf-progress-sep"></div>
+      <div class="nf-progress-step">
+        <span class="nf-progress-num">04</span>
+        <span class="nf-progress-label">Virtudes</span>
+      </div>
+      <div class="nf-progress-sep"></div>
+      <div class="nf-progress-step">
+        <span class="nf-progress-num">05</span>
+        <span class="nf-progress-label">Historia</span>
+      </div>
+      <div class="nf-progress-sep"></div>
+      <div class="nf-progress-step">
+        <span class="nf-progress-num">06</span>
+        <span class="nf-progress-label">Registro</span>
+      </div>
+    </div>
+
+    <!-- ── Form ─────────────────────────────────────────────────────── -->
+    <form method="post" action="/sg/nueva_ficha.php" name="newficha" id="newfichaform">
+
+      <!-- Hidden backend fields — do not remove -->
+      <div style="display:none;">
+        <input type="text" value="false" id="comp" name="submit">
+        <input type="text" id="userid" name="uid" value="{$mybb->user['uid']}">
+        <input type="text" name="fichaurl" value="./ficha.php?action=profile&amp;uid={$mybb->user['uid']}">
+      </div>
+
+      <!-- ── 01 · Identidad ──────────────────────────────────────── -->
+      <div class="nf-section" data-step="01">
+        <div class="nf-section-head">
+          <span class="nf-step-badge">01</span>
+          <span class="nf-step-name">Identidad</span>
+        </div>
+
+        <div class="nf-fields" style="margin-bottom: 20px;">
+          <div class="nf-field">
+            <span class="nf-field-label">Nombre <span class="nf-required">*</span></span>
+            <input class="textbox" type="text" name="name" required placeholder="Uzumaki…">
+          </div>
+          <div class="nf-field">
+            <span class="nf-field-label">Apodo / Alias</span>
+            <input class="textbox" type="text" name="alias" placeholder="Opcional">
+          </div>
+          <div class="nf-field">
+            <span class="nf-field-label">Edad <span class="nf-required">*</span></span>
+            <input class="textbox" type="number" name="age" min="12" max="90" required placeholder="12–90">
+          </div>
+          <div class="nf-field">
+            <span class="nf-field-label">Altura (cm) <span class="nf-required">*</span></span>
+            <input class="textbox" type="number" name="altura" min="100" max="250" required placeholder="100–250">
+          </div>
+          <div class="nf-field">
+            <span class="nf-field-label">Peso (kg) <span class="nf-required">*</span></span>
+            <input class="textbox" type="number" name="peso" min="30" max="300" required placeholder="30–300">
+          </div>
+        </div>
+
+        <div style="max-width: 280px; margin-bottom: 24px;">
+          <span class="nf-field-label" style="display:block; font-family:'Cinzel',serif; font-size:8px; font-weight:700; letter-spacing:2.2px; text-transform:uppercase; color:var(--mist); margin-bottom:8px;">
+            Sexo <span class="nf-required">*</span>
+          </span>
+          <div class="nf-sex-group">
+            <div class="nf-sex-option">
+              <input type="radio" name="sexo" value="Hombre" id="sexo-h" checked>
+              <label for="sexo-h">Hombre</label>
+            </div>
+            <div class="nf-sex-option">
+              <input type="radio" name="sexo" value="Mujer" id="sexo-m">
+              <label for="sexo-m">Mujer</label>
+            </div>
+          </div>
+        </div>
+
+        <span class="nf-field-label" style="display:flex; align-items:center; gap:8px; font-family:'Cinzel',serif; font-size:8px; font-weight:700; letter-spacing:2.2px; text-transform:uppercase; color:var(--mist); margin-bottom:0;">
+          <span style="display:inline-block; width:3px; height:10px; background:var(--oxide); flex-shrink:0;"></span>
+          Estación de nacimiento <span class="nf-required">*</span>
+        </span>
+        <fieldset class="listaSeason nf-season-standalone" data-selector="season">
+          <legend>Cumpleaños (Estación)</legend>
+          <label>
+            <input type="radio" name="season" value="1" required>
+            <img src="https://onepiecegaiden.com/images/op/ficha/InviernoCumple_One_Piece_Gaiden_Foro_Rol.png" alt="Invierno">
+            <p>Invierno</p>
+          </label>
+          <label>
+            <input type="radio" name="season" value="2">
+            <img src="https://onepiecegaiden.com/images/op/ficha/PrimaveraCumple_One_Piece_Gaiden_Foro_Rol.png" alt="Primavera">
+            <p>Primavera</p>
+          </label>
+          <label>
+            <input type="radio" name="season" value="3">
+            <img src="https://onepiecegaiden.com/images/op/ficha/VeranoCumple_One_Piece_Gaiden_Foro_Rol.png" alt="Verano">
+            <p>Verano</p>
+          </label>
+          <label>
+            <input type="radio" name="season" value="4">
+            <img src="https://onepiecegaiden.com/images/op/ficha/OtonoCumple_One_Piece_Gaiden_Foro_Rol.png" alt="Otoño">
+            <p>Otoño</p>
+          </label>
+        </fieldset>
+      </div>
+
+      <!-- ── 02 · Origen & Afiliación ────────────────────────────── -->
+      <div class="nf-section" data-step="02">
+        <div class="nf-section-head">
+          <span class="nf-step-badge">02</span>
+          <span class="nf-step-name">Origen &amp; Afiliación</span>
+        </div>
+
+        <!-- Village intro label -->
+        <span class="nf-field-label" style="display:flex; align-items:center; gap:8px; font-family:'Cinzel',serif; font-size:8px; font-weight:700; letter-spacing:2.2px; text-transform:uppercase; color:var(--mist); margin-bottom:12px;">
+          <span style="display:inline-block; width:3px; height:10px; background:var(--oxide); flex-shrink:0;"></span>
+          Elige tu aldea <span class="nf-required">*</span>
+        </span>
+
+        <!-- Hidden compat container (do not remove) -->
+        <div id="selectors-row" style="display:none;"></div>
+
+        <div id="selectors-column">
+
+          <!-- Village: big horizontal cards -->
+          <fieldset class="listaAldeas nf-village-fieldset" data-selector="aldea"></fieldset>
+
+          <!-- Clan: slides in below after village selection -->
+          <div id="nf-clan-step" class="nf-panel-hidden">
+            <div class="nf-cascade-header">
+              <span class="nf-cascade-header-label">
+                Elige tu clan <span class="nf-required">*</span>
+              </span>
+            </div>
+            <fieldset class="listaClanes nf-origin-fieldset" data-selector="clan"></fieldset>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ── 03 · Descripción ─────────────────────────────────────── -->
+      <div class="nf-section" data-step="03">
+        <div class="nf-section-head">
+          <span class="nf-step-badge">03</span>
+          <span class="nf-step-name">Descripción</span>
+        </div>
+
+        <div class="nf-textarea-group">
+          <label class="nf-textarea-label">
+            Apariencia física <span class="nf-required">*</span>
+            <span style="font-weight:400; color:var(--mist); letter-spacing:1px;">&nbsp;— mín. 400 caracteres</span>
+          </label>
+          <textarea name="phi" class="nf-ta-large" minlength="400" required
+            placeholder="Describe el aspecto físico del personaje con detalle…"></textarea>
+        </div>
+
+        <div class="nf-textarea-group">
+          <label class="nf-textarea-label">
+            Personalidad <span class="nf-required">*</span>
+            <span style="font-weight:400; color:var(--mist); letter-spacing:1px;">&nbsp;— mín. 400 caracteres</span>
+          </label>
+          <textarea name="psi" class="nf-ta-large" minlength="400" required
+            placeholder="¿Cómo es tu personaje? ¿Cómo actúa, piensa y siente?…"></textarea>
+        </div>
+      </div>
+
+      <!-- ── 04 · Virtudes y Defectos ──────────────────────────────── -->
+      <div class="nf-section" data-step="04">
+        <div class="nf-section-head">
+          <span class="nf-step-badge">04</span>
+          <span class="nf-step-name">Virtudes y Defectos</span>
+        </div>
+
+        <p class="nf-vd-intro">
+          Elige las virtudes y defectos de tu personaje. Las combinaciones incompatibles se bloquean solas.
+          El total de <strong>virtudes</strong> no puede superar al de <strong>defectos</strong>: puedes tomar más defectos que virtudes, pero no al revés.
+        </p>
+
+        <div class="nf-vd-balance" id="nf-vd-balance">
+          <div class="nf-vd-balance-item">
+            <span class="nf-vd-balance-label">Virtudes</span>
+            <span class="nf-vd-balance-val nf-vd-pts--v" id="nf-vd-vsum">+0</span>
+          </div>
+          <div class="nf-vd-balance-item">
+            <span class="nf-vd-balance-label">Defectos</span>
+            <span class="nf-vd-balance-val nf-vd-pts--d" id="nf-vd-dsum">−0</span>
+          </div>
+          <div class="nf-vd-balance-item">
+            <span class="nf-vd-balance-label">Balance</span>
+            <span class="nf-vd-balance-val" id="nf-vd-net">0</span>
+          </div>
+          <div class="nf-vd-balance-warn" id="nf-vd-warn">Las virtudes superan a los defectos</div>
+        </div>
+
+        <div class="nf-vd-cols">
+          <div class="nf-vd-col nf-vd-col--v">
+            <div class="nf-vd-col-head nf-vd-col-head--v">Virtudes</div>
+            <div class="nf-vd-list">{$virtudesCards}</div>
+          </div>
+          <div class="nf-vd-col nf-vd-col--d">
+            <div class="nf-vd-col-head nf-vd-col-head--d">Defectos</div>
+            <div class="nf-vd-list">{$defectosCards}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── 05 · Historia ─────────────────────────────────────────── -->
+      <div class="nf-section" data-step="05">
+        <div class="nf-section-head">
+          <span class="nf-step-badge">05</span>
+          <span class="nf-step-name">Historia</span>
+        </div>
+
+        <div class="nf-textarea-group">
+          <label class="nf-textarea-label">
+            Biografía <span class="nf-required">*</span>
+            <span style="font-weight:400; color:var(--mist); letter-spacing:1px;">&nbsp;— mín. 800 caracteres</span>
+          </label>
+          <textarea name="history" class="nf-ta-large" minlength="800" required
+            placeholder="El pasado del personaje, su formación como shinobi, eventos que marcaron su vida…"
+            style="height:180px; min-height:180px;"></textarea>
+        </div>
+
+        <div class="nf-textarea-group">
+          <label class="nf-textarea-label">Información extra <span style="font-weight:400;">(opcional)</span></label>
+          <textarea name="extra" class="nf-ta-large"
+            placeholder="- Le gusta el ramen.&#10;- Tiene miedo a los gatos."></textarea>
+        </div>
+      </div>
+
+      <!-- ── 06 · Registro ─────────────────────────────────────────── -->
+      <div class="nf-section" data-step="06">
+        <div class="nf-section-head">
+          <span class="nf-step-badge">06</span>
+          <span class="nf-step-name">Registro</span>
+        </div>
+
+        <div class="nf-fields-wide">
+          <div class="nf-textarea-group">
+            <label class="nf-textarea-label">Frase del personaje <span style="font-weight:400;">(opcional)</span></label>
+            <textarea name="frase" class="nf-ta-small"
+              placeholder="Un verdadero héroe siempre llega tarde."></textarea>
+          </div>
+          <div class="nf-textarea-group">
+            <label class="nf-textarea-label">Físico del personaje <span class="nf-required">*</span></label>
+            <textarea name="fisico_de_pj" class="nf-ta-small" required
+              placeholder="Nombre del físico — Serie / Juego de donde proviene"></textarea>
+          </div>
+        </div>
+
+        <div class="nf-textarea-group" style="max-width: 480px;">
+          <label class="nf-textarea-label">¿Cómo conociste Shinobi Gaiden? <span class="nf-required">*</span></label>
+          <textarea name="como_nos_conociste" class="nf-ta-small" required
+            placeholder="Google, afiliado, red social, otro usuario…"></textarea>
+        </div>
+      </div>
+
+      <!-- ── Submit ─────────────────────────────────────────────────── -->
+      <div class="nf-submit-section">
+        <div class="nf-submit-lore">
+          <strong>¿Todo listo?</strong>
+          Tu ficha será revisada por el equipo de staff antes de ser aprobada.
+        </div>
+        <div class="nf-submit-rule">
+          <input id="guardar_ficha" type="submit"
+            onclick="javascript: document.getElementById('comp').value = 'true';"
+            value="Inscribir Personaje">
+        </div>
+      </div>
+
+    </form>
+    <else>
+    <!-- ── Creación deshabilitada ─────────────────────────────────── -->
+    <div class="nf-disabled">
+      <div class="nf-disabled-kanji">封</div>
+      <div class="nf-disabled-label">Registro cerrado</div>
+      <h2 class="nf-disabled-title">Creación de fichas deshabilitada</h2>
+      <p class="nf-disabled-text">
+        El registro de nuevos personajes está temporalmente cerrado mientras el equipo de staff
+        prepara la próxima temporada. Vuelve a intentarlo más adelante.
+      </p>
+    </div>
+    </if>
+  </div><!-- /#nf-page -->
+
+  {$footer}
+  <if $sgPuedeCrear == 1 then>{$nueva_ficha_script}</if>
+
+  <script>
+    (function() {
+      var selectorsColumn = document.getElementById('selectors-column');
+
+      /* ── Reveal clan step on village selection ─────────── */
+      function revealOriginPanels() {
+        var clanStep = document.getElementById('nf-clan-step');
+        if (clanStep) clanStep.classList.remove('nf-panel-hidden');
+      }
+
+      function attachAldeasListeners(fieldset) {
+        fieldset.querySelectorAll('input[type="radio"]').forEach(function(i) {
+          i.addEventListener('change', revealOriginPanels);
+        });
+        /* Reveal immediately if a village is already checked (e.g. page reload) */
+        if (fieldset.querySelector('input:checked')) revealOriginPanels();
+      }
+
+      function initializeSelectors() {
+        if (!selectorsColumn) return;
+
+        /* If listaAldeas already has inputs (static page), attach now */
+        var aldeas = selectorsColumn.querySelector('fieldset.listaAldeas');
+        if (aldeas) attachAldeasListeners(aldeas);
+
+        /* Watch for dynamically populating fieldsets */
+        var observer = new MutationObserver(function(mutations) {
+          mutations.forEach(function(mutation) {
+            mutation.addedNodes.forEach(function(node) {
+              if (node.nodeType !== 1) return;
+              /* Node itself is listaAldeas, or node is a label/input added inside it */
+              var fs = null;
+              if (node.classList && node.classList.contains('listaAldeas')) {
+                fs = node;
+              } else if (node.closest) {
+                var candidate = node.closest('fieldset.listaAldeas');
+                if (candidate && selectorsColumn.contains(candidate)) fs = candidate;
+              }
+              if (fs) { attachAldeasListeners(fs); return; }
+              /* Also check if a listaAldeas was added as a subtree descendant */
+              if (node.querySelectorAll) {
+                node.querySelectorAll('fieldset.listaAldeas').forEach(function(f) {
+                  if (selectorsColumn.contains(f)) attachAldeasListeners(f);
+                });
+              }
+            });
+          });
+        });
+
+        observer.observe(selectorsColumn, { childList: true, subtree: true });
+      }
+
+      /* ── Progress strip scroll-spy ──────────────────────────────── */
+      function initProgressSpy() {
+        var progressSteps = document.querySelectorAll('.nf-progress-step');
+        var sections      = document.querySelectorAll('.nf-section[data-step]');
+        if (!progressSteps.length || !sections.length || !window.IntersectionObserver) return;
+
+        progressSteps[0].classList.add('nf-progress-step--active');
+
+        var observer = new IntersectionObserver(function(entries) {
+          entries.forEach(function(entry) {
+            if (!entry.isIntersecting) return;
+            var stepNum = parseInt(entry.target.getAttribute('data-step'), 10);
+            if (!stepNum) return;
+            progressSteps.forEach(function(s) { s.classList.remove('nf-progress-step--active'); });
+            var target = progressSteps[stepNum - 1];
+            if (target) target.classList.add('nf-progress-step--active');
+          });
+        }, { threshold: 0.25, rootMargin: '-15% 0px -55% 0px' });
+
+        sections.forEach(function(s) { observer.observe(s); });
+      }
+
+      /* ── Virtudes y Defectos: incompatibilidades + balance ──────── */
+      function initVirtudesDefectos() {
+        var balance = document.getElementById('nf-vd-balance');
+        var cards = Array.prototype.slice.call(document.querySelectorAll('.nf-vd-card'));
+        if (!balance || !cards.length) return;
+
+        var vsumEl = document.getElementById('nf-vd-vsum');
+        var dsumEl = document.getElementById('nf-vd-dsum');
+        var netEl  = document.getElementById('nf-vd-net');
+        var submit = document.getElementById('guardar_ficha');
+
+        function refresh() {
+          var checked = cards.filter(function(c) { return c.querySelector('input').checked; });
+
+          /* Balance */
+          var vsum = 0, dsum = 0;
+          checked.forEach(function(c) {
+            var p = parseInt(c.getAttribute('data-pts'), 10) || 0;
+            if (p >= 0) vsum += p; else dsum += p;
+          });
+          var net = vsum + dsum;
+          vsumEl.textContent = '+' + vsum;
+          dsumEl.textContent = '−' + Math.abs(dsum);
+          netEl.textContent = (net > 0 ? '+' : '') + net;
+
+          /* Regla: las virtudes no pueden superar a los defectos (net <= 0) */
+          var invalid = net > 0;
+          balance.classList.toggle('is-invalid', invalid);
+          if (submit) {
+            submit.disabled = invalid;
+            submit.style.opacity = invalid ? '0.5' : '';
+            submit.style.pointerEvents = invalid ? 'none' : '';
+          }
+
+          /* Incompatibilidades: bloquea las tarjetas en conflicto con alguna marcada */
+          var blocked = {};
+          checked.forEach(function(c) {
+            (c.getAttribute('data-incompat') || '').split(',').forEach(function(v) {
+              v = v.trim();
+              if (v) blocked[v] = true;
+            });
+          });
+          cards.forEach(function(c) {
+            var input = c.querySelector('input');
+            var vid = c.getAttribute('data-vid');
+            var dis = !input.checked && !!blocked[vid];
+            c.classList.toggle('is-disabled', dis);
+            input.disabled = dis;
+          });
+        }
+
+        cards.forEach(function(c) {
+          c.querySelector('input').addEventListener('change', refresh);
+        });
+        refresh();
+      }
+
+      /* ── Init ───────────────────────────────────────────────────── */
+      function init() {
+        initializeSelectors();
+        initProgressSpy();
+        initVirtudesDefectos();
+      }
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+      } else {
+        init();
+      }
+    })();
+  </script>
+
+</body>
+</html>

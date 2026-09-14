@@ -1,0 +1,85 @@
+<html>
+
+<head>
+  <title>Modificar NPCs</title>
+  {$headerinclude}
+</head>
+
+<body>
+  {$header}
+  <div class="fondo-blanco">
+    <if $npc_id == '' then>
+      NPC ID*<br><input style="width: 300px;" class="textbox" type="text" placeholder="" required id='npc_id'><button
+        onclick=onClickTid()>Buscar</button><br><br>
+    </if>
+	<if $npc_id !='' then>
+      NPC ID<br><input style="width: 300px;" class="textbox" type="text" value='{$npc_id}' disabled><br>
+        <form method="post" action="/op/staff/npcs_modificar.php" name="crear_npcs" id="crear_npcs">
+        <div style="display: none">
+           <input type="text" name="npc_id" value="{$npc_id}">
+        </div><br>
+		ID de NPC*: <br><input style="width: 300px;" class="textbox" value="{$npc_id}" type="text" name="nuevo_npc_id" id="nuevo_npc_id" required /><br>
+        Nombre*: <br><input style="width: 300px;" class="textbox" value="{$npc['nombre']}" type="text" name="nombre" id="nombre" /><br>
+		Apodo*: <br><input style="width: 300px;" class="textbox" value="{$npc['apodo']}" type="text" name="apodo" id="apodo" /><br>
+		Facción*: <br><input style="width: 300px;" class="textbox" value="{$npc['faccion']}" type="text" name="faccion" id="faccion" /><br>  
+		Raza*: <br><input style="width: 300px;" class="textbox" value="{$npc['raza']}" type="text" name="raza" id="raza" /><br>  
+		Edad*: <br><input style="width: 300px;" class="textbox" value="{$npc['edad']}" type="text" name="edad" id="edad" /><br>    
+	    Altura*: <br><input style="width: 300px;" class="textbox" value="{$npc['altura']}" type="text" name="altura" id="altura" /><br>  
+		Peso*: <br><input style="width: 300px;" class="textbox" value="{$npc['peso']}" type="text" name="peso" id="peso" /><br>    
+		Sexo*: <br><input style="width: 300px;" class="textbox" value="{$npc['sexo']}" type="text" name="sexo" id="sexo" /><br>    
+	    Temporada*: <br><input style="width: 300px;" class="textbox" value="{$npc['temporada']}" type="text" name="temporada" id="temporada" /><br>  
+		Nivel*: <br><input style="width: 300px;" class="textbox" value="{$npc['nivel']}" type="text" name="nivel" id="nivel" /><br><br>    
+		  
+		Fuerza*: <br><input style="width: 300px;" class="textbox" value="{$npc['fuerza']}" type="text" name="fuerza" id="fuerza" /><br>  
+		Resistencia*: <br><input style="width: 300px;" class="textbox" value="{$npc['resistencia']}" type="text" name="resistencia" id="resistencia" /><br>  
+		Destreza*: <br><input style="width: 300px;" class="textbox" value="{$npc['destreza']}" type="text" name="destreza" id="destreza" /><br>  
+		Voluntad*: <br><input style="width: 300px;" class="textbox" value="{$npc['voluntad']}" type="text" name="voluntad" id="voluntad" /><br>  
+		Puntería*: <br><input style="width: 300px;" class="textbox" value="{$npc['punteria']}" type="text" name="punteria" id="punteria" /><br>  
+		Agilidad*: <br><input style="width: 300px;" class="textbox" value="{$npc['agilidad']}" type="text" name="agilidad" id="agilidad" /><br>  
+		Reflejos*: <br><input style="width: 300px;" class="textbox" value="{$npc['reflejos']}" type="text" name="reflejos" id="reflejos" /><br>  
+		Control Akuma*: <br><input style="width: 300px;" class="textbox" value="{$npc['control_akuma']}" type="text" name="control_akuma" id="control_akuma" /><br>  
+			
+		Vitalidad*: <br><input style="width: 300px;" class="textbox" value="{$npc['vitalidad']}" type="text" name="vitalidad" id="vitalidad" /><br>  
+		Energía*: <br><input style="width: 300px;" class="textbox" value="{$npc['energia']}" type="text" name="energia" id="energia" /><br>  
+		Haki*: <br><input style="width: 300px;" class="textbox" value="{$npc['haki']}" type="text" name="haki" id="haki" /><br>  
+		  
+		Extra*: <br><input style="width: 300px;" class="textbox" value="{$npc['extra']}" type="text" name="extra" id="extra" /><br>  
+		Rango*: <br><input style="width: 300px;" class="textbox" value="{$npc['rango']}" type="text" name="rango" id="rango" /><br>  
+		Sangre*: <br><input style="width: 300px;" class="textbox" value="{$npc['sangre']}" type="text" name="sangre" id="sangre" /><br>  
+		Akuma: <br><input style="width: 300px;" class="textbox" value="{$npc['akuma']}" type="text" name="akuma" id="akuma" /><br>  
+		Avatar (200x300px)*: <br><input style="width: 500px;" class="textbox" value="{$npc['avatar1']}" type="text" name="avatar1" id="avatar1" /><br>  
+	    Avatar2 (420x420px)*: <br><input style="width: 500px;" class="textbox" value="{$npc['avatar2']}" type="text" name="avatar2" id="avatar2" /><br>  
+		
+        Apariencia*:<br>
+        <textarea placeholder="" style="width: 400px;height: 125px;" name="apariencia" minlength="1" placeholder="">{$npc['apariencia']}</textarea><br>
+		Personalidad*:<br>
+        <textarea placeholder="" style="width: 400px;height: 125px;" name="personalidad" minlength="1" placeholder="">{$npc['personalidad']}</textarea><br>
+		Historia 1*:<br>
+        <textarea placeholder="" style="width: 400px;height: 125px;" name="historia1" minlength="1" placeholder="">{$npc['historia1']}</textarea><br>
+		Historia 2*:<br>
+        <textarea placeholder="" style="width: 400px;height: 125px;" name="historia2" minlength="1" placeholder="">{$npc['historia2']}</textarea><br>
+		Historia 3*:<br>
+        <textarea placeholder="" style="width: 400px;height: 125px;" name="historia3" minlength="1" placeholder="">{$npc['historia3']}</textarea><br>
+		Extras*:<br>
+        <textarea placeholder="" style="width: 400px;height: 125px;" name="extra" minlength="1" placeholder="">{$npc['extra']}</textarea><br>
+		Notas*:<br>
+        <textarea placeholder="" style="width: 400px;height: 125px;" name="notas" minlength="1" placeholder="">{$npc['notas']}</textarea><br>
+        <input class="button" type="submit" value="Modificar NPC">
+      </form>
+    </if>
+
+  </div>
+  {$footer}
+</body>
+<if $log_var !='' then><script>alert(`{$log_var}`);</script></if>
+{$reload_script}
+<script>
+  function onClickTid() {
+    const npcId = document.getElementById('npc_id').value;
+    if (npcId) {
+		    window.location.href = window.location.pathname + '?npc_id=' + npcId;		
+	}
+  }
+</script>
+
+</html>

@@ -766,10 +766,12 @@ if ($ficha_existe == true && ($moderated == true || is_mod($s_uid) || is_staff($
     foreach ($pas_lista as $pa) {
         $pa_nombre = htmlspecialchars($pa['nombre'] !== null ? $pa['nombre'] : $pa['pasiva_id'], ENT_QUOTES);
         $pa_desc   = trim((string) $pa['descripcion']) !== '' ? nl2br(htmlspecialchars($pa['descripcion'], ENT_QUOTES)) : '';
+        $pa_efecto = trim((string) $pa['efecto_texto']) !== '' ? nl2br(htmlspecialchars($pa['efecto_texto'], ENT_QUOTES)) : '';
 
         $pas_html .= "<article class=\"fx-pas-item\">"
             . "<h4 class=\"fx-pas-name\">$pa_nombre</h4>"
             . ($pa_desc !== '' ? "<p class=\"fx-pas-desc\">$pa_desc</p>" : '')
+            . ($pa_efecto !== '' ? "<div class=\"fx-pas-effect\"><span class=\"fx-pas-eff-label\">Efecto</span> $pa_efecto</div>" : '')
             . "</article>";
     }
     $sgPasivasHtml = $pas_html;

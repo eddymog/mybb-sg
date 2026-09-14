@@ -1,0 +1,476 @@
+<html>
+<head>
+    <title>Recompensas al Staff</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Source+Serif+4:wght@300;400;600;700&display=swap" rel="stylesheet">
+    {$headerinclude}
+    <style>
+        :root {
+            --bg: #0f0c18;
+            --surface: rgba(23, 18, 36, 0.84);
+            --surface-soft: rgba(28, 22, 44, 0.7);
+            --border: rgba(156, 107, 204, 0.12);
+            --ink: #e8dff8;
+            --plum2: #9c6bcc;
+            --plum3: #b890e0;
+            --oxide: #c0582a;
+            --stone: #8a7a9a;
+            --fiber: rgba(156, 107, 204, 0.04);
+            --shadow: 0 24px 60px rgba(0, 0, 0, 0.28);
+            --shadow-soft: 0 12px 28px rgba(0, 0, 0, 0.18);
+        }
+
+        body {
+            background:
+                radial-gradient(circle at top left, rgba(123, 74, 184, 0.12), transparent 28%),
+                radial-gradient(circle at bottom right, rgba(192, 88, 42, 0.08), transparent 24%),
+                var(--bg);
+            color: var(--ink);
+            font-family: "Source Serif 4", serif;
+            margin: 0;
+        }
+
+        .staff-page {
+            max-width: 900px;
+            margin: 28px auto 44px;
+            padding: 0 18px;
+        }
+
+        .staff-shell {
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            background: rgba(19, 15, 30, 0.94);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        .staff-header {
+            padding: 24px 28px 18px;
+            border-bottom: 1px solid var(--border);
+            background: rgba(23, 18, 36, 0.82);
+        }
+
+        .staff-label {
+            margin-bottom: 8px;
+            font-family: "Cinzel", serif;
+            text-transform: uppercase;
+            font-size: 10px;
+            letter-spacing: 2.4px;
+            color: var(--plum3);
+        }
+
+        .staff-title {
+            margin: 0;
+            font: 900 clamp(24px, 3.5vw, 34px)/1.05 "Cinzel", serif;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: var(--ink);
+        }
+
+        .staff-subtitle {
+            max-width: 720px;
+            margin: 10px 0 0;
+            color: var(--stone);
+            font-size: 14px;
+            line-height: 1.7;
+        }
+
+        .staff-body {
+            padding: 20px;
+            display: grid;
+            gap: 18px;
+        }
+
+        .rw-card {
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            background: var(--surface);
+            box-shadow: var(--shadow-soft);
+            overflow: hidden;
+        }
+
+        .rw-card--admin {
+            border-color: rgba(192, 88, 42, 0.28);
+        }
+
+        .rw-card__head {
+            padding: 18px 20px 12px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .rw-eyebrow {
+            margin-bottom: 6px;
+            font-family: "Cinzel", serif;
+            text-transform: uppercase;
+            font-size: 10px;
+            letter-spacing: 2px;
+            color: var(--plum2);
+        }
+
+        .rw-eyebrow--admin {
+            color: var(--oxide);
+        }
+
+        .rw-title {
+            margin: 0;
+            font: 900 18px/1.1 "Cinzel", serif;
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+            color: var(--ink);
+        }
+
+        .rw-desc {
+            margin: 8px 0 0;
+            color: var(--stone);
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .rw-desc code {
+            padding: 1px 6px;
+            border-radius: 6px;
+            background: rgba(15, 12, 24, 0.5);
+            border: 1px solid var(--border);
+            color: var(--plum3);
+            font-size: 12px;
+        }
+
+        .rw-form {
+            padding: 16px 20px 20px;
+            display: grid;
+            gap: 14px;
+        }
+
+        .rw-label {
+            display: block;
+            margin-bottom: 6px;
+            font-family: "Cinzel", serif;
+            text-transform: uppercase;
+            font-size: 10px;
+            letter-spacing: 1.6px;
+            color: var(--plum3);
+        }
+
+        .rw-textarea,
+        .rw-input {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 10px 12px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: rgba(15, 12, 24, 0.5);
+            color: var(--ink);
+            font-family: "Source Serif 4", serif;
+            font-size: 14px;
+            resize: vertical;
+        }
+
+        .rw-textarea:focus,
+        .rw-input:focus {
+            outline: none;
+            border-color: rgba(156, 107, 204, 0.42);
+        }
+
+        .rw-options {
+            display: grid;
+            gap: 10px;
+        }
+
+        .rw-radio {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 14px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: rgba(15, 12, 24, 0.22);
+            cursor: pointer;
+        }
+
+        .rw-radio:hover {
+            border-color: rgba(156, 107, 204, 0.24);
+        }
+
+        .rw-radio span {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .rw-radio strong {
+            color: var(--ink);
+            font-size: 14px;
+        }
+
+        .rw-radio em {
+            color: var(--stone);
+            font-style: normal;
+            font-size: 12px;
+        }
+
+        .rw-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .rw-field--sm {
+            max-width: 200px;
+        }
+
+        .rw-btn {
+            justify-self: start;
+            margin-top: 4px;
+            padding: 11px 22px;
+            border: 1px solid rgba(156, 107, 204, 0.4);
+            border-radius: 12px;
+            background: linear-gradient(180deg, rgba(123, 74, 184, 0.9), rgba(91, 52, 140, 0.9));
+            color: #fff;
+            font-family: "Cinzel", serif;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: transform 0.15s ease;
+        }
+
+        .rw-btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .rw-btn--admin {
+            border-color: rgba(192, 88, 42, 0.5);
+            background: linear-gradient(180deg, rgba(192, 88, 42, 0.92), rgba(150, 64, 28, 0.92));
+        }
+
+        .rw-result {
+            display: grid;
+            gap: 12px;
+        }
+
+        .rw-result__ok,
+        .rw-result__err {
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 14px 16px;
+            background: var(--surface-soft);
+        }
+
+        .rw-result__ok {
+            border-color: rgba(120, 190, 120, 0.32);
+        }
+
+        .rw-result__err {
+            border-color: rgba(192, 88, 42, 0.32);
+        }
+
+        .rw-result__title {
+            margin-bottom: 8px;
+            font-family: "Cinzel", serif;
+            text-transform: uppercase;
+            font-size: 11px;
+            letter-spacing: 1.4px;
+            color: var(--plum3);
+        }
+
+        .rw-result ul {
+            margin: 0;
+            padding-left: 18px;
+            display: grid;
+            gap: 4px;
+        }
+
+        .rw-result li {
+            color: var(--ink);
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .rw-back {
+            display: inline-block;
+            margin-top: 4px;
+            color: var(--plum3);
+            font-size: 13px;
+            text-decoration: none;
+        }
+
+        /* Confirmación */
+        .rw-confirm__body {
+            padding: 16px 20px 20px;
+            display: grid;
+            gap: 14px;
+        }
+
+        .rw-confirm__list {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: grid;
+            gap: 8px;
+        }
+
+        .rw-confirm__list li {
+            padding: 10px 12px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            background: rgba(15, 12, 24, 0.28);
+            color: var(--ink);
+            font-size: 14px;
+        }
+
+        .rw-confirm__uid {
+            color: var(--stone);
+            font-size: 12px;
+        }
+
+        .rw-confirm__warn {
+            margin: 0;
+            padding: 10px 12px;
+            border: 1px solid rgba(192, 88, 42, 0.32);
+            border-radius: 10px;
+            color: var(--plum3);
+            font-size: 13px;
+        }
+
+        .rw-confirm__actions {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .rw-cancel {
+            color: var(--stone);
+            font-size: 13px;
+            text-decoration: none;
+        }
+
+        .rw-cancel:hover {
+            color: var(--plum3);
+        }
+
+        /* Log reciente */
+        .rw-logbox {
+            border: 0;
+        }
+
+        .rw-logtoggle {
+            list-style: none;
+            cursor: pointer;
+            padding: 16px 20px;
+            font-family: "Cinzel", serif;
+            text-transform: uppercase;
+            font-size: 11px;
+            letter-spacing: 1.4px;
+            color: var(--plum3);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .rw-logtoggle::-webkit-details-marker {
+            display: none;
+        }
+
+        .rw-logtoggle::before {
+            content: "▸";
+            font-size: 12px;
+            color: var(--plum2);
+        }
+
+        .rw-logbox[open] .rw-logtoggle {
+            border-bottom: 1px solid var(--border);
+        }
+
+        .rw-logbox[open] .rw-logtoggle::before {
+            content: "▾";
+        }
+
+        .rw-logwrap {
+            padding: 14px 20px 18px;
+            display: grid;
+            gap: 10px;
+        }
+
+        .rw-logrow {
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: rgba(15, 12, 24, 0.28);
+            overflow: hidden;
+        }
+
+        .rw-logrow__head {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 8px 12px;
+            border-bottom: 1px solid var(--border);
+            font-size: 12px;
+        }
+
+        .rw-logrow__id {
+            color: var(--stone);
+        }
+
+        .rw-logrow__staff {
+            color: var(--plum3);
+            font-weight: 600;
+        }
+
+        .rw-logrow__time {
+            margin-left: auto;
+            color: var(--stone);
+        }
+
+        .rw-logrow__body {
+            margin: 0;
+            padding: 10px 12px;
+            color: var(--ink);
+            font-family: "Source Serif 4", serif;
+            font-size: 12.5px;
+            line-height: 1.55;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        .rw-log-empty {
+            padding: 16px;
+            color: var(--stone);
+            font-size: 13px;
+        }
+
+        @media (max-width: 640px) {
+            .rw-row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    {$header}
+    <div class="staff-page">
+        <div class="staff-shell">
+            <section class="staff-header">
+                <div class="staff-label">Panel de staff</div>
+                <h1 class="staff-title">Recompensas al Staff</h1>
+                <p class="staff-subtitle">
+                    Otorga recompensas de misión a una lista de fichas, o (solo administradores) salda la experiencia
+                    semanal convirtiéndola en experiencia o rins. Todos los cambios quedan registrados en el log de consola.
+                </p>
+            </section>
+
+            <section class="staff-body">
+                {$resultado}
+                {$confirmacion}
+                {$form_misiones}
+                {$form_semanal}
+                {$log_reciente}
+                <a class="rw-back" href="/sg/admin/consola_mod.php">‹ Volver a la consola</a>
+            </section>
+        </div>
+    </div>
+    {$footer}
+</body>
+
+</html>

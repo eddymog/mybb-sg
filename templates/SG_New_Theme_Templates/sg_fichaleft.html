@@ -1,0 +1,70 @@
+<div class="leftfichapanel">
+    <div class="bordefichavatar">
+
+        <div class="fichavatar"><img src="{$user_avatar}" class="imgfichavatar">
+        </div>
+    </div>
+    <div class="barritablanca"></div>
+    <div class="fichabasic">
+        <div style="background-color: var({$villaVarColor});"><span class="basictitle">Datos Básicos</span></div>
+        <div>
+            <span class="basicmain">Edad:</span><span class="basicinfo">{$ficha['edad']} | </span>
+            <span class="basicmain">Rango:</span><span class="basicinfo">{$ficha['rango']}</span><br>
+            <span class="basicmain">Aldea:</span><span class="basicinfo">{$villa['nombreVilla']} | </span>
+			<span class="basicmain">Clan:</span><span class="basicinfo">{$nClan}</span><br>
+			<span class="basicmain">Clase:</span><span class="basicinfo" id="clase">D</span>
+        </div>
+    </div>
+    <div class="espacio10px"></div>
+    <div class="fichastats">
+
+        <div class="fichastatsupperbar"><span class="statitle">PR: {$usuario['newpoints']}</span></div>
+        <div class="fichastatsupperbar"><span class="statitle">PE: {$ficha['pe']}</span></div>
+        <div class="fichastatsupperbar"><span class="statitle">Ryos: {$ficha['ryos']}</span></div>
+        <div class="fichastatsupperbar"><span class="statitle">Reputación: {$ficha['reputacion']}</span></div>
+    </div>
+    <div class="fichastatsupperbar"><span class="statitle">PH: {$ficha['puntos_habilidad']}</span></div>
+	<div style=" color: #fff; ">
+		<div class="">Fuerza: {$ficha['str']}</div>
+		<div class="">Resistencia: {$ficha['res']}</div>
+		<div class="">Velocidad: {$ficha['spd']}</div>
+		<div class="">Agilidad: {$ficha['agi']}</div>
+		<div class="">Destreza: {$ficha['dex']}</div>
+		<div class="">Presencia: {$ficha['pres']}</div>
+		<div class="">Inteligencia: {$ficha['inte']}</div>
+		<div class="">Control de Chakra: {$ficha['ctrl']}</div>
+		<div>
+			Vida: <span class="personaje_vida">{$ficha['vida']}</span> <img title="Vida" style="width: 9px;top: -1px;position: relative;" src="/images/sg/icons/vida.png"><br>
+			Chakra: <span class="personaje_chakra">{$ficha['chakra']}</span> <img title="Chakra" style=" width: 9px; top: -1px; position: relative; " src="/images/sg/icons/chakra.png"><br>
+			Reg. Chakra: <span class="personaje_chakra">{$ficha['regchakra']}</span><br>
+		</div>
+	</div>
+
+    <if $mybb->user['uid'] == $ficha['fid'] then>
+        <div class="editstatsbutton">
+            <a href="{$mybb->settings['bburl']}/sg/editar_ficha.php?action=profile&uid={$mybb->user['uid']}"><input
+                    type="button" value="Asignar Stats"></a>
+        </div>
+    </if>
+</div>
+<script>
+const limiteNivel = Math.round({$nivel_limite} / 2);
+const sumaStats = {$suma_stats};
+let clase = 'E';
+if (limiteNivel == 8 && sumaStats >= 560) {
+  clase = 'S+';
+} else if (limiteNivel >= 7 && sumaStats >= 480) {
+  clase = 'S';
+} else if (limiteNivel >= 6 && sumaStats >= 400) {
+  clase = 'A+';
+} else if (sumaStats >= 320) {
+  clase = 'A';
+} else if (sumaStats >= 240) {
+  clase = 'B';
+} else if (sumaStats >= 160) {
+  clase = 'C';
+} else if (sumaStats >= 80) {
+  clase = 'D';
+}
+document.getElementById('clase').innerHTML = clase;
+</script>

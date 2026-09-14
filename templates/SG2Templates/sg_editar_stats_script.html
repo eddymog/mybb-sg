@@ -1,0 +1,150 @@
+<script>
+  /* Función para calcular vida del personaje */
+  /*
+  */
+	
+  function calcHp(fuerza, destreza, cchakra, inteligencia, salud, velocidad, tenketsu, sigilo) {
+    return (fuerza * 2) + (destreza * 1) + (cchakra * 1) + (inteligencia * 2) + (salud * 10) + (velocidad * 5) + (tenketsu * 0) + (sigilo * 5);
+  }
+	
+  function calcCh(fuerza, destreza, cchakra, inteligencia, salud, velocidad, tenketsu, sigilo) {
+	return (fuerza * 1) + (destreza * 2) + (cchakra * 2) + (inteligencia * 1) + (salud * 0) + (velocidad * 5) + (tenketsu * 10) + (sigilo * 5);
+  }
+
+  function setResourceValues() {
+	let fuerza = document.getElementById('fuerza');
+    let destreza = document.getElementById('destreza');
+    let cchakra = document.getElementById('cchakra');
+    let inteligencia = document.getElementById('inteligencia');
+	  
+	let salud = document.getElementById('salud');
+    let velocidad = document.getElementById('velocidad');
+    let tenketsu = document.getElementById('tenketsu');
+    let sigilo = document.getElementById('sigilo');
+	var vida = document.getElementById('hp');
+	var chakra = document.getElementById('mp');
+
+	$('#hp').html(calcHp(parseInt(fuerza.value), parseInt(destreza.value), parseInt(cchakra.value), parseInt(inteligencia.value), parseInt(salud.value), parseInt(velocidad.value), parseInt(tenketsu.value), parseInt(sigilo.value)));
+	$('#mp').html(calcCh(parseInt(fuerza.value), parseInt(destreza.value), parseInt(cchakra.value), parseInt(inteligencia.value), parseInt(salud.value), parseInt(velocidad.value), parseInt(tenketsu.value), parseInt(sigilo.value)));
+  }
+
+  function checkStatGoLessThanAlreadySet(statId) {
+    switch (statId.name) {
+      case "fuerza": if (statId.value == {$ficha['fuerza']}) return true; break;
+      case "destreza": if (statId.value == {$ficha['destreza']}) return true; break;
+      case "cchakra": if (statId.value == {$ficha['cchakra']}) return true; break;
+      case "inteligencia": if (statId.value == {$ficha['inteligencia']}) return true; break;
+      case "salud": if (statId.value == {$ficha['salud']}) return true; break;
+      case "velocidad": if (statId.value == {$ficha['velocidad']}) return true; break;
+      case "tenketsu": if (statId.value == {$ficha['tenketsu']}) return true; break;
+      case "sigilo": if (statId.value == {$ficha['sigilo']}) return true; break;
+    }
+    return false;
+  }
+
+  function checkMinimumForEachStat(minStat) {
+
+    let fuerzaActual = document.getElementById('fuerza');
+    let destrezaActual = document.getElementById('destreza');
+    let cchakraActual = document.getElementById('cchakra');
+    let inteligenciaActual = document.getElementById('inteligencia');
+
+    if (fuerzaActual.value < minStat || destrezaActual.value < minStat || 
+        cchakraActual.value < minStat || inteligenciaActual.value < minStat) {
+      return true;
+    }
+    return false;
+  }
+
+  function changeStat(statId, num) {
+    const statLimit = calculateMinMaxStat();
+
+    if (num >= 1 && getSumOfAllStats() >= 300) {
+      alert('Ya estás maxeado full power supersaiyayin 4, no puedes asignar más puntos.');
+    } else if (hab.value == 0 && num >= 1) {
+      alert('No tienes más puntos de estadísticas pa. Toca farmear más.');
+    } else if (statId.value >= statLimit.max) {
+      alert('Ya has asignado el máximo de puntos para esta estadística, sorry man.')
+    } else if (num <= -1 && checkStatGoLessThanAlreadySet(statId)) {
+      alert('Che qué hacés. No puedes quitar más puntos a este stat.');
+    } else {
+	  
+      statId.value = parseInt(statId.value) + parseInt(num);
+      hab.value = parseInt(hab.value) - parseInt(num);
+      $('.total_puntos')[0].innerHTML = getSumOfAllStats();
+      setResourceValues();
+    }
+  }
+	
+  function changeMejora(statId, num) {
+    const statLimit = calculateMinMaxMejora();
+
+    if (num >= 1 && getSumOfAllMejoras() >= 80) {
+      alert('Ya estás maxeado full power supersaiyayin 4, no puedes asignar más puntos.');
+    } else if (mejora.value == 0 && num >= 1) {
+      alert('No tienes más puntos de mejora pa. Toca farmear más.');
+    } else if (statId.value >= statLimit.max) {
+      alert('Ya has asignado el máximo de puntos para esta estadística, sorry man.')
+    } else if (num <= -1 && checkStatGoLessThanAlreadySet(statId)) {
+      alert('Che qué hacés. No puedes quitar más puntos a este stat.');
+    } else {
+	  
+      statId.value = parseInt(statId.value) + parseInt(num);
+      mejora.value = parseInt(mejora.value) - parseInt(num);
+      $('.total_mejoras')[0].innerHTML = getSumOfAllMejoras();
+      setResourceValues();
+    }
+  }
+
+  function getSumOfAllStats() {
+    let fuerza = document.getElementById('fuerza');
+    let destreza = document.getElementById('destreza');
+    let cchakra = document.getElementById('cchakra');
+    let inteligencia = document.getElementById('inteligencia');
+    return parseInt(fuerza.value) + parseInt(destreza.value) + parseInt(cchakra.value) + parseInt(inteligencia.value);
+  }
+	
+  function getSumOfAllMejoras() {
+    let salud = document.getElementById('salud');
+    let velocidad = document.getElementById('velocidad');
+    let tenketsu = document.getElementById('tenketsu');
+    let sigilo = document.getElementById('sigilo');
+    return parseInt(salud.value) + parseInt(velocidad.value) + parseInt(tenketsu.value) + parseInt(sigilo.value);
+  }
+
+  function calculateMinMaxStat() {
+    const allStats = getSumOfAllStats();
+    const statLimit = {
+      min: 0,
+      max: 200
+	}
+
+    return statLimit;
+  }
+	
+  function calculateMinMaxMejora() {
+    const allStats = getSumOfAllMejoras();
+    const statLimit = {
+      min: 0,
+      max: 20
+	}
+
+    return statLimit;
+  }
+
+  let hab = document.getElementById('h');
+  let mejora = document.getElementById('m');
+  let fuerza = document.getElementById('fuerza');
+  let destreza = document.getElementById('destreza');
+  let cchakra = document.getElementById('cchakra');
+  let inteligencia = document.getElementById('inteligencia');
+  let salud = document.getElementById('salud');
+  let velocidad = document.getElementById('velocidad');
+  let tenketsu = document.getElementById('tenketsu');
+  let sigilo = document.getElementById('sigilo');
+  $('.total_puntos')[0].innerHTML = getSumOfAllStats();
+  $('.total_mejoras')[0].innerHTML = getSumOfAllMejoras();
+
+  var vida = document.getElementById('hp');
+  var chakra = document.getElementById('mp');
+</script>

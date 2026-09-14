@@ -1,0 +1,179 @@
+<script>
+    function toggleSidebar() {
+        const sidebar = document.querySelector('.sidebar');
+        sidebar.classList.toggle('active');
+    }
+</script>
+
+<div id="container">
+    <a name="top" id="top"></a>
+
+    <div id="header">
+        {$headermenu}
+        <hr class="hrDivider">
+
+        <!-- <div id="bannerBox" style="background-image: url(https://i.postimg.cc/hPxymVDm/Banner.png);"></div> -->
+        <a href="/">
+            <div id="logo">
+                <if $g_is_banner_horny then>
+                    <if $banner_horny_or_not == '1' then>
+                        <img src="/images/sg/bannersfreeia/banner{$banner_horny_number}.png">
+                    <else />
+                        <img src="/images/sg/banners/banner{$banner_number}.jpeg">
+                    </if>
+                <elseif $g_enable_hentai == '1' then><img src="/images/sg/bannershitsu/banner{$banner_hitsu_number}.png">
+                <!-- <elseif $g_is_banner_nami then><img src="/images/sg/bannersnami/banner{$banner_nami_number}.png"> -->
+                <else />
+                    <img src="https://i.imgur.com/7SaWu79.png">
+                    <!-- <img src="/images/sg/banners/banner{$banner_number}.jpeg"> -->
+                    <!-- <img src="/images/sg/especiales/bannergoku.png"> -->
+                </if>
+            </div>
+        </a>
+
+        <!-- <div class="sidebar">
+            <div class="toggle-btn" onclick="toggleSidebar()">
+                <span class="toggle-icon">☰</span>
+            </div>
+            <div class="options">
+                <a href="{$mybb->settings['bburl']}/usercp.php">Panel de Usuario</a>
+                <a href="{$mybb->settings['bburl']}/tecnicas.php">Técnicas</a>
+                <a href="{$mybb->settings['bburl']}/forumdisplay.php?fid=25">Guías</a>
+                <a href="{$mybb->settings['bburl']}/member.php?action=logout&amp;logoutkey={$mybb->user['logoutkey']}">Cerrar Sesión</a>
+            </div>
+        </div> -->
+
+        <hr class="hrDivider">
+    </div>
+
+    <if $g_is_staff then>
+        <div id="staff_bar">
+            <span>
+                <a href="/sg/admin/fichas_en_cola.php">Fichas en cola</a>: {$g_fichas_en_cola} ||
+                <a href="/sg/admin/peticiones_admin.php">Peticiones</a>: {$g_peticiones} ||
+                <a href="/sg/admin/tecnicas_creacion.php">Creaciones</a>: {$g_total_creaciones_sin_moderar} / {$g_total_creaciones_pendientes}
+            </span>
+
+            <style>
+                #staff_bar{
+                    text-align: center;
+                    width: 100%;
+                    margin: auto;
+                    height: 27px;
+                    background-color: #013b53;
+                    box-shadow: 0px 1px 2px black;
+                    background-image: linear-gradient(#091926, #203d53);
+
+                    span{
+                        color: white !important;
+                        font-family: Verdana;
+                        font-size: 17px;
+                        text-shadow: 2px 2px 2px black;
+                    }
+                }
+            </style>
+        </div>
+    </if>
+
+    <if $g_uid == '0' then>
+        <div id="logo">
+            <a href="/showthread.php?tid=1938">
+                <img src="/images/sg/misc/inicia_tu_camino.jpg" alt="Inicia tu camino ninja aquí">
+            </a>
+        </div>
+    </if>
+
+    <style>
+        #logo{
+            width: 100%;
+        }
+    </style>
+
+    <!-- <div id="logo">
+        <a href="/showthread.php?tid=12721">
+            <img style="padding: 0px 0px;" src="/images/sg/especiales/minibannergoku.png">
+        </a>
+    </div> -->
+
+    <if $current_page != "index.php" && $current_page != "ficha.php" && ($g_is_staff || $g_uid == '501') then>
+        <div id="sabias_que">
+            <if $banner_sabias_que == '1' then>
+                <div><span>¿Sabías que…?</span></div>
+                <div><span>{$g_sabiasque['texto']}</span></div>
+            </if>
+            <if $banner_sabias_que == '2' then>
+                <div><span>Hay rumores sobre…</span></div>
+                <div><span>{$g_sabiasque['texto']}</span></div>
+            </if>
+            <if $banner_sabias_que == '3' then>
+                <div><span>En este foro…</span></div>
+                <div><span>{$g_sabiasque['texto']}</span></div>
+            </if>
+            <!-- 			<img src="https://onepiecegaiden.com/images/op/uploads/SabiasQue{$banner_sabias_que}_One_Piece_Gaiden_Foro_Rol.png"> -->
+            <img src="https://i.ibb.co/Smmx810/sabiasque1sinletras.png">
+
+            <style>
+                #sabias_que{
+                    position: relative;
+                    width: 100%x;
+                    margin: auto;
+
+                    div:first-child{
+                        position: absolute;
+                        color: white;
+                        font-family: 'interRegular';
+                        font-size: 19px;
+                        text-shadow: 2px 2px black;
+                        top: 26px;
+                        /* left: 508px; */
+                    }
+
+                    div:last-child{
+                        position: absolute;
+                        color: black;
+                        font-family: 'InterRegular';
+                        font-size: 16px;
+                        top: 55px;
+                        /* left: 243px; */
+                        /* width: 667px; */
+                    }
+
+                    img{
+                        width: 100%;
+                    }
+                }
+            </style>
+        </div>
+    </if>
+
+    <div class="modal login-modal" id="quick_login" style="display: none;background-color: #111d2c;">
+        <form method="post" action="{$mybb->settings['bburl']}/member.php">
+            <input name="action" type="hidden" value="do_login" />
+            <input name="url" type="hidden" value="" />
+            <input name="quick_login" type="hidden" value="1" />
+            <input name="my_post_key" type="hidden" value="{$mybb->post_code}" />
+            <table style=" background-color: #111d2c; " width="100%" cellspacing="{$theme['borderwidth']}"
+                cellpadding="{$theme['tablespace']}" border="0" class="tborder">
+                <tr>
+                    <td class="thead signin" colspan="3" style=" background-color: #111d2c; color: white !important; ">
+                        {$lang->login}</td>
+                </tr>
+                {$loginform}
+            </table>
+        </form>
+    </div>
+
+    <script>
+        $("#quick_login input[name='url']").val($(location).attr('href'));
+    </script>
+
+    <div id="content">
+        <div class="wrapper">
+            {$bbclosedwarning}
+            {$modnotice}
+            {$pm_notice}
+            {$remote_avatar_notice}
+            {$bannedwarning}
+            {$pending_joinrequests}
+            {$awaitingusers}
+            <navigation>

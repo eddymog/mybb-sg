@@ -1,0 +1,60 @@
+<if $nav then>
+<div class="navigation">
+  <div class="navContent">
+    {$nav}{$activesep}{$activebit}
+  </div>
+</div>
+</if>
+
+<style>
+  .navigation {
+    position: relative;
+    overflow: hidden;
+    background: var(--bg3);
+    border-bottom: 0.5px solid var(--border);
+    height: 36px;
+    display: flex;
+    align-items: center;
+    padding: 0 28px;
+    margin: 0;
+  }
+
+  .navigation::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+/*     background-image: repeating-linear-gradient(
+      90deg, transparent 0, transparent 24px,
+      var(--fiber) 24px, var(--fiber) 25px
+    ); */
+  }
+
+  .navContent {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: 'Cinzel', serif;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--stone);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .navContent a {
+    color: var(--stone);
+    text-decoration: none;
+    transition: color 0.15s;
+  }
+
+  .navContent a:hover {
+    color: var(--plum2);
+    text-decoration: none;
+  }
+</style>

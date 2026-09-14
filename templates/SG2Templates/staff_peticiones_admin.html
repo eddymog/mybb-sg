@@ -1,0 +1,240 @@
+<html>
+
+<head>
+    <title>Consola Súper Secreta</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Source+Serif+4:wght@300;400;600;700&family=Zen+Old+Mincho:wght@400;700&display=swap" rel="stylesheet">
+    {$headerinclude}
+    <style>
+        :root {
+            --bg: #0f0c18;
+            --surface: rgba(23, 18, 36, 0.84);
+            --border: rgba(156, 107, 204, 0.12);
+            --ink: #e8dff8;
+            --plum2: #9c6bcc;
+            --plum3: #b890e0;
+            --plum4: #d4b8f0;
+            --stone: #8a7a9a;
+            --fiber: rgba(156, 107, 204, 0.04);
+            --shadow: 0 24px 60px rgba(0, 0, 0, 0.28);
+            --shadow-soft: 0 12px 28px rgba(0, 0, 0, 0.18);
+        }
+
+        body {
+            background:
+                radial-gradient(circle at top left, rgba(123, 74, 184, 0.12), transparent 28%),
+                radial-gradient(circle at bottom right, rgba(192, 88, 42, 0.08), transparent 24%),
+                var(--bg);
+            color: var(--ink);
+            font-family: "Source Serif 4", serif;
+            margin: 0;
+            position: relative;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+            background-image:
+                repeating-linear-gradient(13deg, transparent 0, transparent 24px, var(--fiber) 24px, var(--fiber) 25px),
+                repeating-linear-gradient(82deg, transparent 0, transparent 36px, var(--fiber) 36px, var(--fiber) 37px),
+                repeating-linear-gradient(151deg, transparent 0, transparent 19px, var(--fiber) 19px, var(--fiber) 19.5px);
+        }
+
+        .staff-peti-page {
+            max-width: 1180px;
+            margin: 28px auto 44px;
+            padding: 0 18px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .staff-peti-shell {
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            background: rgba(19, 15, 30, 0.94);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        .staff-peti-head {
+            padding: 22px 26px 16px;
+            border-bottom: 1px solid var(--border);
+            background: rgba(23, 18, 36, 0.82);
+        }
+
+        .staff-peti-label,
+        .peti-section-title,
+        .peti-action,
+        .staff-empty {
+            font-family: "Cinzel", serif;
+            text-transform: uppercase;
+        }
+
+        .staff-peti-label {
+            margin-bottom: 8px;
+            font-size: 10px;
+            letter-spacing: 2.4px;
+            color: var(--plum3);
+        }
+
+        .staff-peti-title {
+            margin: 0;
+            font: 900 26px/1.05 "Cinzel", serif;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: var(--ink);
+        }
+
+        .staff-peti-copy {
+            margin: 10px 0 0;
+            color: var(--stone);
+            font-size: 14px;
+            line-height: 1.7;
+        }
+
+        .staff-peti-body {
+            padding: 18px;
+        }
+
+        .peti-sections {
+            display: grid;
+            gap: 16px;
+        }
+
+        .peti-section {
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            background: var(--surface);
+            box-shadow: var(--shadow-soft);
+            overflow: hidden;
+        }
+
+        .peti-section-head {
+            padding: 16px 18px 12px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .peti-section-title {
+            margin: 0;
+            font-size: 13px;
+            letter-spacing: 2px;
+            color: var(--plum2);
+        }
+
+        .peti-section-body {
+            padding: 14px;
+            display: grid;
+            gap: 12px;
+        }
+
+        .staff-empty {
+            margin: 0;
+            padding: 18px;
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            background: var(--surface);
+            font-size: 11px;
+            letter-spacing: 1.8px;
+            color: var(--stone);
+        }
+
+        .peti-card {
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            background: rgba(15, 12, 24, 0.22);
+            padding: 14px 16px;
+        }
+
+        .peti-head {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 10px;
+        }
+
+        .peti-title {
+            margin: 0;
+            font: 900 16px/1.3 "Cinzel", serif;
+            letter-spacing: 0.6px;
+            color: var(--ink);
+        }
+
+        .peti-meta {
+            margin: 0 0 10px;
+            color: var(--stone);
+            font-size: 14px;
+            line-height: 1.7;
+        }
+
+        .peti-meta strong {
+            color: var(--ink);
+        }
+
+        .peti-meta a,
+        .peti-user {
+            color: var(--plum3);
+            text-decoration: underline;
+            text-decoration-color: rgba(184, 144, 224, 0.35);
+        }
+
+        .peti-description {
+            margin: 0;
+            color: var(--plum4);
+            font-size: 15px;
+            line-height: 1.75;
+        }
+
+        .peti-actions {
+            margin-top: 12px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .peti-action {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 40px;
+            padding: 0 16px;
+            border: 1px solid var(--border);
+            border-radius: 999px;
+            background: linear-gradient(135deg, rgba(61, 31, 110, 0.96), rgba(90, 46, 154, 0.88));
+            color: #fff;
+            font-size: 10px;
+            letter-spacing: 1.8px;
+            text-decoration: none;
+        }
+    </style>
+</head>
+
+<body>
+    {$header}
+    <div class="staff-peti-page">
+        <div class="staff-peti-shell">
+            <section class="staff-peti-head">
+                <div class="staff-peti-label">Moderación</div>
+                <h1 class="staff-peti-title">Peticiones Administrativas</h1>
+                <p class="staff-peti-copy">Listado de solicitudes activas organizadas por categoría para facilitar revisión y resolución.</p>
+            </section>
+            <section class="staff-peti-body">
+                <if $peticiones_li then>
+                    <div class="peti-sections">
+                        {$peticiones_li}
+                    </div>
+                <else>
+                    <p class="staff-empty">No hay peticiones administrativas pendientes en este momento.</p>
+                </if>
+            </section>
+        </div>
+    </div>
+    {$reload_script}
+    {$footer}
+</body>
+
+</html>

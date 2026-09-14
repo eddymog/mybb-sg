@@ -1,0 +1,604 @@
+<html>
+<head>
+<title>Tecnicas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Source+Serif+4:wght@300;400;600;700&family=Zen+Old+Mincho:wght@400;700&display=swap" rel="stylesheet">
+{$headerinclude}
+<style>
+  :root {
+    --bg: #0f0c18;
+    --bg2: #130f1e;
+    --bg3: #171224;
+    --bg4: #1c162c;
+    --surface: rgba(28, 22, 44, 0.68);
+    --surface-strong: rgba(24, 18, 36, 0.88);
+    --border: rgba(156, 107, 204, 0.12);
+    --ink: #e8dff8;
+    --plum: #7b4ab8;
+    --plum2: #9c6bcc;
+    --plum3: #b890e0;
+    --plum4: #d4b8f0;
+    --oxide: #c0582a;
+    --oxide2: #e07040;
+    --stone: #8a7a9a;
+    --mist: #5a4a6a;
+    --gold: #c09840;
+    --fiber: rgba(156, 107, 204, 0.04);
+    --shadow: 0 24px 60px rgba(0, 0, 0, 0.32);
+    --shadow-soft: 0 14px 32px rgba(0, 0, 0, 0.22);
+    --radius-xl: 28px;
+    --radius-lg: 22px;
+    --radius-md: 16px;
+    --radius-sm: 12px;
+  }
+
+  body {
+    background:
+      radial-gradient(circle at top left, rgba(123, 74, 184, 0.12), transparent 28%),
+      radial-gradient(circle at bottom right, rgba(192, 88, 42, 0.08), transparent 24%),
+      var(--bg);
+    color: var(--ink);
+    font-family: "Source Serif 4", serif;
+    margin: 0;
+    position: relative;
+  }
+
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    background-image:
+      repeating-linear-gradient(13deg, transparent 0, transparent 24px, var(--fiber) 24px, var(--fiber) 25px),
+      repeating-linear-gradient(82deg, transparent 0, transparent 36px, var(--fiber) 36px, var(--fiber) 37px),
+      repeating-linear-gradient(151deg, transparent 0, transparent 19px, var(--fiber) 19px, var(--fiber) 19.5px);
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .sg-page {
+    max-width: 1240px;
+    margin: 32px auto 48px;
+    padding: 0 18px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .sg-shell {
+    background: linear-gradient(180deg, rgba(19, 15, 30, 0.92), rgba(23, 18, 36, 0.96));
+    border: 1px solid var(--border);
+    border-radius: 34px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    backdrop-filter: blur(8px);
+  }
+
+  .sg-hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1.25fr) minmax(280px, 0.75fr);
+    gap: 0;
+    min-height: 320px;
+    background:
+      linear-gradient(135deg, rgba(28, 22, 44, 0.7), rgba(19, 15, 30, 0.96)),
+      var(--bg2);
+    border-bottom: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .sg-hero::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(circle at top right, rgba(123, 74, 184, 0.12), transparent 34%),
+      radial-gradient(circle at bottom left, rgba(192, 88, 42, 0.09), transparent 28%);
+    pointer-events: none;
+  }
+
+  .sg-hero-main,
+  .sg-hero-side {
+    position: relative;
+    z-index: 1;
+  }
+
+  .sg-hero-main {
+    padding: 42px 40px 36px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .sg-kicker {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    font: 700 10px/1 "Cinzel", serif;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--oxide);
+    margin-bottom: 18px;
+  }
+
+  .sg-kicker::before {
+    content: "";
+    width: 48px;
+    height: 1px;
+    background: var(--oxide);
+  }
+
+  .sg-heading-wrap {
+    display: grid;
+    grid-template-columns: 54px minmax(0, 1fr);
+    gap: 18px;
+    align-items: start;
+  }
+
+  .sg-kanji {
+    font: 700 44px/0.8 "Zen Old Mincho", serif;
+    color: rgba(212, 184, 240, 0.16);
+    writing-mode: vertical-rl;
+    letter-spacing: 8px;
+    user-select: none;
+  }
+
+  .sg-title {
+    margin: 0;
+    font: 900 clamp(34px, 5vw, 58px)/0.95 "Cinzel", serif;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--ink);
+  }
+
+  .sg-subtitle {
+    max-width: 650px;
+    margin: 16px 0 0;
+    font-size: 17px;
+    line-height: 1.9;
+    color: var(--stone);
+    text-align: justify;
+  }
+
+  .sg-hero-side {
+    padding: 36px 28px;
+    background: linear-gradient(180deg, rgba(61, 31, 110, 0.96), rgba(61, 31, 110, 0.9));
+    color: #ede0fa;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  .sg-side-label,
+  .sg-side-nav a,
+  .sg-chip,
+  .sg-category-eyebrow,
+  .sg-link-count {
+    font-family: "Cinzel", serif;
+    text-transform: uppercase;
+  }
+
+  .sg-side-label {
+    font-size: 10px;
+    letter-spacing: 3px;
+    color: rgba(237, 224, 250, 0.72);
+    margin-bottom: 14px;
+  }
+
+  .sg-side-nav {
+    display: grid;
+    gap: 10px;
+  }
+
+  .sg-side-nav a {
+    position: relative;
+    display: block;
+    padding: 14px 16px;
+    border: 1px solid rgba(237, 224, 250, 0.12);
+    border-radius: var(--radius-sm);
+    color: #ede0fa;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.8px;
+    background: rgba(255, 255, 255, 0.03);
+    transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+  }
+
+  .sg-side-nav a:hover {
+    transform: translateX(4px);
+    border-color: rgba(237, 224, 250, 0.28);
+    background: rgba(255, 255, 255, 0.07);
+  }
+
+  .sg-content {
+    padding: 24px;
+    display: grid;
+    gap: 22px;
+    background: linear-gradient(180deg, rgba(15, 12, 24, 0.68), rgba(15, 12, 24, 0.96));
+  }
+
+  .sg-overview {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 14px;
+  }
+
+  .sg-chip {
+    padding: 18px 16px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border);
+    background: var(--surface-strong);
+    box-shadow: var(--shadow-soft);
+  }
+
+  .sg-chip strong {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--mist);
+  }
+
+  .sg-chip span {
+    display: block;
+    font-family: "Source Serif 4", serif;
+    font-size: 16px;
+    line-height: 1.65;
+    text-transform: none;
+    color: var(--plum3);
+  }
+
+  .sg-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+  }
+
+  .sg-category {
+    position: relative;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xl);
+    background:
+      linear-gradient(180deg, rgba(28, 22, 44, 0.84), rgba(19, 15, 30, 0.96)),
+      var(--surface);
+    box-shadow: var(--shadow-soft);
+  }
+
+  .sg-category::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background:
+      radial-gradient(circle at top right, rgba(123, 74, 184, 0.1), transparent 34%),
+      linear-gradient(120deg, transparent 0%, rgba(192, 88, 42, 0.06) 100%);
+  }
+
+  .sg-category-head {
+    position: relative;
+    z-index: 1;
+    padding: 26px 26px 18px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .sg-category-eyebrow {
+    font-size: 10px;
+    letter-spacing: 3px;
+    color: var(--oxide);
+    margin-bottom: 10px;
+  }
+
+  .sg-category h2 {
+    margin: 0;
+    font: 900 24px/1.1 "Cinzel", serif;
+    letter-spacing: 1px;
+    color: var(--ink);
+    text-transform: uppercase;
+  }
+
+  .sg-category p {
+    margin: 12px 0 0;
+    color: var(--stone);
+    line-height: 1.85;
+    text-align: justify;
+  }
+
+  .sg-links {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    padding: 22px;
+  }
+
+  .sg-link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    min-height: 66px;
+    padding: 14px 16px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border);
+    background: rgba(28, 22, 44, 0.72);
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  }
+
+  .sg-link:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 18px 28px rgba(0, 0, 0, 0.24);
+    border-color: rgba(156, 107, 204, 0.26);
+  }
+
+  .sg-link-name {
+    display: block;
+    font: 700 16px/1.35 "Source Serif 4", serif;
+    color: var(--plum4);
+  }
+
+  .sg-link-count {
+    flex-shrink: 0;
+    font-size: 9px;
+    letter-spacing: 2.2px;
+    color: var(--plum2);
+  }
+
+  .sg-archive {
+    display: flex;
+    align-items: stretch;
+    justify-content: space-between;
+    gap: 24px;
+    padding: 28px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xl);
+    background:
+      linear-gradient(135deg, rgba(61, 31, 110, 0.96), rgba(90, 46, 154, 0.88));
+    box-shadow: var(--shadow-soft);
+    color: #ede0fa;
+  }
+
+  .sg-archive-copy {
+    max-width: 720px;
+  }
+
+  .sg-archive h2 {
+    margin: 0 0 10px;
+    font: 900 24px/1.1 "Cinzel", serif;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .sg-archive p {
+    margin: 0;
+    font-size: 15px;
+    line-height: 1.85;
+    color: rgba(237, 224, 250, 0.84);
+    text-align: justify;
+  }
+
+  .sg-archive-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    align-self: center;
+    min-width: 220px;
+    padding: 18px 24px;
+    border-radius: 999px;
+    border: 1px solid rgba(237, 224, 250, 0.16);
+    background: rgba(255, 255, 255, 0.08);
+    color: #fff;
+    font: 700 11px/1 "Cinzel", serif;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    transition: transform 0.2s ease, background 0.2s ease;
+  }
+
+  .sg-archive-action:hover {
+    transform: translateY(-2px);
+    background: rgba(255, 255, 255, 0.14);
+  }
+
+  @media (max-width: 1100px) {
+    .sg-overview,
+    .sg-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .sg-hero {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 800px) {
+    .sg-page {
+      margin-top: 20px;
+      padding: 0 12px;
+    }
+
+    .sg-shell {
+      border-radius: 24px;
+    }
+
+    .sg-hero-main,
+    .sg-hero-side,
+    .sg-content,
+    .sg-category-head,
+    .sg-links,
+    .sg-archive {
+      padding-left: 18px;
+      padding-right: 18px;
+    }
+
+    .sg-heading-wrap {
+      grid-template-columns: 1fr;
+    }
+
+    .sg-kanji {
+      display: none;
+    }
+
+    .sg-overview,
+    .sg-grid,
+    .sg-links {
+      grid-template-columns: 1fr;
+    }
+
+    .sg-archive {
+      flex-direction: column;
+    }
+
+    .sg-archive-action {
+      width: 100%;
+      min-width: 0;
+    }
+  }
+</style>
+</head>
+<body>
+{$header}
+<div class="sg-page">
+  <div class="sg-shell">
+    <section class="sg-hero">
+      <div class="sg-hero-main">
+        <div class="sg-kicker">Archivo Shinobi</div>
+        <div class="sg-heading-wrap">
+          <div class="sg-kanji">術式</div>
+          <div>
+            <h1 class="sg-title">Biblioteca de Técnicas</h1>
+            <p class="sg-subtitle">
+              Este archivo central reúne las disciplinas activas del sistema shinobi y las ordena por afinidad, linaje y estilo de combate. Funciona como una puerta de entrada al repertorio técnico del foro: un índice pensado para orientar personajes, comparar rutas de desarrollo y localizar con rapidez el árbol exacto que define cada especialización.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <aside class="sg-hero-side">
+        <div>
+          <div class="sg-side-label">Acceso rápido</div>
+          <nav class="sg-side-nav">
+            <a href="#elementales">Técnicas elementales</a>
+            <a href="#konoha">Clanes Konoha</a>
+            <a href="#kiri">Clanes Kiri</a>
+            <a href="#generales">Jutsus generales</a>
+            <a href="#archivo-antiguo">Técnicas antiguas</a>
+          </nav>
+        </div>
+      </aside>
+    </section>
+
+    <div class="sg-content">
+      <section class="sg-overview">
+        <div class="sg-chip">
+          <strong>Elementales</strong>
+          <span>7 afinidades base y polaridades espirituales.</span>
+        </div>
+        <div class="sg-chip">
+          <strong>Konoha</strong>
+          <span>9 linajes principales del País del Fuego.</span>
+        </div>
+        <div class="sg-chip">
+          <strong>Kiri</strong>
+          <span>9 clanes de la Niebla y ramas derivadas.</span>
+        </div>
+        <div class="sg-chip">
+          <strong>Generales</strong>
+          <span>4 estilos abiertos de combate y defensa.</span>
+        </div>
+        <div class="sg-chip">
+          <strong>Archivo</strong>
+          <span>Consulta técnicas antiguas en su índice dedicado.</span>
+        </div>
+      </section>
+
+      <section class="sg-grid">
+        <article class="sg-category" id="elementales">
+          <div class="sg-category-head">
+            <div class="sg-category-eyebrow">Afinidades base</div>
+            <h2>Técnicas elementales</h2>
+            <p>La base del ninjutsu clásico. Aquí se agrupan las naturalezas elementales y las corrientes Yin-Yang para construir estilos versátiles o especializaciones puras.</p>
+          </div>
+          <div class="sg-links">
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_lista.php?arbol=Katon"><span class="sg-link-name">Katon</span><span class="sg-link-count">Ver árbol</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_lista.php?arbol=Suiton"><span class="sg-link-name">Suiton</span><span class="sg-link-count">Ver árbol</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_lista.php?arbol=Doton"><span class="sg-link-name">Doton</span><span class="sg-link-count">Ver árbol</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_lista.php?arbol=Fuuton"><span class="sg-link-name">Fuuton</span><span class="sg-link-count">Ver árbol</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_lista.php?arbol=Raiton"><span class="sg-link-name">Raiton</span><span class="sg-link-count">Ver árbol</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_lista.php?arbol=Yin"><span class="sg-link-name">Yin</span><span class="sg-link-count">Ver árbol</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_lista.php?arbol=Yang"><span class="sg-link-name">Yang</span><span class="sg-link-count">Ver árbol</span></a>
+          </div>
+        </article>
+
+        <article class="sg-category" id="konoha">
+          <div class="sg-category-head">
+            <div class="sg-category-eyebrow">Linajes del fuego</div>
+            <h2>Clanes Konoha</h2>
+            <p>Selección de árboles heredados por las familias más influyentes de la Hoja. Ideal para ubicar de inmediato rutas de identidad, legado y especialización de clan.</p>
+          </div>
+          <div class="sg-links">
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_lista.php?arbol=aburame"><span class="sg-link-name">Aburame</span><span class="sg-link-count">Ver árbol</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_lista.php?arbol=akimichi"><span class="sg-link-name">Akimichi</span><span class="sg-link-count">Ver árbol</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_lista.php?arbol=hyuga"><span class="sg-link-name">Hyuga</span><span class="sg-link-count">Ver árbol</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_lista.php?arbol=Nara"><span class="sg-link-name">Nara</span><span class="sg-link-count">Ver árbol</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_lista.php?arbol=Senju"><span class="sg-link-name">Senju</span><span class="sg-link-count">Ver árbol</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_lista.php?arbol=Uchiha"><span class="sg-link-name">Uchiha</span><span class="sg-link-count">Ver árbol</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_lista.php?arbol=Yamanaka"><span class="sg-link-name">Yamanaka</span><span class="sg-link-count">Ver árbol</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_lista.php?arbol=Inuzuka"><span class="sg-link-name">Inuzuka</span><span class="sg-link-count">Ver árbol</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_lista.php?arbol=Sarutobi"><span class="sg-link-name">Sarutobi</span><span class="sg-link-count">Ver árbol</span></a>
+          </div>
+        </article>
+
+        <article class="sg-category" id="kiri">
+          <div class="sg-category-head">
+            <div class="sg-category-eyebrow">Linajes de la niebla</div>
+            <h2>Clanes Kiri</h2>
+            <p>Un compendio de ramas asociadas a Kirigakure, con énfasis en herencias de sangre, técnicas singulares y estilos de combate marcados por la brutalidad o la adaptabilidad.</p>
+          </div>
+          <div class="sg-links">
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_lista.php?arbol=Hoshigaki"><span class="sg-link-name">Hoshigaki</span><span class="sg-link-count">Ver árbol</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_lista.php?arbol=Kaguya"><span class="sg-link-name">Kaguya</span><span class="sg-link-count">Ver árbol</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_lista.php?arbol=Yuki"><span class="sg-link-name">Yuki</span><span class="sg-link-count">Ver árbol</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_lista.php?arbol=Hozuki"><span class="sg-link-name">Hozuki</span><span class="sg-link-count">Ver árbol</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_lista.php?arbol=Heizu"><span class="sg-link-name">Heizu</span><span class="sg-link-count">Ver árbol</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_lista.php?arbol=Terumi"><span class="sg-link-name">Terumi</span><span class="sg-link-count">Ver árbol</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_lista.php?arbol=Akizu"><span class="sg-link-name">Akizu</span><span class="sg-link-count">Ver árbol</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_lista.php?arbol=Funato"><span class="sg-link-name">Funato</span><span class="sg-link-count">Ver árbol</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_lista.php?arbol=Kodon"><span class="sg-link-name">Kodon</span><span class="sg-link-count">Ver árbol</span></a>
+          </div>
+        </article>
+
+        <article class="sg-category" id="generales">
+          <div class="sg-category-head">
+            <div class="sg-category-eyebrow">Estilos abiertos</div>
+            <h2>Jutsus generales</h2>
+            <p>Ramas versátiles para personajes de múltiples perfiles. Reúnen caminos amplios de arma, defensa, aguante físico y combate cuerpo a cuerpo.</p>
+          </div>
+          <div class="sg-links">
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_lista.php?arbol=Bukijutsu"><span class="sg-link-name">Bukijutsu</span><span class="sg-link-count">Ver árbol</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_lista.php?arbol=Defensivo"><span class="sg-link-name">Defensivo</span><span class="sg-link-count">Ver árbol</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_lista.php?arbol=Resistencia"><span class="sg-link-name">Resistencia</span><span class="sg-link-count">Ver árbol</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_lista.php?arbol=Taijutsu"><span class="sg-link-name">Taijutsu</span><span class="sg-link-count">Ver árbol</span></a>
+          </div>
+        </article>
+      </section>
+
+      <section class="sg-archive" id="archivo-antiguo">
+        <div class="sg-archive-copy">
+          <h2>Técnicas antiguas</h2>
+          <p>
+            Algunas ramas permanecen separadas como archivo histórico. Si necesitas revisar contenido previo, árboles retirados o material legado, este acceso directo te lleva a su índice sin mezclarlo con la navegación principal.
+          </p>
+        </div>
+        <a class="sg-archive-action" href="{$mybb->settings['bburl']}/sg/tecnicas2.php">Abrir archivo antiguo</a>
+      </section>
+    </div>
+  </div>
+</div>
+{$footer}
+</body>
+</html>

@@ -1,0 +1,101 @@
+<html>
+
+<head>
+  <title>Ficha Nueva</title>
+  {$headerinclude}
+  <style>
+    #newfichaform {
+      color: white;
+      width: 992px;
+      margin: 0 auto;
+      font-size: 13px;
+      font-family: "Myriad Pro", Myriad, "Liberation Sans", "Nimbus Sans L", "Helvetica Neue", Helvetica, Arial, sans-serif;
+      text-align: center;
+      font-weight: bold;
+      margin-top: 10px;
+      padding: 10px 0;
+    }
+
+    #newfichaform textarea {
+      color: #1A1A1A;
+      width: 500px;
+      height: 175px;
+    }
+
+    #newfichaform input[type="submit"] {
+      background-color: #a31520;
+      border: 0px;
+      width: 80px;
+      height: 30px;
+      border-radius: 3px;
+      color: #fff;
+    }
+
+    #newfichaform input {
+      background-color: #e6dbfd;
+      border-radius: 3px;
+      border: none;
+      padding: 5px;
+    }
+
+    #guardar_ficha:hover {
+      cursor: pointer;
+    }
+
+    #newfichaform textarea {
+      text-align: left;
+      border-radius: 3px;
+      background-color: #e6dbfd;
+      width: 400px;
+      height: 150px;
+    }
+
+   #text_frase {
+      height: 55px;
+   }
+   
+  </style>
+</head>
+
+<body>
+  {$header}
+  <table border="0" cellspacing="{$theme['borderwidth']}" cellpadding="{$theme['tablespace']}" class="tborder">
+    <tr>
+      <td class="thead" colspan="1"><strong>Editar Descripción</strong></td>
+    </tr>
+    <tr>
+      <td class="trow1" valign="top" style="background-color: #2d342c;">
+        <div class="div_ficha">
+          <form method="post" action="/sg/editar_descripcion_form.php" name="newficha" id="newfichaform">
+            Apodo<br><input type="text" name="alias"><br>
+            <br>
+            <br>
+            Apariencia (mínimo 150 carácteres)<br><textarea name="phi" minlength="150" required=""></textarea><br>
+            <br>
+            Personalidad (mínimo 150 carácteres)<br><textarea name="psi" minlength="150" required=""></textarea><br>
+            <br>
+            Biografía (mínimo 300 carácteres)<br><textarea name="history" minlength="300" required=""></textarea><br>
+            <br>
+            Información Extra (opcional)<br><textarea name="extra"></textarea><br>
+            <br>
+            Frase que representa al usuario (opcional)<br><textarea style="height: 55px;" name="frase"></textarea><br>
+            <br>
+            <div style="display: none">
+              <input type="text" value="false" id="comp" name="submit">
+              <input type="text" id="userid" name="uid" value="{$mybb->user['uid']}">
+              <input type="text" name="fichaurl" value="./ficha.php?action=profile&amp;uid={$mybb->user['uid']}">
+            </div>
+            <input id="guardar_ficha" type="submit" onclick="javascript: document.getElementById('comp').value = 'true';"
+              value="Guardar"><br>
+            <br>
+          </form>
+        </div>
+        <br />
+      </td>
+    </tr>
+  </table>
+  {$footer}
+  {$nueva_ficha_script}
+</body>
+
+</html>

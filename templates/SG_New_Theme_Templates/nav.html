@@ -1,0 +1,26 @@
+<if $nav then>    
+<div class="navigation">
+	<div class="navContent">
+		{$nav}{$activesep}{$activebit}
+	</div>			
+</div>
+</if>
+
+<style>
+	.navigation {
+	background-color: #014C7D;
+	height: 50px;
+		margin: 0px;
+		padding: 0px;
+		display: flex;
+		flex-direction: row;
+		justify-content: center;
+		align-items: center;
+	}
+	
+	.navContent {
+		text-transform: uppercase;
+		letter-spacing: 0.075rem;
+		font-size: 0.75rem;
+	}
+</style>

@@ -1,0 +1,148 @@
+<html>
+<head>
+<title>Calculadora de Reacción</title>
+{$headerinclude}
+</head>
+<body>
+{$header}
+<div class="fondo-blanco">
+	<div>
+	<h1>Calculadora de Reacción</h1>
+	<div style="display: flex; flex-direction: row;">
+		<div style=" margin-right: 20px; ">
+			Estadística ofensiva del rival:<br>
+			<input class="textbox" type="text" id="ofensiva" name="ofensiva" value="0" min="0" max="200">
+		</div>
+		<div style=" margin-right: 20px; ">
+			Distancia (en metros):<br>
+    		<input class="textbox" type="text" id="distancia" name="distancia" value="0" min="0" max="500">
+		</div>
+		<div>
+			¿Es un ataque oculto/impredecible?<br>
+			<input type="checkbox" id="ataque_oculto" name="ataque_oculto" /> 
+		</div>
+	</div>
+	<br>
+	<hr>
+	<div style="display: flex; flex-direction: row;">
+		<div style=" margin-right: 20px; ">
+			Tu presencia:<br>
+			<input class="textbox" type="text" id="presencia" name="presencia" value="0" min="0" max="200">
+		</div>
+		<div style=" margin-right: 20px; ">
+			Tu agilidad:<br>
+    		<input class="textbox" type="text" id="agilidad" name="agilidad" value="0" min="0" max="200">
+		</div>
+		<div>
+			Tu velocidad:<br>
+			<input class="textbox" type="text" id="velocidad" name="velocidad" value="0" min="0" max="200">
+		</div>
+	</div><br>
+	<span id="reaccionTexto"></span>
+	<span id="esquiveTexto"></span><span id="eviteTexto"></span><br>
+	<span id="choqueTexto"></span><br>
+	</div>
+	<br><br><br><br><br><br>
+</div>
+<script>
+let nivelReaccion = -1;	
+	
+function reaccionChanges() {
+	const ofensiva = parseInt($("#ofensiva").val());
+	let presencia = parseInt($("#presencia").val());
+	const distancia  = parseInt($("#distancia").val());
+	let agilidad = parseInt($("#agilidad").val());
+	const velocidad = parseInt($("#velocidad").val());
+	const resistencia = parseInt($("#resistencia").val());
+	const resistenciaPasiva = parseInt($("#resistencia_pasiva").val());
+	const isAtaqueOculto = $("#ataque_oculto")[0].checked;
+	const bonusDistancia = Math.floor(distancia / 10) * 5;
+	let textoDistancia = '';
+	let textoAtaqueOculto = '';
+	
+	if (!isAtaqueOculto) {
+		presencia += 30;
+		textoAtaqueOculto = '<br> - Esto ya incluye un <strong>bonus +30 de presencia</strong> al ser una acción que percibes. ';
+		
+	}
+	
+	if (distancia > 0) {
+		textoDistancia = '<br> - Esto ya incluye un <strong>bonus +' + bonusDistancia + ' de presencia</strong> al ser un ataque a la distancia. ';
+	}
+
+	presencia += bonusDistancia;
+		
+	const diffOfPr = ofensiva - presencia;
+	let canEsquivar = false;
+	
+	if (ofensiva <= presencia) { nivelReaccion = 3; }
+	if (diffOfPr <= 20 && diffOfPr >= 1) { nivelReaccion = 2; }
+	if (diffOfPr <= 40 && diffOfPr >= 21) { nivelReaccion = 1; }
+	if (diffOfPr > 40) { nivelReaccion = 0; }
+	
+	$('#reaccionTexto').html(
+		`<hr>Tu rival lanza un ataque a <strong>` + ofensiva + ` puntos de estadística ofensiva</strong>, a <strong>` + distancia + `</strong> metros de distancia.<br>
+		- Tu presencia es de <strong>` + presencia + `</strong>. 
+		` + textoDistancia + textoAtaqueOculto + 
+		`<br>- Tienes <strong>nivel ` + nivelReaccion + `</strong> de reacción.`
+		
+	);
+
+	// agilidad = agilidad + (Math.floor((diffOfPr * -1) / 10) * 5);
+	
+	if (agilidad >= ofensiva && nivelReaccion == 3) { 
+		canEsquivar = true; 
+	}
+	
+	if (canEsquivar) {
+		$('#esquiveTexto').html('<hr><strong>Esquiva</strong>: Puedes esquivar');
+		$('#eviteTexto').text(' y desplazarte como máximo ' + velocidad / 10 + ' metros.')
+	} else {
+		$('#esquiveTexto').html('<hr><strong>Esquiva</strong>: No puedes esquivar');
+	}
+	
+	if (nivelReaccion >= 2) {
+		const segundosDistancia = Math.floor(distancia / 10);
+		$('#choqueTexto').html('<hr><strong>Choque</strong>: Puedes chocar jutsus y golpes blancos del oponente. <br>- Tienes ' + segundosDistancia + ' segundos de ventaja para realizar una técnica y chocar la ofensiva.<br>Por ejemplo: Si te atacan con una técnica que tarda 3 segundos para ejecutarse, tienes 3 + ' + segundosDistancia + ' segundos de reacción para chocarla.<hr>');
+	} else if (nivelReaccion >= 1) {
+	    $('#choqueTexto').html('<hr><strong>Choque</strong>: Puedes chocar solo golpes blancos del oponente.<hr>');
+	} else {
+		$('#choqueTexto').html('<hr><strong>Choque</strong>: No puedes chocar.<hr>');
+	}
+	
+	if (nivelReaccion >= 1) {
+		const diffOfRes = resistencia - ofensiva;
+		let bloqueoTotal = 0;
+		if (diffOfRes == 0) {
+			bloqueoTotal = (resistencia + resistenciaPasiva) * 0.50;
+		} else if (diffOfRes > 0) {
+			const porcentajeExtra = Math.floor(diffOfRes / 10);
+			bloqueoTotal = (resistencia + resistenciaPasiva) * (0.50 + (0.20 * porcentajeExtra));
+		} else if (diffOfRes < 0) {
+			const porcentajeExtra = Math.floor(diffOfRes / 10);
+			
+			if (porcentajeExtra < 3) {
+				bloqueoTotal = (resistencia + resistenciaPasiva) * (0.50 + (0.20 * porcentajeExtra));
+			}
+		}
+		
+		$('#bloqueoTexto').text('Puedes bloquear un daño de ' + bloqueoTotal + '.');
+	} else {
+		$('#bloqueoTexto').text('No puedes chocar.');
+	}
+}	
+	
+$("#ofensiva").change(function() { reaccionChanges(); } );
+$("#presencia").change(function() { reaccionChanges(); } );	
+$("#distancia").change(function() { reaccionChanges(); } );
+$("#ataque_oculto").change(function() { reaccionChanges(); } );
+	
+$("#agilidad").change(function() { reaccionChanges(); } );
+$("#velocidad").change(function() { reaccionChanges(); } );
+$("#resistencia").change(function() { reaccionChanges(); } );
+$("#resistencia_pasiva").change(function() { reaccionChanges(); } );
+		
+</script>
+{$footer}
+</body>
+</html>

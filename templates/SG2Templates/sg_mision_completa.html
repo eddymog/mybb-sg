@@ -1,0 +1,316 @@
+<html>
+
+<head>
+    <title>Misiones</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Source+Serif+4:wght@300;400;600;700&family=Zen+Old+Mincho:wght@400;700&display=swap" rel="stylesheet">
+    {$headerinclude}
+    <style>
+        :root {
+            --bg: #0f0c18;
+            --surface: rgba(23, 18, 36, 0.84);
+            --surface-soft: rgba(28, 22, 44, 0.7);
+            --border: rgba(156, 107, 204, 0.12);
+            --ink: #e8dff8;
+            --plum3: #b890e0;
+            --plum4: #d4b8f0;
+            --gold: #c09840;
+            --stone: #8a7a9a;
+            --fiber: rgba(156, 107, 204, 0.04);
+            --shadow: 0 24px 60px rgba(0, 0, 0, 0.28);
+            --shadow-soft: 0 12px 28px rgba(0, 0, 0, 0.18);
+        }
+
+        body {
+            background:
+                radial-gradient(circle at top left, rgba(123, 74, 184, 0.12), transparent 28%),
+                radial-gradient(circle at bottom right, rgba(192, 88, 42, 0.08), transparent 24%),
+                var(--bg);
+            color: var(--ink);
+            font-family: "Source Serif 4", serif;
+            margin: 0;
+            position: relative;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+            background-image:
+                repeating-linear-gradient(13deg, transparent 0, transparent 24px, var(--fiber) 24px, var(--fiber) 25px),
+                repeating-linear-gradient(82deg, transparent 0, transparent 36px, var(--fiber) 36px, var(--fiber) 37px),
+                repeating-linear-gradient(151deg, transparent 0, transparent 19px, var(--fiber) 19px, var(--fiber) 19.5px);
+        }
+
+        .mission-done-page {
+            max-width: 940px;
+            margin: 28px auto 44px;
+            padding: 0 18px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .mission-done-shell {
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            background: rgba(19, 15, 30, 0.94);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        .mission-done-head {
+            padding: 22px 26px 16px;
+            border-bottom: 1px solid var(--border);
+            background: rgba(23, 18, 36, 0.82);
+        }
+
+        .mission-done-label,
+        .mission-reward-label,
+        .mission-claim {
+            font-family: "Cinzel", serif;
+            text-transform: uppercase;
+        }
+
+        .mission-done-label {
+            margin-bottom: 8px;
+            font-size: 10px;
+            letter-spacing: 2.4px;
+            color: var(--plum3);
+        }
+
+        .mission-done-title {
+            margin: 0;
+            font: 900 28px/1.05 "Cinzel", serif;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: var(--ink);
+        }
+
+        .mission-done-copy {
+            margin: 10px 0 0;
+            color: var(--stone);
+            font-size: 14px;
+            line-height: 1.7;
+        }
+
+        .mission-done-body {
+            padding: 20px;
+            display: grid;
+            gap: 16px;
+        }
+
+        .mission-pr {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 16px;
+            border: 1px solid var(--border);
+            border-radius: 999px;
+            background: rgba(15, 12, 24, 0.24);
+            color: var(--gold);
+            font: 700 12px/1 "Cinzel", serif;
+            letter-spacing: 1.6px;
+            text-transform: uppercase;
+        }
+
+        .mission-done-card {
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            background: var(--surface);
+            box-shadow: var(--shadow-soft);
+            padding: 22px;
+            text-align: center;
+        }
+
+        .mission-done-hero {
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 18px;
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            background: #130f1e;
+            box-shadow: var(--shadow-soft);
+        }
+
+        .mission-done-hero img {
+            display: block;
+            width: 100%;
+            max-width: 100%;
+            max-height: 300px;
+            margin: 0 auto;
+            object-fit: cover;
+        }
+
+        .mission-done-hero::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            background:
+                linear-gradient(180deg, rgba(15, 12, 24, 0.04), rgba(15, 12, 24, 0.3)),
+                radial-gradient(circle at center, transparent 42%, rgba(15, 12, 24, 0.18) 100%);
+        }
+
+        .mission-done-badge {
+            position: absolute;
+            left: 16px;
+            bottom: 16px;
+            z-index: 1;
+            display: inline-flex;
+            align-items: center;
+            min-height: 30px;
+            padding: 0 12px;
+            border: 1px solid rgba(232, 223, 248, 0.14);
+            border-radius: 999px;
+            background: rgba(19, 15, 30, 0.7);
+            backdrop-filter: blur(6px);
+            color: #fff;
+            font: 700 10px/1 "Cinzel", serif;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .mission-done-name {
+            margin: 0 0 12px;
+            font: 900 26px/1.1 "Cinzel", serif;
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+            color: var(--ink);
+        }
+
+        .mission-done-description {
+            margin: 0;
+            color: var(--stone);
+            font-size: 15px;
+            line-height: 1.8;
+        }
+
+        .mission-rewards {
+            margin-top: 18px;
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px;
+        }
+
+        .mission-reward {
+            padding: 16px;
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            background: var(--surface-soft);
+        }
+
+        .mission-reward-label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 10px;
+            letter-spacing: 1.8px;
+            color: var(--stone);
+        }
+
+        .mission-reward-value {
+            display: block;
+            color: var(--plum4);
+            font: 700 18px/1.35 "Cinzel", serif;
+        }
+
+        .mission-claim-wrap {
+            margin-top: 20px;
+        }
+
+        .mission-claim {
+            min-width: 260px;
+            min-height: 50px;
+            padding: 0 20px;
+            border: 1px solid rgba(156, 107, 204, 0.2);
+            border-radius: 999px;
+            background: linear-gradient(135deg, rgba(61, 31, 110, 0.96), rgba(90, 46, 154, 0.88));
+            color: #fff;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            cursor: pointer;
+        }
+
+        @media (max-width: 720px) {
+            .mission-done-page {
+                margin-top: 20px;
+                padding: 0 12px;
+            }
+
+            .mission-done-shell {
+                border-radius: 18px;
+            }
+
+            .mission-done-head,
+            .mission-done-body,
+            .mission-done-card {
+                padding: 16px;
+            }
+
+            .mission-rewards {
+                grid-template-columns: 1fr;
+            }
+
+            .mission-claim {
+                width: 100%;
+                min-width: 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    {$header}
+    <div class="mission-done-page">
+        <div class="mission-done-shell">
+            <section class="mission-done-head">
+                <div class="mission-done-label">Recompensa lista</div>
+                <h1 class="mission-done-title">Misión completada</h1>
+                <p class="mission-done-copy">El tiempo de la misión ha terminado. Ya puedes reclamar tus ryos y la experiencia obtenida por finalizar el encargo.</p>
+            </section>
+
+            <section class="mission-done-body">
+                <div class="mission-pr">{$pr} puntos de rol actuales</div>
+
+                <div style="display: none">
+                    <form id="misform" method="post" action="misiones.php">
+                        <input type="text" name="uid" id="userid" value="{$userid}">
+                        <input type="text" id="mid" name="mid3" value="{$mision['cod']}">
+                    </form>
+                </div>
+
+                <article class="mission-done-card">
+                    <div class="mission-done-hero">
+                        <img src="https://media.tenor.com/bf4vvgp8xIsAAAAC/naruto-naruto-clone.gif" alt="Misión completada">
+                        <div class="mission-done-badge">Lista para cobrar</div>
+                    </div>
+
+                    <h2 class="mission-done-name">{$mision['title']} ({$mision['rango']})</h2>
+                    <p class="mission-done-description">Has terminado esta misión con éxito. Reclama ahora la recompensa para acreditar el progreso en tu ficha.</p>
+
+                    <div class="mission-rewards">
+                        <div class="mission-reward">
+                            <span class="mission-reward-label">Pago</span>
+                            <span class="mission-reward-value">{$mision['ryos']} Ryos</span>
+                        </div>
+                        <div class="mission-reward">
+                            <span class="mission-reward-label">Experiencia</span>
+                            <span class="mission-reward-value">{$mision['coste']} Puntos</span>
+                        </div>
+                    </div>
+
+                    <div class="mission-claim-wrap">
+                        <input type="button" class="mission-claim" onclick="javascript: document.getElementById('misform').submit();" value="Reclamar misión">
+                    </div>
+                </article>
+            </section>
+        </div>
+    </div>
+    {$reload_script}
+    {$footer}
+</body>
+
+</html>

@@ -1,0 +1,97 @@
+<script type="text/javascript">    
+	    
+jQuery(function($) {    
+	$("#backtop").hide();    
+  	$(window).scroll(function () {    
+  	  if ($(this).scrollTop() > 400) {    
+    	   $("#backtop").fadeIn(160);    
+	  } else {    
+		  $("#backtop").fadeOut(160);    
+	  }    
+	});    
+  $('.backtop').on( "click", function () {    
+	  $('html, body').animate({    
+		  scrollTop: 0    
+	  }, 650);    
+	  return false;    
+  });    
+});    
+</script>    
+<script type="text/javascript">    
+jQuery(function($) {    
+    $(".leftbutton").hide();    
+    $(".rightbutton").on("click", function() {    
+        $(".sidebar").animate({    
+            height: "hide",    
+            opacity: 0    
+        }, 150, function() {    
+            $(".forums").animate({    
+                width: "100%"    
+            }, 400)    
+        });    
+        $(this).hide();    
+        $(".leftbutton").show();    
+        Cookie.set("sidebar", "collapsed", 60 * 60 * 24 * 365);    
+        return false;    
+    });    
+    $(".leftbutton").on("click", function() {    
+        $(".forums").animate({    
+            width: "76%"    
+        }, 400, function() {    
+            $(".sidebar").animate({    
+                height: "show",    
+                opacity: 1    
+            }, 150)    
+        });    
+        $(this).hide();    
+        $(".rightbutton").show();    
+        Cookie.set("sidebar", "expanded", 60 * 60 * 24 * 365);    
+        return false;    
+    });    
+    if (Cookie.get("sidebar") == "collapsed") {    
+        $(".rightbutton").hide();    
+        $(".leftbutton").show();    
+        $(".forums").css("width", "100%");    
+        $(".sidebar").hide();    
+    }    
+    if ($(".forums").length < 1) $(".toggle-container").hide();    
+});    
+</script>    
+<!-- debugstuff> -->
+	</div>    
+</div>    
+<a class="backtop"><span id='backtop'><i class="fa fa-angle-up arr-adj"></i></span></a>    
+    
+<!-- The following piece of code allows MyBB to run scheduled tasks. DO NOT REMOVE -->{$task_image}<!-- End task image code -->    
+{$auto_dst_detection}    
+</div>    
+<script>
+	const entrenamiento_completo = '{$g_entrenamiento_completo}';
+	const entrenamiento_en_curso = '{$g_entrenamiento_en_curso}';
+	const mision_en_curso = '{$g_mision_en_curso}';
+	const mision_completa = '{$g_mision_completa}';
+	const recompensa_en_curso = '{$g_recompensa_en_curso}';
+	const recompensa_completa = '{$g_recompensa_completa}';
+
+	if (entrenamiento_completo) {
+		$('#entrenamientos').css({ color: "#0BD93C" });
+		$('#rol').css({ color: "#0BD93C" });
+	} else if (entrenamiento_en_curso) {
+		$('#entrenamientos').css({ color: "#F38806" });
+		$('#rol').css({ color: "#F38806" });
+	} else if (mision_en_curso) {
+		$('#misiones').css({ color: "#F38806" });
+		$('#rol').css({ color: "#F38806" });
+	} else if (mision_completa) {
+		$('#misiones').css({ color: "#0BD93C" });
+		$('#rol').css({ color: "#0BD93C" });
+	}
+	
+	if (recompensa_completa) {
+		$('#recompensas').css({ color: "#0BD93C" });
+		$('#informacion').css({ color: "#0BD93C" });
+	} else if (recompensa_en_curso) {
+		$('#recompensas').css({ color: "#F38806" });
+		$('#informacion').css({ color: "#F38806" });
+	}
+</script>

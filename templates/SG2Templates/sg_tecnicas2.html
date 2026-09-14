@@ -1,0 +1,795 @@
+<html>
+<head>
+<title>Tecnicas Antiguas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Source+Serif+4:wght@300;400;600;700&family=Zen+Old+Mincho:wght@400;700&display=swap" rel="stylesheet">
+{$headerinclude}
+<style>
+  :root {
+    --bg: #0f0c18;
+    --bg2: #130f1e;
+    --bg3: #171224;
+    --bg4: #1c162c;
+    --surface: rgba(28, 22, 44, 0.68);
+    --surface-strong: rgba(24, 18, 36, 0.88);
+    --border: rgba(156, 107, 204, 0.12);
+    --ink: #e8dff8;
+    --plum: #7b4ab8;
+    --plum2: #9c6bcc;
+    --plum3: #b890e0;
+    --plum4: #d4b8f0;
+    --oxide: #c0582a;
+    --oxide2: #e07040;
+    --stone: #8a7a9a;
+    --mist: #5a4a6a;
+    --gold: #c09840;
+    --fiber: rgba(156, 107, 204, 0.04);
+    --shadow: 0 24px 60px rgba(0, 0, 0, 0.32);
+    --shadow-soft: 0 14px 32px rgba(0, 0, 0, 0.22);
+    --radius-xl: 28px;
+    --radius-lg: 22px;
+    --radius-md: 16px;
+    --radius-sm: 12px;
+  }
+
+  body {
+    background:
+      radial-gradient(circle at top left, rgba(123, 74, 184, 0.12), transparent 28%),
+      radial-gradient(circle at bottom right, rgba(192, 88, 42, 0.08), transparent 24%),
+      var(--bg);
+    color: var(--ink);
+    font-family: "Source Serif 4", serif;
+    margin: 0;
+    position: relative;
+  }
+
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    background-image:
+      repeating-linear-gradient(13deg, transparent 0, transparent 24px, var(--fiber) 24px, var(--fiber) 25px),
+      repeating-linear-gradient(82deg, transparent 0, transparent 36px, var(--fiber) 36px, var(--fiber) 37px),
+      repeating-linear-gradient(151deg, transparent 0, transparent 19px, var(--fiber) 19px, var(--fiber) 19.5px);
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .sg-page {
+    max-width: 1320px;
+    margin: 32px auto 48px;
+    padding: 0 18px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .sg-shell {
+    background: linear-gradient(180deg, rgba(19, 15, 30, 0.92), rgba(23, 18, 36, 0.96));
+    border: 1px solid var(--border);
+    border-radius: 34px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    backdrop-filter: blur(8px);
+  }
+
+  .sg-hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(300px, 0.8fr);
+    min-height: 320px;
+    background:
+      linear-gradient(135deg, rgba(28, 22, 44, 0.7), rgba(19, 15, 30, 0.96)),
+      var(--bg2);
+    border-bottom: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .sg-hero::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(circle at top right, rgba(123, 74, 184, 0.12), transparent 34%),
+      radial-gradient(circle at bottom left, rgba(192, 88, 42, 0.09), transparent 28%);
+    pointer-events: none;
+  }
+
+  .sg-hero-main,
+  .sg-hero-side {
+    position: relative;
+    z-index: 1;
+  }
+
+  .sg-hero-main {
+    padding: 42px 40px 36px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .sg-kicker {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    font: 700 10px/1 "Cinzel", serif;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--oxide);
+    margin-bottom: 18px;
+  }
+
+  .sg-kicker::before {
+    content: "";
+    width: 48px;
+    height: 1px;
+    background: var(--oxide);
+  }
+
+  .sg-heading-wrap {
+    display: grid;
+    grid-template-columns: 54px minmax(0, 1fr);
+    gap: 18px;
+    align-items: start;
+  }
+
+  .sg-kanji {
+    font: 700 44px/0.8 "Zen Old Mincho", serif;
+    color: rgba(212, 184, 240, 0.16);
+    writing-mode: vertical-rl;
+    letter-spacing: 8px;
+    user-select: none;
+  }
+
+  .sg-title {
+    margin: 0;
+    font: 900 clamp(34px, 5vw, 56px)/0.95 "Cinzel", serif;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--ink);
+  }
+
+  .sg-subtitle {
+    max-width: 730px;
+    margin: 16px 0 0;
+    font-size: 17px;
+    line-height: 1.9;
+    color: var(--stone);
+    text-align: justify;
+  }
+
+  .sg-hero-side {
+    padding: 36px 28px;
+    background: linear-gradient(180deg, rgba(61, 31, 110, 0.96), rgba(61, 31, 110, 0.9));
+    color: #ede0fa;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .sg-side-label,
+  .sg-side-nav a,
+  .sg-chip,
+  .sg-category-eyebrow,
+  .sg-link-count {
+    font-family: "Cinzel", serif;
+    text-transform: uppercase;
+  }
+
+  .sg-side-label {
+    font-size: 10px;
+    letter-spacing: 3px;
+    color: rgba(237, 224, 250, 0.72);
+    margin-bottom: 14px;
+  }
+
+  .sg-side-nav {
+    display: grid;
+    gap: 10px;
+  }
+
+  .sg-side-nav a {
+    display: block;
+    padding: 14px 16px;
+    border: 1px solid rgba(237, 224, 250, 0.12);
+    border-radius: var(--radius-sm);
+    color: #ede0fa;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.8px;
+    background: rgba(255, 255, 255, 0.03);
+    transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+  }
+
+  .sg-side-nav a:hover {
+    transform: translateX(4px);
+    border-color: rgba(237, 224, 250, 0.28);
+    background: rgba(255, 255, 255, 0.07);
+  }
+
+  .sg-content {
+    padding: 24px;
+    display: grid;
+    gap: 22px;
+    background: linear-gradient(180deg, rgba(15, 12, 24, 0.68), rgba(15, 12, 24, 0.96));
+  }
+
+  .sg-overview {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 14px;
+  }
+
+  .sg-chip {
+    padding: 18px 16px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border);
+    background: var(--surface-strong);
+    box-shadow: var(--shadow-soft);
+  }
+
+  .sg-chip strong {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--mist);
+  }
+
+  .sg-chip span {
+    display: block;
+    font-family: "Source Serif 4", serif;
+    font-size: 16px;
+    line-height: 1.65;
+    text-transform: none;
+    color: var(--plum3);
+  }
+
+  .sg-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+  }
+
+  .sg-category {
+    position: relative;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xl);
+    background:
+      linear-gradient(180deg, rgba(28, 22, 44, 0.84), rgba(19, 15, 30, 0.96)),
+      var(--surface);
+    box-shadow: var(--shadow-soft);
+  }
+
+  .sg-category::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background:
+      radial-gradient(circle at top right, rgba(123, 74, 184, 0.1), transparent 34%),
+      linear-gradient(120deg, transparent 0%, rgba(192, 88, 42, 0.06) 100%);
+  }
+
+  .sg-category-head {
+    position: relative;
+    z-index: 1;
+    padding: 26px 26px 18px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .sg-category-eyebrow {
+    font-size: 10px;
+    letter-spacing: 3px;
+    color: var(--oxide);
+    margin-bottom: 10px;
+  }
+
+  .sg-category h2 {
+    margin: 0;
+    font: 900 24px/1.1 "Cinzel", serif;
+    letter-spacing: 1px;
+    color: var(--ink);
+    text-transform: uppercase;
+  }
+
+  .sg-category p {
+    margin: 12px 0 0;
+    color: var(--stone);
+    line-height: 1.85;
+    text-align: justify;
+  }
+
+  .sg-links {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    padding: 22px;
+  }
+
+  .sg-link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    min-height: 66px;
+    padding: 14px 16px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border);
+    background: rgba(28, 22, 44, 0.72);
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  }
+
+  .sg-link:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 18px 28px rgba(0, 0, 0, 0.24);
+    border-color: rgba(156, 107, 204, 0.26);
+  }
+
+  .sg-link-name {
+    display: block;
+    font: 700 16px/1.35 "Source Serif 4", serif;
+    color: var(--plum4);
+  }
+
+  .sg-link-count {
+    flex-shrink: 0;
+    font-size: 9px;
+    letter-spacing: 2.2px;
+    color: var(--plum2);
+  }
+
+  .sg-archive {
+    display: flex;
+    align-items: stretch;
+    justify-content: space-between;
+    gap: 24px;
+    padding: 28px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xl);
+    background: linear-gradient(135deg, rgba(61, 31, 110, 0.96), rgba(90, 46, 154, 0.88));
+    box-shadow: var(--shadow-soft);
+    color: #ede0fa;
+  }
+
+  .sg-archive-copy {
+    max-width: 760px;
+  }
+
+  .sg-archive h2 {
+    margin: 0 0 10px;
+    font: 900 24px/1.1 "Cinzel", serif;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .sg-archive p {
+    margin: 0;
+    font-size: 15px;
+    line-height: 1.85;
+    color: rgba(237, 224, 250, 0.84);
+    text-align: justify;
+  }
+
+  .sg-archive-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    align-self: center;
+    min-width: 220px;
+    padding: 18px 24px;
+    border-radius: 999px;
+    border: 1px solid rgba(237, 224, 250, 0.16);
+    background: rgba(255, 255, 255, 0.08);
+    color: #fff;
+    font: 700 11px/1 "Cinzel", serif;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    transition: transform 0.2s ease, background 0.2s ease;
+  }
+
+  .sg-archive-action:hover {
+    transform: translateY(-2px);
+    background: rgba(255, 255, 255, 0.14);
+  }
+
+  @media (max-width: 1180px) {
+    .sg-overview {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .sg-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .sg-hero {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 800px) {
+    .sg-page {
+      margin-top: 20px;
+      padding: 0 12px;
+    }
+
+    .sg-shell {
+      border-radius: 24px;
+    }
+
+    .sg-hero-main,
+    .sg-hero-side,
+    .sg-content,
+    .sg-category-head,
+    .sg-links,
+    .sg-archive {
+      padding-left: 18px;
+      padding-right: 18px;
+    }
+
+    .sg-heading-wrap {
+      grid-template-columns: 1fr;
+    }
+
+    .sg-kanji {
+      display: none;
+    }
+
+    .sg-overview,
+    .sg-links {
+      grid-template-columns: 1fr;
+    }
+
+    .sg-archive {
+      flex-direction: column;
+    }
+
+    .sg-archive-action {
+      width: 100%;
+      min-width: 0;
+    }
+  }
+</style>
+</head>
+<body>
+{$header}
+<div class="sg-page">
+  <div class="sg-shell">
+    <section class="sg-hero">
+      <div class="sg-hero-main">
+        <div class="sg-kicker">Archivo Histórico</div>
+        <div class="sg-heading-wrap">
+          <div class="sg-kanji">古術</div>
+          <div>
+            <h1 class="sg-title">Biblioteca Antigua</h1>
+            <p class="sg-subtitle">
+              Este índice conserva la estructura clásica de técnicas del foro: ramas heredadas, maestrías, pactos, pasivas y catálogos por aldea que ya no forman parte del sistema principal actual. Su función es servir como archivo consultable para referencias antiguas, desarrollo de conceptos veteranos y revisión de contenido legado sin mezclarlo con la biblioteca moderna.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <aside class="sg-hero-side">
+        <div>
+          <div class="sg-side-label">Acceso rápido</div>
+          <nav class="sg-side-nav">
+            <a href="#fundamentos">Fundamentos</a>
+            <a href="#aldeas">Clanes y únicas</a>
+            <a href="#especiales">Especiales</a>
+            <a href="#pactos">Invocaciones</a>
+            <a href="#archivo-nuevo">Técnicas nuevas</a>
+          </nav>
+        </div>
+      </aside>
+    </section>
+
+    <div class="sg-content">
+      <section class="sg-overview">
+        <div class="sg-chip">
+          <strong>Fundamentos</strong>
+          <span>Generales, elementales y ramas base del sistema clásico.</span>
+        </div>
+        <div class="sg-chip">
+          <strong>Aldeas</strong>
+          <span>Clanes y técnicas únicas organizadas por villa.</span>
+        </div>
+        <div class="sg-chip">
+          <strong>Errantes</strong>
+          <span>Linajes sin aldea y ramas externas del archivo.</span>
+        </div>
+        <div class="sg-chip">
+          <strong>Especiales</strong>
+          <span>Maestrías, kosei y pasivas avanzadas.</span>
+        </div>
+        <div class="sg-chip">
+          <strong>Invocación</strong>
+          <span>Pactos con criaturas y bestias asociadas.</span>
+        </div>
+      </section>
+
+      <section class="sg-grid" id="fundamentos">
+        <article class="sg-category">
+          <div class="sg-category-head">
+            <div class="sg-category-eyebrow">Base clásica</div>
+            <h2>Técnicas generales</h2>
+            <p>Las disciplinas troncales del sistema original, útiles como puerta de entrada al archivo tradicional de combate directo, ilusión y artes shinobi generales.</p>
+          </div>
+          <div class="sg-links">
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Ninjutsu&amp;aldea=general"><span class="sg-link-name">Ninjutsu</span><span class="sg-link-count">Ver archivo</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Genjutsu&amp;aldea=general"><span class="sg-link-name">Genjutsu</span><span class="sg-link-count">Ver archivo</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Taijutsu&amp;aldea=general"><span class="sg-link-name">Taijutsu</span><span class="sg-link-count">Ver archivo</span></a>
+          </div>
+        </article>
+
+        <article class="sg-category">
+          <div class="sg-category-head">
+            <div class="sg-category-eyebrow">Naturalezas base</div>
+            <h2>Técnicas elementales</h2>
+            <p>Las afinidades primarias del archivo antiguo, mantenidas aparte para conservar el recorrido original del sistema elemental previo.</p>
+          </div>
+          <div class="sg-links">
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Katon&amp;aldea=general"><span class="sg-link-name">Katon</span><span class="sg-link-count">Ver archivo</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Suiton&amp;aldea=general"><span class="sg-link-name">Suiton</span><span class="sg-link-count">Ver archivo</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Doton&amp;aldea=general"><span class="sg-link-name">Doton</span><span class="sg-link-count">Ver archivo</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Fuuton&amp;aldea=general"><span class="sg-link-name">Fuuton</span><span class="sg-link-count">Ver archivo</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Raiton&amp;aldea=general"><span class="sg-link-name">Raiton</span><span class="sg-link-count">Ver archivo</span></a>
+          </div>
+        </article>
+      </section>
+
+      <section class="sg-grid" id="aldeas">
+        <article class="sg-category">
+          <div class="sg-category-head">
+            <div class="sg-category-eyebrow">Hoja</div>
+            <h2>Konoha</h2>
+            <p>Herencias de clan y ramas exclusivas de la Hoja dentro del sistema clásico, separadas entre linajes generales y técnicas únicas de aldea.</p>
+          </div>
+          <div class="sg-links">
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Aburame&amp;aldea=general"><span class="sg-link-name">Aburame</span><span class="sg-link-count">Clan</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Akimichi&amp;aldea=general"><span class="sg-link-name">Akimichi</span><span class="sg-link-count">Clan</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Hyūga&amp;aldea=general"><span class="sg-link-name">Hyūga</span><span class="sg-link-count">Clan</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Nara&amp;aldea=general"><span class="sg-link-name">Nara</span><span class="sg-link-count">Clan</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Senju&amp;aldea=general"><span class="sg-link-name">Senju</span><span class="sg-link-count">Clan</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Uchiha&amp;aldea=general"><span class="sg-link-name">Uchiha</span><span class="sg-link-count">Clan</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Uzumaki&amp;aldea=general"><span class="sg-link-name">Uzumaki</span><span class="sg-link-count">Clan</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Yamanaka&amp;aldea=general"><span class="sg-link-name">Yamanaka</span><span class="sg-link-count">Clan</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Inuzuka&amp;aldea=general"><span class="sg-link-name">Inuzuka</span><span class="sg-link-count">Clan</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Sarutobi&amp;aldea=general"><span class="sg-link-name">Sarutobi</span><span class="sg-link-count">Clan</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Ninjutsu&amp;aldea=konoha"><span class="sg-link-name">Ninjutsu de Konoha</span><span class="sg-link-count">Única</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Genjutsu&amp;aldea=konoha"><span class="sg-link-name">Genjutsu de Konoha</span><span class="sg-link-count">Única</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Taijutsu&amp;aldea=konoha"><span class="sg-link-name">Taijutsu de Konoha</span><span class="sg-link-count">Única</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Katon&amp;aldea=konoha"><span class="sg-link-name">Katon de Konoha</span><span class="sg-link-count">Única</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Suiton&amp;aldea=konoha"><span class="sg-link-name">Suiton de Konoha</span><span class="sg-link-count">Única</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Doton&amp;aldea=konoha"><span class="sg-link-name">Doton de Konoha</span><span class="sg-link-count">Única</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Fuuton&amp;aldea=konoha"><span class="sg-link-name">Fuuton de Konoha</span><span class="sg-link-count">Única</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Raiton&amp;aldea=konoha"><span class="sg-link-name">Raiton de Konoha</span><span class="sg-link-count">Única</span></a>
+          </div>
+        </article>
+
+        <article class="sg-category">
+          <div class="sg-category-head">
+            <div class="sg-category-eyebrow">Arena</div>
+            <h2>Suna</h2>
+            <p>Catálogo clásico de clanes del desierto y ramas exclusivas ligadas a Sunagakure dentro de la versión antigua del sistema.</p>
+          </div>
+          <div class="sg-links">
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Jiki&amp;aldea=general"><span class="sg-link-name">Jiki</span><span class="sg-link-count">Clan</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Amagiri&amp;aldea=general"><span class="sg-link-name">Amagiri</span><span class="sg-link-count">Clan</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Tatsumaki&amp;aldea=general"><span class="sg-link-name">Tatsumaki</span><span class="sg-link-count">Clan</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Pakura&amp;aldea=general"><span class="sg-link-name">Pakura</span><span class="sg-link-count">Clan</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Maki&amp;aldea=general"><span class="sg-link-name">Maki</span><span class="sg-link-count">Clan</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Yoichi&amp;aldea=general"><span class="sg-link-name">Yoichi</span><span class="sg-link-count">Clan</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Shijin&amp;aldea=general"><span class="sg-link-name">Shijin</span><span class="sg-link-count">Clan</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Jinsoku&amp;aldea=general"><span class="sg-link-name">Jinsoku</span><span class="sg-link-count">Clan</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Shoku&amp;aldea=general"><span class="sg-link-name">Shoku</span><span class="sg-link-count">Clan</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Ninjutsu&amp;aldea=suna"><span class="sg-link-name">Ninjutsu de Suna</span><span class="sg-link-count">Única</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Genjutsu&amp;aldea=suna"><span class="sg-link-name">Genjutsu de Suna</span><span class="sg-link-count">Única</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Taijutsu&amp;aldea=suna"><span class="sg-link-name">Taijutsu de Suna</span><span class="sg-link-count">Única</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Katon&amp;aldea=suna"><span class="sg-link-name">Katon de Suna</span><span class="sg-link-count">Única</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Suiton&amp;aldea=suna"><span class="sg-link-name">Suiton de Suna</span><span class="sg-link-count">Única</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Doton&amp;aldea=suna"><span class="sg-link-name">Doton de Suna</span><span class="sg-link-count">Única</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Fuuton&amp;aldea=suna"><span class="sg-link-name">Fuuton de Suna</span><span class="sg-link-count">Única</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Raiton&amp;aldea=suna"><span class="sg-link-name">Raiton de Suna</span><span class="sg-link-count">Única</span></a>
+          </div>
+        </article>
+
+        <article class="sg-category">
+          <div class="sg-category-head">
+            <div class="sg-category-eyebrow">Niebla</div>
+            <h2>Kiri</h2>
+            <p>Linajes sangrientos, ramas especiales y técnicas únicas de Kirigakure preservadas en la biblioteca histórica del foro.</p>
+          </div>
+          <div class="sg-links">
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Yuki&amp;aldea=general"><span class="sg-link-name">Yuki</span><span class="sg-link-count">Clan</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Kaguya&amp;aldea=general"><span class="sg-link-name">Kaguya</span><span class="sg-link-count">Clan</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Kenju&amp;aldea=general"><span class="sg-link-name">Kenju</span><span class="sg-link-count">Clan</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Hozuki&amp;aldea=general"><span class="sg-link-name">Hozuki</span><span class="sg-link-count">Clan</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Hoshigaki&amp;aldea=general"><span class="sg-link-name">Hoshigaki</span><span class="sg-link-count">Clan</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Heizu&amp;aldea=general"><span class="sg-link-name">Heizu</span><span class="sg-link-count">Clan</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Terumi&amp;aldea=general"><span class="sg-link-name">Terumi</span><span class="sg-link-count">Clan</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Taiki&amp;aldea=general"><span class="sg-link-name">Taiki</span><span class="sg-link-count">Clan</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Onmyōji&amp;aldea=general"><span class="sg-link-name">Onmyōji</span><span class="sg-link-count">Clan</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Kurama&amp;aldea=general"><span class="sg-link-name">Kurama</span><span class="sg-link-count">Clan</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Ninjutsu&amp;aldea=kiri"><span class="sg-link-name">Ninjutsu de Kiri</span><span class="sg-link-count">Única</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Genjutsu&amp;aldea=kiri"><span class="sg-link-name">Genjutsu de Kiri</span><span class="sg-link-count">Única</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Taijutsu&amp;aldea=kiri"><span class="sg-link-name">Taijutsu de Kiri</span><span class="sg-link-count">Única</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Katon&amp;aldea=kiri"><span class="sg-link-name">Katon de Kiri</span><span class="sg-link-count">Única</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Suiton&amp;aldea=kiri"><span class="sg-link-name">Suiton de Kiri</span><span class="sg-link-count">Única</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Doton&amp;aldea=kiri"><span class="sg-link-name">Doton de Kiri</span><span class="sg-link-count">Única</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Fuuton&amp;aldea=kiri"><span class="sg-link-name">Fuuton de Kiri</span><span class="sg-link-count">Única</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Raiton&amp;aldea=kiri"><span class="sg-link-name">Raiton de Kiri</span><span class="sg-link-count">Única</span></a>
+          </div>
+        </article>
+
+        <article class="sg-category">
+          <div class="sg-category-head">
+            <div class="sg-category-eyebrow">Roca</div>
+            <h2>Iwa</h2>
+            <p>Compendio histórico de clanes de Iwagakure y técnicas exclusivas ligadas a su versión clásica de combate y especialización.</p>
+          </div>
+          <div class="sg-links">
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Kamizuru&amp;aldea=general"><span class="sg-link-name">Kamizuru</span><span class="sg-link-count">Clan</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Konjiki&amp;aldea=general"><span class="sg-link-name">Konjiki</span><span class="sg-link-count">Clan</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Iburi&amp;aldea=general"><span class="sg-link-name">Iburi</span><span class="sg-link-count">Clan</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Ryotenbin&amp;aldea=general"><span class="sg-link-name">Ryotenbin</span><span class="sg-link-count">Clan</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Ashira&amp;aldea=general"><span class="sg-link-name">Ashira</span><span class="sg-link-count">Clan</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Kazan&amp;aldea=general"><span class="sg-link-name">Kazan</span><span class="sg-link-count">Clan</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Origami&amp;aldea=general"><span class="sg-link-name">Origami</span><span class="sg-link-count">Clan</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Kusarizoku&amp;aldea=general"><span class="sg-link-name">Kusarizoku</span><span class="sg-link-count">Clan</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Onikuma&amp;aldea=general"><span class="sg-link-name">Onikuma</span><span class="sg-link-count">Clan</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Ichigi&amp;aldea=general"><span class="sg-link-name">Ichigi</span><span class="sg-link-count">Clan</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Ninjutsu&amp;aldea=iwa"><span class="sg-link-name">Ninjutsu de Iwa</span><span class="sg-link-count">Única</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Genjutsu&amp;aldea=iwa"><span class="sg-link-name">Genjutsu de Iwa</span><span class="sg-link-count">Única</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Taijutsu&amp;aldea=iwa"><span class="sg-link-name">Taijutsu de Iwa</span><span class="sg-link-count">Única</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Katon&amp;aldea=iwa"><span class="sg-link-name">Katon de Iwa</span><span class="sg-link-count">Única</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Suiton&amp;aldea=iwa"><span class="sg-link-name">Suiton de Iwa</span><span class="sg-link-count">Única</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Doton&amp;aldea=iwa"><span class="sg-link-name">Doton de Iwa</span><span class="sg-link-count">Única</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Fuuton&amp;aldea=iwa"><span class="sg-link-name">Fuuton de Iwa</span><span class="sg-link-count">Única</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Raiton&amp;aldea=iwa"><span class="sg-link-name">Raiton de Iwa</span><span class="sg-link-count">Única</span></a>
+          </div>
+        </article>
+
+        <article class="sg-category">
+          <div class="sg-category-head">
+            <div class="sg-category-eyebrow">Nube</div>
+            <h2>Kumo</h2>
+            <p>Listado histórico de clanes y técnicas únicas de Kumogakure, con un enfoque marcado en ofensiva, velocidad y estilos de alta presión.</p>
+          </div>
+          <div class="sg-links">
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Arashi&amp;aldea=general"><span class="sg-link-name">Arashi</span><span class="sg-link-count">Clan</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Chinoike&amp;aldea=general"><span class="sg-link-name">Chinoike</span><span class="sg-link-count">Clan</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Fuuma&amp;aldea=general"><span class="sg-link-name">Fuuma</span><span class="sg-link-count">Clan</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Miroku&amp;aldea=general"><span class="sg-link-name">Miroku</span><span class="sg-link-count">Clan</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Hyouji&amp;aldea=general"><span class="sg-link-name">Hyouji</span><span class="sg-link-count">Clan</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Jiryoku&amp;aldea=general"><span class="sg-link-name">Jiryoku</span><span class="sg-link-count">Clan</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Tokage&amp;aldea=general"><span class="sg-link-name">Tokage</span><span class="sg-link-count">Clan</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Tajuken&amp;aldea=general"><span class="sg-link-name">Tajuken</span><span class="sg-link-count">Clan</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Yotsuki&amp;aldea=general"><span class="sg-link-name">Yotsuki</span><span class="sg-link-count">Clan</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Kidou&amp;aldea=general"><span class="sg-link-name">Kidou</span><span class="sg-link-count">Clan</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Ninjutsu&amp;aldea=kumo"><span class="sg-link-name">Ninjutsu de Kumo</span><span class="sg-link-count">Única</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Genjutsu&amp;aldea=kumo"><span class="sg-link-name">Genjutsu de Kumo</span><span class="sg-link-count">Única</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Taijutsu&amp;aldea=kumo"><span class="sg-link-name">Taijutsu de Kumo</span><span class="sg-link-count">Única</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Katon&amp;aldea=kumo"><span class="sg-link-name">Katon de Kumo</span><span class="sg-link-count">Única</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Suiton&amp;aldea=kumo"><span class="sg-link-name">Suiton de Kumo</span><span class="sg-link-count">Única</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Doton&amp;aldea=kumo"><span class="sg-link-name">Doton de Kumo</span><span class="sg-link-count">Única</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Fuuton&amp;aldea=kumo"><span class="sg-link-name">Fuuton de Kumo</span><span class="sg-link-count">Única</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Raiton&amp;aldea=kumo"><span class="sg-link-name">Raiton de Kumo</span><span class="sg-link-count">Única</span></a>
+          </div>
+        </article>
+
+        <article class="sg-category">
+          <div class="sg-category-head">
+            <div class="sg-category-eyebrow">Errantes</div>
+            <h2>Sin aldea y otras villas</h2>
+            <p>Ramas externas al núcleo de las grandes aldeas: clanes independientes, tradiciones menores y técnicas archivadas de asentamientos alternativos.</p>
+          </div>
+          <div class="sg-links">
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Otenki&amp;aldea=general"><span class="sg-link-name">Otenki</span><span class="sg-link-count">Sin aldea</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Emaki%20Ninpō&amp;aldea=general"><span class="sg-link-name">Emaki Ninpō</span><span class="sg-link-count">Sin aldea</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Rakanken%20Ninpō&amp;aldea=general"><span class="sg-link-name">Rakanken Ninpō</span><span class="sg-link-count">Sin aldea</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Suzume&amp;aldea=general"><span class="sg-link-name">Suzume</span><span class="sg-link-count">Sin aldea</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Izuno&amp;aldea=general"><span class="sg-link-name">Izuno</span><span class="sg-link-count">Sin aldea</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Dōka Ninpō&amp;aldea=general"><span class="sg-link-name">Dōka Ninpō</span><span class="sg-link-count">Sin aldea</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Nagamushi&amp;aldea=general"><span class="sg-link-name">Nagamushi</span><span class="sg-link-count">Sin aldea</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Shiin&amp;aldea=general"><span class="sg-link-name">Shiin</span><span class="sg-link-count">Sin aldea</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Kujaku Myōhō&amp;aldea=general"><span class="sg-link-name">Kujaku Myōhō</span><span class="sg-link-count">Hoshi</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Hyōten&amp;aldea=general"><span class="sg-link-name">Hyōten</span><span class="sg-link-count">Yuki</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Tenbin&amp;aldea=general"><span class="sg-link-name">Tenbin</span><span class="sg-link-count">Oto</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Higasa&amp;aldea=general"><span class="sg-link-name">Higasa</span><span class="sg-link-count">Ame</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Tenrō&amp;aldea=general"><span class="sg-link-name">Tenrō</span><span class="sg-link-count">Kusa</span></a>
+          </div>
+        </article>
+      </section>
+
+      <section class="sg-grid" id="especiales">
+        <article class="sg-category">
+          <div class="sg-category-head">
+            <div class="sg-category-eyebrow">Especialización</div>
+            <h2>Maestrías</h2>
+            <p>Ramas avanzadas del sistema antiguo enfocadas en disciplinas concretas, sellos, medicina, armas, percepción y otros caminos de alta especialización.</p>
+          </div>
+          <div class="sg-links">
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Fūinjutsu&amp;aldea=maestrias"><span class="sg-link-name">Fūinjutsu</span><span class="sg-link-count">Maestría</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Kekkaijutsu&amp;aldea=maestrias"><span class="sg-link-name">Kekkaijutsu</span><span class="sg-link-count">Maestría</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Iryou Ninjutsu&amp;aldea=maestrias"><span class="sg-link-name">Iryō Ninjutsu</span><span class="sg-link-count">Maestría</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Ankoku Ijutsu&amp;aldea=maestrias"><span class="sg-link-name">Ankoku Ijutsu</span><span class="sg-link-count">Maestría</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Yin&amp;aldea=maestrias"><span class="sg-link-name">Yin</span><span class="sg-link-count">Maestría</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Shoten&amp;aldea=maestrias"><span class="sg-link-name">Shoten</span><span class="sg-link-count">Maestría</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Kenjutsu&amp;aldea=maestrias"><span class="sg-link-name">Kenjutsu</span><span class="sg-link-count">Maestría</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Bōjutsu&amp;aldea=maestrias"><span class="sg-link-name">Bōjutsu</span><span class="sg-link-count">Maestría</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Shurikenjutsu&amp;aldea=maestrias"><span class="sg-link-name">Shurikenjutsu</span><span class="sg-link-count">Maestría</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Gotai&amp;aldea=maestrias"><span class="sg-link-name">Gotai</span><span class="sg-link-count">Maestría</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Hachimon&amp;aldea=maestrias"><span class="sg-link-name">Hachimon</span><span class="sg-link-count">Maestría</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Tansakujutsu&amp;aldea=maestrias"><span class="sg-link-name">Tansakujutsu</span><span class="sg-link-count">Maestría</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Ninshu&amp;aldea=maestrias"><span class="sg-link-name">Ninshu</span><span class="sg-link-count">Maestría</span></a>
+          </div>
+        </article>
+
+        <article class="sg-category">
+          <div class="sg-category-head">
+            <div class="sg-category-eyebrow">Pasivas y kosei</div>
+            <h2>Ramas especiales</h2>
+            <p>Conjunto de técnicas pasivas y estados excepcionales del sistema antiguo, desde modos sabios hasta variantes de cuerpo, sangre o condición extraordinaria.</p>
+          </div>
+          <div class="sg-links">
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Pasivas&amp;aldea=general"><span class="sg-link-name">Técnicas Pasivas</span><span class="sg-link-count">Especial</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Senjutsu&amp;aldea=general"><span class="sg-link-name">Senjutsu</span><span class="sg-link-count">Especial</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Juinjutsu&amp;aldea=general"><span class="sg-link-name">Juinjutsu</span><span class="sg-link-count">Especial</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Pseudo Jinchuuriki&amp;aldea=general"><span class="sg-link-name">Pseudo Jinchuuriki</span><span class="sg-link-count">Especial</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Jashin&amp;aldea=general"><span class="sg-link-name">Jashin</span><span class="sg-link-count">Especial</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Jiongu&amp;aldea=general"><span class="sg-link-name">Jiongu</span><span class="sg-link-count">Especial</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Tensai&amp;aldea=general"><span class="sg-link-name">Tensai</span><span class="sg-link-count">Especial</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Yobidashi&amp;aldea=general"><span class="sg-link-name">Yobidashi</span><span class="sg-link-count">Especial</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Kazoku&amp;aldea=general"><span class="sg-link-name">Kazoku</span><span class="sg-link-count">Especial</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Tokubetsu&amp;aldea=general"><span class="sg-link-name">Tokubetsu</span><span class="sg-link-count">Especial</span></a>
+          </div>
+        </article>
+      </section>
+
+      <section class="sg-grid" id="pactos">
+        <article class="sg-category">
+          <div class="sg-category-head">
+            <div class="sg-category-eyebrow">Invocación</div>
+            <h2>Pactos de invocación</h2>
+            <p>Archivo de contratos con criaturas invocables del sistema antiguo, desde bestias icónicas hasta pactos menos comunes ligados a estilos de combate específicos.</p>
+          </div>
+          <div class="sg-links">
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Gama&amp;aldea=invo"><span class="sg-link-name">Gama</span><span class="sg-link-count">Sapos</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Serpientes&amp;aldea=invo"><span class="sg-link-name">Hebi</span><span class="sg-link-count">Serpientes</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Babosas&amp;aldea=invo"><span class="sg-link-name">Namekuji</span><span class="sg-link-count">Babosas</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Gatos&amp;aldea=invo"><span class="sg-link-name">Neko</span><span class="sg-link-count">Gatos</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Arañas&amp;aldea=invo"><span class="sg-link-name">Kumo</span><span class="sg-link-count">Arañas</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Murcielagos&amp;aldea=invo"><span class="sg-link-name">Kōmori</span><span class="sg-link-count">Murciélagos</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Lobos&amp;aldea=invo"><span class="sg-link-name">Ōkami</span><span class="sg-link-count">Lobos</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Aves&amp;aldea=invo"><span class="sg-link-name">Tori</span><span class="sg-link-count">Aves</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Osos&amp;aldea=invo"><span class="sg-link-name">Kuma</span><span class="sg-link-count">Osos</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Salamandras&amp;aldea=invo"><span class="sg-link-name">Sanshōuo</span><span class="sg-link-count">Salamandras</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Tortugas&amp;aldea=invo"><span class="sg-link-name">Kame</span><span class="sg-link-count">Tortugas</span></a>
+            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_show.php?tipo=Monos&amp;aldea=invo"><span class="sg-link-name">Saru</span><span class="sg-link-count">Monos</span></a>
+          </div>
+        </article>
+      </section>
+
+      <section class="sg-archive" id="archivo-nuevo">
+        <div class="sg-archive-copy">
+          <h2>Volver a técnicas nuevas</h2>
+          <p>
+            Si lo que buscas es el sistema activo y actualizado del foro, esta ruta te devuelve a la biblioteca moderna, separada del archivo histórico para que ambas experiencias mantengan una navegación más clara.
+          </p>
+        </div>
+        <a class="sg-archive-action" href="{$mybb->settings['bburl']}/sg/tecnicas.php">Abrir técnicas nuevas</a>
+      </section>
+    </div>
+  </div>
+</div>
+{$footer}
+</body>
+</html>

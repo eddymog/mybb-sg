@@ -1,0 +1,32 @@
+<html>
+
+<head>
+    <style>
+
+
+    </style>
+    <title>Consola Súper Secreta</title>
+    {$headerinclude}
+</head>
+
+<body>
+    {$header}
+    <div class="fondo-blanco">
+    <h2 style=" text-align: center; ">Habitación de Nerfeos</h2>
+	<div style=" text-align: center; ">
+		<a href="/sg/admin/nerfeos.php?balance=sin_balance" target="_blank">Técnicas sin incluir balance</a>: {$sin_balance} || 
+		<a href="/sg/admin/nerfeos.php?balance=pj_sin_balance" target="_blank">Técnicas 'personaje' sin incluir balance</a>: {$pj_sin_balance} ||
+		<a href="/sg/admin/nerfeos.php?balance=balanceadas" target="_blank">Técnicas balanceadas</a>: {$balanceadas} || 
+		<a href="/sg/admin/nerfeos.php?balance=desbalanceadas" target="_blank">Técnicas desbalanceadas</a>: {$desbalanceadas} || 
+		<a href="/sg/admin/nerfeos.php?balance=descartadas" target="_blank">Técnicas descartadas</a>: {$descartadas} </div>
+	<hr>
+	<br>
+    <ul>
+        {$tecnicas_li}
+    </ul>
+    </div>
+    {$reload_script}
+    {$footer}
+</body>
+
+</html>

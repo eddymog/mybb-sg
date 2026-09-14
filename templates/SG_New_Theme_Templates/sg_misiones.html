@@ -1,0 +1,45 @@
+<html>
+<head>
+    <title>Entrenar: Misiones</title>
+    {$headerinclude}
+</head>
+<body>
+    {$header}
+    <div class="fondo-blanco">
+        <div class="mission_pr_available">{$pr} Puntos de rol disponibles.</div><br>
+        <div style="display: none">
+            <form id="misform" method="post" action="misiones.php">
+                <input type="text" name="uid" id="userid" value="{$userid}">
+                <input type="text" id="mid" name="mid" value="{$mision['cod']}">
+            </form>
+        </div>
+        <div class="mission_board">
+            <div class="mission_picture">
+                <img style="
+    height: 100%;
+" src="https://i.pinimg.com/originals/1a/e3/0f/1ae30f8c4ef2c68a95695b07b754f32b.gif" />
+            </div>
+            <div class="mission_data">
+                <div class="mission">
+<p>
+	<strong class="mission_title"><h2>{$mision['title']} - Misión Rango: {$mision['rango']}</h2></strong>
+	<strong style="font-size: 16px">Detalles:</strong>
+	<p style="text-align:justify; padding-right: 30px;">{$mision['descripcion']}</p>
+	Tu pago será <strong>{$mision['ryos']} Ryos</strong> y recibirás <strong>{$mision['expt']} Puntos de 		Habilidad</strong>
+	<br><br>
+	Esta misión requiere <strong>{$mision['coste']} Puntos de Rol</strong>
+</p>
+</div>
+
+<div class="boton_mision" style="text-align: center;">
+	<input class="button" type="button" onclick="{$comenzar_accion}" value="Comenzar Misión" style="font-size: 20px;width: 100%;">
+</div>
+                </div>
+        </div>
+    </div>
+    <if $log_var !='' then><script>alert('{$log_var}');</script></if>
+    {$reload_script}
+    {$footer}
+</body>
+
+</html>

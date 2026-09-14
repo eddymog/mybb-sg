@@ -1,0 +1,192 @@
+<html>
+
+<head>
+  <title>Virtudes y Defectos</title>
+  {$headerinclude}
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Noto+Serif+JP:wght@300;400;700&display=swap" rel="stylesheet">
+  <style>
+    .sg-admin {
+      --bg: #0f0c18; --bg2: #130f1e; --bg3: #171224;
+      --border: rgba(156, 107, 204, 0.12);
+      --border-strong: rgba(156, 107, 204, 0.22);
+      --ink: #e8dff8; --plum: #7b4ab8; --plum2: #9c6bcc; --plum3: #b890e0;
+      --stone: #8a7a9a; --mist: #5a4a6a; --oxide: #c0582a; --lavender: #ede0fa;
+      max-width: 860px;
+      margin: 24px auto 40px;
+      padding: 0 16px;
+      color: var(--ink);
+      font-family: 'Noto Serif JP', serif;
+    }
+
+    .sg-admin-card {
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), transparent 16%), var(--bg2);
+      border: 0.5px solid var(--border);
+      overflow: hidden;
+    }
+
+    .sg-admin-head {
+      display: flex; align-items: center; gap: 12px;
+      padding: 18px 22px; background: var(--bg3); border-bottom: 0.5px solid var(--border);
+    }
+    .sg-admin-head::before { content: ''; width: 3px; height: 20px; background: var(--oxide); flex-shrink: 0; }
+    .sg-admin-head h1 {
+      margin: 0; font-family: 'Cinzel', serif; font-size: 15px; font-weight: 900;
+      letter-spacing: 2px; text-transform: uppercase; color: var(--ink);
+    }
+
+    .sg-admin-body { padding: 22px; }
+
+    .sg-lookup {
+      display: flex; flex-wrap: wrap; align-items: flex-end; gap: 10px;
+      margin-bottom: 20px; padding-bottom: 20px; border-bottom: 0.5px solid var(--border);
+    }
+
+    .sg-mode {
+      margin-bottom: 16px; font-family: 'Cinzel', serif; font-size: 8px; font-weight: 700;
+      letter-spacing: 2px; text-transform: uppercase; color: var(--plum3);
+    }
+
+    .sg-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .sg-field { display: flex; flex-direction: column; gap: 5px; }
+    .sg-field--full { grid-column: 1 / -1; }
+
+    .sg-label {
+      font-family: 'Cinzel', serif; font-size: 8px; font-weight: 700; letter-spacing: 1.5px;
+      text-transform: uppercase; color: var(--mist);
+    }
+    .sg-label .req { color: var(--oxide); }
+    .sg-hint { font-size: 11px; color: var(--mist); }
+
+    .sg-input, .sg-textarea, .sg-select {
+      width: 100%; padding: 9px 12px; background: var(--bg);
+      border: 0.5px solid var(--border-strong); color: var(--ink);
+      font-family: 'Noto Serif JP', serif; font-size: 14px; line-height: 1.5;
+      box-sizing: border-box; transition: border-color 0.15s;
+    }
+    .sg-input, .sg-select { height: 40px; }
+
+    .sg-select {
+      -webkit-appearance: none; appearance: none; padding-right: 32px;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%238a7a9a' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 12px center;
+    }
+
+    .sg-input:focus, .sg-textarea:focus, .sg-select:focus { outline: none; border-color: var(--plum3); }
+    .sg-textarea { resize: vertical; line-height: 1.6; }
+
+    .sg-btn {
+      display: inline-flex; align-items: center; justify-content: center; height: 38px;
+      padding: 0 22px; background: var(--plum); border: none; color: var(--lavender);
+      font-family: 'Cinzel', serif; font-size: 9px; font-weight: 700; letter-spacing: 2px;
+      text-transform: uppercase; cursor: pointer; transition: background 0.15s;
+    }
+    .sg-btn:hover { background: var(--plum2); }
+    .sg-btn--danger { background: var(--oxide); color: #fff; }
+    .sg-btn--danger:hover { filter: brightness(1.15); background: var(--oxide); }
+
+    .sg-actions {
+      display: flex; justify-content: space-between; gap: 10px;
+      margin-top: 18px; padding-top: 16px; border-top: 0.5px solid var(--border);
+    }
+
+    @media (max-width: 640px) { .sg-grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+
+<body>
+  {$header}
+  <main class="sg-admin">
+    <div class="sg-admin-card">
+      <div class="sg-admin-head">
+        <h1>Virtudes y Defectos</h1>
+      </div>
+      <div class="sg-admin-body">
+
+        <!-- Cargar una virtud/defecto existente para modificar / borrar -->
+        <div class="sg-lookup">
+          <div class="sg-field" style="flex: 1; min-width: 220px;">
+            <label class="sg-label" for="lookup_id">Cargar por ID</label>
+            <select class="sg-select" id="lookup_id">
+              <option value="">— Selecciona —</option>
+              <optgroup label="Virtudes">{$opts_virtudes}</optgroup>
+              <optgroup label="Defectos">{$opts_defectos}</optgroup>
+            </select>
+          </div>
+          <button class="sg-btn" type="button" onclick="onLoadVirtud()">Cargar</button>
+          <if $vid != '' then><button class="sg-btn" type="button" onclick="window.location.href=window.location.pathname" style="background:transparent;border:0.5px solid var(--border-strong);color:var(--stone);">Nuevo</button></if>
+        </div>
+
+        <div class="sg-mode">
+          <if $vid != '' then>Modificando: {$vid}<else>Creando nueva virtud / defecto</if>
+        </div>
+
+        <form method="post" action="/sg/admin/gestionar_virtudes.php" name="gestionar_virtudes" id="gestionar_virtudes">
+          <input type="hidden" name="virtud_id_old" value="{$vid}">
+
+          <div class="sg-grid">
+            <div class="sg-field">
+              <label class="sg-label" for="virtud_id_post">ID <span class="req">*</span></label>
+              <input class="sg-input" value="{$virtud['virtud_id']}" type="text" name="virtud_id_post" id="virtud_id_post" maxlength="30" required />
+            </div>
+            <div class="sg-field">
+              <label class="sg-label" for="nombre">Nombre <span class="req">*</span></label>
+              <input class="sg-input" value="{$virtud['nombre']}" type="text" name="nombre" id="nombre" required />
+            </div>
+            <div class="sg-field">
+              <label class="sg-label" for="puntos">Puntos <span class="req">*</span></label>
+              <input class="sg-input" value="{$virtud['puntos']}" type="number" name="puntos" id="puntos" required />
+              <span class="sg-hint">Positivo = virtud · Negativo = defecto</span>
+            </div>
+            <div class="sg-field">
+              <label class="sg-label" for="exclusivo">Exclusivo</label>
+              <select class="sg-select" name="exclusivo" id="exclusivo">
+                <option value="0" <if $virtud['exclusivo'] == 0 then>selected</if>>No</option>
+                <option value="1" <if $virtud['exclusivo'] != 0 && $virtud['exclusivo'] != '' then>selected</if>>Sí</option>
+              </select>
+            </div>
+            <div class="sg-field sg-field--full">
+              <label class="sg-label" for="descripcion">Descripción <span class="req">*</span></label>
+              <textarea class="sg-textarea" style="height: 200px;" name="descripcion" id="descripcion" minlength="1" required>{$virtud['descripcion']}</textarea>
+            </div>
+
+            <div class="sg-field">
+              <label class="sg-label" for="staff">Miembro de Staff <span class="req">*</span></label>
+              <input class="sg-input" type="text" name="staff" id="staff" required />
+            </div>
+            <div class="sg-field">
+              <label class="sg-label" for="razon">Razón <span class="req">*</span></label>
+              <input class="sg-input" type="text" name="razon" id="razon" required />
+            </div>
+          </div>
+
+          <div class="sg-actions">
+            <if $vid != '' then>
+              <button class="sg-btn sg-btn--danger" type="submit" name="accion" value="Eliminar" onclick="return confirm('¿Eliminar {$vid}? Esta acción no se puede deshacer.');">Eliminar</button>
+            <else>
+              <span></span>
+            </if>
+            <button class="sg-btn" type="submit" name="accion" value="Guardar">Guardar</button>
+          </div>
+        </form>
+
+      </div>
+    </div>
+  </main>
+  {$footer}
+</body>
+<if $log_var != '' then><script>alert(`{$log_var}`);</script></if>
+{$reload_script}
+<script>
+  function onLoadVirtud() {
+    const id = document.getElementById('lookup_id').value;
+    if (id) {
+      window.location.href = window.location.pathname + '?virtud_id=' + encodeURIComponent(id);
+    } else {
+      window.location.href = window.location.pathname;
+    }
+  }
+</script>
+
+</html>

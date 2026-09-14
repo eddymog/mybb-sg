@@ -1,0 +1,44 @@
+<div class="privatezone">
+  <div class="greytitle"><span class="privtitle">Zona Privada</span></div>
+  <div class="tecscontainer">
+    <div class="greytitle"><span class="privtitle">• Técnicas •</span></div>
+    <div style="display: inline-block;">
+      <div id="tecDiv">
+        <div class="tecblock ninjutsu ninjutsu_general" id="ninblock" style="display: inline-block;"></div>
+        <div class="tecblock taijutsu taijutsu_general" id="taiblock" style="display: none;"></div>
+        <div class="tecblock genjutsu genjutsu_general" id="genblock" style="display: none;"></div>
+      </div>
+      <div class="tecselector">
+        <input type="button" id="ninbutton" value="Ninjutsu" onclick="showBlock('ninblock')">
+        <input type="button" id="taibutton" value="Taijutsu" onclick="showBlock('taiblock')">
+        <input type="button" id="genbutton" value="Genjutsu" onclick="showBlock('genblock')">
+      </div>
+    </div>
+  </div>
+  <div style=" background-color: #1a1a1a; font-size: 21px; color: white; padding-top: 15px; ">
+	<span>Anotaciones de Staff:</span><br>
+	<textarea required="" disabled="" style="text-align: left; border-radius: 3px; background-color: rgb(230, 219, 253); width: 400px; height: 140px;">{$ficha['notas']}</textarea>
+  </div>
+  <div style=" background-color: #1a1a1a; font-size: 21px; color: white; padding-top: 15px; ">Slots restantes: {$ficha['slots']}</div>
+  <div style=" background-color: #1a1a1a; font-size: 21px; color: white; padding-top: 15px; ">Limite de clase: <span id="limite_clase">{$ficha['limite_nivel']}</span></div>
+	<script>
+		let limiteClase = 'E';
+		if (limiteNivel == 8) {
+		  limiteClase = 'S+';
+		} else if (limiteNivel == 7) {
+		  limiteClase = 'S';
+		} else if (limiteNivel == 6) {
+		  limiteClase = 'A+';
+		} else if (sumaStats >= 320) {
+		  limiteClase = 'A';
+		} else if (sumaStats >= 240) {
+		  limiteClase = 'B';
+		} else if (sumaStats >= 160) {
+		  limiteClase = 'C';
+		} else if (sumaStats >= 80) {
+		  limiteClase = 'D';
+		}
+		document.getElementById('limite_clase').innerHTML = limiteClase;
+	</script>
+	{$fichaprivate_script}
+</div>

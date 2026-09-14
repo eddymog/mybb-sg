@@ -1,0 +1,58 @@
+<html>
+	<head>
+		<style>
+
+
+		</style>
+		<title>Peticiones de Moderación</title>
+		{$headerinclude}
+	</head>
+	<body>
+		{$header}
+		<div class="fondo-blanco" style="text-align: center;">
+			<div class="formpanel">
+				<span class="formtitle" style=" font-size: 20px; "><strong>Envía tu petición o moderación:</strong></span><br><br>
+				<form id="peticion_form" method="post" action="peticiones.php">
+					
+					<label class="form-label" for="resumen">Selecciona un tipo de petición:*</label><br>
+					<select name="categoria" id="categoria" class="form-select mb-3" style=" background: #fff !important; ">
+					  <option value="ficha">Moderacion de Ficha</option>
+					  <option value="tema">Moderacion de Tema</option>
+					  <option value="combate">Moderacion de Combate</option>
+					  <option value="tecnica">Moderacion de Técnica</option>
+					  <option value="otros">Otros</option>
+					</select><br><br>
+					
+					<label class="form-label" for="resumen">Resumen de petición (máximo 120 carácteres):*</label><br>
+					<div class="input-group mb-3">
+						<input class="textbox" type="text" class="form-control" placeholder="Moderar esto o lo otro de mi ficha." name="resumen" minlength="1" maxlength="120" style=" width: 519px; ">
+					</div><br>
+					
+					<label class="form-label" for="url">Link de tema:</label>
+					<div class="input-group mb-3">
+						<input class="textbox" type="text" class="form-control" placeholder="Link (opcional)" name="url" style=" width: 519px; ">
+					</div><br>
+					
+					<label class="form-label" for="descripcion">Descripción*:</label>
+					<div class="input-group mb-3">
+					  <textarea class="form-control" name="descripcion" placeholder="Describe tu petición de moderación." style="width: 500px;height: 100px;"></textarea>
+				</form>
+				
+			</div><br>
+			<div class="buttonsection">
+				<input class="button" type="button" onclick="document.getElementById('peticion_form').submit();" value="Enviar Petición"><br><br>
+			</div>
+			<br><br>
+			<if $peticiones_txt then>
+				<h3>Peticiones pendientes:</h3>
+				<div>
+					<span>{$peticiones_txt}</span>
+				</div>
+			</if>
+		</div>
+		{$footer}
+	</body>
+	<script>
+
+	</script>
+</html>

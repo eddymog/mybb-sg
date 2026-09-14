@@ -1,0 +1,114 @@
+    <script>
+function toggleSidebar() {
+  const sidebar = document.querySelector('.sidebar');
+  sidebar.classList.toggle('active');
+}
+    </script>
+<div id="container">
+    <a name="top" id="top"></a>
+    <div id="header" style=" width: 1100px; margin: auto; ">
+        <nav class="navbar">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a href="{$mybb->settings['bburl']}/index.php">Indice</a>
+                </li>
+                <li class="nav-item">
+                    <a href="{$mybb->settings['bburl']}/sg/ficha.php?action=profile&uid={$mybb->user['uid']}">
+                        <if $mybb->user['uid'] != '0' then>Ficha
+                            <else />¡Crea tu ficha!
+                        </if>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{$mybb->settings['bburl']}/forumdisplay.php?fid=25">Guías</a>
+                </li>
+                <li class="nav-item">
+                    <a href="{$mybb->settings['bburl']}/sg/tecnicas.php">Técnicas</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#">Información</a>
+                    <ul class="dropdown-content">
+                        <li><a href="{$mybb->settings['bburl']}/sg/mapa_mundo.php">Mapa Mundi</a></li>
+                        <li><a href="{$mybb->settings['bburl']}/sg/recompensa_diaria.php">Recompensas Diarias</a></li>
+                        <li><a href="{$mybb->settings['bburl']}/sg/promocion.php">Códigos Promocionales</a></li>
+                        <li><a href="{$mybb->settings['bburl']}/sg/calculadora.php">Calculadora de Estadísticas</a></li>
+                        <li><a href="{$mybb->settings['bburl']}/sg/censo.php">Censo de Usuarios</a></li>
+                        <li><a href="{$mybb->settings['bburl']}/sg/registro_fisicos.php">Registro de Físicos de PJs</a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="nav-item">
+                    <a href="#">Rol</a>
+                    <ul class="dropdown-content">
+                        <li><a href="{$mybb->settings['bburl']}/sg/entrenamientos.php">Entrenamiento de Técnicas</a>
+                        </li>
+                        <li><a href="{$mybb->settings['bburl']}/sg/misiones.php">Misiones Automáticas</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item">
+                    <a href="#">Usuario</a>
+                    <ul class="dropdown-content">
+                        <li><a href="{$mybb->settings['bburl']}/admin/index.php">Consola de Administración</a></li>
+                        <li><a href="{$mybb->settings['bburl']}/sg/admin/consola_mod.php">Herramientas de Moderación</a>
+                        </li>
+                        <li><a href="{$mybb->settings['bburl']}/sg/peticiones.php">Petición Administrativa</a></li>
+                        <li><a href="{$mybb->settings['bburl']}/private.php">Mensajes Privados</a></li>
+                        <li><a href="{$mybb->settings['bburl']}/usercp.php">Panel de Usuario</a></li>
+                        <li><a href="{$mybb->settings['bburl']}/search.php">Busqueda</a></li>
+                        <li><a href="{$mybb->settings['bburl']}/usercp.php?action=as_edit">Multicuenta</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item">
+                    <a href="https://discord.com/invite/UMBSGnWmwt">Discord</a>
+                </li>
+        </nav>
+        <hr class="hrDivider">
+			
+        <!-- <div id="bannerBox" style="background-image: url(https://i.postimg.cc/hPxymVDm/Banner.png);"></div> -->
+		<a href="https://shinobigaiden.net/index.php">
+			<div id="logo">
+				<if $g_is_banner_horny then>
+					<if $banner_horny_or_not == '1' then>
+						<img src="/images/sg/bannersfreeia/banner{$banner_horny_number}.png">
+					<else />	
+						<img src="/images/sg/banners/banner{$banner_number}.jpeg">
+					</if> 
+				<elseif $g_is_banner_hitsu then>
+					<img src="/images/sg/bannershitsu/banner{$banner_hitsu_number}.png">
+				<elseif $g_is_banner_nami then>
+					<img src="/images/sg/bannersnami/banner{$banner_nami_number}.png">
+				<elseif $banner_easter == '50' then>
+					<img src="/images/sg/banner50.jpeg">
+				<else />	
+					<!-- <img src="/images/sg/banners/banner{$banner_number}.jpeg"> -->
+					<img src="https://cdn.discordapp.com/attachments/1158387347751182406/1163696952815390790/halloween_gaiden.jpg?ex=6549bebd&is=653749bd&hm=595705003bb16dc4e33f8bed0e36f2d2c66cea76e55fc3fce14cfdf6539cdc01&">
+					
+				</if>
+			</div>
+		</a>
+			
+			<!-- <div class="sidebar">
+    <div class="toggle-btn" onclick="toggleSidebar()">
+      <span class="toggle-icon">☰</span>
+    </div>
+    <div class="options">
+		<a href="{$mybb->settings['bburl']}/usercp.php">Panel de Usuario</a>
+        <a href="{$mybb->settings['bburl']}/tecnicas.php">Técnicas</a>
+        <a href="{$mybb->settings['bburl']}/forumdisplay.php?fid=25">Guías</a>
+        <a href="{$mybb->settings['bburl']}/member.php?action=logout&amp;logoutkey={$mybb->user['logoutkey']}">Cerrar Sesión</a>
+    </div>
+  </div> -->
+
+        
+        </a>
+        <hr class="hrDivider">
+    </div>
+<div id="content">
+    <div class="wrapper">
+        {$bbclosedwarning}
+        {$modnotice}
+        {$pm_notice}
+        {$remote_avatar_notice}
+        {$bannedwarning}
+        {$pending_joinrequests}
+        {$awaitingusers}

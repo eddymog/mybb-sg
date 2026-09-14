@@ -1,0 +1,48 @@
+<html>
+<head>
+	<script src="https://kit.fontawesome.com/ba27a46c48.js" crossorigin="anonymous"></script>
+	<title>{$mybb->settings['bbname']}</title>
+	{$testheaderinclude}
+	{$recentthread_headerinclude}
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter">
+	<script type="text/javascript">
+		<!--
+			lang.no_new_posts = "{$lang->no_new_posts}";
+			lang.click_mark_read = "{$lang->click_mark_read}";
+		// -->
+	</script>
+	<link rel="stylesheet" href="/tests/css/global.min.css">
+	<link rel="stylesheet" href="/tests/css/sg_global.min.css">
+	<link rel="stylesheet" href="/tests/css/customSG.min.css">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+	{$header}
+	<div id="mainBackground">
+		<div id="secondBackground">
+			<div id="thirdBackground">
+				{$index_section_1_inicial}
+				{$index_section_2_personajes}
+				{$index_section_3_mundo}
+				{$index_section_4_offrol}
+				<hr>
+				{$index_section_5_final}
+
+				<if $g_is_staff then>
+                    <hr>
+					{$index_section_6_staff}
+				</if>
+			</div>
+		</div>
+	</div>
+	{$footer}
+
+    <style>
+        hr{
+            margin-top: 15px;
+            height: 2px;
+            background-color: #517988;
+        }
+    </style>
+</body>
+</html>

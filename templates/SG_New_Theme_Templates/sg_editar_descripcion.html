@@ -1,0 +1,126 @@
+<html>
+
+<head>
+  <title>Editar Descripción</title>
+  {$headerinclude}
+  <style>
+    #newfichaform {
+      color: white;
+      width: 992px;
+      margin: 0 auto;
+      font-size: 13px;
+      font-family: "Myriad Pro", Myriad, "Liberation Sans", "Nimbus Sans L", "Helvetica Neue", Helvetica, Arial, sans-serif;
+      text-align: center;
+      font-weight: bold;
+      margin-top: 10px;
+      padding: 10px 0;
+    }
+
+    #newfichaform textarea {
+      color: #1A1A1A;
+      width: 500px;
+      height: 175px;
+    }
+
+    #newfichaform input[type="submit"] {
+      border: 0px;
+      width: 80px;
+      height: 30px;
+      border-radius: 3px;
+      color: #fff;
+    }
+
+    #newfichaform input {
+      border-radius: 3px;
+      border: none;
+      padding: 5px;
+    }
+
+    #guardar_ficha:hover {
+      cursor: pointer;
+    }
+
+    #newfichaform textarea {
+      text-align: left;
+      border-radius: 3px;
+      width: 800px;
+      height: 200px;
+    }
+
+   #text_frase {
+      height: 55px;
+   }
+   
+  </style>
+</head>
+
+<body>
+  {$header}
+  <div class="fondo-blanco">
+  <table border="0" cellspacing="{$theme['borderwidth']}" cellpadding="{$theme['tablespace']}" class="tborder">
+    <tr>
+      <td class="thead" colspan="1"><strong>Editar Descripción</strong></td>
+    </tr>
+    <tr>
+      <td class="trow1" valign="top" style="background-color: #122636;">
+        <div class="div_ficha">
+          <form method="post" action="/sg/nueva_descripcion.php" name="newficha" id="newfichaform">
+            Apodo<br><input class="textbox" type="text" name="alias" value="{$ficha['apodo']}"><br>
+            <br>
+		    <label for="sexo">Facción:</label><br>
+			<select style=" width: 200px; " name="faccion" id="faccion" value="{$ficha['faccion']}">
+				<option value="sin facción" <if $ficha['faccion'] == 'sin facción' then>selected</if> >Sin Facción</option> 
+				<option value="imperial" <if $ficha['faccion'] == 'imperial' then>selected</if> >Imperial</option>
+				<option value="rebelde" <if $ficha['faccion'] == 'rebelde' then>selected</if> >Rebelde</option>
+				<option value="rounin" <if $ficha['faccion'] == 'rounin' then>selected</if> >Rounin</option>
+				<option value="criminal" <if $ficha['faccion'] == 'criminal' then>selected</if> >Criminal</option>
+			</select>
+            <br><br>
+            Apariencia (mínimo 200 carácteres)<br><textarea name="phi" minlength="150" required="">{$ficha['apariencia']}</textarea><br>
+            <br>
+            Personalidad (mínimo 200 carácteres)<br><textarea name="psi" minlength="150" required="">{$ficha['personalidad']}</textarea><br>
+            <br>
+            Biografía (mínimo 500 carácteres)<br><textarea name="history" minlength="300" required="">{$ficha['historia']}</textarea><br>
+            <br>
+            Información Extra<br><textarea name="extra">{$ficha['extra']}</textarea><br>
+            <br>
+            Frase que representa al personaje<br><textarea style="height: 55px;" name="frase">{$ficha['frase']}</textarea><br>
+            <br>
+			Origen del físico del personaje<br><textarea style="height: 55px;" name="fisico_de_pj" required="">{$ficha['fisico_de_pj']}</textarea><br>
+			<br>
+			Banner de la ficha (100x700):<br><textarea style="width: 800px;height: 38px;" name="banner">{$ficha['banner']}</textarea><br>
+            <br>
+            <br>
+            <div style="display: none">
+              <input type="text" value="false" id="comp" name="submit">
+              <input type="text" id="userid" name="uid" value="{$mybb->user['uid']}">
+              <input type="text" name="fichaurl" value="./ficha.php?action=profile&amp;uid={$mybb->user['uid']}">
+            </div>
+            <input id="guardar_ficha" class="button" type="submit" onclick="javascript: document.getElementById('comp').value = 'true';"
+              value="Guardar"><br>
+            <br>
+			<if $g_is_staff then>
+				<div style=" text-align: left; ">
+					<span>Área solo para Staff:</span>
+					<ul>
+						<li><a href="/sg/admin/ficha_atributos.php?fid={$uid}">Modificar atributos de ficha</a></li>
+						<li><a href="/sg/admin/modificar_ficha.php?fid={$uid}">Modificar variables de la ficha</a></li>
+						<li><a href="/sg/admin/ficha_objetos.php?fid={$uid}&accion=Añadir">Agregar objetos en la ficha</a></li>
+						<li><a href="/sg/admin/ficha_objetos.php?fid={$uid}&accion=Remover">Quitar objetos en la ficha</a></li>
+						<li><a href="/sg/admin/ficha_tecnicas.php?fid={$uid}&accion=Añadir">Agregar técnicas en la ficha</a></li>
+						<li><a href="/sg/admin/ficha_tecnicas.php?fid={$uid}&accion=Remover">Quitar técnicas en la ficha</a></li>
+					</ul>
+				</div>
+			</if>
+          </form>
+        </div>
+        <br />
+      </td>
+    </tr>
+  </table>
+	</div>
+  {$footer}
+  {$nueva_ficha_script}
+</body>
+
+</html>

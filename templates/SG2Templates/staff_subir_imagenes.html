@@ -1,0 +1,293 @@
+<html>
+
+<head>
+  <title>Subir Imágenes</title>
+  {$headerinclude}
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Noto+Serif+JP:wght@300;400;700&display=swap" rel="stylesheet">
+  <style>
+    .sg-admin {
+      --bg: #0f0c18; --bg2: #130f1e; --bg3: #171224;
+      --border: rgba(156, 107, 204, 0.12);
+      --border-strong: rgba(156, 107, 204, 0.22);
+      --ink: #e8dff8; --plum: #7b4ab8; --plum2: #9c6bcc; --plum3: #b890e0;
+      --stone: #8a7a9a; --mist: #5a4a6a; --oxide: #c0582a; --lavender: #ede0fa;
+      --green: #4f9d69;
+      max-width: 860px;
+      margin: 24px auto 40px;
+      padding: 0 16px;
+      color: var(--ink);
+      font-family: 'Noto Serif JP', serif;
+    }
+
+    .sg-admin-card {
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), transparent 16%), var(--bg2);
+      border: 0.5px solid var(--border);
+      overflow: hidden;
+    }
+
+    .sg-admin-head {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 18px 22px;
+      background: var(--bg3);
+      border-bottom: 0.5px solid var(--border);
+    }
+
+    .sg-admin-head::before {
+      content: '';
+      width: 3px;
+      height: 20px;
+      background: var(--oxide);
+      flex-shrink: 0;
+    }
+
+    .sg-admin-head h1 {
+      margin: 0;
+      font-family: 'Cinzel', serif;
+      font-size: 15px;
+      font-weight: 900;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--ink);
+    }
+
+    .sg-admin-body { padding: 22px; }
+
+    .sg-section-label {
+      margin: 0 0 8px;
+      font-family: 'Cinzel', serif;
+      font-size: 8px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--plum3);
+    }
+
+    .sg-label {
+      font-family: 'Cinzel', serif;
+      font-size: 8px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--mist);
+    }
+
+    /* Mensaje de resultado */
+    .sg-msg {
+      margin-bottom: 18px;
+      padding: 12px 14px;
+      border: 0.5px solid var(--border-strong);
+      border-left-width: 2px;
+      font-size: 14px;
+      line-height: 1.6;
+      color: var(--ink);
+      word-break: break-word;
+    }
+    .sg-msg--ok { border-left-color: var(--green); background: rgba(79, 157, 105, 0.12); }
+    .sg-msg--error { border-left-color: var(--oxide); background: rgba(192, 88, 42, 0.12); }
+
+    .sg-msg-url {
+      width: 100%;
+      margin-top: 10px;
+      padding: 8px 12px;
+      background: var(--bg);
+      border: 0.5px solid var(--border-strong);
+      color: var(--plum3);
+      font-family: 'Noto Serif JP', serif;
+      font-size: 13px;
+      box-sizing: border-box;
+    }
+
+    /* Formulario de subida */
+    .sg-upload {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 12px;
+      padding: 16px;
+      border: 0.5px solid var(--border);
+      background: var(--bg3);
+    }
+
+    .sg-file {
+      flex: 1;
+      min-width: 220px;
+      color: var(--stone);
+      font-size: 13px;
+    }
+    .sg-file::file-selector-button {
+      margin-right: 12px;
+      padding: 9px 16px;
+      background: var(--bg);
+      border: 0.5px solid var(--border-strong);
+      color: var(--ink);
+      font-family: 'Cinzel', serif;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+    .sg-file::file-selector-button:hover { border-color: var(--plum3); }
+
+    .sg-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      height: 40px;
+      padding: 0 22px;
+      background: var(--plum);
+      border: none;
+      color: var(--lavender);
+      font-family: 'Cinzel', serif;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background 0.15s;
+      white-space: nowrap;
+    }
+    .sg-btn:hover { background: var(--plum2); }
+
+    .sg-rules {
+      margin: 14px 0 0;
+      padding-left: 18px;
+      color: var(--mist);
+      font-size: 12px;
+      line-height: 1.8;
+    }
+
+    /* Galería */
+    .sg-gal-wrap { margin-top: 26px; padding-top: 20px; border-top: 0.5px solid var(--border); }
+
+    .sg-gal {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 12px;
+      margin-top: 10px;
+    }
+
+    .sg-gal-item {
+      margin: 0;
+      border: 0.5px solid var(--border);
+      background: var(--bg);
+      overflow: hidden;
+    }
+
+    .sg-gal-img {
+      display: block;
+      width: 100%;
+      height: 120px;
+      object-fit: cover;
+      background: var(--bg3);
+    }
+
+    .sg-gal-url {
+      width: 100%;
+      padding: 6px 8px;
+      border: none;
+      border-top: 0.5px solid var(--border);
+      background: var(--bg2);
+      color: var(--stone);
+      font-family: 'Noto Serif JP', serif;
+      font-size: 11px;
+      box-sizing: border-box;
+    }
+    .sg-gal-url:focus { outline: none; color: var(--plum3); }
+
+    .sg-gal-empty {
+      padding: 18px 14px;
+      text-align: center;
+      color: var(--mist);
+      font-size: 13px;
+      border: 0.5px solid var(--border);
+      background: var(--bg);
+    }
+
+    @media (max-width: 640px) {
+      .sg-upload { flex-direction: column; align-items: stretch; }
+      .sg-btn { width: 100%; }
+    }
+
+    /* Aviso de PNG pesado (aparece al elegir un .png) */
+    .sg-png-warn {
+      display: none;
+      margin-bottom: 14px;
+      padding: 12px 14px;
+      border: 0.5px solid var(--border-strong);
+      border-left-width: 2px;
+      border-left-color: var(--oxide);
+      background: rgba(192, 88, 42, 0.12);
+      font-size: 13px;
+      line-height: 1.6;
+      color: var(--ink);
+    }
+    .sg-png-warn.is-visible { display: block; }
+    .sg-png-warn strong { color: var(--oxide); }
+  </style>
+</head>
+
+<body>
+  {$header}
+  <main class="sg-admin">
+    <div class="sg-admin-card">
+      <div class="sg-admin-head">
+        <h1>Subir Imágenes</h1>
+      </div>
+      <div class="sg-admin-body">
+
+        <if $mensaje != '' then>
+          <div class="sg-msg sg-msg--{$mensaje_tipo}">
+            {$mensaje}
+            <if $url_subida != '' then>
+              <input class="sg-msg-url" type="text" readonly value="{$url_subida}" onclick="this.select()">
+            </if>
+          </div>
+        </if>
+
+        <div class="sg-section-label">Nueva imagen</div>
+        <form method="post" action="/sg/admin/subir_imagenes.php" enctype="multipart/form-data" name="subir_imagen" id="subir_imagen">
+          <div class="sg-png-warn" id="sg-png-warn">
+            <strong>CUIDADO:</strong> Subir imágenes PNG son muy pesadas para el foro y puede hacer que los usuarios tarden en verlas.
+            Sube PNG solo si es extremadamente necesario e idealmente solo si necesitamos tener transparencia.
+            De resto, es preferible usar <strong>.jpg</strong> o <strong>.webp</strong>.
+          </div>
+          <div class="sg-upload">
+            <input class="sg-file" type="file" name="imagen" id="imagen" accept=".jpg,.jpeg,.png,.gif,.webp,image/*" required onchange="sgAvisoPng(this)">
+            <button class="sg-btn" type="submit">Subir imagen</button>
+          </div>
+          <ul class="sg-rules">
+            <li>Formatos permitidos: JPG, JPEG, PNG, GIF, WEBP (máx. 8 MB).</li>
+            <li>El nombre debe ser único: <strong>no se sobrescriben</strong> imágenes. Si ya existe, se te avisa.</li>
+            <li>Las imágenes <strong>no se pueden borrar</strong> desde aquí; solo agregar nuevas.</li>
+            <li>El nombre se normaliza (minúsculas; espacios y símbolos pasan a <em>-</em>).</li>
+          </ul>
+        </form>
+
+        <script>
+          function sgAvisoPng(input) {
+            var warn = document.getElementById('sg-png-warn');
+            if (!warn) { return; }
+            var nombre = (input.files && input.files[0]) ? input.files[0].name.toLowerCase() : '';
+            warn.classList.toggle('is-visible', nombre.slice(-4) === '.png');
+          }
+        </script>
+
+        <div class="sg-gal-wrap">
+          <div class="sg-section-label">Imágenes subidas</div>
+          <div class="sg-gal">
+            {$galeria}
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </main>
+  {$footer}
+</body>
+
+</html>

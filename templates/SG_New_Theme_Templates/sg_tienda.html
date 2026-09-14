@@ -1,0 +1,80 @@
+<html>
+<head>
+	<title>Tienda</title>
+	{$headerinclude}
+</head>
+<body>
+{$header}
+<div class="shop_main_decoration">
+<div class="welcome_shop_text">
+	<span>¡Bienvenido! Tomate tu tiempo y asegurate de tener los Ryous suficiente.</span>
+	</div>
+<img style="position:absolute;width: 325px;bottom: 0;right: 0; left:80%;" src="https://i.ibb.co/XDzJD37/tenten-shinobi-sisters-render-2-naruto-mobile-by-maxiuchiha22-de85l6o.png">
+
+<!-- Aquí inicia el codigo de la tienda -->
+<div class="shop_main_container">
+	<div class="shop_banner" style="background-image: url('https://i.ibb.co/QYc2VhW/image.png')"></div>
+	<div class="shop_content">
+		<!-- Categorias de Objetos -->
+		<div class="item_category">
+		<div class="category_tab weapons" style="background-image: url(https://i.pinimg.com/736x/11/c1/dc/11c1dc505f66c5116cb42159f679aa16.jpg);"><span>Armas</span></div>
+		<div class="category_tab utils" style="background-image: url('https://i.ibb.co/10W5kmC/UtilsTab.png')"><span>Utensilios</span></div>
+		<div class="category_tab throwable" style="background-image: url('https://i.ibb.co/TKTpMm6/Weapons-			Tab.png')"><span>Distancia</span></div>
+		<div class="category_tab misc" style="background-image: url('https://i.ibb.co/H2vNncV/image.png')"><span>Otros</span></div>
+	</div>
+		<div class="shop_sections">
+			<div class="left_shop_section">
+			<!-- Lista de Compras -->
+			<div class="shop_cart">
+			<span class="title">Lista de Compras</span>	
+			</div>
+			<!-- Botón de Compra -->
+			<div class="confirm_buy"><button>Comprar</button></div>
+		</div>
+			<div class="right_shop_section">
+			<!-- Display de Objetos -->
+			<div class="items_display">
+				<div class="ryous_tabs">
+					<div class="act_balance">
+						<span>Saldo Actual:</span> {$ryos}
+					</div>
+					<div class="post_buy_balance">
+						<span>Saldo Restante:</span> 0
+					</div>
+				</div>
+				<div class="title_divider">
+				<div style="width:100%; height: 3px; background-color: white;"></div>
+				<span>Categoria</span>
+				</div>
+				</div>
+		</div>
+		</div>
+	</div>
+</div>
+</div>
+
+	<div id="objetos" class="fondo-blanco">
+		<form method="post" action="/sg/tienda.php" name="tienda" id="tienda">
+			<div style="display: none">
+			   <input type="text" id="accion" name="accion" value="">
+			   <input type="text" id="objeto" name="objeto" value="">
+			</div>
+			<div>
+				{$objetos_html}	
+			</div>
+		</form>
+		<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+	</div>	
+	{$footer}
+</body>
+	
+{$reload_js}
+
+<script>
+const objetos = {$objetos_json};
+const inventario = {$inventario_json};
+const objetos_array = {$objetos_array_json};
+const ryos = {$ryos};
+</script>
+
+</html>

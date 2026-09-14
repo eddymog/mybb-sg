@@ -16,9 +16,6 @@
 
     .sq-body { padding: 22px 24px; }
 
-    /* Flash (fallback sin JS) */
-    .sq-flash { margin-bottom: 18px; padding: 11px 16px; border: 0.5px solid var(--border); border-left: 3px solid var(--plum); background: var(--bg3); font-size: 13px; color: var(--ink); }
-
     /* Meta band */
     .sq-meta { display: flex; flex-wrap: wrap; gap: 26px; margin-bottom: 22px; padding: 12px 16px; border: 0.5px solid var(--border); background: var(--bg3); }
     .sq-stat { display: flex; flex-direction: column; gap: 2px; }
@@ -53,53 +50,31 @@
     #sq-page select { -webkit-appearance: none; appearance: none; cursor: pointer; font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 0.5px; text-transform: uppercase; }
     #sq-page textarea { min-height: 120px; resize: vertical; line-height: 1.7; }
 
-    .sq-counter { font-family: 'Cinzel', serif; font-size: 8px; letter-spacing: 1px; color: var(--mist); text-align: right; margin-top: 4px; }
-    .sq-counter.is-max { color: var(--oxide2); font-weight: 700; }
-    .sq-warn { font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 0.5px; color: var(--oxide2); margin: -8px 0 12px; }
-
     /* Preview */
-    .sq-preview { margin: 4px 0 16px; padding: 14px 16px; border: 0.5px dashed var(--border); background: var(--bg3); font-family: 'Source Serif 4', serif; font-size: 14px; line-height: 1.75; color: var(--stone); text-align: justify; }
+    .sq-preview { margin-top: 4px; margin-bottom: 16px; padding: 14px 16px; border: 0.5px dashed var(--border); background: var(--bg3); font-family: 'Source Serif 4', serif; font-size: 14px; line-height: 1.75; color: var(--stone); text-align: justify; }
     .sq-preview b { color: var(--plum3); font-weight: 700; }
 
     /* Buttons */
     .sq-actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
-    .sq-btn { display: inline-flex; align-items: center; justify-content: center; font-family: 'Cinzel', serif; font-size: 9px; font-weight: 900; letter-spacing: 2.5px; text-transform: uppercase; color: var(--lavender); background: var(--plum); border: none; padding: 0 28px; height: 42px; cursor: pointer; transition: background 0.15s, transform 0.12s, color 0.15s; text-decoration: none; }
+    .sq-btn { display: inline-flex; align-items: center; justify-content: center; font-family: 'Cinzel', serif; font-size: 9px; font-weight: 900; letter-spacing: 2.5px; text-transform: uppercase; color: var(--lavender); background: var(--plum); border: none; padding: 0 28px; height: 42px; cursor: pointer; transition: background 0.15s, transform 0.12s; text-decoration: none; }
     .sq-btn:hover { background: var(--plum2); transform: translateY(-1px); }
     .sq-btn:active { transform: translateY(0); }
     .sq-btn--ghost { background: transparent; color: var(--plum2); border: 0.5px solid var(--border); }
     .sq-btn--ghost:hover { background: var(--bg3); color: var(--ink); }
-    .sq-btn--danger { background: transparent; color: var(--oxide2); border: 0.5px solid var(--oxide2); }
-    .sq-btn--danger:hover { background: var(--oxide2); color: #fff; }
-
-    /* Chips (filtro por tipo) */
-    .sq-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
-    .sq-chip { font-family: 'Cinzel', serif; font-size: 9px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: var(--stone); background: var(--bg2); border: 0.5px solid var(--border); padding: 6px 12px; cursor: pointer; transition: color 0.15s, border-color 0.15s, background 0.15s; }
-    .sq-chip:hover { color: var(--ink); border-color: var(--plum3); }
-    .sq-chip.is-active { color: var(--ink); background: var(--bg3); border-color: var(--oxide); }
-    .sq-chip__n { display: inline-block; margin-left: 5px; padding: 1px 5px; font-size: 8px; color: var(--mist); background: var(--bg3); }
-    .sq-chip.is-active .sq-chip__n { color: var(--plum3); }
 
     /* List */
     .sq-list { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
-    .sq-card { position: relative; cursor: pointer; border: 0.5px solid var(--border); border-top: 1.5px solid var(--plum3); background: var(--bg2); padding: 12px 14px; transition: border-color 0.15s, background 0.15s, transform 0.12s; }
+    .sq-card { display: block; text-decoration: none; border: 0.5px solid var(--border); border-top: 1.5px solid var(--plum3); background: var(--bg2); padding: 12px 14px; transition: border-color 0.15s, background 0.15s, transform 0.12s; }
     .sq-card:hover { border-top-color: var(--oxide); background: var(--bg3); transform: translateY(-1px); }
     .sq-card.is-active { border-top-color: var(--oxide); background: var(--bg3); }
-    .sq-card__top { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+    .sq-card__top { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
     .sq-card__id { font-family: 'Cinzel', serif; font-size: 11px; font-weight: 900; letter-spacing: 1px; color: var(--ink); }
-    .sq-badge { margin-left: auto; font-family: 'Cinzel', serif; font-size: 8px; letter-spacing: 1.4px; text-transform: uppercase; padding: 2px 8px; border: 0.5px solid var(--plum3); color: var(--plum3); white-space: nowrap; }
+    .sq-badge { font-family: 'Cinzel', serif; font-size: 8px; letter-spacing: 1.4px; text-transform: uppercase; padding: 2px 8px; border: 0.5px solid var(--plum3); color: var(--plum3); white-space: nowrap; }
     .sq-badge--t2 { border-color: var(--oxide2); color: var(--oxide2); }
     .sq-badge--t3 { border-color: var(--stone); color: var(--stone); }
-    .sq-card__del { flex-shrink: 0; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; background: transparent; border: 0.5px solid transparent; color: var(--mist); font-size: 15px; line-height: 1; cursor: pointer; opacity: 0; transition: opacity 0.15s, color 0.15s, border-color 0.15s, background 0.15s; }
-    .sq-card:hover .sq-card__del { opacity: 1; }
-    .sq-card__del:hover { color: var(--oxide2); border-color: var(--oxide2); background: var(--bg2); }
     .sq-card__text { margin: 0; font-family: 'Source Serif 4', serif; font-size: 13px; line-height: 1.55; color: var(--stone); display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; line-clamp: 3; overflow: hidden; }
     .sq-empty { grid-column: 1 / -1; padding: 26px; text-align: center; color: var(--mist); border: 0.5px dashed var(--border); font-size: 14px; }
     .sq-noresults { display: none; padding: 20px; text-align: center; color: var(--mist); font-size: 14px; }
-
-    /* Toast */
-    .sq-toast { position: fixed; left: 50%; bottom: 26px; transform: translateX(-50%) translateY(20px); min-width: 220px; max-width: 90vw; padding: 12px 18px; background: var(--bg2); border: 0.5px solid var(--border); border-left: 3px solid var(--plum); color: var(--ink); font-family: 'Source Serif 4', serif; font-size: 13px; opacity: 0; visibility: hidden; transition: opacity 0.2s, transform 0.2s, visibility 0.2s; z-index: 9999; }
-    .sq-toast.is-show { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0); }
-    .sq-toast.is-error { border-left-color: var(--oxide2); }
 
     @media (max-width: 640px) {
       .sq-list { grid-template-columns: 1fr; }
@@ -120,17 +95,14 @@
 
       <div class="sq-body">
 
-        <if $log_var != '' then><div class="sq-flash">{$log_var}</div></if>
-
         <if $sabiasque_id != '' then>
           <!-- ── MODO EDICIÓN ── -->
           <div class="sq-section">
             <div class="sq-section__head"><span class="sq-section__title">Editando entrada #{$sabiasque_id}</span></div>
-            <form method="post" action="/sg/admin/sabiasque_modificar.php" id="sq-form-edit">
-              <input type="hidden" name="my_post_key" value="{$sabiasquePostKey}">
+            <form method="post" action="/sg/admin/sabiasque_modificar.php" id="sq-form">
               <input type="hidden" name="sabiasque_id" value="{$sabiasque_id}">
               <div class="sq-field">
-                <label class="sq-label" for="sq-tipo">Tipo</label>
+                <label class="sq-label">Tipo</label>
                 <select name="tipo" id="sq-tipo">
                   <option value="1" <if $sabiasque['tipo'] == '1' then>selected</if>>Sabías qué…</option>
                   <option value="2" <if $sabiasque['tipo'] == '2' then>selected</if>>Hay rumores sobre…</option>
@@ -138,15 +110,13 @@
                 </select>
               </div>
               <div class="sq-field">
-                <label class="sq-label" for="sq-texto">Texto</label>
-                <textarea name="texto" id="sq-texto" minlength="1" maxlength="1000" required>{$sabiasqueTextoEsc}</textarea>
-                <div class="sq-counter"><span id="sq-chars">{$sabiasqueTextoLen}</span>/1000</div>
+                <label class="sq-label">Texto</label>
+                <textarea name="texto" id="sq-texto" minlength="1" required>{$sabiasqueTextoEsc}</textarea>
               </div>
               <div class="sq-preview" id="sq-preview"></div>
               <div class="sq-actions">
                 <button class="sq-btn" type="submit">Guardar cambios</button>
                 <a class="sq-btn sq-btn--ghost" href="/sg/admin/sabiasque_modificar.php">← Volver al listado</a>
-                <button class="sq-btn sq-btn--danger" type="button" onclick="sqDelete(event, {$sabiasque_id})">Eliminar</button>
               </div>
             </form>
           </div>
@@ -154,21 +124,20 @@
         <else>
           <!-- ── MODO LISTADO + CREACIÓN ── -->
           <div class="sq-meta">
-            <div class="sq-stat"><span class="sq-stat__k">Entradas</span><span class="sq-stat__v" id="sq-count">{$sabiasqueCount}</span></div>
-            <div class="sq-stat"><span class="sq-stat__k">Próximo ID</span><span class="sq-stat__v" id="sq-next-id">{$sabiasqueNextId}</span></div>
+            <div class="sq-stat"><span class="sq-stat__k">Entradas</span><span class="sq-stat__v">{$sabiasqueCount}</span></div>
+            <div class="sq-stat"><span class="sq-stat__k">Próximo ID</span><span class="sq-stat__v">{$sabiasqueNextId}</span></div>
           </div>
 
           <div class="sq-section">
             <div class="sq-section__head"><span class="sq-section__title">Nueva entrada</span></div>
-            <form method="post" action="/sg/admin/sabiasque_modificar.php" id="sq-form-nuevo">
-              <input type="hidden" name="my_post_key" value="{$sabiasquePostKey}">
+            <form method="post" action="/sg/admin/sabiasque_modificar.php" id="sq-form">
               <div class="sq-row">
                 <div class="sq-field">
-                  <label class="sq-label" for="sq-nuevo-id">ID</label>
-                  <input type="number" id="sq-nuevo-id" name="sabiasque_id" value="{$sabiasqueNextId}" min="1" required>
+                  <label class="sq-label">ID</label>
+                  <input type="number" name="sabiasque_id" value="{$sabiasqueNextId}" min="1" required>
                 </div>
                 <div class="sq-field">
-                  <label class="sq-label" for="sq-tipo">Tipo</label>
+                  <label class="sq-label">Tipo</label>
                   <select name="tipo" id="sq-tipo">
                     <option value="1">Sabías qué…</option>
                     <option value="2">Hay rumores sobre…</option>
@@ -176,27 +145,19 @@
                   </select>
                 </div>
               </div>
-              <div class="sq-warn" id="sq-idwarn" style="display:none;"></div>
               <div class="sq-field">
-                <label class="sq-label" for="sq-texto">Texto</label>
-                <textarea name="texto" id="sq-texto" minlength="1" maxlength="1000" required placeholder="Escribe la curiosidad…"></textarea>
-                <div class="sq-counter"><span id="sq-chars">0</span>/1000</div>
+                <label class="sq-label">Texto</label>
+                <textarea name="texto" id="sq-texto" minlength="1" required placeholder="Escribe la curiosidad…"></textarea>
               </div>
               <div class="sq-preview" id="sq-preview"></div>
               <div class="sq-actions">
-                <button class="sq-btn" type="submit" id="sq-crear-btn">Crear entrada</button>
+                <button class="sq-btn" type="submit">Crear entrada</button>
               </div>
             </form>
           </div>
 
           <div class="sq-section">
             <div class="sq-section__head"><span class="sq-section__title">Entradas existentes</span></div>
-            <div class="sq-chips" id="sq-chips">
-              <button type="button" class="sq-chip is-active" data-tipo="" onclick="sqChip(this)">Todos <span class="sq-chip__n">0</span></button>
-              <button type="button" class="sq-chip" data-tipo="1" onclick="sqChip(this)">Sabías qué <span class="sq-chip__n">0</span></button>
-              <button type="button" class="sq-chip" data-tipo="2" onclick="sqChip(this)">Rumores <span class="sq-chip__n">0</span></button>
-              <button type="button" class="sq-chip" data-tipo="3" onclick="sqChip(this)">En este foro <span class="sq-chip__n">0</span></button>
-            </div>
             <div class="sq-field">
               <input type="text" id="sq-filter" placeholder="Buscar por texto, tipo o ID…" oninput="sqFilter()">
             </div>
@@ -209,39 +170,16 @@
     </div>
   </div>
 
-  <div id="sq-toast" class="sq-toast" role="status" aria-live="polite"></div>
-
   {$footer}
 </body>
 
+<if $log_var != '' then><script>alert(`{$log_var}`);</script></if>
+{$reload_script}
+
 <script>
   var sqTipos = { '1': 'Sabías qué…', '2': 'Hay rumores sobre…', '3': 'En este foro…' };
-  var sqPostKey = '{$sabiasquePostKey}';
-  var sqActiveTipo = '';
-  var sqExistingIds = {};
-  (function () { var arr = {$sabiasqueIdsJson}; for (var i = 0; i < arr.length; i++) { sqExistingIds[arr[i]] = true; } })();
 
-  function sqEscape(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
-
-  function sqToast(msg, ok) {
-    var el = document.getElementById('sq-toast'); if (!el) { return; }
-    el.textContent = msg;
-    el.className = 'sq-toast is-show' + (ok ? '' : ' is-error');
-    clearTimeout(el._t);
-    el._t = setTimeout(function () { el.className = 'sq-toast' + (ok ? '' : ' is-error'); }, 2600);
-  }
-
-  function sqAjax(params, cb) {
-    var body = 'ajax=1&my_post_key=' + encodeURIComponent(sqPostKey);
-    for (var k in params) { if (params.hasOwnProperty(k)) { body += '&' + k + '=' + encodeURIComponent(params[k]); } }
-    fetch(window.location.pathname, {
-      method: 'POST', credentials: 'same-origin',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' },
-      body: body
-    }).then(function (r) { return r.json(); }).then(cb).catch(function () {
-      cb({ ok: false, mensaje: 'Error de red. Inténtalo de nuevo.' });
-    });
-  }
+  function sqEscape(s) { return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
 
   function sqUpdatePreview() {
     var t = document.getElementById('sq-tipo');
@@ -249,39 +187,10 @@
     var pv = document.getElementById('sq-preview');
     if (!pv) { return; }
     var pre = t ? (sqTipos[t.value] || '') : '';
-    var bodyTxt = tx ? tx.value.trim() : '';
-    pv.innerHTML = bodyTxt
-      ? ('<b>' + sqEscape(pre) + '</b> ' + sqEscape(bodyTxt))
+    var body = tx ? tx.value.trim() : '';
+    pv.innerHTML = body
+      ? ('<b>' + sqEscape(pre) + '</b> ' + sqEscape(body))
       : '<span style="color:var(--mist)">La vista previa aparecerá aquí…</span>';
-  }
-
-  function sqUpdateCounter() {
-    var tx = document.getElementById('sq-texto');
-    var c = document.getElementById('sq-chars');
-    if (!tx || !c) { return; }
-    c.textContent = tx.value.length;
-    if (c.parentNode) { c.parentNode.className = 'sq-counter' + (tx.value.length >= 1000 ? ' is-max' : ''); }
-  }
-
-  function sqSyncMeta(r) {
-    if (typeof r.count !== 'undefined') { var c = document.getElementById('sq-count'); if (c) { c.textContent = r.count; } }
-    if (typeof r.next_id !== 'undefined') { var n = document.getElementById('sq-next-id'); if (n) { n.textContent = r.next_id; } }
-  }
-
-  function sqRecount() {
-    var cards = document.querySelectorAll('#sq-list .sq-card');
-    var counts = { all: 0, '1': 0, '2': 0, '3': 0 };
-    for (var i = 0; i < cards.length; i++) {
-      counts.all++;
-      var t = cards[i].getAttribute('data-tipo');
-      if (typeof counts[t] !== 'undefined') { counts[t]++; }
-    }
-    var chips = document.querySelectorAll('#sq-chips .sq-chip');
-    for (var j = 0; j < chips.length; j++) {
-      var tp = chips[j].getAttribute('data-tipo');
-      var n = chips[j].querySelector('.sq-chip__n');
-      if (n) { n.textContent = (tp === '' || tp === null) ? counts.all : (counts[tp] || 0); }
-    }
   }
 
   function sqFilter() {
@@ -291,107 +200,20 @@
     var shown = 0;
     for (var i = 0; i < cards.length; i++) {
       var hay = cards[i].getAttribute('data-search') || '';
-      var okText = hay.indexOf(q) !== -1;
-      var okTipo = (sqActiveTipo === '') || (cards[i].getAttribute('data-tipo') === sqActiveTipo);
-      var ok = okText && okTipo;
+      var ok = hay.indexOf(q) !== -1;
       cards[i].style.display = ok ? '' : 'none';
       if (ok) { shown++; }
     }
     var nr = document.getElementById('sq-noresults');
-    if (nr) { nr.style.display = (shown === 0 && cards.length > 0) ? 'block' : 'none'; }
-  }
-
-  function sqChip(btn) {
-    var chips = document.querySelectorAll('#sq-chips .sq-chip');
-    for (var i = 0; i < chips.length; i++) { chips[i].className = 'sq-chip'; }
-    btn.className = 'sq-chip is-active';
-    sqActiveTipo = btn.getAttribute('data-tipo') || '';
-    sqFilter();
-  }
-
-  function sqCheckId() {
-    var form = document.getElementById('sq-form-nuevo'); if (!form) { return; }
-    var idInput = form.querySelector('[name="sabiasque_id"]');
-    var warn = document.getElementById('sq-idwarn');
-    var btn = document.getElementById('sq-crear-btn');
-    var v = parseInt(idInput.value, 10);
-    if (sqExistingIds[v]) {
-      if (warn) { warn.style.display = 'block'; warn.textContent = '⚠ El #' + v + ' ya existe: al guardar se actualizará su contenido.'; }
-      if (btn) { btn.textContent = 'Actualizar entrada'; }
-    } else {
-      if (warn) { warn.style.display = 'none'; }
-      if (btn) { btn.textContent = 'Crear entrada'; }
-    }
-  }
-
-  function sqEnsureEmpty() {
-    var list = document.getElementById('sq-list'); if (!list) { return; }
-    if (!list.querySelector('.sq-card') && !list.querySelector('.sq-empty')) {
-      var d = document.createElement('div'); d.className = 'sq-empty';
-      d.textContent = 'Aún no hay entradas registradas.'; list.appendChild(d);
-    }
-  }
-
-  function sqOpen(ev, id) {
-    if (ev && ev.target && ev.target.closest && ev.target.closest('.sq-card__del')) { return; }
-    window.location.href = window.location.pathname + '?sabiasque_id=' + id;
-  }
-
-  function sqDelete(ev, id) {
-    if (ev) { ev.stopPropagation(); }
-    if (!confirm('¿Eliminar la entrada #' + id + '? Esta acción no se puede deshacer.')) { return; }
-    sqAjax({ accion: 'eliminar', sabiasque_id: id }, function (r) {
-      if (!r.ok) { sqToast(r.mensaje || 'No se pudo eliminar.', false); return; }
-      sqToast(r.mensaje, true);
-      var list = document.getElementById('sq-list');
-      if (!list) { setTimeout(function () { window.location.href = window.location.pathname; }, 800); return; }
-      var card = list.querySelector('.sq-card[data-id="' + id + '"]');
-      if (card) { card.parentNode.removeChild(card); }
-      delete sqExistingIds[id];
-      sqSyncMeta(r); sqEnsureEmpty(); sqRecount(); sqFilter(); sqCheckId();
-    });
-  }
-
-  function sqSubmit(ev, esEdicion) {
-    ev.preventDefault();
-    var form = ev.target;
-    var id = form.querySelector('[name="sabiasque_id"]').value;
-    var tipo = form.querySelector('[name="tipo"]').value;
-    var texto = form.querySelector('[name="texto"]').value;
-    if (!texto.trim()) { sqToast('El texto no puede estar vacío.', false); return; }
-    if (texto.length > 1000) { sqToast('El texto supera los 1000 caracteres.', false); return; }
-    sqAjax({ accion: 'guardar', sabiasque_id: id, tipo: tipo, texto: texto }, function (r) {
-      if (!r.ok) { sqToast(r.mensaje || 'No se pudo guardar.', false); return; }
-      sqToast(r.mensaje, true);
-      if (esEdicion) { sqSyncMeta(r); return; }
-      var list = document.getElementById('sq-list');
-      if (list) {
-        var empty = list.querySelector('.sq-empty'); if (empty) { empty.parentNode.removeChild(empty); }
-        var existing = list.querySelector('.sq-card[data-id="' + r.id + '"]');
-        var tmp = document.createElement('div'); tmp.innerHTML = r.card_html;
-        var node = tmp.firstChild;
-        if (existing) { existing.parentNode.replaceChild(node, existing); }
-        else { list.insertBefore(node, list.firstChild); }
-      }
-      sqExistingIds[r.id] = true;
-      sqSyncMeta(r);
-      var tx = form.querySelector('[name="texto"]'); if (tx) { tx.value = ''; }
-      var idInput = form.querySelector('[name="sabiasque_id"]'); if (idInput && typeof r.next_id !== 'undefined') { idInput.value = r.next_id; }
-      sqUpdatePreview(); sqUpdateCounter(); sqCheckId(); sqRecount(); sqFilter();
-    });
+    if (nr) { nr.style.display = (shown === 0) ? 'block' : 'none'; }
   }
 
   (function () {
     var t = document.getElementById('sq-tipo');
     var tx = document.getElementById('sq-texto');
     if (t) { t.addEventListener('change', sqUpdatePreview); }
-    if (tx) { tx.addEventListener('input', function () { sqUpdatePreview(); sqUpdateCounter(); }); }
-    var idInput = document.querySelector('#sq-form-nuevo [name="sabiasque_id"]');
-    if (idInput) { idInput.addEventListener('input', sqCheckId); }
-    var formNuevo = document.getElementById('sq-form-nuevo'); if (formNuevo) { formNuevo.addEventListener('submit', function (e) { sqSubmit(e, false); }); }
-    var formEdit = document.getElementById('sq-form-edit'); if (formEdit) { formEdit.addEventListener('submit', function (e) { sqSubmit(e, true); }); }
-    sqUpdatePreview(); sqUpdateCounter(); sqRecount(); sqCheckId();
-    if (tx) { tx.focus(); }
+    if (tx) { tx.addEventListener('input', sqUpdatePreview); }
+    sqUpdatePreview();
   })();
 </script>
 

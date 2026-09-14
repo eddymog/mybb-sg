@@ -1,0 +1,163 @@
+<script>
+  /* Función para calcular vida del personaje */
+  /*
+  */
+  function calcHp(str, res) {
+    return str * 3 + res * 4;
+  }
+	
+  function calcCh(str, res, vel, agi, des, pre, int, cc, esp) {
+    var espSum = 0;
+    if (esp == 'NIN' || esp == 'GEN') {
+      espSum = int + cc;
+	} else if (esp == 'TAI') {
+      espSum = agi + res;
+    }
+    return (str * 1) + (res * 0.5) + (vel * 2) + (agi * 0.5) + (des * 2) + (pre * 2) + (int * 2) + (cc * 2.5);
+  }
+
+  function calcRegCh(str, res, vel, agi, des, pre, int, cc, niv, esp) {
+	let espeSum = 1;
+	if (esp == 'NIN' || espe == 'GEN' || esp == 'TAI') {
+	  espeSum = 2;
+	}
+    return Math.round((((str + res + vel + agi + des + pre + int + cc) * 2) / 40) + 1);
+  }
+
+  function setResourceValues() {
+    vida.value = calcHp(parseInt(frz.value), parseInt(res.value));
+    // aguante.value = calcSt(parseInt(frz.value), parseInt(res.value), parseInt(vel.value), parseInt(agi.value), parseInt(dex.value), espe);
+	aguante.value = 0;
+    // chakra.value = calcCh(parseInt(pres.value), parseInt(int.value), parseInt(ctrl.value), espe);
+	chakra.value = Math.round(calcCh(parseInt(frz.value), parseInt(res.value), parseInt(vel.value), parseInt(agi.value), parseInt(dex.value), parseInt(pres.value), parseInt(int.value), parseInt(ctrl.value), espe));
+    const sumStats = getSumOfAllStats();
+    const level = (sumStats - (sumStats % 40)) / 40;
+
+    // regaguante.value = calcRegSt(parseInt(frz.value), parseInt(res.value), parseInt(vel.value), parseInt(agi.value), level, espe);
+	regaguante.value = 0;
+//    regchakra.value = calcRegCh(parseInt(pres.value), parseInt(int.value), parseInt(ctrl.value), level, espe);
+	regchakra.value = Math.round(calcRegCh(parseInt(frz.value), parseInt(res.value), parseInt(vel.value), parseInt(agi.value), parseInt(dex.value), parseInt(pres.value), parseInt(int.value), parseInt(ctrl.value), level, espe));
+  }
+
+  function checkStatGoLessThanAlreadySet(statId) {
+    switch (statId.name) {
+      case "fuerza": if (statId.value == {$ficha['str']}) return true; break;
+      case "res": if (statId.value == {$ficha['res']}) return true; break;
+      case "vel": if (statId.value == {$ficha['spd']}) return true; break;
+      case "agi": if (statId.value == {$ficha['agi']}) return true; break;
+      case "dex": if (statId.value == {$ficha['dex']}) return true; break;
+      case "pres": if (statId.value == {$ficha['pres']}) return true; break;
+      case "int": if (statId.value == {$ficha['inte']}) return true; break;
+      case "ctrl": if (statId.value == {$ficha['ctrl']}) return true; break;
+    }
+    return false;
+  }
+
+  function checkMinimumForEachStat(minStat) {
+
+    let frzActual = document.getElementById('f');
+    let resActual = document.getElementById('r');
+    let velActual = document.getElementById('v');
+    let agiActual = document.getElementById('a');
+    let dexActual = document.getElementById('d');
+    let presActual = document.getElementById('p');
+    let intActual = document.getElementById('i');
+    let ctrlActual = document.getElementById('c');
+
+    if (frzActual.value < minStat || resActual.value < minStat || 
+        velActual.value < minStat || agiActual.value < minStat || 
+        dexActual.value < minStat || presActual.value < minStat || 
+        intActual.value < minStat || ctrlActual.value < minStat) {
+      return true;
+    }
+    return false;
+  }
+
+  function changeStat(statId, num) {
+    const statLimit = calculateMinMaxStat();
+	const limiteNivel = Math.round({$nivel_limite} / 2);
+
+    if (num >= 1 && getSumOfAllStats() >= 640) {
+      alert('Ya estás maxeado full power supersaiyayin 4, no puedes asignar más puntos.');
+    } else if (num >= 1 && getSumOfAllStats() >= limiteNivel * 80) {
+	  alert('Tu límite de PH actual es ' + (limiteNivel* 80) + 'PH. Debes superar tu límite. Vive con orgullo. Si te vence tu debilidad, calienta tu corazón, aprieta los dientes y sigue adelante. Aunque tu cobardía te frene, eso no detendrá el paso del tiempo; todos llegaremos a nuestro fin tarde o temprano, no te sientas triste por ello.');
+	} else if (hab.value == 0 && num >= 1) {
+      alert('No tienes más puntos de estadísticas pa. Toca farmear más.');
+    } else if (statId.value >= statLimit.max) {
+      alert('Ya has asignado el máximo de puntos para esta estadística, sorry man.')
+    } else if (num <= -1 && checkStatGoLessThanAlreadySet(statId)) {
+      alert('Che qué hacés. No puedes quitar más puntos a este stat, sos re pete.');
+    } else if (num >= 1 && (checkMinimumForEachStat(statLimit.min) && parseInt(statId.value) >= statLimit.min)) {
+      alert('Man bájale a maxear un solo stats y dejar el resto sin nada, tas loco. Tienes que subir primero las estadísticas inferiores a ' + statLimit.min + '.');
+    } else {
+      statId.value = parseInt(statId.value) + parseInt(num);
+      hab.value = parseInt(hab.value) - parseInt(num);
+      $('.total_puntos')[0].innerHTML = getSumOfAllStats();
+      setResourceValues();
+    }
+  }
+
+  function getSumOfAllStats() {
+    let f = document.getElementById('f');
+    let r = document.getElementById('r');
+    let v = document.getElementById('v');
+    let a = document.getElementById('a');
+    let d = document.getElementById('d');
+    let p = document.getElementById('p');
+    let i = document.getElementById('i');
+    let c = document.getElementById('c');
+    return parseInt(f.value) + parseInt(r.value) + parseInt(v.value) + parseInt(a.value) + parseInt(d.value) + parseInt(p.value) + parseInt(i.value) + parseInt(c.value);
+  }
+
+  function calculateMinMaxStat() {
+    const allStats = getSumOfAllStats();
+    const statLimit = {
+      min: 0,
+      max: 30
+    }
+
+	if (allStats >= 560) {
+	  statLimit.max = 90;
+      statLimit.min = 60;
+	} else if (allStats >= 480) { // rango S+, nivel 13
+      statLimit.max = 90;
+      statLimit.min = 50;
+    } else if (allStats >= 400) { // // rango S, nivel 11
+      statLimit.max = 80;
+      statLimit.min = 40;
+    } else if (allStats >= 320) { // rango A+, nivel 9 35 * 8
+      statLimit.max = 70;
+      statLimit.min = 30;
+    } else if (allStats >= 240) { // rango A, nivel 7 20 * 8
+      statLimit.max = 60;
+      statLimit.min = 20;
+    } else if (allStats >= 160) {  // rango B, nivel 5 15 * 8
+      statLimit.max = 50;
+      statLimit.min = 10;
+    } else if (allStats >= 80) { // rango C, nivel 3 10 * 
+      statLimit.max = 40;
+      statLimit.min = 5; 
+    }
+
+    return statLimit;
+  }
+
+  let hab = document.getElementById('h');
+  let frz = document.getElementById('f');
+  let res = document.getElementById('r');
+  let vel = document.getElementById('v');
+  let agi = document.getElementById('a');
+  let dex = document.getElementById('d');
+  let pres = document.getElementById('p');
+  let int = document.getElementById('i');
+  let ctrl = document.getElementById('c');
+  $('.total_puntos')[0].innerHTML = getSumOfAllStats();
+
+  var vida = document.getElementById('hp');
+  var aguante = document.getElementById('sp');
+  var chakra = document.getElementById('mp');
+  var regaguante = document.getElementById('regr');
+  var regchakra = document.getElementById('regc');
+  var espe = "{$especialidad}";
+
+</script>

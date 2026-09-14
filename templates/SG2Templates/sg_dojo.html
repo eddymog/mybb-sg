@@ -1,0 +1,547 @@
+<html>
+
+<head>
+  <title>Dojo Shinobi</title>
+  {$headerinclude}
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Noto+Serif+JP:wght@300;400;700&display=swap" rel="stylesheet">
+  <style>
+    .sg-dojo {
+      --bg: #0f0c18; --bg2: #130f1e; --bg3: #171224;
+      --border: rgba(156, 107, 204, 0.12);
+      --border-strong: rgba(156, 107, 204, 0.22);
+      --ink: #e8dff8; --plum: #7b4ab8; --plum2: #9c6bcc; --plum3: #b890e0;
+      --stone: #8a7a9a; --mist: #5a4a6a; --oxide: #c0582a; --lavender: #ede0fa;
+      --gold: #c09840; --green: #4f9d69;
+      max-width: 1040px;
+      margin: 24px auto 44px;
+      padding: 0 16px;
+      color: var(--ink);
+      font-family: 'Noto Serif JP', serif;
+    }
+
+    .sg-dojo-shell {
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), transparent 16%), var(--bg2);
+      border: 0.5px solid var(--border);
+      overflow: hidden;
+    }
+
+    .sg-dojo-header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 14px 18px;
+      padding: 20px 24px;
+      background: var(--bg3);
+      border-bottom: 0.5px solid var(--border);
+    }
+    .sg-dojo-titles { display: flex; align-items: center; gap: 12px; }
+    .sg-dojo-titles::before {
+      content: ''; width: 3px; height: 30px; background: var(--oxide); flex-shrink: 0;
+    }
+    .sg-dojo-eyebrow {
+      font-family: 'Cinzel', serif; font-size: 8px; font-weight: 700;
+      letter-spacing: 2px; text-transform: uppercase; color: var(--plum3);
+    }
+    .sg-dojo-title {
+      margin: 2px 0 0; font-family: 'Cinzel', serif; font-size: 19px; font-weight: 900;
+      letter-spacing: 1px; text-transform: uppercase; color: var(--ink); line-height: 1;
+    }
+    .sg-dojo-balances { display: flex; gap: 10px; margin-left: auto; flex-wrap: wrap; }
+    .sg-balance {
+      display: inline-flex; align-items: baseline; gap: 7px; padding: 8px 14px;
+      border: 0.5px solid var(--border-strong); background: rgba(123, 74, 184, 0.08);
+    }
+    .sg-balance--gold { border-color: rgba(192, 152, 64, 0.45); background: rgba(192, 152, 64, 0.10); }
+    .sg-balance-label {
+      font-family: 'Cinzel', serif; font-size: 8px; font-weight: 700;
+      letter-spacing: 1.5px; text-transform: uppercase; color: var(--mist);
+    }
+    .sg-balance-value { font-family: 'Cinzel', serif; font-size: 14px; font-weight: 700; color: var(--plum3); }
+    .sg-balance--gold .sg-balance-value { color: var(--gold); }
+
+    .sg-dojo-body { padding: 22px 24px; }
+
+    .sg-msg {
+      margin-bottom: 18px; padding: 12px 14px; border: 0.5px solid var(--border-strong);
+      border-left-width: 2px; font-size: 14px; line-height: 1.6; color: var(--ink);
+    }
+    .sg-msg--ok { border-left-color: var(--green); background: rgba(79, 157, 105, 0.12); }
+    .sg-msg--error { border-left-color: var(--oxide); background: rgba(192, 88, 42, 0.12); }
+
+    /* Panel árbol elemental */
+    .sg-dpanel {
+      margin-bottom: 22px; padding: 16px 18px; border: 0.5px solid var(--border);
+      background: var(--bg);
+    }
+    .sg-dpanel-head { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+    .sg-dpanel-title {
+      margin: 0; font-family: 'Cinzel', serif; font-size: 12px; font-weight: 700;
+      letter-spacing: 1.5px; text-transform: uppercase; color: var(--plum3);
+    }
+    .sg-dtag {
+      margin-left: auto; padding: 4px 10px; border: 0.5px solid var(--border-strong);
+      font-family: 'Cinzel', serif; font-size: 9px; font-weight: 700; letter-spacing: 1px;
+      text-transform: uppercase; color: var(--stone);
+    }
+    .sg-dtag--free { color: var(--green); border-color: rgba(79, 157, 105, 0.4); }
+
+    .sg-dchips { display: flex; flex-wrap: wrap; gap: 8px; }
+    .sg-dform { display: inline-flex; margin: 0; }
+
+    .sg-dbtn {
+      display: inline-flex; align-items: center; gap: 6px; height: 34px; padding: 0 14px;
+      background: var(--plum); border: none; color: var(--lavender);
+      font-family: 'Cinzel', serif; font-size: 9px; font-weight: 700; letter-spacing: 1px;
+      text-transform: uppercase; cursor: pointer; transition: background 0.15s;
+    }
+    .sg-dbtn:hover { background: var(--plum2); }
+    .sg-dbtn em { font-style: normal; color: var(--lavender); opacity: 0.72; font-weight: 400; }
+    .sg-dbtn--free { background: var(--green); }
+    .sg-dbtn--free:hover { background: #5cb079; }
+    .sg-dbtn--off {
+      background: transparent; border: 0.5px solid var(--border); color: var(--mist);
+      cursor: not-allowed;
+    }
+    .sg-dbtn--off em { color: var(--mist); opacity: 0.8; }
+    .sg-dbtn:disabled { opacity: 0.45; cursor: not-allowed; }
+    .sg-dbtn--outline {
+      background: transparent; border: 0.5px solid var(--border-strong); color: var(--stone);
+    }
+    .sg-dbtn--outline:hover { border-color: var(--plum2); color: var(--ink); background: rgba(123, 74, 184, 0.08); }
+
+    .sg-dnote { margin: 6px 0 0; color: var(--mist); font-size: 13px; }
+
+    .sg-tree-toolbar { display: flex; justify-content: flex-end; margin-bottom: 12px; }
+
+    /* Árbol */
+    .sg-tree { margin-bottom: 18px; border: 0.5px solid var(--border); background: var(--bg); }
+    .sg-tree-head {
+      display: flex; align-items: center; gap: 12px; padding: 14px 18px;
+      background: var(--bg3); border-bottom: 0.5px solid var(--border);
+      cursor: pointer; user-select: none;
+    }
+    .sg-tree-titles { display: flex; flex-direction: column; gap: 2px; }
+    .sg-tree-eyebrow {
+      font-family: 'Cinzel', serif; font-size: 8px; font-weight: 700; letter-spacing: 1.5px;
+      text-transform: uppercase; color: var(--mist);
+    }
+    .sg-tree-name {
+      margin: 0; font-family: 'Cinzel', serif; font-size: 16px; font-weight: 900;
+      letter-spacing: 0.6px; color: var(--ink);
+    }
+    .sg-tree-lvl {
+      margin-left: auto; font-family: 'Cinzel', serif; font-size: 11px; font-weight: 700;
+      letter-spacing: 1px; color: var(--gold);
+    }
+    .sg-tree-caret {
+      flex-shrink: 0; font-size: 11px; color: var(--stone); transition: transform 0.2s ease;
+    }
+    .sg-tree.is-collapsed .sg-tree-caret { transform: rotate(-90deg); }
+    .sg-tree.is-collapsed .sg-tree-head { border-bottom: none; }
+    .sg-tree.is-collapsed .sg-tree-body { display: none; }
+
+    .sg-ramas {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 12px; padding: 16px 18px;
+    }
+    .sg-rama { border: 0.5px solid var(--border); background: var(--bg2); padding: 12px 13px; }
+    .sg-rama-head { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+    .sg-rama-name {
+      font-family: 'Cinzel', serif; font-size: 11px; font-weight: 700; letter-spacing: 1px;
+      text-transform: uppercase; color: var(--plum3);
+    }
+    .sg-rama-lvl {
+      margin-left: auto; font-family: 'Cinzel', serif; font-size: 10px; font-weight: 700;
+      color: var(--stone);
+    }
+    .sg-rama-lvl--lock { color: var(--mist); }
+    .sg-rama-base {
+      font-size: 13px; color: var(--ink); padding: 6px 0; border-top: 0.5px solid var(--border);
+    }
+    .sg-rama-actions { display: flex; flex-direction: column; gap: 6px; }
+    .sg-rama-note { margin-top: 6px; font-size: 11px; color: var(--mist); }
+
+    /* Selección de mejoras */
+    .sg-mejoras { margin: 0; }
+    .sg-mejoras-hint { font-size: 11px; color: var(--mist); margin-bottom: 6px; }
+    .sg-mejoras-list { display: flex; flex-direction: column; gap: 4px; margin-bottom: 8px; }
+    .sg-mcheck {
+      display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--ink);
+      cursor: pointer; padding: 3px 0;
+    }
+    .sg-mcheck input { accent-color: var(--plum2); width: 15px; height: 15px; }
+    .sg-mcheck input:disabled + span { color: var(--mist); }
+    .sg-mejoras .sg-dbtn { width: 100%; justify-content: center; }
+
+    /* Especializaciones */
+    .sg-espec { padding: 14px 18px; border-top: 0.5px solid var(--border); }
+    .sg-espec-head { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+    .sg-espec-title {
+      font-family: 'Cinzel', serif; font-size: 10px; font-weight: 700; letter-spacing: 1.5px;
+      text-transform: uppercase; color: var(--gold);
+    }
+    .sg-espec-cupo {
+      margin-left: auto; font-family: 'Cinzel', serif; font-size: 11px; font-weight: 700;
+      color: var(--stone);
+    }
+
+    /* Ruleta elemental */
+    .sg-ruleta-cta { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+    .sg-dbtn--big { height: 42px; padding: 0 22px; font-size: 10px; align-self: flex-start; }
+    .sg-dnote--soft { color: var(--mist); font-size: 11px; }
+
+    .sg-direct { border-top: 0.5px solid var(--border); padding-top: 12px; }
+    .sg-direct-label {
+      font-family: 'Cinzel', serif; font-size: 9px; font-weight: 700; letter-spacing: 1.5px;
+      text-transform: uppercase; color: var(--mist); margin-bottom: 8px;
+    }
+
+    .sg-ruleta-overlay {
+      position: fixed; inset: 0; z-index: 9999; display: none;
+      align-items: center; justify-content: center;
+      background: rgba(8, 6, 14, 0.86); backdrop-filter: blur(3px);
+    }
+    .sg-ruleta-overlay.show { display: flex; }
+    .sg-ruleta-box {
+      width: 440px; max-width: 92vw; padding: 26px 24px 22px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.03), transparent 18%), var(--bg2);
+      border: 0.5px solid var(--border-strong); text-align: center;
+    }
+    .sg-ruleta-title {
+      font-family: 'Cinzel', serif; font-size: 12px; font-weight: 900; letter-spacing: 2px;
+      text-transform: uppercase; color: var(--plum3); margin-bottom: 18px;
+    }
+    .sg-ruleta-window {
+      position: relative; width: 100%; height: 132px; overflow: hidden;
+      border: 0.5px solid var(--border); background: var(--bg);
+    }
+    .sg-ruleta-marker {
+      position: absolute; top: 0; bottom: 0; left: 50%; width: 2px; margin-left: -1px;
+      background: var(--oxide); z-index: 3; box-shadow: 0 0 12px rgba(192, 88, 42, 0.7);
+    }
+    .sg-ruleta-window::before, .sg-ruleta-window::after {
+      content: ''; position: absolute; top: 0; bottom: 0; width: 70px; z-index: 2; pointer-events: none;
+    }
+    .sg-ruleta-window::before { left: 0; background: linear-gradient(90deg, var(--bg), transparent); }
+    .sg-ruleta-window::after { right: 0; background: linear-gradient(270deg, var(--bg), transparent); }
+    .sg-ruleta-strip {
+      position: absolute; top: 0; left: 0; height: 100%; display: flex; align-items: center;
+      will-change: transform;
+    }
+    .sg-rtile {
+      width: 110px; height: 100%; flex: 0 0 110px; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 4px;
+      border-right: 0.5px solid var(--border);
+    }
+    .sg-rtile-kanji {
+      font-family: 'Noto Serif JP', serif; font-size: 40px; line-height: 1; color: var(--plum2);
+      transition: color 0.2s;
+    }
+    .sg-rtile-name {
+      font-family: 'Cinzel', serif; font-size: 9px; font-weight: 700; letter-spacing: 1.5px;
+      text-transform: uppercase; color: var(--stone);
+    }
+    .sg-rtile.win .sg-rtile-kanji { color: var(--oxide); text-shadow: 0 0 16px rgba(192, 88, 42, 0.6); }
+    .sg-rtile.win .sg-rtile-name { color: var(--lavender); }
+
+    .sg-ruleta-result {
+      margin: 16px 0 18px; min-height: 22px; opacity: 0; transition: opacity 0.3s;
+      font-family: 'Cinzel', serif; font-size: 15px; font-weight: 900; letter-spacing: 1px;
+      color: var(--gold);
+    }
+    .sg-ruleta-result.show { opacity: 1; }
+
+    @media (max-width: 640px) {
+      .sg-dojo-balances { margin-left: 0; width: 100%; }
+      .sg-ramas { grid-template-columns: 1fr; }
+    }
+
+    /* ── Guía "cómo funciona el dojo" ── */
+    .sg-guide { margin-bottom: 22px; border: 0.5px solid var(--border); border-left: 2px solid var(--oxide); background: var(--bg); }
+    .sg-guide__summary { list-style: none; cursor: pointer; display: flex; align-items: center; gap: 12px; padding: 14px 18px; user-select: none; }
+    .sg-guide__summary::-webkit-details-marker { display: none; }
+    .sg-guide__summary::before { content: '?'; flex-shrink: 0; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--oxide); border-radius: 50%; color: var(--oxide); font-family: 'Cinzel', serif; font-size: 12px; font-weight: 700; }
+    .sg-guide__title { font-family: 'Cinzel', serif; font-size: 12px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--ink); }
+    .sg-guide__hint { margin-left: auto; font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 1px; text-transform: uppercase; color: var(--mist); }
+    .sg-guide[open] .sg-guide__hint-open { display: none; }
+    .sg-guide:not([open]) .sg-guide__hint-close { display: none; }
+    .sg-guide__body { padding: 4px 18px 20px; border-top: 0.5px solid var(--border); }
+    .sg-guide-intro { font-size: 14px; line-height: 1.7; color: var(--stone); margin: 14px 0 4px; }
+    .sg-guide b { color: var(--plum3); font-weight: 700; }
+    .sg-guide-sub { display: flex; align-items: center; gap: 10px; margin: 20px 0 12px; }
+    .sg-guide-sub::before { content: ''; width: 3px; height: 13px; background: var(--oxide); flex-shrink: 0; }
+    .sg-guide-sub span { font-family: 'Cinzel', serif; font-size: 10px; font-weight: 700; letter-spacing: 1.6px; text-transform: uppercase; color: var(--plum3); }
+    .sg-guide-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    .sg-guide-card { border: 0.5px solid var(--border); background: var(--bg2); padding: 12px 14px; }
+    .sg-guide-card__head { display: flex; align-items: center; gap: 8px; margin-bottom: 7px; flex-wrap: wrap; }
+    .sg-guide-card__name { font-family: 'Cinzel', serif; font-size: 11px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; color: var(--ink); }
+    .sg-guide-tag { font-family: 'Cinzel', serif; font-size: 8px; letter-spacing: 1px; text-transform: uppercase; padding: 2px 7px; border: 0.5px solid var(--border-strong); color: var(--stone); white-space: nowrap; }
+    .sg-guide-tag--cost { color: var(--gold); border-color: rgba(192, 152, 64, 0.4); }
+    .sg-guide-tag--free { color: var(--green); border-color: rgba(79, 157, 105, 0.4); }
+    .sg-guide-card__desc { font-size: 13px; line-height: 1.6; color: var(--stone); margin: 0; }
+    .sg-guide-rules { margin: 0; padding-left: 0; list-style: none; display: grid; gap: 8px; }
+    .sg-guide-rules li { position: relative; padding-left: 20px; font-size: 13px; line-height: 1.55; color: var(--stone); }
+    .sg-guide-rules li::before { content: '\2715'; position: absolute; left: 0; top: 1px; color: var(--oxide); font-size: 11px; }
+    .sg-guide-rules--ok li::before { content: '\2713'; color: var(--green); }
+    .sg-guide-note { margin-top: 16px; padding-top: 12px; border-top: 0.5px solid var(--border); font-size: 12.5px; line-height: 1.6; color: var(--mist); }
+    @media (max-width: 640px) { .sg-guide-grid { grid-template-columns: 1fr; } }
+
+    /* ── Franja de progreso ── */
+    .sg-prog { margin-bottom: 22px; border: 0.5px solid var(--border); background: var(--bg); }
+    .sg-prog-head { display: flex; align-items: center; gap: 10px; padding: 14px 18px 0; }
+    .sg-prog-title { margin: 0; font-family: 'Cinzel', serif; font-size: 12px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--plum3); }
+    .sg-prog-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; padding: 12px 18px 16px; }
+    .sg-prog-card { border: 0.5px solid var(--border); background: var(--bg2); padding: 12px 13px; }
+    .sg-prog-k { font-family: 'Cinzel', serif; font-size: 8px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--mist); margin-bottom: 6px; }
+    .sg-prog-v { font-family: 'Cinzel', serif; font-size: 26px; font-weight: 900; line-height: 1; color: var(--ink); }
+    .sg-prog-v--free { color: var(--green); }
+    .sg-prog-sub { margin-top: 8px; font-size: 11px; line-height: 1.5; color: var(--stone); }
+    .sg-prog-sub b { color: var(--gold); font-weight: 700; }
+    @media (max-width: 640px) { .sg-prog-grid { grid-template-columns: repeat(2, 1fr); } }
+
+    /* ── Dojo bloqueado (sin permiso) ── */
+    .sg-locked { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 22px; padding: 14px 18px; border: 0.5px solid var(--gold); border-left: 3px solid var(--gold); background: rgba(192, 152, 64, 0.10); }
+    .sg-locked__i { font-size: 18px; line-height: 1.4; flex-shrink: 0; }
+    .sg-locked__txt { font-size: 13.5px; line-height: 1.6; color: var(--ink); }
+    .sg-locked__txt strong { display: block; margin-bottom: 3px; font-family: 'Cinzel', serif; font-size: 12px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; color: var(--gold); }
+
+    /* ── Vista de staff (impersonación, solo lectura) ── */
+    .sg-staffview { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 22px; padding: 14px 18px; border: 0.5px solid var(--plum2); border-left: 3px solid var(--plum2); background: rgba(123, 74, 184, 0.12); }
+    .sg-staffview__i { font-size: 18px; line-height: 1.4; flex-shrink: 0; }
+    .sg-staffview__txt { font-size: 13.5px; line-height: 1.6; color: var(--ink); }
+    .sg-staffview__txt strong { display: block; margin-bottom: 3px; font-family: 'Cinzel', serif; font-size: 12px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; color: var(--plum3); }
+    .sg-staffview__txt b { color: var(--plum3); }
+  </style>
+</head>
+
+<body>
+  {$header}
+  <main class="sg-dojo">
+    <div class="sg-dojo-shell">
+      <div class="sg-dojo-header">
+        <div class="sg-dojo-titles">
+          <div>
+            <div class="sg-dojo-eyebrow">Desarrollo</div>
+            <h1 class="sg-dojo-title">Dojo Shinobi</h1>
+          </div>
+        </div>
+        <div class="sg-dojo-balances">
+          <span class="sg-balance"><span class="sg-balance-label">Nivel</span><span class="sg-balance-value">{$nivel_label}</span></span>
+          <span class="sg-balance sg-balance--gold"><span class="sg-balance-label">Tobis</span><span class="sg-balance-value">{$tobi_label}</span></span>
+        </div>
+      </div>
+
+      <div class="sg-dojo-body">
+        <if $dojo_impersonando then>
+          <div class="sg-staffview">
+            <span class="sg-staffview__i" aria-hidden="true">?️</span>
+            <div class="sg-staffview__txt">
+              <strong>Vista de staff · solo lectura</strong>
+              Estás viendo el Dojo de <b>{$ver_nombre}</b> (ficha #{$ver_uid}) tal como lo vería su dueño. Las acciones están deshabilitadas.
+            </div>
+          </div>
+        </if>
+
+        <if $dojo_bloqueado then>
+          <div class="sg-locked">
+            <span class="sg-locked__i" aria-hidden="true">?</span>
+            <div class="sg-locked__txt">
+              <strong>El Dojo no está operativo para tu ficha todavía</strong>
+              Un moderador debe revisar y habilitar tu ficha para el Dojo. Mientras tanto puedes ver cómo funciona y tu progreso, pero las acciones están deshabilitadas.
+            </div>
+          </div>
+        </if>
+
+        <details class="sg-guide">
+          <summary class="sg-guide__summary">
+            <span class="sg-guide__title">Cómo funciona el Dojo</span>
+            <span class="sg-guide__hint sg-guide__hint-open">Ver guía ▾</span>
+            <span class="sg-guide__hint sg-guide__hint-close">Ocultar ▴</span>
+          </summary>
+          <div class="sg-guide__body">
+            <p class="sg-guide-intro">En el Dojo gastas <b>Tobis</b> para desarrollar tus <b>árboles de técnicas</b>. Tu <b>Nivel</b> de personaje limita cuántos árboles puedes tener y cada acción se resuelve con un solo clic. Los <b>Slots elementales</b> se gastan únicamente al girar la ruleta de elementos.</p>
+
+            <div class="sg-guide-sub"><span>Tus acciones</span></div>
+            <div class="sg-guide-grid">
+              <div class="sg-guide-card">
+                <div class="sg-guide-card__head"><span class="sg-guide-card__name">Desbloquear árbol elemental</span><span class="sg-guide-tag sg-guide-tag--cost">15 → 25 → 35… Tobis</span></div>
+                <p class="sg-guide-card__desc"><b>Naturales</b> (Katon, Fuuton, Suiton, Doton, Raiton): salen por <b>ruleta al azar</b> y gastan <b>1 slot</b>. <b>Directos</b> (Yin/Yang): los eliges tú. Piden Nivel <b>1 / 5 / 10 / 15 / 20</b> según cuántos árboles lleves. Siempre cuestan Tobis.</p>
+              </div>
+              <div class="sg-guide-card">
+                <div class="sg-guide-card__head"><span class="sg-guide-card__name">Desbloquear rama</span><span class="sg-guide-tag sg-guide-tag--cost">10 → 15 → 20… Tobis</span></div>
+                <p class="sg-guide-card__desc">Abre una rama nueva de un árbol que ya poseas. Siempre cuesta Tobis. <b>Excepción:</b> en tu árbol de clan debes reclamar antes la rama de clan gratis.</p>
+              </div>
+              <div class="sg-guide-card">
+                <div class="sg-guide-card__head"><span class="sg-guide-card__name">Subir nivel de rama</span><span class="sg-guide-tag sg-guide-tag--cost">5 → 7 → 9… Tobis</span></div>
+                <p class="sg-guide-card__desc">Eliges <b>2 mejoras</b> de esa rama. Es <b>gratis si tienes crédito</b> de nivel; si no, cuesta Tobis. Cada rama tiene <b>6 mejoras = 3 niveles</b>.</p>
+              </div>
+              <div class="sg-guide-card">
+                <div class="sg-guide-card__head"><span class="sg-guide-card__name">Especializaciones</span><span class="sg-guide-tag sg-guide-tag--free">Gratis</span></div>
+                <p class="sg-guide-card__desc">Se desbloquean al subir el árbol a nivel <b>3, 6 y 9</b>. Tu cupo = nivel del árbol ÷ 3 (máx. 3). Eliges cuál aprender del catálogo del árbol.</p>
+              </div>
+            </div>
+
+            <div class="sg-guide-sub"><span>Cómo se cuentan los niveles</span></div>
+            <ul class="sg-guide-rules sg-guide-rules--ok">
+              <li><b>Nivel de una rama</b> = mejoras aprendidas ÷ 2 (de 0 a 3).</li>
+              <li><b>Nivel de un árbol</b> = suma de los niveles de sus 3 ramas (de 0 a 9).</li>
+              <li>Cuanto más sube el árbol, más especializaciones abres (en 3, 6 y 9).</li>
+            </ul>
+
+          </div>
+        </details>
+
+        <section class="sg-prog">
+          <div class="sg-prog-head"><span class="sg-prog-title">Progreso</span></div>
+          <div class="sg-prog-grid">
+            <div class="sg-prog-card">
+              <div class="sg-prog-k">Árboles</div>
+              <div class="sg-prog-v">{$tot_arboles}</div>
+              <div class="sg-prog-sub">{$prog_arboles_pag} comprados · próximo <b>{$prox_arbol_costo} Tobis · Nivel {$prox_arbol_nivel}</b></div>
+            </div>
+            <div class="sg-prog-card">
+              <div class="sg-prog-k">Ramas</div>
+              <div class="sg-prog-v">{$tot_ramas}</div>
+              <div class="sg-prog-sub">{$prog_ramas_pag} compradas · próxima <b>{$prox_rama_costo} Tobis</b></div>
+            </div>
+            <div class="sg-prog-card">
+              <div class="sg-prog-k">Niveles de rama</div>
+              <div class="sg-prog-v">{$tot_niveles}</div>
+              <div class="sg-prog-sub">{$prog_niv_pag} pagados · próximo <b>{$prox_nivel_label}</b></div>
+            </div>
+            <div class="sg-prog-card">
+              <div class="sg-prog-k">Mejoras gratis</div>
+              <div class="sg-prog-v{$cred_cls}">{$prog_cred_gratis}</div>
+              <div class="sg-prog-sub">niveles de rama que puedes subir gratis (se ganan al subir de nivel)</div>
+            </div>
+          </div>
+        </section>
+
+        <if $msg != '' then><div class="sg-msg sg-msg--{$msg_tipo}">{$msg}</div></if>
+        <if $tot_arboles > 0 then>
+        <div class="sg-tree-toolbar">
+          <button type="button" class="sg-dbtn sg-dbtn--outline" id="sg-tree-toggle-all" onclick="sgToggleAllTrees()">Expandir todo</button>
+        </div>
+        </if>
+        {$dojo_html}
+      </div>
+    </div>
+  </main>
+
+  <div class="sg-ruleta-overlay" id="sg-ruleta-overlay">
+    <div class="sg-ruleta-box">
+      <div class="sg-ruleta-title">Tirada Elemental</div>
+      <div class="sg-ruleta-window">
+        <div class="sg-ruleta-marker"></div>
+        <div class="sg-ruleta-strip" id="sg-ruleta-strip"></div>
+      </div>
+      <div class="sg-ruleta-result" id="sg-ruleta-result"></div>
+      <button class="sg-dbtn" type="button" id="sg-ruleta-close" style="display:none" onclick="sgRuletaClose()">Continuar</button>
+    </div>
+  </div>
+
+  {$footer}
+
+  <script>
+    // Colapsa/expande un árbol individual al hacer clic en su cabecera.
+    function sgToggleTree(head) {
+      var tree = head.closest('.sg-tree');
+      if (!tree) { return; }
+      tree.classList.toggle('is-collapsed');
+    }
+
+    // Colapsa/expande TODOS los árboles de una sola vez.
+    var sgTreesExpanded = false;
+
+    function sgToggleAllTrees() {
+      var trees = document.querySelectorAll('.sg-tree');
+      var btn = document.getElementById('sg-tree-toggle-all');
+      sgTreesExpanded = !sgTreesExpanded;
+
+      for (var i = 0; i < trees.length; i++) {
+        trees[i].classList.toggle('is-collapsed', !sgTreesExpanded);
+      }
+
+      if (btn) {
+        btn.textContent = sgTreesExpanded ? 'Colapsar todo' : 'Expandir todo';
+      }
+    }
+
+    function sgDojoMejoras(box) {
+      var checks = box.querySelectorAll('input[type=checkbox]');
+      var n = 0;
+      checks.forEach(function (c) { if (c.checked) n++; });
+      checks.forEach(function (c) { c.disabled = (!c.checked && n >= 2); });
+      var btn = box.querySelector('button[type=submit]');
+      if (btn) { btn.disabled = !(n === 2 && btn.getAttribute('data-needtobi') === '1'); }
+    }
+
+    /* ── Ruleta elemental ── */
+    var sgRuletaResult = "{$ruleta_elemento}";
+    var SG_ELEMS = [
+      { k: 'katon',  n: 'Katon',  kanji: '火' },
+      { k: 'fuuton', n: 'Fuuton', kanji: '風' },
+      { k: 'suiton', n: 'Suiton', kanji: '水' },
+      { k: 'doton',  n: 'Doton',  kanji: '土' },
+      { k: 'raiton', n: 'Raiton', kanji: '雷' }
+    ];
+
+    function sgRuletaClose() {
+      var o = document.getElementById('sg-ruleta-overlay');
+      if (o) { o.classList.remove('show'); }
+    }
+
+    function sgRuletaTile(e) {
+      return '<div class="sg-rtile"><span class="sg-rtile-kanji">' + e.kanji +
+             '</span><span class="sg-rtile-name">' + e.n + '</span></div>';
+    }
+
+    function sgRuletaInit() {
+      if (!sgRuletaResult) { return; }
+      var idx = -1;
+      for (var i = 0; i < SG_ELEMS.length; i++) { if (SG_ELEMS[i].k === sgRuletaResult) { idx = i; } }
+      if (idx < 0) { return; }
+
+      var cycles = 16;
+      var html = '';
+      for (var c = 0; c < cycles; c++) {
+        for (var j = 0; j < SG_ELEMS.length; j++) { html += sgRuletaTile(SG_ELEMS[j]); }
+      }
+      var strip = document.getElementById('sg-ruleta-strip');
+      strip.innerHTML = html;
+
+      var targetIndex = (cycles - 2) * SG_ELEMS.length + idx;
+      var overlay = document.getElementById('sg-ruleta-overlay');
+      overlay.classList.add('show');
+
+      requestAnimationFrame(function () {
+        var tiles = strip.children;
+        var tileW = tiles[0].offsetWidth;
+        var winW = strip.parentElement.clientWidth;
+        var offset = targetIndex * tileW + tileW / 2 - winW / 2;
+
+        strip.style.transition = 'none';
+        strip.style.transform = 'translateX(0)';
+
+        requestAnimationFrame(function () {
+          strip.style.transition = 'transform 4.2s cubic-bezier(0.10, 0.72, 0.08, 1)';
+          strip.style.transform = 'translateX(-' + offset + 'px)';
+        });
+
+        strip.addEventListener('transitionend', function () {
+          if (tiles[targetIndex]) { tiles[targetIndex].classList.add('win'); }
+          var r = document.getElementById('sg-ruleta-result');
+          r.textContent = '¡Obtuviste ' + SG_ELEMS[idx].n + '!';
+          r.classList.add('show');
+          document.getElementById('sg-ruleta-close').style.display = '';
+        }, { once: true });
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', sgRuletaInit);
+  </script>
+</body>
+
+</html>

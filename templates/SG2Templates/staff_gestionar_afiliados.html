@@ -1,0 +1,384 @@
+<html>
+
+<head>
+  <title>Afiliados — Staff</title>
+  {$headerinclude}
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Source+Serif+4:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <style>
+    #afg-page { max-width: 960px; margin: 24px auto 60px; color: var(--ink); font-family: 'Source Serif 4', serif; text-align: left; }
+
+    .afg-panel { border: 0.5px solid var(--border); background: var(--bg2); overflow: hidden; }
+    .afg-panel__head { position: relative; padding: 20px 24px 18px; background: var(--bg3); border-bottom: 0.5px solid var(--border); }
+    .afg-panel__head::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--oxide); }
+    .afg-eyebrow { display: block; font-family: 'Cinzel', serif; font-size: 8px; font-weight: 700; letter-spacing: 2.4px; text-transform: uppercase; color: var(--mist); margin-bottom: 6px; }
+    .afg-title { margin: 0; font-family: 'Cinzel', serif; font-size: 17px; font-weight: 900; letter-spacing: 1.5px; text-transform: uppercase; color: var(--ink); }
+
+    .afg-body { padding: 22px 24px; }
+
+    .afg-meta { display: flex; flex-wrap: wrap; gap: 26px; margin-bottom: 22px; padding: 12px 16px; border: 0.5px solid var(--border); background: var(--bg3); }
+    .afg-stat { display: flex; flex-direction: column; gap: 2px; }
+    .afg-stat__k { font-family: 'Cinzel', serif; font-size: 8px; letter-spacing: 1.6px; text-transform: uppercase; color: var(--mist); }
+    .afg-stat__v { font-family: 'Cinzel', serif; font-size: 18px; font-weight: 900; color: var(--ink); }
+
+    .afg-section { margin-bottom: 30px; }
+    .afg-section:last-child { margin-bottom: 0; }
+    .afg-section__head { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+    .afg-section__head::before { content: ''; width: 3px; height: 13px; background: var(--oxide); flex-shrink: 0; }
+    .afg-section__head::after { content: ''; flex: 1; height: 0.5px; background: var(--border); }
+    .afg-section__title { font-family: 'Cinzel', serif; font-size: 10px; font-weight: 900; letter-spacing: 1.8px; text-transform: uppercase; color: var(--ink); }
+
+    .afg-field { display: flex; flex-direction: column; gap: 5px; margin-bottom: 14px; }
+    .afg-label { font-family: 'Cinzel', serif; font-size: 8px; font-weight: 700; letter-spacing: 1.4px; text-transform: uppercase; color: var(--mist); }
+    .afg-row { display: grid; grid-template-columns: 2fr 2fr 1fr; gap: 14px; }
+    .afg-row--full { display: grid; grid-template-columns: 1fr; gap: 14px; }
+
+    #afg-page input[type="text"], #afg-page input[type="number"], #afg-page textarea {
+      width: 100%; box-sizing: border-box; padding: 9px 11px;
+      background: var(--bg3); border: none;
+      border-bottom: 1.5px solid var(--border); border-left: 1.5px solid var(--border);
+      color: var(--ink); font-family: 'Source Serif 4', serif; font-size: 13px;
+      outline: none; transition: border-color 0.15s, background 0.15s;
+    }
+    #afg-page textarea { resize: vertical; min-height: 44px; }
+    #afg-page input:focus, #afg-page textarea:focus { border-bottom-color: var(--plum3); border-left-color: var(--plum3); background: var(--bg2); }
+
+    .afg-hint { margin: -6px 0 14px; font-size: 11.5px; line-height: 1.6; color: var(--mist); }
+    .afg-hint a { color: var(--plum2); }
+
+    .afg-actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+    .afg-btn { display: inline-flex; align-items: center; justify-content: center; font-family: 'Cinzel', serif; font-size: 9px; font-weight: 900; letter-spacing: 2.5px; text-transform: uppercase; color: var(--lavender); background: var(--plum); border: none; padding: 0 24px; height: 40px; cursor: pointer; transition: background 0.15s, transform 0.12s; text-decoration: none; }
+    .afg-btn:hover { background: var(--plum2); transform: translateY(-1px); }
+    .afg-btn--ghost { background: transparent; color: var(--plum2); border: 0.5px solid var(--border); height: 32px; padding: 0 14px; font-size: 8px; }
+    .afg-btn--ghost:hover { background: var(--bg3); color: var(--ink); }
+    .afg-btn--danger { background: transparent; color: #e07040; border: 0.5px solid var(--oxide); height: 32px; padding: 0 14px; font-size: 8px; }
+    .afg-btn--danger:hover { background: var(--oxide); color: #fff; }
+
+    .afg-list { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    /* Pequeños son cuadritos 45×45 en el índice: tarjetas más angostas para
+       previsualizar eso, no el mismo ancho que Hermano/Grandes. */
+    .afg-list--pequeno { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+    .afg-card { display: flex; flex-direction: column; border: 0.5px solid var(--border); border-top: 1.5px solid var(--plum3); background: var(--bg2); overflow: hidden; transition: opacity 0.15s ease, border-color 0.15s ease; }
+    .afg-card.is-inactive { opacity: 0.5; border-top-color: var(--mist); }
+    /* Hermano/Grande se ven en 16:9 en el índice; el thumb acá previsualiza
+       esa misma proporción en vez de un rectángulo genérico. */
+    .afg-card__thumb { width: 100%; aspect-ratio: 16 / 9; background: var(--bg3); overflow: hidden; }
+    .afg-card__thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    /* Pequeño se ve como un cuadrito de 45×45 en el índice: thumb cuadrado y
+       chico en vez del 16:9 de los otros dos niveles. */
+    .afg-card--pequeno .afg-card__thumb { width: 56px; height: 56px; aspect-ratio: 1 / 1; margin: 12px auto 0; }
+    .afg-card__body { padding: 10px 12px 4px; }
+    .afg-card__title { font-family: 'Cinzel', serif; font-size: 12px; font-weight: 700; color: var(--ink); line-height: 1.35; }
+    .afg-card__title em { color: var(--mist); font-style: italic; font-weight: 400; }
+    .afg-card__meta { margin-top: 4px; font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 1px; text-transform: uppercase; color: var(--mist); }
+    .afg-card.is-inactive .afg-card__status { color: var(--mist); }
+    .afg-card:not(.is-inactive) .afg-card__status { color: var(--green); }
+    .afg-card__url { margin-top: 4px; font-size: 10.5px; word-break: break-all; }
+    .afg-card__url a { color: var(--plum2); }
+    .afg-card__actions { display: flex; gap: 8px; padding: 10px 12px 12px; margin-top: auto; }
+    .afg-empty { grid-column: 1 / -1; padding: 26px; text-align: center; color: var(--mist); border: 0.5px dashed var(--border); font-size: 14px; }
+
+    .afg-toast { position: fixed; left: 50%; bottom: 26px; transform: translateX(-50%) translateY(20px); min-width: 220px; max-width: 90vw; padding: 12px 18px; background: var(--bg2); border: 0.5px solid var(--border); border-left: 3px solid var(--plum); color: var(--ink); font-family: 'Source Serif 4', serif; font-size: 13px; opacity: 0; visibility: hidden; transition: opacity 0.2s, transform 0.2s, visibility 0.2s; z-index: 9999; }
+    .afg-toast.is-show { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0); }
+    .afg-toast.is-error { border-left-color: var(--oxide); }
+
+    @media (max-width: 640px) {
+      .afg-list { grid-template-columns: 1fr; }
+      .afg-row, .afg-row--full { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+
+<body>
+  {$header}
+
+  <div id="afg-page">
+    <div class="afg-panel">
+      <div class="afg-panel__head">
+        <span class="afg-eyebrow">Consola Staff · Índice</span>
+        <h1 class="afg-title">Afiliados</h1>
+      </div>
+
+      <div class="afg-body">
+
+        <div class="afg-meta">
+          <div class="afg-stat"><span class="afg-stat__k">Hermano</span><span class="afg-stat__v" id="afg-count-hermano">{$afgHermanoCount}</span></div>
+          <div class="afg-stat"><span class="afg-stat__k">Grandes</span><span class="afg-stat__v" id="afg-count-grande">{$afgGrandeCount}</span></div>
+          <div class="afg-stat"><span class="afg-stat__k">Pequeños</span><span class="afg-stat__v" id="afg-count-pequeno">{$afgPequenoCount}</span></div>
+        </div>
+
+        <!-- ── Hermano ── -->
+        <div class="afg-section">
+          <div class="afg-section__head"><span class="afg-section__title">Afiliado Hermano</span></div>
+          <form class="afg-form-nuevo" data-tipo="hermano">
+            <input type="hidden" name="id" value="">
+            <div class="afg-row">
+              <div class="afg-field">
+                <label class="afg-label" for="afg-hermano-nombre">Nombre</label>
+                <input type="text" id="afg-hermano-nombre" name="nombre" maxlength="120" required>
+              </div>
+              <div class="afg-field">
+                <label class="afg-label" for="afg-hermano-url">URL</label>
+                <input type="text" id="afg-hermano-url" name="url" placeholder="https://…" maxlength="255" required>
+              </div>
+              <div class="afg-field">
+                <label class="afg-label" for="afg-hermano-orden">Orden</label>
+                <input type="number" id="afg-hermano-orden" name="orden" value="0">
+              </div>
+            </div>
+            <div class="afg-row--full">
+              <div class="afg-field">
+                <label class="afg-label" for="afg-hermano-imagen">URL de la imagen</label>
+                <input type="text" id="afg-hermano-imagen" name="imagen" placeholder="https://…/logo.png" maxlength="255" required>
+              </div>
+              <div class="afg-field">
+                <label class="afg-label" for="afg-hermano-descripcion">Descripción (opcional)</label>
+                <textarea id="afg-hermano-descripcion" name="descripcion" maxlength="255"></textarea>
+              </div>
+            </div>
+            <div class="afg-hint">Sube la imagen primero en <a href="/sg/admin/subir_imagenes.php">Subir Imágenes</a> y pega aquí la URL que te da.</div>
+            <div class="afg-actions">
+              <button class="afg-btn" type="submit" data-label-add="Agregar" data-label-edit="Guardar cambios">Agregar</button>
+              <button class="afg-btn afg-btn--ghost afg-btn-cancelar" type="button" style="display:none;" onclick="afgCancelarEdicion(this)">Cancelar</button>
+            </div>
+          </form>
+          <div class="afg-list" id="afg-list-hermano">{$afgHermanoHtml}</div>
+        </div>
+
+        <!-- ── Grandes ── -->
+        <div class="afg-section">
+          <div class="afg-section__head"><span class="afg-section__title">Afiliados Grandes</span></div>
+          <form class="afg-form-nuevo" data-tipo="grande">
+            <input type="hidden" name="id" value="">
+            <div class="afg-row">
+              <div class="afg-field">
+                <label class="afg-label" for="afg-grande-nombre">Nombre</label>
+                <input type="text" id="afg-grande-nombre" name="nombre" maxlength="120" required>
+              </div>
+              <div class="afg-field">
+                <label class="afg-label" for="afg-grande-url">URL</label>
+                <input type="text" id="afg-grande-url" name="url" placeholder="https://…" maxlength="255" required>
+              </div>
+              <div class="afg-field">
+                <label class="afg-label" for="afg-grande-orden">Orden</label>
+                <input type="number" id="afg-grande-orden" name="orden" value="0">
+              </div>
+            </div>
+            <div class="afg-row--full">
+              <div class="afg-field">
+                <label class="afg-label" for="afg-grande-imagen">URL de la imagen</label>
+                <input type="text" id="afg-grande-imagen" name="imagen" placeholder="https://…/logo.png" maxlength="255" required>
+              </div>
+              <div class="afg-field">
+                <label class="afg-label" for="afg-grande-descripcion">Descripción (opcional)</label>
+                <textarea id="afg-grande-descripcion" name="descripcion" maxlength="255"></textarea>
+              </div>
+            </div>
+            <div class="afg-hint">Sube la imagen primero en <a href="/sg/admin/subir_imagenes.php">Subir Imágenes</a> y pega aquí la URL que te da.</div>
+            <div class="afg-actions">
+              <button class="afg-btn" type="submit" data-label-add="Agregar" data-label-edit="Guardar cambios">Agregar</button>
+              <button class="afg-btn afg-btn--ghost afg-btn-cancelar" type="button" style="display:none;" onclick="afgCancelarEdicion(this)">Cancelar</button>
+            </div>
+          </form>
+          <div class="afg-list" id="afg-list-grande">{$afgGrandeHtml}</div>
+        </div>
+
+        <!-- ── Pequeños ── -->
+        <div class="afg-section">
+          <div class="afg-section__head"><span class="afg-section__title">Afiliados Pequeños (45×45)</span></div>
+          <form class="afg-form-nuevo" data-tipo="pequeno">
+            <input type="hidden" name="id" value="">
+            <div class="afg-row">
+              <div class="afg-field">
+                <label class="afg-label" for="afg-pequeno-nombre">Nombre</label>
+                <input type="text" id="afg-pequeno-nombre" name="nombre" maxlength="120" required>
+              </div>
+              <div class="afg-field">
+                <label class="afg-label" for="afg-pequeno-url">URL</label>
+                <input type="text" id="afg-pequeno-url" name="url" placeholder="https://…" maxlength="255" required>
+              </div>
+              <div class="afg-field">
+                <label class="afg-label" for="afg-pequeno-orden">Orden</label>
+                <input type="number" id="afg-pequeno-orden" name="orden" value="0">
+              </div>
+            </div>
+            <div class="afg-row--full">
+              <div class="afg-field">
+                <label class="afg-label" for="afg-pequeno-imagen">URL de la imagen (45×45)</label>
+                <input type="text" id="afg-pequeno-imagen" name="imagen" placeholder="https://…/logo.png" maxlength="255" required>
+              </div>
+            </div>
+            <div class="afg-hint">Sube la imagen primero en <a href="/sg/admin/subir_imagenes.php">Subir Imágenes</a> y pega aquí la URL que te da. Se recorta sola a 45×45 en el índice.</div>
+            <div class="afg-actions">
+              <button class="afg-btn" type="submit" data-label-add="Agregar" data-label-edit="Guardar cambios">Agregar</button>
+              <button class="afg-btn afg-btn--ghost afg-btn-cancelar" type="button" style="display:none;" onclick="afgCancelarEdicion(this)">Cancelar</button>
+            </div>
+          </form>
+          <div class="afg-list afg-list--pequeno" id="afg-list-pequeno">{$afgPequenoHtml}</div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <div id="afg-toast" class="afg-toast" role="status" aria-live="polite"></div>
+
+  {$footer}
+</body>
+
+<script>
+  var afgPostKey = '{$afgPostKey}';
+
+  function afgToast(msg, ok) {
+    var el = document.getElementById('afg-toast'); if (!el) { return; }
+    el.textContent = msg;
+    el.className = 'afg-toast is-show' + (ok ? '' : ' is-error');
+    clearTimeout(el._t);
+    el._t = setTimeout(function () { el.className = 'afg-toast' + (ok ? '' : ' is-error'); }, 2600);
+  }
+
+  function afgAjax(params, cb) {
+    var body = 'ajax=1&my_post_key=' + encodeURIComponent(afgPostKey);
+    for (var k in params) { if (params.hasOwnProperty(k)) { body += '&' + k + '=' + encodeURIComponent(params[k]); } }
+    fetch(window.location.pathname, {
+      method: 'POST', credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' },
+      body: body
+    }).then(function (r) { return r.json(); }).then(cb).catch(function () {
+      cb({ ok: false, mensaje: 'Error de red. Inténtalo de nuevo.' });
+    });
+  }
+
+  function afgEnsureEmpty(tipo) {
+    var list = document.getElementById('afg-list-' + tipo); if (!list) { return; }
+    if (!list.querySelector('.afg-card') && !list.querySelector('.afg-empty')) {
+      var d = document.createElement('div'); d.className = 'afg-empty';
+      d.textContent = 'Todavía no hay afiliados en este nivel.'; list.appendChild(d);
+    }
+  }
+
+  function afgSyncCount(tipo, delta) {
+    var el = document.getElementById('afg-count-' + tipo); if (!el) { return; }
+    el.textContent = Math.max(0, (parseInt(el.textContent, 10) || 0) + delta);
+  }
+
+  function afgToggle(ev, id) {
+    if (ev) { ev.stopPropagation(); }
+    afgAjax({ accion: 'toggle', id: id }, function (r) {
+      if (!r.ok) { afgToast(r.mensaje || 'No se pudo cambiar el estado.', false); return; }
+      afgToast(r.mensaje, true);
+      var card = document.querySelector('.afg-card[data-id="' + id + '"]');
+      if (card) {
+        card.classList.toggle('is-inactive', !r.activo);
+        var status = card.querySelector('.afg-card__status');
+        if (status) { status.textContent = r.activo ? 'Activo' : 'Inactivo'; }
+        var btn = card.querySelector('.afg-btn--ghost');
+        if (btn) { btn.textContent = r.activo ? 'Desactivar' : 'Activar'; }
+      }
+    });
+  }
+
+  function afgEliminar(ev, id) {
+    if (ev) { ev.stopPropagation(); }
+    if (!confirm('¿Eliminar el afiliado #' + id + '? Esta acción no se puede deshacer.')) { return; }
+    afgAjax({ accion: 'eliminar', id: id }, function (r) {
+      if (!r.ok) { afgToast(r.mensaje || 'No se pudo eliminar.', false); return; }
+      afgToast(r.mensaje, true);
+      var card = document.querySelector('.afg-card[data-id="' + id + '"]');
+      if (card) {
+        var list = card.closest('.afg-list');
+        card.parentNode.removeChild(card);
+        if (list) {
+          var tipo = list.id.replace('afg-list-', '');
+          afgSyncCount(tipo, -1);
+          afgEnsureEmpty(tipo);
+        }
+      }
+    });
+  }
+
+  function afgSetModoForm(form, enEdicion) {
+    var btn = form.querySelector('button[type="submit"]');
+    if (btn) { btn.textContent = enEdicion ? btn.getAttribute('data-label-edit') : btn.getAttribute('data-label-add'); }
+    var cancelar = form.querySelector('.afg-btn-cancelar');
+    if (cancelar) { cancelar.style.display = enEdicion ? 'inline-flex' : 'none'; }
+  }
+
+  // Precarga el form "Agregar" de la misma sección con los datos ya
+  // guardados de la tarjeta, y lo pasa a modo edición (afgSetModoForm).
+  function afgEditar(ev, id) {
+    if (ev) { ev.stopPropagation(); }
+    var card = document.querySelector('.afg-card[data-id="' + id + '"]'); if (!card) { return; }
+    var list = card.closest('.afg-list'); if (!list) { return; }
+    var tipo = list.id.replace('afg-list-', '');
+    var form = document.querySelector('.afg-form-nuevo[data-tipo="' + tipo + '"]'); if (!form) { return; }
+
+    form.querySelector('[name="id"]').value = id;
+    form.querySelector('[name="nombre"]').value = card.getAttribute('data-nombre') || '';
+    form.querySelector('[name="url"]').value = card.getAttribute('data-url') || '';
+    form.querySelector('[name="imagen"]').value = card.getAttribute('data-imagen') || '';
+    var descripcionEl = form.querySelector('[name="descripcion"]');
+    if (descripcionEl) { descripcionEl.value = card.getAttribute('data-descripcion') || ''; }
+    var ordenEl = form.querySelector('[name="orden"]');
+    if (ordenEl) { ordenEl.value = card.getAttribute('data-orden') || '0'; }
+
+    afgSetModoForm(form, true);
+    form.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
+  function afgCancelarEdicion(btn) {
+    var form = btn.closest('form'); if (!form) { return; }
+    form.reset();
+    form.querySelector('[name="id"]').value = '';
+    afgSetModoForm(form, false);
+  }
+
+  (function () {
+    var forms = document.querySelectorAll('.afg-form-nuevo');
+    forms.forEach(function (form) {
+      form.addEventListener('submit', function (ev) {
+        ev.preventDefault();
+        var tipo = form.getAttribute('data-tipo');
+        var idEl = form.querySelector('[name="id"]');
+        var id = idEl ? idEl.value.trim() : '';
+        var enEdicion = id !== '';
+        var nombre = form.querySelector('[name="nombre"]').value.trim();
+        var url = form.querySelector('[name="url"]').value.trim();
+        var imagen = form.querySelector('[name="imagen"]').value.trim();
+        var descripcionEl = form.querySelector('[name="descripcion"]');
+        var descripcion = descripcionEl ? descripcionEl.value.trim() : '';
+        var ordenEl = form.querySelector('[name="orden"]');
+        var orden = ordenEl ? (parseInt(ordenEl.value, 10) || 0) : 0;
+
+        if (!nombre || !url || !imagen) { afgToast('Nombre, URL e imagen son obligatorios.', false); return; }
+
+        var params = { accion: enEdicion ? 'editar' : 'agregar', tipo: tipo, nombre: nombre, url: url, imagen: imagen, descripcion: descripcion, orden: orden };
+        if (enEdicion) { params.id = id; }
+
+        afgAjax(params, function (r) {
+          if (!r.ok) { afgToast(r.mensaje || (enEdicion ? 'No se pudo guardar.' : 'No se pudo agregar.'), false); return; }
+          afgToast(r.mensaje, true);
+          var list = document.getElementById('afg-list-' + tipo);
+
+          if (enEdicion) {
+            var actual = document.querySelector('.afg-card[data-id="' + id + '"]');
+            if (actual) {
+              var tmpE = document.createElement('div'); tmpE.innerHTML = r.card_html;
+              actual.parentNode.replaceChild(tmpE.firstChild, actual);
+            }
+          } else if (list) {
+            var empty = list.querySelector('.afg-empty'); if (empty) { empty.parentNode.removeChild(empty); }
+            var tmp = document.createElement('div'); tmp.innerHTML = r.card_html;
+            list.insertBefore(tmp.firstChild, list.firstChild);
+            afgSyncCount(tipo, 1);
+          }
+
+          form.reset();
+          if (idEl) { idEl.value = ''; }
+          afgSetModoForm(form, false);
+        });
+      });
+    });
+  })();
+</script>
+
+</html>

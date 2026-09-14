@@ -1,0 +1,226 @@
+<html>
+
+<head>
+  <title>Registro · Consola</title>
+  {$headerinclude}
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Noto+Serif+JP:wght@300;400;700&display=swap" rel="stylesheet">
+  <style>
+    .sg-admin {
+      --bg: #0f0c18; --bg2: #130f1e; --bg3: #171224;
+      --border: rgba(156, 107, 204, 0.12);
+      --border-strong: rgba(156, 107, 204, 0.22);
+      --ink: #e8dff8; --plum: #7b4ab8; --plum2: #9c6bcc; --plum3: #b890e0;
+      --stone: #8a7a9a; --mist: #5a4a6a; --oxide: #c0582a; --lavender: #ede0fa;
+      max-width: 900px;
+      margin: 24px auto 40px;
+      padding: 0 16px;
+      color: var(--ink);
+      font-family: 'Noto Serif JP', serif;
+    }
+
+    .sg-admin-card {
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), transparent 16%), var(--bg2);
+      border: 0.5px solid var(--border);
+      overflow: hidden;
+    }
+
+    .sg-admin-head {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 18px 22px;
+      background: var(--bg3);
+      border-bottom: 0.5px solid var(--border);
+    }
+
+    .sg-admin-head::before {
+      content: '';
+      width: 3px;
+      height: 20px;
+      background: var(--oxide);
+      flex-shrink: 0;
+    }
+
+    .sg-admin-head h1 {
+      margin: 0;
+      font-family: 'Cinzel', serif;
+      font-size: 15px;
+      font-weight: 900;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--ink);
+    }
+
+    .sg-admin-body { padding: 18px 22px; }
+
+    /* Lista de registros */
+    .sg-log-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .sg-log {
+      background: var(--bg);
+      border: 0.5px solid var(--border);
+      border-left: 2px solid var(--villa, var(--plum));
+      overflow: hidden;
+    }
+
+    .sg-log__head {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px 16px;
+      padding: 10px 14px;
+      background: var(--bg3);
+      border-bottom: 0.5px solid var(--border);
+    }
+
+    .sg-log__id {
+      font-family: 'Cinzel', serif;
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 1px;
+      color: var(--plum3);
+    }
+
+    .sg-log__meta {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      color: var(--ink);
+    }
+
+    .sg-log__label {
+      font-family: 'Cinzel', serif;
+      font-size: 7px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--mist);
+    }
+
+    .sg-log__time {
+      margin-left: auto;
+      font-family: 'Cinzel', serif;
+      font-size: 9px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--mist);
+      white-space: nowrap;
+    }
+
+    .sg-log__body {
+      margin: 0;
+      padding: 14px;
+      font-family: 'Source Serif 4', 'Noto Serif JP', serif;
+      font-size: 13px;
+      line-height: 1.7;
+      color: var(--stone);
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .sg-log-empty {
+      padding: 28px;
+      text-align: center;
+      font-size: 14px;
+      color: var(--mist);
+    }
+
+    /* Filtros */
+    .sg-filter {
+      display: flex; flex-wrap: wrap; align-items: flex-end; gap: 10px;
+      margin-bottom: 16px; padding-bottom: 16px; border-bottom: 0.5px solid var(--border);
+    }
+    .sg-filter__field { display: flex; flex-direction: column; gap: 5px; }
+    .sg-filter__label {
+      font-family: 'Cinzel', serif; font-size: 8px; font-weight: 700; letter-spacing: 1.5px;
+      text-transform: uppercase; color: var(--mist);
+    }
+    .sg-filter__input {
+      height: 38px; padding: 0 12px; background: var(--bg);
+      border: 0.5px solid var(--border-strong); color: var(--ink);
+      font-family: 'Noto Serif JP', serif; font-size: 14px; box-sizing: border-box;
+    }
+    .sg-filter__input:focus { outline: none; border-color: var(--plum3); }
+
+    .sg-btn {
+      display: inline-flex; align-items: center; justify-content: center; height: 38px;
+      padding: 0 18px; background: var(--plum); border: none; color: var(--lavender);
+      font-family: 'Cinzel', serif; font-size: 9px; font-weight: 700; letter-spacing: 1.5px;
+      text-transform: uppercase; cursor: pointer; text-decoration: none; transition: background 0.15s;
+    }
+    .sg-btn:hover { background: var(--plum2); }
+    .sg-btn--ghost {
+      background: transparent; border: 0.5px solid var(--border-strong); color: var(--stone);
+    }
+    .sg-btn--ghost:hover { background: transparent; border-color: var(--plum3); color: var(--ink); }
+
+    .sg-log-summary { font-size: 12px; color: var(--mist); margin-bottom: 12px; }
+
+    /* Paginación */
+    .sg-pagination {
+      display: flex; flex-wrap: wrap; gap: 6px; justify-content: center;
+      margin-top: 18px; padding-top: 16px; border-top: 0.5px solid var(--border);
+    }
+    .sg-page {
+      display: inline-flex; align-items: center; justify-content: center;
+      min-width: 34px; height: 34px; padding: 0 10px;
+      border: 0.5px solid var(--border-strong); color: var(--stone);
+      font-family: 'Cinzel', serif; font-size: 12px; font-weight: 700; text-decoration: none;
+      transition: border-color 0.15s, color 0.15s;
+    }
+    .sg-page:hover { border-color: var(--plum3); color: var(--ink); }
+    .sg-page--active { background: var(--plum); border-color: var(--plum); color: var(--lavender); }
+    .sg-page--gap { border: none; min-width: 20px; color: var(--mist); }
+
+    @media (max-width: 640px) {
+      .sg-log__time { margin-left: 0; width: 100%; }
+    }
+  </style>
+</head>
+
+<body>
+  {$header}
+  <main class="sg-admin">
+    <div class="sg-admin-card">
+      <div class="sg-admin-head">
+        <h1>Registro · Consola</h1>
+      </div>
+      <div class="sg-admin-body">
+        <form class="sg-filter" method="get" action="/sg/admin/log_consola_mod.php">
+          <div class="sg-filter__field">
+            <label class="sg-filter__label" for="f_usuario">Usuario</label>
+            <input class="sg-filter__input" type="text" name="f_usuario" id="f_usuario" value="{$f_usuario_val}" placeholder="Nombre de usuario">
+          </div>
+          <div class="sg-filter__field">
+            <label class="sg-filter__label" for="f_staff">Staff</label>
+            <input class="sg-filter__input" type="text" name="f_staff" id="f_staff" value="{$f_staff_val}" placeholder="Miembro de staff">
+          </div>
+          <div class="sg-filter__field">
+            <label class="sg-filter__label" for="q">Búsqueda (razón / contenido)</label>
+            <input class="sg-filter__input" type="text" name="q" id="q" value="{$q_val}" placeholder="Texto del log, razón…">
+          </div>
+          <button class="sg-btn" type="submit">Filtrar</button>
+          <a class="sg-btn sg-btn--ghost" href="/sg/admin/log_consola_mod.php">Limpiar</a>
+        </form>
+
+        <div class="sg-log-summary">{$resumen}</div>
+
+        <div class="sg-log-list">
+          {$logs_li}
+        </div>
+
+        <div class="sg-pagination">{$pagination}</div>
+      </div>
+    </div>
+  </main>
+  {$footer}
+</body>
+
+</html>

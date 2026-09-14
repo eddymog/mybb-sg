@@ -1,0 +1,70 @@
+<section class="sg-profile-main">
+  <section class="sg-profile-hero">
+    <div class="sg-profile-hero__banner <if $is_owner then>sg-profile-editable</if>" style="background-image: url({$ficha['banner']});" <if $is_owner then>onclick="openProfileAssetModal('banner')"</if>></div>
+    <div class="sg-profile-hero__overlay"></div>
+    <div class="sg-profile-hero__content">
+      <div class="sg-profile-hero__meta">
+        <span class="sg-profile-village">{$sgFichaThemeLabel}</span>
+        <h1 class="sg-profile-name">{$ficha['nombre']}</h1>
+        <p class="sg-profile-alias">{$ficha['apodo']}</p>
+        <div class="sg-profile-summary">
+          <div class="sg-profile-summary__item">
+            <span class="sg-profile-summary__label">Clase</span>
+            <span class="sg-profile-summary__value" id="sg-profile-class-summary">E</span>
+          </div>
+          <div class="sg-profile-summary__item">
+            <span class="sg-profile-summary__label">Puntos de Habilidad</span>
+            <span class="sg-profile-summary__value">{$ficha['puntos_habilidad']}</span>
+          </div>
+          <div class="sg-profile-summary__item">
+            <span class="sg-profile-summary__label">Vida Base</span>
+            <span class="sg-profile-summary__value">{$vida}</span>
+          </div>
+          <div class="sg-profile-summary__item">
+            <span class="sg-profile-summary__label">Chakra Base</span>
+            <span class="sg-profile-summary__value">{$chakra}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="sg-profile-panel">
+    <div class="sg-profile-panel__head">
+      <h2>Perfil Narrativo</h2>
+      <span class="sg-profile-meta-pill">Página única</span>
+    </div>
+    <div class="sg-profile-panel__body">
+      <div class="sg-profile-story">
+        <section class="sg-profile-section">
+          <div class="sg-profile-section__head"><h3>Biografía</h3></div>
+          <div class="sg-profile-section__body">{$historia}</div>
+        </section>
+
+        <section class="sg-profile-section">
+          <div class="sg-profile-section__head"><h3>Apariencia</h3></div>
+          <div class="sg-profile-section__body">{$apariencia}</div>
+        </section>
+
+        <section class="sg-profile-section">
+          <div class="sg-profile-section__head"><h3>Personalidad</h3></div>
+          <div class="sg-profile-section__body">{$personalidad}</div>
+        </section>
+
+        <section class="sg-profile-section">
+          <div class="sg-profile-section__head"><h3>Frase y Extras</h3></div>
+          <div class="sg-profile-section__body">
+            <if $frase then>
+              <p style="margin-top:0;">{$frase}</p>
+            </if>
+            <if $extra then>
+              <p style="margin-bottom:0;">{$extra}</p>
+            </if>
+          </div>
+        </section>
+
+        <div class="sg-profile-physical-origin">Origen físico del personaje: {$ficha['fisico_de_pj']}</div>
+      </div>
+    </div>
+  </div>
+</section>

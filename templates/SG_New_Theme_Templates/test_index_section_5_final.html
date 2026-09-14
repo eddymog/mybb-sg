@@ -1,0 +1,229 @@
+<section id="section5-final">
+
+    <section class="s5-online">
+        <div style="padding: 10px 10px 0px;">
+            <span class="s5-title"><a href="/online.php">Conectados</a>:</span>
+        </div>
+        <div style="padding-left: 13px;">
+            <span class="s5-content">{$onlinemembers}</span>
+        </div>
+        <div style="padding: 10px 10px 0px;">
+            <span class="s5-title">En línea la última semana:</span>
+        </div>
+        <div class="online_div_inner" style="padding-top: 0px;">
+            <span class="s5-content">{$online_today}</span>
+        </div>
+    </section>
+
+    <section class="s5-miscelanea">
+        <div>
+            <span class="text-moon" style="bottom: 45px;right: 20px;">Verano</span>
+            <span class="text-moon" style="bottom: 25px;right: 20px;">~30 de Junio</span>
+            <span class="text-moon" style="bottom: 5px;right: 15px;">Año 16 D.K.</span>
+            <img class="temporada_index" src="https://i.ibb.co/kxBKxcp/verano.png">
+        </div>
+
+        <div>
+            <div>Se han escrito {$stats['numposts']} posts en {$stats['numthreads']} temas.</div>
+            <div style="margin-top: 3px;">Actualmente tenemos {$stats['numusers']} miembros registrados.</div>
+            <div style="margin-top: 3px;">Démosle la bienvenida al miembro más reciente: {$newestmember}.</div>
+            <div style="text-align: center;margin-top: 10px;">
+                <a href="https://discord.com/invite/UMBSGnWmwt">
+                    <button class="discord-button">
+                        <i class="fab fa-discord" aria-hidden="true"></i> ¡Únete a nuestro Discord!
+                    </button>
+                </a>
+            </div>
+            <div style="text-align: center;margin-top: 5px;">
+                <a href="/sg/censo.php">
+                    <button style="font-size: 15px; margin-top: 7px;" class="discord-button">
+                        Censo y Estadísticas
+                    </button>
+                </a>
+            </div>
+        </div>
+    </section>
+    
+    <section class="s5-posts">
+        <div class="barra-op bbox">
+            <span class="barra-texto-op">
+                <a href="misc.php?action=recent_threads">Últimos Posts</a>
+            </span>
+        </div>
+        <div class="ultimos-temas bbox">
+            <div id="ultimos_todo" style="display:block;">{$g_ultimos_post}</div>
+            <div id="ultimos_rol" style="display:none;">{$g_ultimos_post_rol}</div>
+            <div id="ultimos_off" style="display:none;">{$g_ultimos_post_off}</div>
+        </div>
+        <div>
+            <div class="ultimos-post ultimos-post-todo ultimos-active" onClick="clickUltimoPost('todo');">
+                <span>Todo</span>
+            </div>
+            <div class="ultimos-post ultimos-post-rol" onClick="clickUltimoPost('rol');">
+                <span>Rol</span>
+            </div>
+            <div class="ultimos-post ultimos-post-off" onClick="clickUltimoPost('off');">
+                <span>Off</span>
+            </div>
+        </div>
+    </section>
+
+    <style>
+        #section5-final{
+            margin-top: 10px;
+            display: flex;
+            justify-content: space-between;
+
+            .s5-online{
+                width:29%;
+				max-height: 450px;
+                background-color: #0e1a28;
+                overflow-y: auto;
+                border: 5px solid #0e2034;
+
+                .s5-title{
+                    color: white;
+                    font-family: InterRegular;
+                    letter-spacing: 2px;
+                    font-size: 15px;
+                }
+
+                .s5-content{
+                    color: #dcdbdb;
+                    font-family: InterRegular;
+                    font-size: 10px;
+                    letter-spacing: 1px;
+                }
+            }
+
+            .s5-miscelanea{
+                width: 37%;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+
+                > :first-child{
+                    position: relative;
+                    background-color: #0e2034;
+                    border: 5px solid #0e2034;
+
+                    span{
+                        position: absolute;
+                        font-family: interRegular;
+                        font-size: 19px;
+                        text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
+                        z-index: 1;
+                    }
+
+                    span:first-child{
+                        font-size: 25px;
+                    }
+
+                    img{
+                        width: 100%;
+                        height: 100%;
+                    }
+                }
+
+                > :last-child{
+                    background-color: #0e1a28;
+                    border: 5px solid #0e2034;
+                    padding: 20px 20px 20px;
+                    font-family: InterRegular;
+                    text-align: center;
+                }
+            }
+
+            .s5-posts{
+                width: 30%;
+                display: flex;
+                flex-direction: column;
+                border: 5px solid #0e2034;
+
+                .barra-op.bbox{
+                    height: 29px;
+
+                    span{
+                        top: 3px;
+                        font-size: 18px;
+                        font-family: InterRegular;
+                        letter-spacing: 2px;
+                    }
+                }
+
+                .ultimos-temas.bbox{
+                    flex: 1;
+                    border-left: 1px solid #4e7482;
+                    border-right: 1px solid #4e7482;
+                    border-bottom: 1px solid #4e7482;
+                    max-height: 390px;
+                    overflow: auto;
+                }
+
+                > :last-child{
+                    display: flex;
+                    text-align: center;
+                }
+            }
+
+            @media (width < 576px){
+                width: 100%;
+                flex-direction: column;
+                gap: 10px;
+
+                .s5-online{
+                    width: 100%;
+                    box-sizing: border-box;
+                }
+
+                .s5-miscelanea{
+                    width: 100%;
+                    box-sizing: border-box;
+
+                    > :last-child{
+                        margin-top: 10px;
+                    }
+                }
+
+                .s5-posts{
+                    width: 100%;
+                    box-sizing: border-box;
+
+                    > :last-child{
+                        div{
+                            flex: 1;
+                        }
+                    }
+                }
+            }
+        }
+    </style>
+
+    <script>
+        function clickUltimoPost(tipo) {
+            console.log(tipo);
+            $('.ultimos-post').removeClass('ultimos-active');
+    
+            if (tipo == 'todo') {
+                $('#ultimos_todo').css('display', 'block');
+                $('#ultimos_rol').css('display', 'none');
+                $('#ultimos_off').css('display', 'none');
+                $('.ultimos-post-todo').addClass('ultimos-active');
+            }
+    
+            if (tipo == 'rol') {
+                $('#ultimos_todo').css('display', 'none');
+                $('#ultimos_rol').css('display', 'block');
+                $('#ultimos_off').css('display', 'none');
+                $('.ultimos-post-rol').addClass('ultimos-active');
+            }
+    
+            if (tipo == 'off') {
+                $('#ultimos_todo').css('display', 'none');
+                $('#ultimos_rol').css('display', 'none');
+                $('#ultimos_off').css('display', 'block');
+                $('.ultimos-post-off').addClass('ultimos-active');
+            }
+        }	
+    </script>
+</section>

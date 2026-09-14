@@ -1,0 +1,180 @@
+<html>
+<head>
+<style>
+	.ava-hs {
+		margin: 0 !important;
+    	float: none !important;
+	}
+	
+	.ava-hs img {
+		border-radius: 0px !important;
+		width: 268px !important;
+		height: auto !important;
+	}	
+	
+	.tab-content {
+		background: #0e1a28 !important;	
+	}
+	
+	ul.tabs, ul.tabs li.current {
+    	background: #07607c !important;
+	}
+	
+	.tabs-wrap {
+    	border: 1px solid #7aa9b7 !important;
+	}
+	
+	.profile-ctbox {
+    	border-bottom: 1px solid #7aa9b7 !important;
+	}
+	
+	.thead.profile-side {
+		color: unset !important;
+		border-bottom: 1px solid #7aa9b7 !important;
+		background: #07607c !important;
+	}
+	
+	.profcontainer .left-sidebar .sidebar-container {
+		background: #0e1a28 !important;
+		border: 1px solid #7aa9b7 !important;
+	}
+	
+	.profcontainer .left-sidebar .sidebar-container .sidebar-inner {
+		color: unset !important;
+	}
+</style>
+	
+<title>{$mybb->settings['bbname']} - {$lang->profile}</title>
+{$headerinclude}
+<script type="text/javascript" src="{$mybb->asset_url}/jscripts/report.js?ver=1820"></script>
+</head>
+<body>
+{$header}
+<div class="profcontainer" style=" margin-top: 20px; ">
+	<div class="left-sidebar">
+		<div class="sidebar-container">
+			<div class="ava-hs"><a href="/sg/ficha.php?uid={$memprofile['uid']}">{$avatar}</a></div>
+			<div class="thead profile-side">{$lang->users_forum_info}</div>
+			<div class="sidebar-inner">
+				<span class="float_left clr_drk">{$lang->joined}</span>
+				<span class="float_right"><strong>{$memregdate}</strong></span><br />
+				<span class="float_left clr_drk">Posts:</span>
+				<span class="float_right"><strong>{$memprofile['postnum']}</strong></span><br />
+				<span class="float_left clr_drk">Threads:</span>
+				<span class="float_right"><strong>{$memprofile['threadnum']}</strong></span><br />
+				{$referrals}
+				{$buddy_options}
+				{$ignore_options}
+				{$report_options}
+			</div>
+		</div>
+<!-- 		<div class="sidebar-container">
+			<div class="thead profile-side">Custom</div>
+			<div class="sidebar-inner">
+				<span>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor...</span>
+			</div>
+		</div> -->
+	</div>
+
+	<div class="resp ib-hs">
+		<div class="sidebar-container">
+			<div class="sidebar-inner">
+				<span class="float_left clr_drk">{$lang->joined}</span>
+				<span class="float_right"><strong>{$memregdate}</strong></span><br />
+				<span class="float_left clr_drk">Posts:</span>
+				<span class="float_right"><strong>{$memprofile['postnum']}</strong></span><br />
+				<span class="float_left clr_drk">Threads:</span>
+				<span class="float_right"><strong>{$memprofile['threadnum']}</strong></span><br />
+				{$referrals}
+				{$buddy_options}
+				{$ignore_options}
+				{$report_options}
+			</div>
+		</div>
+		<div class="sidebar-container">
+			<div class="sidebar-inner">
+				<span>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor...</span>
+			</div>
+		</div>
+		<br />
+	</div>
+	<div class="tabs-wrap">
+		<ul class="tabs">
+			<li class="tab-link current" data-tab="tab-1">{$lang->users_forum_info}</li>
+<!-- 			<li class="tab-link" data-tab="tab-2">{$lang->users_additional_info}</li>
+			<li class="tab-link" data-tab="tab-3">{$lang->users_signature}</li>
+			<li class="tab-link" data-tab="tab-4">{$lang->users_contact_details}</li> -->
+		</ul>
+		<div id="tab-1" class="tab-content current">
+			<div>
+				<div class="profile-ctbox">
+					<div><strong>Ficha del Personaje:</strong></div>
+					<div class="clr_gry"><a href="/sg/ficha.php?uid={$memprofile['uid']}">{$formattedname}</a></div><br>
+					{$newpoints_profile}
+				</div>
+				
+				<div class="profile-ctbox">
+					<div><strong>ID del Personaje/Usuario:</strong></div>
+					<div class="clr_gry">{$memprofile['uid']}</div>
+				</div>
+				
+				<div class="profile-ctbox">
+					<div><strong>{$lang->postbit_status}</strong></div>
+					<div class="clr_gry">{$online_status}</div>
+				</div>
+				<div class="profile-ctbox">
+					<div><strong>{$lang->lastvisit}</strong></div>
+					<div class="clr_gry">{$memlastvisitdate}</div>
+				</div>
+<!-- 				{reputation}
+				{warning_level} -->
+				<div class="profile-ctbox">
+					<div><strong>{$lang->timeonline}</strong></div>
+					<div class="clr_lgr">{$timeonline}</div>
+				</div>
+				{$profile_attached}
+				<div class="profile-ctbox">
+					<div><strong>{$lang->total_posts}</strong></span></div>
+					<div class="clr_lgr">{$memprofile['postnum']} ({$lang->ppd_percent_total}){$findposts}</div>
+				</div>
+				<div class="profile-ctbox">
+					<div><strong>{$lang->total_threads}</strong></div>
+					<div class="clr_lgr">{$memprofile['threadnum']} ({$lang->tpd_percent_total}){$findthreads}</div>
+				</div>
+				
+				{$modoptions}
+				{$adminoptions}
+			</div>
+		</div>
+		<div id="tab-2" class="tab-content">
+			{$profilefields}{$profile_attached}
+			<div class="profile-ctbox">
+				<div><strong>{$lang->total_posts}</strong></span></div>
+				<div class="clr_lgr">{$memprofile['postnum']} ({$lang->ppd_percent_total}){$findposts}</div>
+			</div>
+			<div class="profile-ctbox">
+				<div><strong>{$lang->total_threads}</strong></div>
+				<div class="clr_lgr">{$memprofile['threadnum']} ({$lang->tpd_percent_total}){$findthreads}</div>
+			</div>
+			{$modoptions}
+			{$adminoptions} 
+		</div>
+		<div id="tab-3" class="tab-content">{$signature}</div>
+		<div id="tab-4" class="tab-content">{$contact_details}</div>
+	</div>
+	<br />
+</div> 
+{$bannedbit}
+{$awaybit}
+<script language="javascript" type="text/javascript">
+$('ul.tabs li').click(function(){
+var tab_id = $(this).attr('data-tab');
+$('ul.tabs li').removeClass('current');
+$('.tab-content').removeClass('current');
+$(this).addClass('current');
+$("#"+tab_id).addClass('current');
+});
+</script> 
+{$footer}
+</body>
+</html>

@@ -1,0 +1,99 @@
+<html>
+
+<head>
+    <style>
+
+
+    </style>
+    <title>Misiones</title>
+    {$headerinclude}
+</head>
+
+<body>
+    {$header}
+    <div class="fondo-blanco">
+		<div style="font-size: 21px;text-align: center;">
+			<div class="entrenamiento"><p>¡Misión en progreso!</p></div>
+			<div id="contenedor">
+				<p id="countdown" style="color: #3498db;"></p>
+			</div>
+		</div>
+        <script>
+            var end = new Date({$tiempo});
+
+            var _second = 1000;
+            var _minute = _second * 60;
+            var _hour = _minute * 60;
+            var _day = _hour * 24;
+            var timer;
+
+            var progBar = document.getElementById('barracarga');
+            var headBar = document.getElementById('hhead');
+
+            function showRemaining() {
+                var now = new Date();
+                var distance = end - now;
+                if (distance < 1000 && distance > 1) {
+                    location.reload(true);
+                    return;
+                }
+                if (distance < 0) {
+                    clearInterval(timer);
+                    document.getElementById('countdown').innerHTML = '0 dias, 0 horas, 0 minutos y 0 segundos';
+					location.reload();
+                    return;
+                }
+                var days = Math.floor(distance / _day);
+                var hours = Math.floor((distance % _day) / _hour);
+                var minutes = Math.floor((distance % _hour) / _minute);
+                var seconds = Math.floor((distance % _minute) / _second);
+
+                document.getElementById('countdown').innerHTML = days + ' dias, ';
+                document.getElementById('countdown').innerHTML += hours + ' horas, ';
+                document.getElementById('countdown').innerHTML += minutes + ' minutos y ';
+                document.getElementById('countdown').innerHTML += seconds + ' segundos';
+            }
+
+            timer = setInterval(showRemaining, 1000);
+        </script>
+		<div style="border: 3px double #3498db;padding: 20px;width: 800px;margin: auto;">
+			<div style="text-align: center; font-size: 22px;"><strong class="missionName">{$mision['title']} ({$mision['rango']})</strong></div>
+			<br>
+			<div style=" text-align: center; font-size: 15px; "><span><strong>Detalles:</strong> {$mision['descripcion']}</span></div><br><br>
+			
+			<div style="font-size: 16px;text-align: center;">
+				<span>Tu pago será <strong>{$mision['ryos']} Ryos</strong> y recibirás <strong>{$mision['expt']} Puntos de Habilidad</strong>.</span><br>
+				<span>Esta misión requiere <strong>{$mision['coste']} Puntos de Rol</strong>.</span>
+			</div><br>
+		</div>
+        <div class="barritanegra"></div>
+        <br>
+        <div style="display: none">
+            <form id="cmisform" method="post" action="misiones.php">
+                <input type="text" name="userid2" id="userid" value="{$userid}">
+                <input type="text" id="mid2" name="mid2" value="false">
+            </form>
+        </div>
+        <div class="boton_mision" style="text-align: center;"><div id="confirmacion" style="display: none;">¿Estás seguro de que quieres cancelar la Misión?<br><br>
+			<input
+                type="button" class="button"
+                onclick="javascript: document.getElementById('mid2').value = 'cancel'; document.getElementById('cmisform').submit();"
+                value="Sí" style="background-color: #5f6572;"> 
+			<input type="button" class="button"
+                onclick="javascript: document.getElementById('confirmacion').style= 'display: none';" value="No"
+                style="background-color: #5f6572;"><br><br>
+			<img src="https://media.giphy.com/media/2SviMQehkY0lG/giphy.gif">
+			</div>
+			<input type="button" class="button"
+				onclick="javascript: document.getElementById('confirmacion').style= 'display: block;border: 3px dotted rgb(52, 152, 219);padding: 20px;border-radius: 5px;width: 800px;margin: 20px auto;';"
+				value="Cancelar" style="background-color: #5f6572;">
+			
+		</div><br>
+		<div style="text-align: center;"><img src="https://narutoversity.files.wordpress.com/2015/07/naruto-versus-kimimaro.gif" /></div>	
+        <br><br>
+    </div>
+    {$reload_script}
+    {$footer}
+</body>
+
+</html>

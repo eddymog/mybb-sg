@@ -1,0 +1,378 @@
+<html>
+	<head>
+		<title>Entrenamientos</title>
+		{$headerinclude}
+	</head>
+
+	<body>
+		{$header}
+
+		<div class="fondo-blanco">
+			<div style="width: 400px;margin: auto;padding: 6px;border-radius: 2px;font-family: monospace;font-size: 23px;color: #3498db;border: 2px dotted #3498db;text-align:center;">¡Tienes {$pr} puntos de rol!</div>
+			<br>
+			<div style="display: none"><form id="tecform" method="post" action="entrenamientos.php"><input type="text" id="tecid" name="tid" value="false"></form></div>
+			<div class="aviso_tecnicas" style=" text-align: center;font-size: 17px; "></div>
+			<div id="tecnicasEntrenar">
+
+			</div>
+			<br>
+		</div>
+		{$footer}
+	</body>
+	<if $log_var !='' then><script>alert(`{$log_var}`);</script></if>
+	{$reload_script}
+	<script>		
+		function createSpoiler(spoilerId, title) {
+			const generalTecs = `
+				<div class="spoiler" style=" margin: 10px auto; ">
+					<div class="spoiler_title" onclick="{$spoiler_onclick}"><span class="spoiler_button">` + title +`</span></div>
+					<div class="spoiler_content" style="display: none;" align="center" id="` + spoilerId +`"></div>
+                </div>`;
+			return generalTecs;
+		}
+		
+		function getRecursos(rango) {
+			const recursos = { 
+				coste: 0,
+				recompensa: 0
+			};
+			const suma_stats_var = {$suma_stats_var};
+			
+			if (rango == 'E') {
+				recursos.coste = '0';
+				recursos.recompensa = '5';
+			} else if (rango == 'D') {
+				
+				if (suma_stats_var >= 80 && suma_stats_var < 160) {
+					recursos.recompensa = '3';
+				} else {
+					recursos.recompensa = '2';
+				}
+				recursos.coste = '5';
+			} else if (rango == 'C') {
+				recursos.coste = '8';
+				recursos.recompensa = '2';      
+			} else if (rango == 'B') {
+				recursos.coste = '12';
+				recursos.recompensa = '3';
+			} else if (rango == 'A') {
+				recursos.coste = '16';
+				recursos.recompensa = '3';
+			} else if (rango == 'A+') {
+				recursos.coste = '20';
+				recursos.recompensa = '4';
+			} else if (rango == 'S') {
+				recursos.coste = '25';
+				recursos.recompensa = '5';
+			} else if (rango == 'S+') {
+				recursos.coste = '30';
+				recursos.recompensa = '7';
+			} 
+			return recursos;
+		}
+		
+		function getEntrenarButton(coste, tid) {
+			if ({$pr} >= coste) {
+				return `<input class="button" style="margin-bottom: 5px;font-size: 17px;margin-top: -12px;" type="button" value="Entrenar" class="trainButton" onclick="javascript: document.getElementById('tecid').value = '` + tid + `'; document.getElementById('tecform').submit();">`;
+			} else {
+				return `<input class="button" type="button" value="Te falta rolear :'(" class="trainButton" onclick="javascript: $(this).attr(&quot;disabled&quot;, true).after('<div class=&quot;alert&quot; style=&quot;color:#a31520&quot;>No tienes suficientes puntos de rol para comenzar este entrenamiento. Mejor ponete a rolear de una.</div>');" style="background-color: rgb(95, 101, 114);margin-bottom: 5px;font-size: 17px;margin-top: -12px;">`;
+			}
+		}
+		
+		function createTecnica(tecnica) {
+			const recursos = getRecursos(tecnica.rango);
+			const modoVista = '{$modo_vista}' == '1' ? true : false;
+			
+			let tec_sellos_html = '';
+			let tec_categoria_html = '';
+			if (tecnica.sellos) {
+				tec_sellos_html += "<div class='tecnicaType'><span>SELLOS: " + tecnica.sellos.toUpperCase() + "</span></div>";
+			}
+			if (tecnica.categoria && (tecnica.categoria != tecnica.tipo)) {
+				tec_categoria_html += "<div class='tecnicaType'><span>" + tecnica.categoria.toUpperCase() + "</span></div>";
+			}
+			
+			const generalTecs = `
+				<div><div class="spoiler" style="margin: 10px;">
+					<div class="spoiler_title" onclick="{$spoiler_onclick}">
+						<span class="spoiler_button" style="text-transform: uppercase;"><strong>` + tecnica.nombre + `</strong></span></div>
+					<div class="tecnica_spoiler_content" style="display: none;">
+						<div style='display: flex;flex-direction: column;'>
+							<div style='display: flex;flex-direction: row;justify-content: space-between;margin-bottom: 10px;margin-top: 7px;'>
+								<div class='tecnicaLvl'><span>Rango ` + tecnica.rango + `</span></div>
+							</div>
+							<div style='display: flex;flex-direction: row;justify-content: space-between;margin-bottom: 10px;margin-top: -11px;'>` +
+							  (tecnica.requisito ? `<div class='tecnicaLvl'><span>` + tecnica.requisito + `</span></div>` : ``) + `
+							</div>
+							<div style='display: flex;flex-direction: row;justify-content: center;margin: 9px 8px 10px;'>
+								<div class='tecnicaId'><span>ID: ` + tecnica.tid.toUpperCase() + `</span></div> 
+								` + tec_sellos_html + `
+								<div class='tecnicaType'><span>` + tecnica.tipo.toUpperCase() + `</span></div> 
+								` + tec_categoria_html + `
+							</div>
+                            <p class='tecnicaDes'><span>` + tecnica.descripcion + `</span></p>` +
+						  (tecnica.coste ? `<div class='tecnicaCost'><span class='tecnicaLvl'>Coste:</span> <span class='efectoDescripcion'>` + tecnica.coste + `</span></div>` : ``) + 
+						  (tecnica.efecto ? `<div class='tecnicaEfect'><span class='tecnicaLvl'>Efecto:</span> <span class='efectoDescripcion'>` + tecnica.efecto + `</span></div>` : ``) + `
+						</div>
+						<hr>
+      					<div style="text-align: center;">
+                        	<span><strong>Coste de Entrenamiento:</strong> ` + recursos.coste + ` PR</span><br>
+                        	<span><strong>Recompensa:</strong> ` + recursos.recompensa + ` PH</span><br><br>
+                			` + (!modoVista ? getEntrenarButton(recursos.coste, tecnica.tid) : '') + `
+					    </div>
+					</div>
+				</div>
+			</div>`;
+			return generalTecs;
+		}
+		
+		function createSpoilers(idName) {
+            $('#' + idName).append(createSpoiler(idName + 'E', 'Rango E'));
+            $('#' + idName).append(createSpoiler(idName + 'D', 'Rango D'));
+            $('#' + idName).append(createSpoiler(idName + 'C', 'Rango C'));
+            $('#' + idName).append(createSpoiler(idName + 'B', 'Rango B'));
+            $('#' + idName).append(createSpoiler(idName + 'A', 'Rango A'));
+            $('#' + idName).append(createSpoiler(idName + 'APlus', 'Rango A+'));
+            $('#' + idName).append(createSpoiler(idName + 'S', 'Rango S'));
+            $('#' + idName).append(createSpoiler(idName + 'SPlus', 'Rango S+'));
+        }
+
+        function removeSpoilers(idName) {
+            if ($('#' + idName + 'E')[0].children.length == 0) { $('#' + idName + 'E')[0].parentNode.remove(); }
+            if ($('#' + idName + 'D')[0].children.length == 0) { $('#' + idName + 'D')[0].parentNode.remove(); }
+            if ($('#' + idName + 'C')[0].children.length == 0) { $('#' + idName + 'C')[0].parentNode.remove(); }
+            if ($('#' + idName + 'B')[0].children.length == 0) { $('#' + idName + 'B')[0].parentNode.remove(); }
+            if ($('#' + idName + 'A')[0].children.length == 0) { $('#' + idName + 'A')[0].parentNode.remove(); }
+            if ($('#' + idName + 'APlus')[0].children.length == 0) { $('#' + idName + 'APlus')[0].parentNode.remove(); }
+            if ($('#' + idName + 'S')[0].children.length == 0) { $('#' + idName + 'S')[0].parentNode.remove(); }
+            if ($('#' + idName + 'SPlus')[0].children.length == 0) { $('#' + idName + 'SPlus')[0].parentNode.remove(); }
+        }
+
+        function appendTechniques(tecKey, idName) {
+            for (let i = 0; i < tecs[tecKey].length; i++) {
+                const tec = tecs[tecKey][i];
+                const rangoSpoiler = idName + tec.rango.toUpperCase().replace('+', 'Plus');
+                const idRango = '#' + rangoSpoiler; 	
+                
+                $(idRango).append(createTecnica(tec));
+            }
+			delete tecs[tecKey];
+        }
+		
+		function capitalizeOneWord(word) {
+			return word[0].toUpperCase() + word.slice(1);
+		}
+		
+		function capitalizeAllWords(words) {
+			return words.split(" ").map((word) => { 
+				return word[0].toUpperCase() + word.substring(1); 
+			}).join(" ");
+		}
+		
+		const pr = {$pr};
+		const tecsBackup = {$tecs};
+		const tecs = {$tecs};
+		
+		if (tecs.length == 0) {
+			$('.aviso_tecnicas')[0].innerHTML = "No tienes ninguna técnica para entrenar. Esto puede ser por dos razones: <br><br>1. Has entrenado cientas de técnicas para tu personaje y no te queda ninguna más por entrenar, y en ese caso, no sé si sentirme orgulloso o preocupado.<br>2. Has entrenado todas las técnicas de tu clase y debes subir tus estadísticas para acceder a las técnicas de la siguiente clase. Por ejemplo: eres un nuevo usuario, entrenaste todas las técnicas E, y una vez gastes todos tus PH en las estadísticas, pasarás a ser clase D y verás todas las técnicas de dicha clase.";
+		} else {
+			let numeroDeTecs = 0;
+			for (const key in tecs) {
+			  numeroDeTecs += tecs[key].length;
+			}
+			$('.aviso_tecnicas')[0].innerHTML = "{$nombrePersonaje}, tienes " + numeroDeTecs + " técnicas para entrenar en total. Uff mucha suerte." 
+		}
+	
+		const tecKeys = Object.keys(tecs);
+		const nombreClan = '{$nombreClan}';
+		const cleanNombreClan = '{$cleanNombreClan}';
+		const nombreVilla = '{$villa_nombre}';
+		const elemento1 = '{$elemento1}';
+		const elemento2 = '{$elemento2}';
+		const elemento3 = '{$elemento3}';
+		const elemento4 = '{$elemento4}';
+		const elemento5 = '{$elemento5}';
+		const maestria1 = '{$maestria1}';
+		const maestria2 = '{$maestria2}';
+		const invo1 = '{$invo1}';
+		const invo2 = '{$invo2}';
+		const maestria1Nombre = '{$maestria1_nombre}';
+		const maestria2Nombre = '{$maestria2_nombre}';
+		const invo1Nombre = '{$invo1_nombre}';
+		const invo2Nombre = '{$invo2_nombre}';
+		
+		if (!!tecs['ninjutsu_general'] || !!tecs['genjutsu_general'] || !!tecs['taijutsu_general']) {
+			$('#tecnicasEntrenar').append('<div id="generalTecs">' + createSpoiler('generalSpoiler', 'Técnicas Generales') + '</div>');
+			
+			if (!!tecs['ninjutsu_general']) {
+				$('#generalSpoiler').append(createSpoiler('ninjutsuSpoiler', 'Ninjutsu'));
+                createSpoilers('ninjutsuSpoiler');
+				appendTechniques('ninjutsu_general', 'ninjutsuSpoiler');
+                removeSpoilers('ninjutsuSpoiler');
+			}
+			
+			if (!!tecs['genjutsu_general']) {
+				$('#generalSpoiler').append(createSpoiler('genjutsuSpoiler', 'Genjutsu'));
+                createSpoilers('genjutsuSpoiler');
+				appendTechniques('genjutsu_general', 'genjutsuSpoiler');
+                removeSpoilers('genjutsuSpoiler');
+			}
+			
+			if (!!tecs['taijutsu_general']) {
+				$('#generalSpoiler').append(createSpoiler('taijutsuSpoiler', 'Taijutsu'));
+                createSpoilers('taijutsuSpoiler');
+				appendTechniques('taijutsu_general', 'taijutsuSpoiler');
+                removeSpoilers('taijutsuSpoiler');
+			}
+		}
+		
+		if (!!tecs[elemento1 + '_general'] || !!tecs[elemento2 + '_general'] || !!tecs[elemento3 + '_general'] || !!tecs[elemento4 + '_general'] || !!tecs[elemento5 + '_general']) {
+			$('#tecnicasEntrenar').append('<div id="elementTecs">' + createSpoiler('elementSpoiler', 'Técnicas Elementales') + '</div>');
+			
+			if (!!tecs[elemento1 + '_general']) {
+				$('#elementSpoiler').append(createSpoiler(elemento1 + 'Spoiler', capitalizeOneWord(elemento1)));
+                createSpoilers(elemento1 + 'Spoiler');
+				appendTechniques(elemento1 + '_general', elemento1 + 'Spoiler');
+                removeSpoilers(elemento1 + 'Spoiler');
+			}
+			
+			if (!!tecs[elemento2 + '_general']) {
+				$('#elementSpoiler').append(createSpoiler(elemento2 + 'Spoiler', capitalizeOneWord(elemento2)));
+                createSpoilers(elemento2 + 'Spoiler');
+				appendTechniques(elemento2 + '_general', elemento2 + 'Spoiler');
+                removeSpoilers(elemento2 + 'Spoiler');
+			}
+			
+			if (!!tecs[elemento3 + '_general']) {
+				$('#elementSpoiler').append(createSpoiler(elemento3 + 'Spoiler', capitalizeOneWord(elemento3)));
+                createSpoilers(elemento3 + 'Spoiler');
+				appendTechniques(elemento3 + '_general', elemento3 + 'Spoiler');
+                removeSpoilers(elemento3 + 'Spoiler');
+			}
+			
+			if (!!tecs[elemento4 + '_general']) {
+				$('#elementSpoiler').append(createSpoiler(elemento4 + 'Spoiler', capitalizeOneWord(elemento4)));
+                createSpoilers(elemento4 + 'Spoiler');
+				appendTechniques(elemento4 + '_general', elemento4 + 'Spoiler');
+                removeSpoilers(elemento4 + 'Spoiler');
+			}
+			
+			if (!!tecs[elemento5 + '_general']) {
+				$('#elementSpoiler').append(createSpoiler(elemento5 + 'Spoiler', capitalizeOneWord(elemento5)));
+                createSpoilers(elemento5 + 'Spoiler');
+				appendTechniques(elemento5 + '_general', elemento5 + 'Spoiler');
+                removeSpoilers(elemento5 + 'Spoiler');
+			}
+		}
+		
+		if (!!tecs[elemento1 + '_' + nombreVilla] || !!tecs[elemento2 + '_' + nombreVilla] || !!tecs[elemento3 + '_' + nombreVilla] || !!tecs[elemento4 + '_' + nombreVilla] || !!tecs[elemento5 + '_' + nombreVilla] || !!tecs['ninjutsu_' + nombreVilla] || !!tecs['genjutsu_' + nombreVilla] || !!tecs['taijutsu_' + nombreVilla]) {
+			$('#tecnicasEntrenar').append('<div id="aldeaTecs">' + createSpoiler('aldeaSpoiler', 'Técnicas de ' + capitalizeOneWord(nombreVilla)) + '</div>');
+			
+			if (!!tecs['ninjutsu_' + nombreVilla]) {
+				$('#aldeaSpoiler').append(createSpoiler('ninjutsuVillaSpoiler', 'Ninjutsu'));
+				createSpoilers('ninjutsuVillaSpoiler');
+				appendTechniques('ninjutsu_' + nombreVilla, 'ninjutsuVillaSpoiler');
+				removeSpoilers('ninjutsuVillaSpoiler');
+			}
+			
+			if (!!tecs['genjutsu_' + nombreVilla]) {
+				$('#aldeaSpoiler').append(createSpoiler('genjutsuVillaSpoiler', 'Genjutsu'));
+				createSpoilers('genjutsuVillaSpoiler');
+				appendTechniques('genjutsu_' + nombreVilla, 'genjutsuVillaSpoiler');
+				removeSpoilers('genjutsuVillaSpoiler');
+			}
+			
+			if (!!tecs['taijutsu_' + nombreVilla]) {
+				$('#aldeaSpoiler').append(createSpoiler('taijutsuVillaSpoiler', 'Taijutsu'));
+				createSpoilers('taijutsuVillaSpoiler');
+				appendTechniques('taijutsu_' + nombreVilla, 'taijutsuVillaSpoiler');
+				removeSpoilers('taijutsuVillaSpoiler');
+			}
+			
+			if (!!tecs[elemento1 + '_' + nombreVilla]) {
+				$('#aldeaSpoiler').append(createSpoiler(elemento1 + 'VillaSpoiler', capitalizeOneWord(elemento1)));
+                createSpoilers(elemento1 + 'VillaSpoiler');
+				appendTechniques(elemento1 + '_' + nombreVilla, elemento1 + 'VillaSpoiler');
+                removeSpoilers(elemento1 + 'VillaSpoiler');
+			}
+			
+			if (!!tecs[elemento2 + '_' + nombreVilla]) {
+				$('#aldeaSpoiler').append(createSpoiler(elemento2 + 'VillaSpoiler', capitalizeOneWord(elemento2)));
+                createSpoilers(elemento2 + 'VillaSpoiler');
+				appendTechniques(elemento2 + '_' + nombreVilla, elemento2 + 'VillaSpoiler');
+                removeSpoilers(elemento2 + 'VillaSpoiler');
+			}
+			
+			if (!!tecs[elemento3 + '_' + nombreVilla]) {
+				$('#aldeaSpoiler').append(createSpoiler(elemento3 + 'VillaSpoiler', capitalizeOneWord(elemento3)));
+                createSpoilers(elemento3 + 'VillaSpoiler');
+				appendTechniques(elemento3 + '_' + nombreVilla, elemento3 + 'VillaSpoiler');
+                removeSpoilers(elemento3 + 'VillaSpoiler');
+			}
+			
+			if (!!tecs[elemento4 + '_' + nombreVilla]) {
+				$('#aldeaSpoiler').append(createSpoiler(elemento4 + 'VillaSpoiler', capitalizeOneWord(elemento4)));
+                createSpoilers(elemento4 + 'VillaSpoiler');
+				appendTechniques(elemento4 + '_' + nombreVilla, elemento4 + 'VillaSpoiler');
+                removeSpoilers(elemento4 + 'VillaSpoiler');
+			}
+			
+			if (!!tecs[elemento5 + '_' + nombreVilla]) {
+				$('#aldeaSpoiler').append(createSpoiler(elemento5 + 'VillaSpoiler', capitalizeOneWord(elemento5)));
+                createSpoilers(elemento5 + 'VillaSpoiler');
+				appendTechniques(elemento5 + '_' + nombreVilla, elemento5 + 'VillaSpoiler');
+                removeSpoilers(elemento5 + 'VillaSpoiler');
+			}
+			
+		}
+		
+		if (!!tecs[cleanNombreClan + '_general']) {
+			$('#tecnicasEntrenar').append('<div id="clanTecs">' + createSpoiler('clanSpoiler', 'Clan ' + capitalizeAllWords(nombreClan)) + '</div>');
+			createSpoilers('clanSpoiler');
+			appendTechniques(cleanNombreClan + '_general', 'clanSpoiler');
+			removeSpoilers('clanSpoiler');
+		}
+		
+		if (!!tecs[maestria1Nombre.replace(' ', '_') + '_maestrias']) {
+			$('#tecnicasEntrenar').append('<div id="maestria1Tecs">' + createSpoiler('maestria1Spoiler', 'Maestria: ' + capitalizeAllWords(maestria1Nombre)) + '</div>');
+			createSpoilers('maestria1Spoiler');
+			appendTechniques(maestria1Nombre.replace(' ', '_') + '_maestrias', 'maestria1Spoiler');
+			removeSpoilers('maestria1Spoiler');
+		}
+		
+		if (!!tecs[maestria2Nombre.replace(' ', '_') + '_maestrias']) {
+			$('#tecnicasEntrenar').append('<div id="maestria2Tecs">' + createSpoiler('maestria2Spoiler', 'Maestria: ' + capitalizeAllWords(maestria2Nombre)) + '</div>');
+			createSpoilers('maestria2Spoiler');
+			appendTechniques(maestria2Nombre.replace(' ', '_') + '_maestrias', 'maestria2Spoiler');
+			removeSpoilers('maestria2Spoiler');
+		}
+		
+		if (!!tecs[invo1Nombre + '_invo']) {
+			$('#tecnicasEntrenar').append('<div id="invo1Tecs">' + createSpoiler('invo1Spoiler', 'Invocación: ' + capitalizeAllWords(invo1Nombre)) + '</div>');
+			createSpoilers('invo1Spoiler');
+			appendTechniques(invo1Nombre + '_invo', 'invo1Spoiler');
+			removeSpoilers('invo1Spoiler');
+		}
+		
+		if (!!tecs[invo2Nombre + '_invo']) {
+			$('#tecnicasEntrenar').append('<div id="invo2Tecs">' + createSpoiler('invo2Spoiler', 'Invocación: ' + capitalizeAllWords(invo2Nombre)) + '</div>');
+			createSpoilers('invo2Spoiler');
+			appendTechniques(invo2Nombre + '_invo', 'invo2Spoiler');
+			removeSpoilers('invo2Spoiler');
+		}
+		
+		const newTecKeys = Object.keys(tecs);
+		for (let i = 0; i < newTecKeys.length; i++) {
+			const tipoAldea = newTecKeys[i];
+			const id = tipoAldea + "Tecs";
+			const spoiler = tipoAldea + "Spoiler";
+			const label = capitalizeAllWords(tipoAldea.replace("_general", "").replace("_", " "));
+			$('#tecnicasEntrenar').append('<div id="' + id +'">' + createSpoiler(spoiler, label) + '</div>');
+			createSpoilers(spoiler);
+			appendTechniques(tipoAldea, spoiler);
+			removeSpoilers(spoiler);
+		}
+		
+	</script>
+
+</html>

@@ -1,0 +1,249 @@
+<html>
+
+<head>
+    <title>Consola Súper Secreta</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Source+Serif+4:wght@300;400;600;700&family=Zen+Old+Mincho:wght@400;700&display=swap" rel="stylesheet">
+    {$headerinclude}
+    <style>
+        :root {
+            --bg: #0f0c18;
+            --surface: rgba(23, 18, 36, 0.84);
+            --border: rgba(156, 107, 204, 0.12);
+            --ink: #e8dff8;
+            --plum2: #9c6bcc;
+            --plum3: #b890e0;
+            --stone: #8a7a9a;
+            --fiber: rgba(156, 107, 204, 0.04);
+            --shadow: 0 24px 60px rgba(0, 0, 0, 0.28);
+            --shadow-soft: 0 12px 28px rgba(0, 0, 0, 0.18);
+        }
+
+        body {
+            background:
+                radial-gradient(circle at top left, rgba(123, 74, 184, 0.12), transparent 28%),
+                radial-gradient(circle at bottom right, rgba(192, 88, 42, 0.08), transparent 24%),
+                var(--bg);
+            color: var(--ink);
+            font-family: "Source Serif 4", serif;
+            margin: 0;
+            position: relative;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+            background-image:
+                repeating-linear-gradient(13deg, transparent 0, transparent 24px, var(--fiber) 24px, var(--fiber) 25px),
+                repeating-linear-gradient(82deg, transparent 0, transparent 36px, var(--fiber) 36px, var(--fiber) 37px),
+                repeating-linear-gradient(151deg, transparent 0, transparent 19px, var(--fiber) 19px, var(--fiber) 19.5px);
+        }
+
+        .staff-queue-page {
+            max-width: 1120px;
+            margin: 28px auto 44px;
+            padding: 0 18px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .staff-queue-shell {
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            background: rgba(19, 15, 30, 0.94);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        .staff-queue-head {
+            padding: 22px 26px 16px;
+            border-bottom: 1px solid var(--border);
+            background: rgba(23, 18, 36, 0.82);
+        }
+
+        .staff-queue-label,
+        .staff-empty,
+        .queue-action {
+            font-family: "Cinzel", serif;
+            text-transform: uppercase;
+        }
+
+        .staff-queue-label {
+            margin-bottom: 8px;
+            font-size: 10px;
+            letter-spacing: 2.4px;
+            color: var(--plum3);
+        }
+
+        .staff-queue-title {
+            margin: 0;
+            font: 900 26px/1.05 "Cinzel", serif;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: var(--ink);
+        }
+
+        .staff-queue-copy {
+            margin: 10px 0 0;
+            color: var(--stone);
+            font-size: 14px;
+            line-height: 1.7;
+        }
+
+        .staff-queue-body {
+            padding: 18px;
+        }
+
+        .queue-list {
+            display: grid;
+            gap: 12px;
+        }
+
+        .staff-empty {
+            margin: 0;
+            padding: 18px;
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            background: var(--surface);
+            font-size: 11px;
+            letter-spacing: 1.8px;
+            color: var(--stone);
+        }
+
+        .queue-card {
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            background: var(--surface);
+            box-shadow: var(--shadow-soft);
+            padding: 16px;
+        }
+
+        .queue-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 10px;
+        }
+
+        .queue-title {
+            margin: 0;
+            font: 900 16px/1.2 "Cinzel", serif;
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+            color: var(--ink);
+        }
+
+        .queue-uid {
+            color: var(--plum3);
+        }
+
+        .queue-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px 16px;
+            margin-bottom: 14px;
+        }
+
+        .queue-meta {
+            font-size: 14px;
+            line-height: 1.6;
+            color: var(--stone);
+        }
+
+        .queue-meta strong {
+            color: var(--ink);
+        }
+
+        .queue-meta a {
+            color: var(--plum3);
+            text-decoration: underline;
+            text-decoration-color: rgba(184, 144, 224, 0.35);
+        }
+
+        .queue-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .queue-action {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 40px;
+            padding: 0 16px;
+            border: 1px solid var(--border);
+            border-radius: 999px;
+            background: rgba(15, 12, 24, 0.28);
+            color: var(--ink);
+            font-size: 10px;
+            letter-spacing: 1.8px;
+            text-decoration: none;
+        }
+
+        .queue-action--primary {
+            background: linear-gradient(135deg, rgba(61, 31, 110, 0.96), rgba(90, 46, 154, 0.88));
+            color: #fff;
+        }
+
+        .queue-action--danger {
+            border-color: rgba(192, 88, 42, 0.2);
+            color: #f2b49a;
+        }
+
+        @media (max-width: 720px) {
+            .staff-queue-page {
+                margin-top: 20px;
+                padding: 0 12px;
+            }
+
+            .staff-queue-shell {
+                border-radius: 18px;
+            }
+
+            .staff-queue-head {
+                padding: 20px 18px 16px;
+            }
+
+            .staff-queue-body {
+                padding: 16px;
+            }
+
+            .queue-head,
+            .queue-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    {$header}
+    <div class="staff-queue-page">
+        <div class="staff-queue-shell">
+            <section class="staff-queue-head">
+                <div class="staff-queue-label">Moderación</div>
+                <h1 class="staff-queue-title">Fichas en Cola</h1>
+                <p class="staff-queue-copy">Listado de fichas pendientes de revisión y aprobación dentro del sistema.</p>
+            </section>
+            <section class="staff-queue-body">
+                <if $li_fichas then>
+                    <div class="queue-list">
+                        {$li_fichas}
+                    </div>
+                <else>
+                    <p class="staff-empty">No hay fichas pendientes en este momento.</p>
+                </if>
+            </section>
+        </div>
+    </div>
+    {$reload_script}
+    {$footer}
+</body>
+
+</html>

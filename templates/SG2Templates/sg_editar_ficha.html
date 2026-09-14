@@ -1,0 +1,598 @@
+<html>
+<head>
+  <title>Asignar Estadísticas — Shinobi Gaiden</title>
+  {$headerinclude}
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Noto+Serif+JP:wght@300;400;700&display=swap" rel="stylesheet">
+  <style>
+
+    /* ─── Page wrapper ───────────────────────────────────────────── */
+    #ef-page {
+      max-width: 640px;
+      margin: 0 auto;
+      padding: 0 0 60px;
+      color: var(--ink);
+      font-family: 'Noto Serif JP', serif;
+    }
+
+    /* ─── Banner ─────────────────────────────────────────────────── */
+    .ef-banner {
+      position: relative;
+      overflow: hidden;
+      background: var(--bg2);
+      border-bottom: 0.5px solid var(--border);
+      padding: 32px 40px 28px;
+      display: flex;
+      align-items: flex-end;
+      gap: 20px;
+      min-height: 110px;
+    }
+
+    .ef-banner::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        repeating-linear-gradient(13deg,  transparent 0, transparent 24px, var(--fiber) 24px, var(--fiber) 25px),
+        repeating-linear-gradient(82deg,  transparent 0, transparent 36px, var(--fiber) 36px, var(--fiber) 37px),
+        repeating-linear-gradient(151deg, transparent 0, transparent 19px, var(--fiber) 19px, var(--fiber) 19.5px);
+    }
+
+    .ef-banner::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background:
+        radial-gradient(ellipse at 100% 0%,  rgba(123,74,184,0.07) 0%, transparent 55%),
+        radial-gradient(ellipse at 0%  100%, rgba(192,88,42,0.05)  0%, transparent 40%);
+    }
+
+    .ef-banner-kanji {
+      position: absolute;
+      right: 28px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-family: 'Noto Serif JP', serif;
+      font-size: 120px;
+      font-weight: 700;
+      line-height: 1;
+      color: var(--plum);
+      opacity: 0.05;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    .ef-hanko {
+      position: relative;
+      z-index: 1;
+      width: 52px;
+      height: 52px;
+      border: 1.5px solid var(--oxide);
+      border-radius: 50%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: rgba(192,88,42,0.07);
+      flex-shrink: 0;
+    }
+
+    .ef-hanko__kanji {
+      font-family: 'Noto Serif JP', serif;
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--oxide);
+      line-height: 1;
+    }
+
+    .ef-hanko__sub {
+      font-family: 'Cinzel', serif;
+      font-size: 7px;
+      letter-spacing: 1.5px;
+      color: var(--oxide);
+      text-transform: uppercase;
+      margin-top: 2px;
+    }
+
+    .ef-banner__text {
+      position: relative;
+      z-index: 1;
+    }
+
+    .ef-banner__label {
+      font-family: 'Cinzel', serif;
+      font-size: 8px;
+      font-weight: 400;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--mist);
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .ef-banner__label::before {
+      content: '';
+      display: inline-block;
+      width: 24px;
+      height: 1.5px;
+      background: var(--oxide);
+    }
+
+    .ef-banner__title {
+      font-family: 'Cinzel', serif;
+      font-size: 22px;
+      font-weight: 900;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      color: var(--ink);
+      line-height: 1;
+      margin: 0;
+    }
+
+    /* ─── Points band ────────────────────────────────────────────── */
+    .ef-points-bar {
+      background: var(--plum);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0;
+      height: 54px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .ef-points-bar::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: repeating-linear-gradient(
+        90deg, transparent 0, transparent 24px,
+        rgba(255,255,255,0.03) 24px, rgba(255,255,255,0.03) 25px
+      );
+    }
+
+    .ef-points-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      position: relative;
+      z-index: 1;
+      padding: 0 32px;
+    }
+
+    .ef-points-sep {
+      width: 0.5px;
+      height: 28px;
+      background: rgba(255,255,255,0.15);
+      flex-shrink: 0;
+    }
+
+    .ef-points-label {
+      font-family: 'Cinzel', serif;
+      font-size: 8px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.5);
+    }
+
+    .ef-points-bar input.textbox {
+      width: 38px;
+      text-align: center;
+      background: transparent;
+      border: none;
+      border-bottom: 1px solid rgba(255,255,255,0.3);
+      color: rgba(255,255,255,0.95);
+      font-family: 'Cinzel', serif;
+      font-size: 16px;
+      font-weight: 900;
+      padding: 2px 4px;
+      outline: none;
+    }
+
+    /* ─── Sections ───────────────────────────────────────────────── */
+    .ef-section {
+      padding: 28px 40px;
+      border-bottom: 0.5px solid var(--border);
+      background: var(--bg2);
+    }
+
+    .ef-section:nth-child(even) {
+      background: var(--bg);
+    }
+
+    .ef-section-head {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    .ef-section-head::before {
+      content: '';
+      width: 3px;
+      height: 16px;
+      background: var(--oxide);
+      flex-shrink: 0;
+    }
+
+    .ef-section-head::after {
+      content: '';
+      flex: 1;
+      height: 0.5px;
+      background: var(--border);
+    }
+
+    .ef-section-title {
+      font-family: 'Cinzel', serif;
+      font-size: 13px;
+      font-weight: 900;
+      color: var(--ink);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    /* ─── Stat grid ──────────────────────────────────────────────── */
+    .ef-stat-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .ef-stat-card {
+      border: 0.5px solid var(--border);
+      background: var(--bg3);
+      padding: 12px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .ef-stat-card__name {
+      font-family: 'Cinzel', serif;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--stone);
+      flex: 1;
+      min-width: 0;
+    }
+
+    .ef-stat-card__controls {
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      flex-shrink: 0;
+    }
+
+    .ef-stat-card__controls input.textbox {
+      width: 38px;
+      text-align: center;
+      background: var(--bg2);
+      border: none;
+      border-bottom: 1.5px solid var(--border);
+      border-left: 1.5px solid var(--border);
+      color: var(--ink);
+      font-family: 'Cinzel', serif;
+      font-size: 15px;
+      font-weight: 900;
+      padding: 5px 4px;
+      outline: none;
+      box-sizing: border-box;
+    }
+
+    .ef-stat-btn {
+      width: 28px;
+      height: 34px;
+      border: 0.5px solid var(--border);
+      background: var(--bg);
+      color: var(--plum2);
+      font-family: 'Cinzel', serif;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.15s, border-color 0.15s, color 0.15s;
+      padding: 0;
+      line-height: 1;
+    }
+
+    .ef-stat-btn:hover {
+      background: var(--plum);
+      border-color: var(--plum);
+      color: var(--lavender);
+    }
+
+    /* ─── Totals row ─────────────────────────────────────────────── */
+    .ef-totals {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 8px;
+      margin-top: 12px;
+      padding-top: 10px;
+      border-top: 0.5px solid var(--border);
+    }
+
+    .ef-totals__label {
+      font-family: 'Cinzel', serif;
+      font-size: 8px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--mist);
+    }
+
+    .ef-totals__value {
+      font-family: 'Cinzel', serif;
+      font-size: 13px;
+      font-weight: 900;
+      color: var(--ink);
+      min-width: 24px;
+      text-align: right;
+    }
+
+    /* ─── Preview band (Vida / Chakra) ───────────────────────────── */
+    .ef-preview {
+      background: var(--bg3);
+      border-bottom: 0.5px solid var(--border);
+      padding: 14px 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0;
+    }
+
+    .ef-preview-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 0 32px;
+    }
+
+    .ef-preview-sep {
+      width: 0.5px;
+      height: 22px;
+      background: var(--border);
+      flex-shrink: 0;
+    }
+
+    .ef-preview-label {
+      font-family: 'Cinzel', serif;
+      font-size: 8px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--mist);
+    }
+
+    .ef-preview-value {
+      font-family: 'Cinzel', serif;
+      font-size: 16px;
+      font-weight: 900;
+      color: var(--ink);
+    }
+
+    /* ─── Submit strip ───────────────────────────────────────────── */
+    .ef-submit {
+      padding: 28px 40px;
+      background: var(--bg2);
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 20px;
+    }
+
+    .ef-submit-lore {
+      font-family: 'Cinzel', serif;
+      font-size: 8px;
+      letter-spacing: 1.8px;
+      text-transform: uppercase;
+      color: var(--mist);
+      flex: 1;
+      line-height: 1.6;
+    }
+
+    #ef-guardar {
+      font-family: 'Cinzel', serif;
+      font-size: 9px;
+      font-weight: 900;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--lavender);
+      background: var(--plum);
+      border: none;
+      padding: 0 28px;
+      height: 40px;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.12s;
+      outline: none;
+      flex-shrink: 0;
+    }
+
+    #ef-guardar:hover {
+      background: var(--plum2);
+      transform: translateY(-1px);
+    }
+
+    #ef-guardar:active {
+      transform: translateY(0);
+    }
+
+    /* ─── Responsive ─────────────────────────────────────────────── */
+    @media (max-width: 640px) {
+      .ef-banner        { padding: 24px 20px 20px; min-height: 90px; }
+      .ef-banner__title { font-size: 16px; }
+      .ef-points-bar    { height: auto; padding: 12px 0; flex-wrap: wrap; }
+      .ef-points-item   { padding: 6px 20px; }
+      .ef-section       { padding: 24px 20px; }
+      .ef-stat-grid     { grid-template-columns: 1fr; }
+      .ef-preview       { padding: 12px 20px; }
+      .ef-preview-item  { padding: 0 16px; }
+      .ef-submit        { padding: 24px 20px; flex-direction: column; align-items: flex-start; }
+    }
+
+  </style>
+</head>
+
+<body>
+  {$header}
+
+  <div id="ef-page">
+
+    <div class="ef-banner">
+      <div class="ef-banner-kanji">忍</div>
+      <div class="ef-hanko">
+        <span class="ef-hanko__kanji">忍</span>
+        <span class="ef-hanko__sub">SG</span>
+      </div>
+      <div class="ef-banner__text">
+        <div class="ef-banner__label">Shinobi Gaiden · Personaje</div>
+        <h1 class="ef-banner__title">Asignar Estadísticas</h1>
+      </div>
+    </div>
+
+    <form id="editarstatsform" method="post" action="/sg/ficha_editada.php">
+
+      <div class="ef-points-bar">
+        <div class="ef-points-item">
+          <span class="ef-points-label">Puntos de Estadística</span>
+          <input class="textbox" type="text" value="{$ficha['puntos_estadistica']}" id="h" name="habilidad" readonly>
+        </div>
+        <div class="ef-points-sep"></div>
+        <div class="ef-points-item">
+          <span class="ef-points-label">Puntos de Mejora</span>
+          <input class="textbox" type="text" value="{$ficha['mejoras']}" id="m" name="mejoras" readonly>
+        </div>
+      </div>
+
+      <!-- Estadísticas -->
+      <div class="ef-section">
+        <div class="ef-section-head">
+          <span class="ef-section-title">Estadísticas</span>
+        </div>
+        <div class="ef-stat-grid">
+          <div class="ef-stat-card">
+            <span class="ef-stat-card__name">Fuerza</span>
+            <div class="ef-stat-card__controls">
+              <button class="ef-stat-btn" type="button" onclick="changeStat(fuerza,-1)">−</button>
+              <input class="textbox" type="text" value="{$ficha['fuerza']}" name="fuerza" id="fuerza" readonly>
+              <button class="ef-stat-btn" type="button" onclick="changeStat(fuerza,1)">+</button>
+            </div>
+          </div>
+          <div class="ef-stat-card">
+            <span class="ef-stat-card__name">Destreza</span>
+            <div class="ef-stat-card__controls">
+              <button class="ef-stat-btn" type="button" onclick="changeStat(destreza,-1)">−</button>
+              <input class="textbox" type="text" value="{$ficha['destreza']}" name="destreza" id="destreza" readonly>
+              <button class="ef-stat-btn" type="button" onclick="changeStat(destreza,1)">+</button>
+            </div>
+          </div>
+          <div class="ef-stat-card">
+            <span class="ef-stat-card__name">Ctrl. de Chakra</span>
+            <div class="ef-stat-card__controls">
+              <button class="ef-stat-btn" type="button" onclick="changeStat(cchakra,-1)">−</button>
+              <input class="textbox" type="text" value="{$ficha['cchakra']}" name="cchakra" id="cchakra" readonly>
+              <button class="ef-stat-btn" type="button" onclick="changeStat(cchakra,1)">+</button>
+            </div>
+          </div>
+          <div class="ef-stat-card">
+            <span class="ef-stat-card__name">Inteligencia</span>
+            <div class="ef-stat-card__controls">
+              <button class="ef-stat-btn" type="button" onclick="changeStat(inteligencia,-1)">−</button>
+              <input class="textbox" type="text" value="{$ficha['inteligencia']}" name="inteligencia" id="inteligencia" readonly>
+              <button class="ef-stat-btn" type="button" onclick="changeStat(inteligencia,1)">+</button>
+            </div>
+          </div>
+        </div>
+        <div class="ef-totals">
+          <span class="ef-totals__label">Total asignado</span>
+          <span class="ef-totals__value total_puntos">0</span>
+        </div>
+      </div>
+
+      <!-- Mejoras de Cuerpo -->
+      <div class="ef-section">
+        <div class="ef-section-head">
+          <span class="ef-section-title">Mejoras de Cuerpo</span>
+        </div>
+        <div class="ef-stat-grid">
+          <div class="ef-stat-card">
+            <span class="ef-stat-card__name">Salud</span>
+            <div class="ef-stat-card__controls">
+              <button class="ef-stat-btn" type="button" onclick="changeMejora(salud,-1)">−</button>
+              <input class="textbox" type="text" value="{$ficha['salud']}" name="salud" id="salud" readonly>
+              <button class="ef-stat-btn" type="button" onclick="changeMejora(salud,1)">+</button>
+            </div>
+          </div>
+          <div class="ef-stat-card">
+            <span class="ef-stat-card__name">Velocidad</span>
+            <div class="ef-stat-card__controls">
+              <button class="ef-stat-btn" type="button" onclick="changeMejora(velocidad,-1)">−</button>
+              <input class="textbox" type="text" value="{$ficha['velocidad']}" name="velocidad" id="velocidad" readonly>
+              <button class="ef-stat-btn" type="button" onclick="changeMejora(velocidad,1)">+</button>
+            </div>
+          </div>
+          <div class="ef-stat-card">
+            <span class="ef-stat-card__name">Tenketsu</span>
+            <div class="ef-stat-card__controls">
+              <button class="ef-stat-btn" type="button" onclick="changeMejora(tenketsu,-1)">−</button>
+              <input class="textbox" type="text" value="{$ficha['tenketsu']}" name="tenketsu" id="tenketsu" readonly>
+              <button class="ef-stat-btn" type="button" onclick="changeMejora(tenketsu,1)">+</button>
+            </div>
+          </div>
+          <div class="ef-stat-card">
+            <span class="ef-stat-card__name">Sigilo</span>
+            <div class="ef-stat-card__controls">
+              <button class="ef-stat-btn" type="button" onclick="changeMejora(sigilo,-1)">−</button>
+              <input class="textbox" type="text" value="{$ficha['sigilo']}" name="sigilo" id="sigilo" readonly>
+              <button class="ef-stat-btn" type="button" onclick="changeMejora(sigilo,1)">+</button>
+            </div>
+          </div>
+        </div>
+        <div class="ef-totals">
+          <span class="ef-totals__label">Total asignado</span>
+          <span class="ef-totals__value total_mejoras">0</span>
+        </div>
+      </div>
+
+      <!-- Preview Vida / Chakra -->
+      <div class="ef-preview">
+        <div class="ef-preview-item">
+          <span class="ef-preview-label">Vida</span>
+          <span class="ef-preview-value personaje_vida" id="hp">{$ficha['vida']}</span>
+        </div>
+        <div class="ef-preview-sep"></div>
+        <div class="ef-preview-item">
+          <span class="ef-preview-label">Chakra</span>
+          <span class="ef-preview-value personaje_chakra" id="mp">{$ficha['chakra']}</span>
+        </div>
+      </div>
+
+      <!-- Hidden fields -->
+      <div style="display:none;">
+        <input class="textbox" type="text" value="false" id="comp" name="submit_edit">
+        <input class="textbox" type="text" value="{$ficha['fid']}" name="uid">
+      </div>
+
+      <div class="ef-submit">
+        <span class="ef-submit-lore">Los cambios se aplicarán de inmediato a tu personaje</span>
+        <input id="ef-guardar" type="button"
+          onclick="document.getElementById('comp').value = 'true'; document.getElementById('editarstatsform').submit();"
+          value="Guardar Cambios">
+      </div>
+
+    </form>
+  </div>
+
+  {$footer}
+  {$editar_ficha_script}
+</body>
+</html>

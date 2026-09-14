@@ -1,0 +1,86 @@
+<html>
+<head>
+<title>Shinobi Gaiden</title>
+{$headerinclude}
+</head>
+<body>
+{$header}
+<div class="fondo-blanco">
+	<div>
+	<!-- Reaccion -->
+	Estadística ofensiva del rival:
+	<input type="text" id="ofensiva" name="ofensiva" value="0"><br>
+	Tu presencia:
+    <input type="text" id="presencia" name="presencia" value="0"><br>
+	Distancia del ataque:
+    <input type="text" id="distancia" name="distancia" value="0"><br>
+	Tu agilidad:
+	<input type="text" id="agilidad" name="agilidad" value="0"><br>
+	Tu velocidad:
+	<input type="text" id="velocidad" name="velocidad" value="0"><br>
+	<br>
+	<span id="reaccionTexto"></span>
+	<br><hr />
+	<strong>Esquiva</strong>: <span id="esquiveTexto"></span><br>
+	<hr />
+	<strong>Evite</strong>: <span id="eviteTexto"></span><br>
+	<span>(Incompleto - no entiendo un carajo)</span>
+	<hr />
+	<strong>Choque</strong>: <span id="choqueTexto"></span><br>
+	<span>(Incompleto - falta considerar diferencia de sellos)</span>
+	<hr />
+	<strong>Bloqueo</strong>: <span id="bloqueoTexto"></span><br>
+	<span>(Incompleto)</span>
+	<hr />
+	</div>
+	<br><br><br><br><br><br>
+</div>
+<script>
+let nivelReaccion = -1;	
+	
+function reaccionChanges() {
+	const ofensiva = parseInt($("#ofensiva").val());
+	let presencia = parseInt($("#presencia").val());
+	const distancia  = parseInt($("#distancia").val());
+	const agilidad = parseInt($("#agilidad").val());
+	const velocidad = parseInt($("#velocidad").val());
+	presencia += Math.floor(distancia / 10) * 5;
+		
+	const diffOfPr = ofensiva - presencia;
+	let canEsquivar = false;
+	
+	if (ofensiva <= presencia) { nivelReaccion = 5; }
+	if (diffOfPr <= 10 && diffOfPr >= 1) { nivelReaccion = 4; }
+	if (diffOfPr <= 20 && diffOfPr >= 11) { nivelReaccion = 3; }
+	if (diffOfPr <= 30 && diffOfPr >= 21) { nivelReaccion = 2; }
+	if (diffOfPr > 30) { nivelReaccion = 1; }
+	
+	$('#reaccionTexto').text(
+		`La ofensiva es ` + ofensiva + `. La presencia (incluyendo bonus de distancia (` + distancia + `) es ` + presencia + `. El nivel de reacción es: ` + nivelReaccion);
+	
+	
+	if (agilidad >= ofensiva + diffOfPr) { canEsquivar = true; }
+	if (canEsquivar) {
+		$('#esquiveTexto').text('Puedes esquivar');
+	} else {
+		$('#esquiveTexto').text('No puedes esquivar');
+	}
+	
+	if (nivelReaccion >= 3) {
+		$('#choqueTexto').text('Puedes chocar.');
+	} else {
+		$('#choqueTexto').text('No puedes chocar.');
+	}
+}	
+	
+$("#ofensiva").change(function() { reaccionChanges(); } );
+$("#presencia").change(function() { reaccionChanges(); } );	
+$("#distancia").change(function() { reaccionChanges(); } );
+	
+$("#agilidad").change(function() { reaccionChanges(); } );
+$("#velocidad").change(function() { reaccionChanges(); } );
+	
+</script>
+{$footer}
+</body>
+</html>

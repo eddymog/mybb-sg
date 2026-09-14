@@ -1,0 +1,106 @@
+{$ignore_bit}{$deleted_bit}
+<a name="pid{$post['pid']}" id="pid{$post['pid']}"></a>
+<div class="post_classic {$unapproved_shade}" style="{$post_visibility}" id="post_{$post['pid']}">
+  <div class="post_general" style="--villa: {$post['villa_sombra2']};">
+
+    <!-- ── Autor ─────────────────────────────────────────────── -->
+    <aside class="post_author scaleimages">
+
+      <div class="author_avatar">{$post['useravatar']}</div>
+
+      <div class="author_information">{$post['username']}</div>
+
+      <if $post['has_ficha'] then>
+        <div class="character_info">
+          <div class="char_data_tab">
+            <span class="char_label">Rango</span>
+            <span class="char_value">{$post['ficha']['rango']}</span>
+          </div>
+          <div class="char_data_tab">
+            <span class="char_label">Clan</span>
+            <span class="char_value">{$post['nombreClan']}</span>
+          </div>
+          <div class="char_data_tab">
+            <span class="char_label">Nivel</span>
+            <span class="char_value">{$post['ficha']['nivel']}</span>
+          </div>
+        </div>
+
+        <div class="char_stats">
+          <span class="stats_title">Estadísticas</span>
+          <div class="stats_table">
+            <span class="stats_group">Generales</span>
+            <div class="stat_row"><span class="stat_label">Fuerza</span><span class="stat_val"><if $post['has_personaje_tag'] then>{$post['personaje_tag']['fuerza']}<elseif $post['has_ficha'] then>{$post['ficha']['fuerza']}</if><sup class="stat_mod"><if $post['has_personaje_tag'] then>({$post['personaje_tag']['mfuerza']})<elseif $post['has_ficha'] then>({$post['ficha']['mfuerza']})</if></sup></span></div>
+            <div class="stat_row"><span class="stat_label">Destreza</span><span class="stat_val"><if $post['has_personaje_tag'] then>{$post['personaje_tag']['destreza']}<elseif $post['has_ficha'] then>{$post['ficha']['destreza']}</if><sup class="stat_mod"><if $post['has_personaje_tag'] then>({$post['personaje_tag']['mdestreza']})<elseif $post['has_ficha'] then>({$post['ficha']['mdestreza']})</if></sup></span></div>
+            <div class="stat_row"><span class="stat_label">Ctrl. de Chakra</span><span class="stat_val"><if $post['has_personaje_tag'] then>{$post['personaje_tag']['cchakra']}<elseif $post['has_ficha'] then>{$post['ficha']['cchakra']}</if><sup class="stat_mod"><if $post['has_personaje_tag'] then>({$post['personaje_tag']['mcchakra']})<elseif $post['has_ficha'] then>({$post['ficha']['mcchakra']})</if></sup></span></div>
+            <div class="stat_row"><span class="stat_label">Inteligencia</span><span class="stat_val"><if $post['has_personaje_tag'] then>{$post['personaje_tag']['inteligencia']}<elseif $post['has_ficha'] then>{$post['ficha']['inteligencia']}</if><sup class="stat_mod"><if $post['has_personaje_tag'] then>({$post['personaje_tag']['minteligencia']})<elseif $post['has_ficha'] then>({$post['ficha']['minteligencia']})</if></sup></span></div>
+            <span class="stats_group">Especiales</span>
+            <div class="stat_row"><span class="stat_label">Salud</span><span class="stat_val"><if $post['has_personaje_tag'] then>{$post['personaje_tag']['salud']}<elseif $post['has_ficha'] then>{$post['ficha']['salud']}</if></span></div>
+            <div class="stat_row"><span class="stat_label">Velocidad</span><span class="stat_val"><if $post['has_personaje_tag'] then>{$post['personaje_tag']['velocidad']}<elseif $post['has_ficha'] then>{$post['ficha']['velocidad']}</if></span></div>
+            <div class="stat_row"><span class="stat_label">Tenketsu</span><span class="stat_val"><if $post['has_personaje_tag'] then>{$post['personaje_tag']['tenketsu']}<elseif $post['has_ficha'] then>{$post['ficha']['tenketsu']}</if></span></div>
+            <div class="stat_row"><span class="stat_label">Sigilo</span><span class="stat_val"><if $post['has_personaje_tag'] then>{$post['personaje_tag']['sigilo']}<elseif $post['has_ficha'] then>{$post['ficha']['sigilo']}</if></span></div>
+          </div>
+        </div>
+
+        <div class="bars_container">
+          <div class="health_status_container">
+            <div class="health_bar"></div>
+            <div class="health_bar_text">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+              <if $post['has_personaje_tag'] then>
+                <span class="personaje_vida">{$post['personaje_tag']['vida']}</span>
+              <elseif $post['has_ficha'] then>
+                <span class="personaje_vida">{$post['ficha']['vida']}</span>
+              </if>
+            </div>
+          </div>
+          <div class="chakra_status_container">
+            <div class="chakra_bar"></div>
+            <div class="chakra_bar_text">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2c.7 2.7 2.6 4.2 3.8 5.9C16.7 9.2 17 10.6 17 12a5 5 0 0 1-10 0c0-1.1.3-2 .8-2.9.4 1 1.2 1.6 2 1.6 1 0 1.6-.8 1.4-2.1C10.8 6.7 11.4 4 12 2z"/></svg>
+              <if $post['has_personaje_tag'] then>
+                <span class="personaje_chakra">{$post['personaje_tag']['chakra']}</span>
+              <elseif $post['has_ficha'] then>
+                <span class="personaje_chakra">{$post['ficha']['chakra']}</span>
+              </if>
+            </div>
+          </div>
+        </div>
+      </if>
+
+    </aside>
+
+    <!-- ── Mensaje ───────────────────────────────────────────── -->
+    <div class="post_message_section">
+      <div class="post_content">
+
+        <div class="post_head">
+          <div class="post_link">
+            <img class="iconLink" src="https://i.ibb.co/558Qz5W/Enlace-Icono.png" alt="">
+            {$post['posturl']}
+          </div>
+          <div class="post_date">{$post['postdate']}</div>
+        </div>
+
+        <div class="post_body scaleimages" id="pid_{$post['pid']}">
+          <div class="post_edition_text"><span class="post_edit" id="edited_by_{$post['pid']}">{$post['editedmsg']}</span></div>
+          <div class="post_body_content">{$post['message']} {$post['attachments']} {$post['signature']}</div>
+        </div>
+
+        <div class="post_controls">
+          <div class="postbit_buttons post_management_buttons">
+            {$post['button_edit']}{$post['button_quickdelete']}{$post['button_quickrestore']}{$post['button_reply_pm']}{$post['button_replyall_pm']}{$post['button_forward_pm']}{$post['button_delete_pm']}
+          </div>
+        </div>
+
+        <div class="post_meta" id="post_meta_{$post['pid']}">
+          {$post['iplogged']}
+          <div class="post_status">{$post['poststatus']}</div>
+        </div>
+        {$post['input_editreason']}
+
+      </div>
+    </div>
+
+  </div>
+</div>

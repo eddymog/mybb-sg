@@ -1,0 +1,225 @@
+{$ignore_bit}{$deleted_bit}
+<a name="pid{$post['pid']}" id="pid{$post['pid']}"></a>
+<div class="post_classic {$unapproved_shade}" style="{$post_visibility}" id="post_{$post['pid']}">
+<div class="post_general">
+<!-- Codigo del Avatar de Usuario -->
+<div class="post_author scaleimages">
+	<div class="author_information" style="background-color: {$post['villa_sombra2']};">
+		<div style="width: 10%; height: 5px; background-color:#ffffffbd;"></div>
+		{$post['username']}
+<div style="width: 10%; height: 5px; background-color: #ffffffbd;"></div>
+	</div>
+<!-- Imagen del Usuario -->
+	<div style="border: 5px solid {$post['villa_sombra2']};">
+		{$post['useravatar']}
+		</div>
+<div class="quick_acces_tabs" style="background-color: {$post['villa_sombra2']};">
+	<div class="inventory_tab">
+<a href="{$mybb->settings['bburl']}/sg/inventario.php?uid={$post['uid']}" style="color: var({$post['villa_color']});"><i class="fa-solid fa-briefcase fa-2xl"></i></a>
+	</div>
+	<div class="profile_tab">
+	<a href="{$mybb->settings['bburl']}
+/member.php?action=profile&uid={$post['uid']}" style="color: var({$post['villa_color']});">
+		<i class="fa-solid fa-user fa-2xl"></i>
+	</a></div>
+	<div class="character_profile_tab">
+<a href="{$mybb->settings['bburl']}/sg/ficha.php?uid={$post['uid']}" style="color: var({$post['villa_color']});"><i class="fa-solid fa-address-card fa-2xl"></i></a></div>	
+</div>
+
+<!-- Condicionante: Ficha Aceptada, podrá ver sus datos en la zona de post -->
+	<if $post['has_ficha'] then>		
+<div class="character_info">
+<!-- Rango del Personaje -->
+<div class="char_data_tab">
+    <div class="kanji" style="background-color: {$post['villa_sombra2']};">
+        <span>位</span>
+    </div>
+    <div class="text" style="background-color: var({$post['villa_color']});">
+        <span>{$post['ficha']['rango']}</span>
+    </div>
+</div>
+
+<div class="row_data">
+	<!-- Aldea del Personaje -->
+<!--
+	<div class="char_data_tab">
+    	<div class="kanji" style="background-color: {$post['villa_sombra2']};">
+        	<span>位</span>
+    	</div>
+    	<div class="text" style="background-color: var({$post['villa_color']});">
+        	<span>{$post['ficha']['aldea']}</span>
+    	</div>
+	</div>-->
+
+	<!-- Facción -->
+	<div class="char_data_tab">
+    	<div class="text" style="background-color: {$post['villa_sombra2']};">
+        	<span>{$post['ficha']['faccion']}</span>
+    	</div>
+	</div>
+</div>	
+
+<!-- Clan -->
+<div class="char_data_tab">
+    <div class="kanji" style="background-color: {$post['villa_sombra2']};">
+        <span>族</span>
+    </div>
+    <div class="text" style="background-color: var({$post['villa_color']});">
+        <span>{$post['nombreClan']}</span>
+    </div>
+</div>
+
+<!-- Clase -->
+<div class="char_data_tab">
+    <div class="kanji" style="background-color: {$post['villa_sombra2']};">
+        <span>級</span>
+    </div>
+    <div class="text" style="background-color: var({$post['villa_color']});">
+        <span>Shinobi Clase {$post['clase']}</span>
+    </div>
+</div>
+
+<!-- Estadisticas -->
+<div class="char_stats" style="background-color: {$post['villa_sombra2']};">
+	<span class="stats_title">Estadísticas</span>
+	<div class="stats_table">
+		<div class="stats_name">
+			<p class="atributos-texto">Fuerza</p>
+			<p class="atributos-texto">Resistencia</p>
+			<p class="atributos-texto">Velocidad</p>
+			<p class="atributos-texto">Agilidad</p>
+			<p class="atributos-texto">Destreza</p>
+			<p class="atributos-texto">Presencia</p>
+			<p class="atributos-texto">Inteligencia</p>
+			<p class="atributos-texto">Control de Chakra</p>
+			<p class="atributos-texto">Reg. de Chakra</p>
+		</div>
+		<div class="stats_value">
+			<if $post['has_personaje_tag'] then>
+				<p class="atributos-texto">{$post['personaje_tag']['fue']}</p>
+				<p class="atributos-texto">{$post['personaje_tag']['res']}</p>
+				<p class="atributos-texto">{$post['personaje_tag']['vel']}</p>
+				<p class="atributos-texto">{$post['personaje_tag']['agi']}</p>
+				<p class="atributos-texto">{$post['personaje_tag']['des']}</p>
+				<p class="atributos-texto">{$post['personaje_tag']['pre']}</p>
+				<p class="atributos-texto">{$post['personaje_tag']['int']}</p>
+				<p class="atributos-texto">{$post['personaje_tag']['cck']}</p>
+				<p class="atributos-texto">{$post['personaje_tag']['regchakra']}</p>
+			<elseif $post['has_ficha'] then>
+				<p class="atributos-texto">{$post['ficha']['str']}</p>
+				<p class="atributos-texto">{$post['ficha']['res']}</p>
+				<p class="atributos-texto">{$post['ficha']['spd']}</p>
+				<p class="atributos-texto">{$post['ficha']['agi']}</p>
+				<p class="atributos-texto">{$post['ficha']['dex']}</p>
+				<p class="atributos-texto">{$post['ficha']['pres']}</p>
+				<p class="atributos-texto">{$post['ficha']['inte']}</p>
+				<p class="atributos-texto">{$post['ficha']['ctrl']}</p>
+				<p class="atributos-texto">{$post['ficha']['regchakra']}</p>
+			</if>
+		</div>
+	</div>
+		<!-- Barras Generales -->
+		<div class="bars_container">
+<!-- Vida -->
+	<div class="health_status_container">
+		<div class="health_bar">
+			<div class="health_bar_text">
+				<span><i class="fa-solid fa-heart"></i></span>
+				<if $post['has_personaje_tag'] then>
+					<span>{$post['personaje_tag']['vida']}</span>
+				<elseif $post['has_ficha'] then>
+					<span class="personaje_vida">{$post['ficha']['vida']}</span>
+				</if>
+			</div>
+		</div>	
+	</div>
+
+<!-- Chakra -->
+<div class="chakra_status_container">
+	<div class="chakra_bar">
+		<div class="chakra_bar_text">
+			<span><i class="fa-solid fa-fire-flame-curved"></i></span>
+			<if $post['has_personaje_tag'] then>
+			<span>{$post['personaje_tag']['chakra']}</span>
+			<elseif $post['has_ficha'] then>
+			<span>{$post['ficha']['chakra']}</span>
+			 </if>
+		</div>
+	</div>
+</div>
+</div>
+	</div>
+</div>
+<!-- Aquí acaban los datos del personaje -->
+<!-- 	<div style="display: flex;position: relative;top: -7px;margin-bottom: 7px;">
+		<div class="post-avatar" style="background-color: {$post['villa_sombra2']};">
+			<span class="post-avatar-mitad-texto"><a href="{$mybb->settings['bburl']}/member.php?action=profile&uid={$post['uid']}">PERFIL</a></span>
+		</div>
+	</div> -->
+</if>
+		<!-- 
+	<if !$post['has_ficha'] then>
+	<div style="display: flex;position: relative;top: -7px;margin-bottom: -5px;">
+		<div class="post-avatar" style="background-color: {$post['villa_sombra2']};">
+			<span class="post-avatar-mitad-texto"><a href="{$mybb->settings['bburl']}/member.php?action=profile&uid={$post['uid']}">PERFIL</a></span>
+		</div>
+	</div>
+	</if>
+-->
+
+	<div style="display: flex;">
+		<div class="post-avatar-final" style="background-color: {$post['villa_sombra2']};"></div>
+	</div>
+	<!-- <div class="author_statistics">
+		{post['user_details']}
+	</div> -->
+</div>
+<div class="post_message_section" 
+	<!-- Acciones, Mensaje, Controles, Etc -->		
+	<div class='post_head'>
+	<div class="post_link">
+	<img class="iconLink" src="https://i.ibb.co/558Qz5W/Enlace-Icono.png" alt="LinkIcon">
+	{$post['posturl']}
+	</div>
+ 	<div class="post_date"><span class="post_date">{$post['postdate']}</span></div>
+		</div>
+	<div class="post_content">
+<!-- 
+<div class="author_information usuario-derecha" style="background-color: {$post['villa_sombra2']};text-align: center;margin-bottom: 10px;display: none;">
+		<strong><span class="largetext">{$post['username']}</span></strong><br />
+	</div>
+-->
+<div class="post_body scaleimages" id="pid_{$post['pid']}">
+<div class="post_edition_text"><span class="post_edit" id="edited_by_{$post['pid']}">{$post['editedmsg']}</span></div>
+	<div class="post_body_content">{$post['message']}	{$post['attachments']}
+	{$post['signature']}</div>
+	</div>
+
+			<div class="post_controls">
+	<div class="postbit_buttons post_management_buttons float_right" style="display:flex; gap:15px">
+		{$post['button_edit']}{$post['button_quickdelete']}{$post['button_quickrestore']}<!-- {post['button_quote']}{post['button_multiquote']}{post['button_report']}  {post['button_warn']} -->{$post['button_reply_pm']}{$post['button_replyall_pm']}{$post['button_forward_pm']}{$post['button_delete_pm']}
+	</div>
+</div>
+
+	<div class="post_meta" id="post_meta_{$post['pid']}">
+		{$post['iplogged']}
+		<div class="float_right">
+			{$post['poststatus']}
+		</div>
+	</div>
+	{$post['input_editreason']}
+</div>
+</div></div>
+</div>
+
+  <style>
+    .quick_acces_tabs a {
+      color: #858B8F;
+      text-decoration: none; /* Si quieres quitar el subrayado */
+    }
+    .quick_acces_tabs a:hover {
+      color: #FF0000; /* Color al hacer hover */
+    }
+  </style>
+
+<script src="https://kit.fontawesome.com/acd2987ee3.js" crossorigin="anonymous"></script>

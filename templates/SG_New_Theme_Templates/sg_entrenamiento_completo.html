@@ -1,0 +1,69 @@
+<html>
+
+	<head>
+		<style>
+
+
+		</style>
+		<title>Entrenamiento Completo</title>
+		{$headerinclude}
+	</head>
+
+	<body>
+		{$header}
+		<div class="fondo-blanco">
+			<div style="width: 380px;margin: auto;padding: 6px;border-radius: 2px;font-family: monospace;font-size: 23px;color: #3498db;border: 2px dotted #3498db;">¡Tienes {$ficha['newpoints']} puntos de rol!</div><br>
+			<div style="text-align: center;">
+				<p style="font-size: 19px;">¡Felicidades! Has entrenado la técnica <strong>{$tecnica['nombre']}</strong> y has obtenido <strong>{$ph_recompensa} Puntos de Habilidad</strong>.</p>
+				<p style="font-size: 19px;">Recuerda que este entrenamiento tiene un costo de <strong>{$pr_coste} puntos de rol</strong>. ¡Hora de celebrar!</p>
+			</div>
+			<div style="display: none">
+				<form id="tecform" method="post" action="entrenamientos.php">
+					<input type="text" id="tid_completo" name="tid_completo" value="{$tecnica['tid']}">
+				</form>
+			</div>
+			<div class="tecnica">
+				<div class="spoiler" style="margin: 10px;">
+					<div class="spoiler_title" style="text-align: center;" onclick="javascript: if(parentNode.getElementsByTagName('div')[1].style.display == 'block'){ parentNode.getElementsByTagName('div')[1].style.display = 'none'; } else { parentNode.getElementsByTagName('div')[1].style.display = 'block'; }">
+						<span class="spoiler_button" style="text-transform: uppercase; font-family: monospace"><strong>{$tecnica['nombre']}</strong></span>
+					</div>
+					<div class="tecnica_spoiler_content" style="display: block;">
+						<div style='display: flex;flex-direction: column;'>
+							<div style='display: flex;flex-direction: row;justify-content: space-between;margin-bottom: 10px;margin-top: 7px;'>
+								<div class='tecnicaLvl'><span>Rango {$tecnica['rango']}</span></div>
+							</div>
+							<div style='display: flex;flex-direction: row;justify-content: center;margin: 9px 8px 10px;'>
+								<div class='tecnicaId'><span>ID: {$tecnica['tid']}</span></div> 
+								<if $tecnica['sellos'] then><div class='tecnicaType'><span>SELLOS: {$tecnica['sellos']}</span></div></if>
+								<div class='tecnicaType'><span>{$tecnica['tipo']}</span></div> 
+								<if $tecnica['categoria'] && ($tecnica['categoria'] != $tecnica['tipo']) then>
+									<div class='tecnicaType'><span>{$tecnica['categoria']}</span></div></if>
+							</div>  
+							<p class='tecnicaDes'><span>{$tecnica['descripcion']}</span></p>
+							<if $tecnica['coste'] then>
+							  <div class='tecnicaCost'><span class='tecnicaLvl'>Coste:</span> <span class='efectoDescripcion'>{$tecnica['coste']}</span></div>
+							</if>
+							<if $tecnica['efecto'] then>
+							  <div class='tecnicaEfect'><span class='tecnicaLvl'>Efecto:</span> <span class='efectoDescripcion'>{$tecnica['efecto']}</span></div>
+							</if>
+
+						</div>
+					</div>
+				</div>
+			</div>
+			<br>
+			<div class="mission">
+				<div class="boton_mision" style="text-align: center;">
+					<input class="button" type="button" onclick="javascript: document.getElementById('tecform').submit();" value="Terminar el Entrenamiento" style="font-size: 20px;"><br><br><br>
+					<img src="https://media.tenor.com/TbHv6Xi1elIAAAAd/hurray-bonzai.gif">
+				</div>
+				<br>
+			</div>
+			<br><br>
+			
+		</div>
+		{$reload_script}
+		{$footer}
+	</body>
+
+</html>

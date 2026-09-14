@@ -160,12 +160,12 @@ interno de la herramienta de Staff):
 - **Columna Kage** (`hermano`): **solo imagen**, ancho de su columna, link al
   foro. Si no hay ninguno activo, un placeholder único ("Todavía no hay
   afiliado hermano") sin CTA de petición (no es solicitable, ver arriba).
-- **Columna ANBU** (`grande`): **4 espacios** fijos (`SG_AFILIADOS_SLOTS_GRANDE = 4`
-  como constante fácil de subir el día que se necesiten más). Si hay menos de
-  4 activos, se completan los cuadros vacíos restantes con el placeholder +
-  link a `peticion_afiliados.php`. Si en el futuro hay más de 4 activos,
-  simplemente se muestran todos (la constante es un mínimo de espacios a
-  completar con placeholder, no un tope duro).
+- **Columna ANBU** (`grande`): arrancamos con **2 espacios** fijos
+  (`SG_AFILIADOS_SLOTS_GRANDE = 2` como constante fácil de subir el día que se
+  necesiten más). Si hay menos de 2 activos, se completan los cuadros vacíos
+  restantes con el placeholder + link a `peticion_afiliados.php`. Si en el
+  futuro hay más de 2 activos, simplemente se muestran todos (la constante es
+  un mínimo de espacios a completar con placeholder, no un tope duro).
 - **Columna Shinobis** (`pequeno`): grid de cuadritos **45×45** (logo
   únicamente, `title` con el nombre, sin texto visible — por el tamaño).
   Mismo mecanismo que ANBU pero con su propia constante de espacios mínimos a
@@ -204,19 +204,18 @@ Mismo patrón que `gestionar_banners.php` (el precedente más cercano: tarjetas
 - Al enviar: `INSERT` en `mybb_sg_sg_peticiones` con `categoria='afiliados'`
   (ver §3) + honeypot y rate-limit por IP (§8) + mensaje de confirmación
   (mismo patrón `sg_redireccion` que ya usa `peticiones.php`), y ese mensaje
-  **debe decirle explícitamente que contacte a un administrador para
-  coordinar imágenes y más detalles**: *"¡Tu solicitud fue enviada! Para
-  coordinar el logo y los detalles de la afiliación, pueden contactar a
-  cualquiera de nuestros administradores (daimyo); por defecto, a
-  @kurosame."* Todo el texto orientado al público (subtítulo del formulario,
-  placeholders, mensajes de error/éxito) usa español neutro, sin voseo.
+  **debe decirle explícitamente que se contacte con un administrador del foro
+  para coordinar imágenes y más detalles** — algo como: *"¡Tu solicitud fue
+  enviada! Para coordinar el logo y los detalles de la afiliación, contactá a
+  un administrador del foro."* (el canal de contacto exacto — Discord, MP,
+  etc. — queda a definir al implementar, según lo que ya use el foro).
 - Los cuadros vacíos del índice linkean todos al mismo
   `peticion_afiliados.php`, sin parámetro de nivel.
 
 ## 7. Decisiones confirmadas
 
-- **Afiliados Grandes (ANBU) arrancan con 4 espacios.** Constante fácil de
-  subir después si hace falta.
+- **Afiliados Grandes arrancan con 2 espacios.** Constante fácil de subir
+  después si hace falta.
 - **"Hermano" es editable desde el panel** (queda como una fila más de la
   tabla, no hardcodeado) — en la práctica no va a cambiar nunca, pero permite
   actualizarle la imagen sin tocar código si hiciera falta.

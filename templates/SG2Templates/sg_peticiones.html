@@ -1,0 +1,374 @@
+<html>
+	<head>
+		<title>Peticiones de Moderación</title>
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+		<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Source+Serif+4:wght@300;400;600;700&family=Zen+Old+Mincho:wght@400;700&display=swap" rel="stylesheet">
+		{$headerinclude}
+		<style>
+			:root {
+				--bg: #0f0c18;
+				--bg2: #130f1e;
+				--surface: rgba(23, 18, 36, 0.84);
+				--border: rgba(156, 107, 204, 0.12);
+				--ink: #e8dff8;
+				--plum2: #9c6bcc;
+				--plum3: #b890e0;
+				--plum4: #d4b8f0;
+				--stone: #8a7a9a;
+				--fiber: rgba(156, 107, 204, 0.04);
+				--shadow: 0 24px 60px rgba(0, 0, 0, 0.28);
+				--shadow-soft: 0 12px 28px rgba(0, 0, 0, 0.18);
+				--radius-xl: 24px;
+				--radius-lg: 18px;
+				--radius-md: 14px;
+			}
+
+			body {
+				background:
+					radial-gradient(circle at top left, rgba(123, 74, 184, 0.12), transparent 28%),
+					radial-gradient(circle at bottom right, rgba(192, 88, 42, 0.08), transparent 24%),
+					var(--bg);
+				color: var(--ink);
+				font-family: "Source Serif 4", serif;
+				margin: 0;
+				position: relative;
+			}
+
+			body::before {
+				content: "";
+				position: fixed;
+				inset: 0;
+				pointer-events: none;
+				z-index: 0;
+				background-image:
+					repeating-linear-gradient(13deg, transparent 0, transparent 24px, var(--fiber) 24px, var(--fiber) 25px),
+					repeating-linear-gradient(82deg, transparent 0, transparent 36px, var(--fiber) 36px, var(--fiber) 37px),
+					repeating-linear-gradient(151deg, transparent 0, transparent 19px, var(--fiber) 19px, var(--fiber) 19.5px);
+			}
+
+			.sg-peticiones-page {
+				max-width: 1180px;
+				margin: 28px auto 44px;
+				padding: 0 18px;
+				position: relative;
+				z-index: 1;
+			}
+
+			.sg-peticiones-shell {
+				border: 1px solid var(--border);
+				border-radius: 24px;
+				background: rgba(19, 15, 30, 0.94);
+				box-shadow: var(--shadow);
+				overflow: hidden;
+			}
+
+			.sg-peticiones-header {
+				padding: 24px 28px 18px;
+				border-bottom: 1px solid var(--border);
+				background: rgba(23, 18, 36, 0.82);
+			}
+
+			.sg-label,
+			.sg-card-eyebrow,
+			.sg-field label,
+			.sg-peticion-tag,
+			.sg-submit {
+				font-family: "Cinzel", serif;
+				text-transform: uppercase;
+			}
+
+			.sg-label {
+				margin-bottom: 8px;
+				font-size: 10px;
+				letter-spacing: 2.4px;
+				color: var(--plum3);
+			}
+
+			.sg-title {
+				margin: 0;
+				font: 900 clamp(24px, 3.5vw, 34px)/1.05 "Cinzel", serif;
+				letter-spacing: 1px;
+				text-transform: uppercase;
+				color: var(--ink);
+			}
+
+			.sg-subtitle {
+				max-width: 780px;
+				margin: 10px 0 0;
+				color: var(--stone);
+				font-size: 14px;
+				line-height: 1.7;
+			}
+
+			.sg-peticiones-body {
+				padding: 20px;
+				display: grid;
+				grid-template-columns: minmax(0, 1.05fr) minmax(320px, 0.95fr);
+				gap: 16px;
+			}
+
+			.sg-card {
+				border: 1px solid var(--border);
+				border-radius: 18px;
+				background: var(--surface);
+				box-shadow: var(--shadow-soft);
+				overflow: hidden;
+			}
+
+			.sg-card-head {
+				padding: 18px 20px 14px;
+				border-bottom: 1px solid var(--border);
+			}
+
+			.sg-card-eyebrow {
+				margin-bottom: 6px;
+				font-size: 10px;
+				letter-spacing: 2px;
+				color: var(--plum2);
+			}
+
+			.sg-card-title {
+				margin: 0;
+				font: 900 18px/1.1 "Cinzel", serif;
+				letter-spacing: 0.8px;
+				text-transform: uppercase;
+				color: var(--ink);
+			}
+
+			.sg-card-copy {
+				margin: 10px 0 0;
+				color: var(--stone);
+				font-size: 14px;
+				line-height: 1.7;
+			}
+
+			.sg-card-body {
+				padding: 16px 18px 18px;
+			}
+
+			.sg-form {
+				display: grid;
+				gap: 14px;
+			}
+
+			.sg-field {
+				display: grid;
+				gap: 8px;
+			}
+
+			.sg-field label {
+				font-size: 11px;
+				letter-spacing: 1.6px;
+				color: var(--plum3);
+			}
+
+			.sg-field input,
+			.sg-field select,
+			.sg-field textarea {
+				width: 100%;
+				border: 1px solid rgba(156, 107, 204, 0.2);
+				border-radius: 12px;
+				background: rgba(15, 12, 24, 0.72);
+				color: var(--ink);
+				padding: 12px 14px;
+				font: 400 15px/1.5 "Source Serif 4", serif;
+				box-sizing: border-box;
+				outline: none;
+                height: 50px;
+			}
+
+			.sg-field textarea {
+				min-height: 148px;
+				resize: vertical;
+			}
+
+			.sg-submit-wrap {
+				padding-top: 4px;
+			}
+
+			.sg-submit {
+				width: 100%;
+				min-height: 48px;
+				border: 1px solid rgba(156, 107, 204, 0.2);
+				border-radius: 999px;
+				background: linear-gradient(135deg, rgba(61, 31, 110, 0.96), rgba(90, 46, 154, 0.88));
+				color: #fff;
+				font-size: 11px;
+				font-weight: 700;
+				letter-spacing: 2px;
+				cursor: pointer;
+			}
+
+			.sg-peticiones-list {
+				display: grid;
+				gap: 12px;
+			}
+
+			.sg-empty {
+				margin: 0;
+				color: var(--stone);
+				font-size: 14px;
+				line-height: 1.7;
+			}
+
+			.sg-peticion-card {
+				border: 1px solid var(--border);
+				border-radius: 14px;
+				background: rgba(15, 12, 24, 0.22);
+				padding: 14px 16px;
+			}
+
+			.sg-peticion-head {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				gap: 12px;
+				margin-bottom: 8px;
+			}
+
+			.sg-peticion-index {
+				margin: 0;
+				font: 700 15px/1.3 "Cinzel", serif;
+				letter-spacing: 0.6px;
+				color: var(--ink);
+			}
+
+			.sg-peticion-tag {
+				flex-shrink: 0;
+				font-size: 9px;
+				letter-spacing: 1.8px;
+				color: var(--stone);
+			}
+
+			.sg-peticion-resumen {
+				margin: 0 0 8px;
+				color: var(--plum4);
+				font-size: 16px;
+				line-height: 1.5;
+			}
+
+			.sg-peticion-url {
+				margin: 10px 0 0;
+				font-size: 14px;
+				line-height: 1.6;
+				color: var(--stone);
+			}
+
+			.sg-peticion-url a {
+				color: var(--plum3);
+				text-decoration: underline;
+				text-decoration-color: rgba(184, 144, 224, 0.35);
+				word-break: break-word;
+			}
+
+			@media (max-width: 920px) {
+				.sg-peticiones-body {
+					grid-template-columns: 1fr;
+				}
+			}
+
+			@media (max-width: 720px) {
+				.sg-peticiones-page {
+					margin-top: 20px;
+					padding: 0 12px;
+				}
+
+				.sg-peticiones-shell {
+					border-radius: 18px;
+				}
+
+				.sg-peticiones-header {
+					padding: 20px 18px 16px;
+				}
+
+				.sg-peticiones-body {
+					padding: 16px;
+				}
+
+				.sg-peticion-head {
+					flex-direction: column;
+					align-items: flex-start;
+				}
+			}
+		</style>
+	</head>
+	<body>
+		{$header}
+		<div class="sg-peticiones-page">
+			<div class="sg-peticiones-shell">
+				<section class="sg-peticiones-header">
+					<div class="sg-label">Panel de soporte</div>
+					<h1 class="sg-title">Peticiones de Moderación</h1>
+					<p class="sg-subtitle">
+						Envía una solicitud clara al equipo de moderación y consulta debajo las peticiones que todavía siguen pendientes. Todo queda organizado para que sea fácil de leer y revisar.
+					</p>
+				</section>
+
+				<section class="sg-peticiones-body">
+					<article class="sg-card">
+						<div class="sg-card-head">
+							<div class="sg-card-eyebrow">Formulario</div>
+							<h2 class="sg-card-title">Nueva petición</h2>
+							<p class="sg-card-copy">Resume bien tu caso, añade contexto útil y deja el enlace correspondiente si aplica.</p>
+						</div>
+						<div class="sg-card-body">
+							<form id="peticion_form" method="post" action="peticiones.php" class="sg-form">
+								<div class="sg-field">
+									<label for="categoria">Tipo de petición</label>
+									<select name="categoria" id="categoria">
+									  <option value="ficha">Moderación de Ficha</option>
+									  <option value="tema">Moderación de Tema</option>
+									  <option value="combate">Moderación de Combate</option>
+									  <option value="tecnica">Moderación de Técnica</option>
+									  <option value="otros">Otros</option>
+									</select>
+								</div>
+
+								<div class="sg-field">
+									<label for="resumen">Resumen de petición</label>
+									<input id="resumen" type="text" placeholder="Moderar esto o lo otro de mi ficha." name="resumen" minlength="1" maxlength="120">
+								</div>
+
+								<div class="sg-field">
+									<label for="url">Link de tema</label>
+									<input id="url" type="text" placeholder="Link opcional" name="url">
+								</div>
+
+								<div class="sg-field">
+									<label for="descripcion">Descripción</label>
+									<textarea id="descripcion" name="descripcion" placeholder="Describe tu petición de moderación."></textarea>
+								</div>
+
+								<div class="sg-submit-wrap">
+									<input class="sg-submit" type="button" onclick="document.getElementById('peticion_form').submit();" value="Enviar Petición">
+								</div>
+							</form>
+						</div>
+					</article>
+
+					<article class="sg-card">
+						<div class="sg-card-head">
+							<div class="sg-card-eyebrow">Seguimiento</div>
+							<h2 class="sg-card-title">Peticiones pendientes</h2>
+							<p class="sg-card-copy">Aquí aparecen tus solicitudes aún no resueltas.</p>
+						</div>
+						<div class="sg-card-body">
+							<if $peticiones_txt then>
+								<div class="sg-peticiones-list">
+									{$peticiones_txt}
+								</div>
+							<else>
+								<p class="sg-empty">No tienes peticiones pendientes por ahora.</p>
+							</if>
+						</div>
+					</article>
+				</section>
+			</div>
+		</div>
+		{$footer}
+	</body>
+	<script>
+
+	</script>
+</html>

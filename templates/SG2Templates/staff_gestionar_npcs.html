@@ -1,0 +1,247 @@
+<html>
+
+<head>
+  <title>NPCs</title>
+  {$headerinclude}
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Noto+Serif+JP:wght@300;400;700&display=swap" rel="stylesheet">
+  <style>
+    .sg-admin {
+      --bg: #0f0c18; --bg2: #130f1e; --bg3: #171224;
+      --border: rgba(156, 107, 204, 0.12);
+      --border-strong: rgba(156, 107, 204, 0.22);
+      --ink: #e8dff8; --plum: #7b4ab8; --plum2: #9c6bcc; --plum3: #b890e0;
+      --stone: #8a7a9a; --mist: #5a4a6a; --oxide: #c0582a; --lavender: #ede0fa;
+      max-width: 920px;
+      margin: 24px auto 40px;
+      padding: 0 16px;
+      color: var(--ink);
+      font-family: 'Noto Serif JP', serif;
+    }
+
+    .sg-admin-card {
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), transparent 16%), var(--bg2);
+      border: 0.5px solid var(--border);
+      overflow: hidden;
+    }
+    .sg-admin-head {
+      display: flex; align-items: center; gap: 12px;
+      padding: 18px 22px; background: var(--bg3); border-bottom: 0.5px solid var(--border);
+    }
+    .sg-admin-head::before { content: ''; width: 3px; height: 20px; background: var(--oxide); flex-shrink: 0; }
+    .sg-admin-head h1 {
+      margin: 0; font-family: 'Cinzel', serif; font-size: 15px; font-weight: 900;
+      letter-spacing: 2px; text-transform: uppercase; color: var(--ink);
+    }
+    .sg-admin-body { padding: 22px; }
+
+    .sg-lookup {
+      display: flex; flex-wrap: wrap; align-items: flex-end; gap: 10px;
+      margin-bottom: 20px; padding-bottom: 20px; border-bottom: 0.5px solid var(--border);
+    }
+    .sg-mode {
+      margin-bottom: 16px; font-family: 'Cinzel', serif; font-size: 8px; font-weight: 700;
+      letter-spacing: 2px; text-transform: uppercase; color: var(--plum3);
+    }
+
+    .sg-section {
+      grid-column: 1 / -1; margin: 8px 0 -2px;
+      font-family: 'Cinzel', serif; font-size: 9px; font-weight: 700; letter-spacing: 2px;
+      text-transform: uppercase; color: var(--plum3);
+      border-top: 0.5px solid var(--border); padding-top: 14px;
+    }
+    .sg-section:first-child { border-top: none; padding-top: 0; }
+
+    .sg-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .sg-grid4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; grid-column: 1 / -1; }
+    .sg-field { display: flex; flex-direction: column; gap: 5px; }
+    .sg-field--full { grid-column: 1 / -1; }
+
+    .sg-label {
+      font-family: 'Cinzel', serif; font-size: 8px; font-weight: 700; letter-spacing: 1.5px;
+      text-transform: uppercase; color: var(--mist);
+    }
+    .sg-label .req { color: var(--oxide); }
+    .sg-hint { font-size: 11px; color: var(--mist); }
+
+    .sg-input, .sg-textarea, .sg-select {
+      width: 100%; padding: 9px 12px; background: var(--bg);
+      border: 0.5px solid var(--border-strong); color: var(--ink);
+      font-family: 'Noto Serif JP', serif; font-size: 14px; line-height: 1.5;
+      box-sizing: border-box; transition: border-color 0.15s;
+    }
+    .sg-input, .sg-select { height: 40px; }
+    .sg-select {
+      -webkit-appearance: none; appearance: none; padding-right: 32px;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%238a7a9a' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 12px center;
+    }
+    .sg-input:focus, .sg-textarea:focus, .sg-select:focus { outline: none; border-color: var(--plum3); }
+    .sg-textarea { resize: vertical; line-height: 1.6; }
+
+    .sg-btn {
+      display: inline-flex; align-items: center; justify-content: center; height: 38px;
+      padding: 0 22px; background: var(--plum); border: none; color: var(--lavender);
+      font-family: 'Cinzel', serif; font-size: 9px; font-weight: 700; letter-spacing: 2px;
+      text-transform: uppercase; cursor: pointer; transition: background 0.15s; text-decoration: none;
+    }
+    .sg-btn:hover { background: var(--plum2); }
+    .sg-btn--ghost { background: transparent; border: 0.5px solid var(--border-strong); color: var(--stone); }
+    .sg-btn--ghost:hover { border-color: var(--plum3); color: var(--ink); }
+    .sg-btn--danger { background: var(--oxide); color: #fff; }
+    .sg-btn--danger:hover { filter: brightness(1.15); background: var(--oxide); }
+
+    .sg-actions {
+      display: flex; justify-content: space-between; gap: 10px;
+      margin-top: 18px; padding-top: 16px; border-top: 0.5px solid var(--border);
+    }
+
+    @media (max-width: 700px) {
+      .sg-grid { grid-template-columns: 1fr; }
+      .sg-grid4 { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+
+<body>
+  {$header}
+  <main class="sg-admin">
+    <div class="sg-admin-card">
+      <div class="sg-admin-head">
+        <h1>NPCs</h1>
+      </div>
+      <div class="sg-admin-body">
+
+        <div class="sg-lookup">
+          <div class="sg-field" style="flex: 1; min-width: 240px;">
+            <label class="sg-label" for="lookup_id">Cargar NPC</label>
+            <select class="sg-select" id="lookup_id">
+              <option value="">— Selecciona —</option>
+              {$opciones}
+            </select>
+          </div>
+          <button class="sg-btn" type="button" onclick="onLoadNpc()">Cargar</button>
+          <if $nid != 0 then><a class="sg-btn sg-btn--ghost" href="/sg/admin/gestionar_npcs.php">Nuevo</a></if>
+        </div>
+
+        <div class="sg-mode">
+          <if $nid != 0 then>Modificando NPC #{$nid}: {$npc['nombre']}<else>Creando nuevo NPC</if>
+        </div>
+
+        <form method="post" action="/sg/admin/gestionar_npcs.php" name="gestionar_npcs" id="gestionar_npcs">
+          <input type="hidden" name="npc_id" value="{$nid}">
+
+          <div class="sg-grid">
+            <div class="sg-section">Identidad</div>
+
+            <div class="sg-field">
+              <label class="sg-label" for="codigo">Código (slug) <span class="req">*</span></label>
+              <input class="sg-input" value="{$npc['codigo']}" type="text" name="codigo" id="codigo" maxlength="60" required />
+              <span class="sg-hint">Único. Ej: akihiro-sarutobi</span>
+            </div>
+            <div class="sg-field">
+              <label class="sg-label" for="nombre">Nombre <span class="req">*</span></label>
+              <input class="sg-input" value="{$npc['nombre']}" type="text" name="nombre" id="nombre" required />
+            </div>
+            <div class="sg-field">
+              <label class="sg-label" for="clan_grupo">Clan / Grupo</label>
+              <input class="sg-input" value="{$npc['clan_grupo']}" type="text" name="clan_grupo" id="clan_grupo" />
+            </div>
+            <div class="sg-field">
+              <label class="sg-label" for="afiliacion">Afiliación</label>
+              <input class="sg-input" value="{$npc['afiliacion']}" type="text" name="afiliacion" id="afiliacion" placeholder="Konoha, Kiri…" />
+            </div>
+            <div class="sg-field">
+              <label class="sg-label" for="cargo">Cargo</label>
+              <input class="sg-input" value="{$npc['cargo']}" type="text" name="cargo" id="cargo" />
+            </div>
+            <div class="sg-field">
+              <label class="sg-label" for="edad">Edad</label>
+              <input class="sg-input" value="{$npc['edad']}" type="text" name="edad" id="edad" />
+            </div>
+            <div class="sg-field">
+              <label class="sg-label" for="rango">Rango</label>
+              <input class="sg-input" value="{$npc['rango']}" type="text" name="rango" id="rango" placeholder="Gennin, Chunnin, Jounin, Tokubetsu Jounin, ANBU, Kage…" />
+            </div>
+            <div class="sg-field">
+              <label class="sg-label" for="nivel">Nivel</label>
+              <input class="sg-input" value="{$npc['nivel']}" type="number" name="nivel" id="nivel" />
+            </div>
+
+            <div class="sg-field sg-field--full">
+              <label class="sg-label" for="frase">Frase</label>
+              <textarea class="sg-textarea" style="height: 60px;" name="frase" id="frase">{$npc['frase']}</textarea>
+            </div>
+            <div class="sg-field sg-field--full">
+              <label class="sg-label" for="descripcion">Descripción</label>
+              <textarea class="sg-textarea" style="height: 180px;" name="descripcion" id="descripcion">{$npc['descripcion']}</textarea>
+            </div>
+            <div class="sg-field sg-field--full">
+              <label class="sg-label" for="imagen">Imagen (URL)</label>
+              <input class="sg-input" value="{$npc['imagen']}" type="text" name="imagen" id="imagen" />
+            </div>
+
+            <div class="sg-section">Estadísticas</div>
+            <div class="sg-grid4">
+              <div class="sg-field"><label class="sg-label" for="fuerza">Fuerza</label><input class="sg-input" value="{$npc['fuerza']}" type="number" name="fuerza" id="fuerza" /></div>
+              <div class="sg-field"><label class="sg-label" for="destreza">Destreza</label><input class="sg-input" value="{$npc['destreza']}" type="number" name="destreza" id="destreza" /></div>
+              <div class="sg-field"><label class="sg-label" for="inteligencia">Inteligencia</label><input class="sg-input" value="{$npc['inteligencia']}" type="number" name="inteligencia" id="inteligencia" /></div>
+              <div class="sg-field"><label class="sg-label" for="cchakra">C. Chakra</label><input class="sg-input" value="{$npc['cchakra']}" type="number" name="cchakra" id="cchakra" /></div>
+
+              <div class="sg-field"><label class="sg-label" for="mfuerza">M. Fuerza</label><input class="sg-input" value="{$npc['mfuerza']}" type="number" name="mfuerza" id="mfuerza" /></div>
+              <div class="sg-field"><label class="sg-label" for="mdestreza">M. Destreza</label><input class="sg-input" value="{$npc['mdestreza']}" type="number" name="mdestreza" id="mdestreza" /></div>
+              <div class="sg-field"><label class="sg-label" for="minteligencia">M. Inteligencia</label><input class="sg-input" value="{$npc['minteligencia']}" type="number" name="minteligencia" id="minteligencia" /></div>
+              <div class="sg-field"><label class="sg-label" for="mcchakra">M. C. Chakra</label><input class="sg-input" value="{$npc['mcchakra']}" type="number" name="mcchakra" id="mcchakra" /></div>
+
+              <div class="sg-field"><label class="sg-label" for="salud">Salud</label><input class="sg-input" value="{$npc['salud']}" type="number" name="salud" id="salud" /></div>
+              <div class="sg-field"><label class="sg-label" for="velocidad">Velocidad</label><input class="sg-input" value="{$npc['velocidad']}" type="number" name="velocidad" id="velocidad" /></div>
+              <div class="sg-field"><label class="sg-label" for="tenketsu">Tenketsu</label><input class="sg-input" value="{$npc['tenketsu']}" type="number" name="tenketsu" id="tenketsu" /></div>
+              <div class="sg-field"><label class="sg-label" for="sigilo">Sigilo</label><input class="sg-input" value="{$npc['sigilo']}" type="number" name="sigilo" id="sigilo" /></div>
+
+              <div class="sg-field"><label class="sg-label" for="vida">Vida</label><input class="sg-input" value="{$npc['vida']}" type="number" name="vida" id="vida" /></div>
+              <div class="sg-field"><label class="sg-label" for="chakra">Chakra</label><input class="sg-input" value="{$npc['chakra']}" type="number" name="chakra" id="chakra" /></div>
+              <div class="sg-field"><label class="sg-label" for="regchakra">Reg. Chakra</label><input class="sg-input" value="{$npc['regchakra']}" type="number" name="regchakra" id="regchakra" /></div>
+              <div class="sg-field"></div>
+            </div>
+
+            <div class="sg-section">Auditoría</div>
+            <div class="sg-field">
+              <label class="sg-label" for="staff">Miembro de Staff <span class="req">*</span></label>
+              <input class="sg-input" type="text" name="staff" id="staff" required />
+            </div>
+            <div class="sg-field">
+              <label class="sg-label" for="razon">Razón <span class="req">*</span></label>
+              <input class="sg-input" type="text" name="razon" id="razon" required />
+            </div>
+          </div>
+
+          <div class="sg-actions">
+            <if $nid != 0 then>
+              <button class="sg-btn sg-btn--danger" type="submit" name="accion" value="Eliminar" onclick="return confirm('¿Eliminar el NPC #{$nid} ({$npc['nombre']})? Esta acción no se puede deshacer.');">Eliminar</button>
+            <else>
+              <span></span>
+            </if>
+            <button class="sg-btn" type="submit" name="accion" value="Guardar">Guardar</button>
+          </div>
+        </form>
+
+      </div>
+    </div>
+  </main>
+  {$footer}
+</body>
+<if $log_var != '' then><script>alert(`{$log_var}`);</script></if>
+{$reload_script}
+<script>
+  function onLoadNpc() {
+    const id = document.getElementById('lookup_id').value;
+    if (id) {
+      window.location.href = window.location.pathname + '?npc_id=' + encodeURIComponent(id);
+    } else {
+      window.location.href = window.location.pathname;
+    }
+  }
+</script>
+
+</html>

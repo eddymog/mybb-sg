@@ -1,0 +1,582 @@
+<html>
+
+<head>
+  <title>Recompensa Diaria — Shinobi Gaiden</title>
+  {$headerinclude}
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Source+Serif+4:wght@300;400;600;700&family=Zen+Old+Mincho:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+
+    #rd-page {
+      max-width: 920px;
+      margin: 0 auto;
+      padding: 0 0 60px;
+      color: var(--ink);
+      font-family: 'Source Serif 4', serif;
+      text-align: left;
+    }
+
+    /* ─── Banner ─────────────────────────────────────────────── */
+    .rd-banner {
+      position: relative;
+      overflow: hidden;
+      background: var(--bg2);
+      border-bottom: 0.5px solid var(--border);
+      padding: 32px 40px 28px;
+      display: flex;
+      align-items: flex-end;
+      gap: 20px;
+      min-height: 110px;
+    }
+
+    .rd-banner::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        repeating-linear-gradient(13deg,  transparent 0, transparent 24px, var(--fiber) 24px, var(--fiber) 25px),
+        repeating-linear-gradient(82deg,  transparent 0, transparent 36px, var(--fiber) 36px, var(--fiber) 37px),
+        repeating-linear-gradient(151deg, transparent 0, transparent 19px, var(--fiber) 19px, var(--fiber) 19.5px);
+    }
+
+    .rd-banner-kanji {
+      position: absolute;
+      right: 28px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-family: 'Zen Old Mincho', serif;
+      font-size: 120px;
+      font-weight: 700;
+      line-height: 1;
+      color: var(--plum);
+      opacity: 0.05;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    .rd-hanko {
+      position: relative;
+      z-index: 1;
+      width: 52px;
+      height: 52px;
+      border: 1.5px solid var(--oxide);
+      border-radius: 50%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: rgba(192,88,42,0.07);
+      flex-shrink: 0;
+    }
+
+    .rd-hanko__kanji { font-family: 'Zen Old Mincho', serif; font-size: 18px; font-weight: 700; color: var(--oxide); line-height: 1; }
+    .rd-hanko__sub   { font-family: 'Cinzel', serif; font-size: 7px; letter-spacing: 1.5px; color: var(--oxide); text-transform: uppercase; margin-top: 2px; }
+
+    .rd-banner__text { position: relative; z-index: 1; }
+
+    .rd-banner__label {
+      font-family: 'Cinzel', serif;
+      font-size: 8px;
+      font-weight: 400;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--mist);
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .rd-banner__label::before { content: ''; display: inline-block; width: 24px; height: 1.5px; background: var(--oxide); }
+
+    .rd-banner__title {
+      font-family: 'Cinzel', serif;
+      font-size: 22px;
+      font-weight: 900;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      color: var(--ink);
+      line-height: 1;
+      margin: 0;
+    }
+
+    /* ─── Section ────────────────────────────────────────────── */
+    .rd-section { padding: 26px 40px; border-bottom: 0.5px solid var(--border); background: var(--bg2); }
+    .rd-section:nth-child(even) { background: var(--bg); }
+
+    .rd-head { display: flex; align-items: center; gap: 10px; margin-bottom: 18px; }
+    .rd-head::before { content: ''; width: 3px; height: 16px; background: var(--oxide); flex-shrink: 0; }
+    .rd-head::after  { content: ''; flex: 1; height: 0.5px; background: var(--border); }
+    .rd-head__title {
+      font-family: 'Cinzel', serif;
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--ink);
+    }
+
+    /* ─── Stat cards ─────────────────────────────────────────── */
+    .rd-stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+    }
+
+    .rd-stat {
+      border: 0.5px solid var(--border);
+      background: var(--bg3);
+      padding: 16px 14px;
+      text-align: center;
+    }
+
+    .rd-stat__value {
+      font-family: 'Cinzel', serif;
+      font-size: 28px;
+      font-weight: 900;
+      color: var(--ink);
+      line-height: 1;
+    }
+
+    .rd-stat__label {
+      font-family: 'Cinzel', serif;
+      font-size: 8px;
+      font-weight: 700;
+      letter-spacing: 1.6px;
+      text-transform: uppercase;
+      color: var(--mist);
+      margin-top: 8px;
+    }
+
+    .rd-stat--accent { border-color: var(--oxide); background: rgba(192,88,42,0.06); }
+    .rd-stat--accent .rd-stat__value { color: var(--oxide); }
+
+    /* ─── Reward ladder ──────────────────────────────────────── */
+    .rd-ladder {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 6px;
+    }
+
+    .rd-step {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 8px 12px;
+      border: 0.5px solid var(--border);
+      background: var(--bg3);
+      opacity: 0.55;
+      transition: opacity 0.15s;
+    }
+
+    .rd-step__day {
+      font-family: 'Cinzel', serif;
+      font-size: 8px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--mist);
+    }
+
+    .rd-step__marker {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      border: 1.5px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Cinzel', serif;
+      font-size: 11px;
+      font-weight: 900;
+      color: var(--stone);
+      background: var(--bg2);
+    }
+
+    .rd-step__reward {
+      font-family: 'Cinzel', serif;
+      font-size: 8px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      color: var(--stone);
+      line-height: 1.5;
+      text-align: center;
+    }
+
+    /* completed days */
+    .rd-step.is-done {
+      opacity: 1;
+      border-color: var(--plum3);
+      background: rgba(123,74,184,0.08);
+    }
+    .rd-step.is-done .rd-step__marker {
+      border-color: var(--plum3);
+      color: var(--plum2);
+      background: var(--bg2);
+    }
+
+    /* current day */
+    .rd-step.is-current {
+      opacity: 1;
+      border-color: var(--oxide);
+      background: rgba(192,88,42,0.08);
+    }
+    .rd-step.is-current .rd-step__day { color: var(--oxide); }
+    .rd-step.is-current .rd-step__marker {
+      border-color: var(--oxide);
+      color: var(--lavender);
+      background: var(--oxide);
+    }
+    .rd-step.is-current .rd-step__reward { color: var(--ink); }
+
+    .rd-note {
+      margin-top: 14px;
+      padding: 10px 14px;
+      border: 0.5px solid var(--oxide);
+      background: rgba(192,88,42,0.06);
+      font-family: 'Source Serif 4', serif;
+      font-size: 13px;
+      line-height: 1.6;
+      color: var(--stone);
+    }
+
+    /* ─── Temporada progress ─────────────────────────────────── */
+    .rd-temporada__top { display: flex; align-items: baseline; gap: 10px; margin-bottom: 12px; }
+    .rd-temporada__count { font-family: 'Cinzel', serif; font-size: 26px; font-weight: 900; color: var(--oxide); line-height: 1; }
+    .rd-temporada__meta { font-family: 'Cinzel', serif; font-size: 9px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--mist); }
+
+    .rd-bar {
+      position: relative;
+      height: 14px;
+      background: var(--bg3);
+      border: 0.5px solid var(--border);
+      overflow: hidden;
+    }
+    .rd-bar__fill {
+      height: 100%;
+      background: var(--oxide);
+      transition: width 0.4s ease;
+    }
+    .rd-bar__tick {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 1px;
+      background: rgba(255,255,255,0.28);
+      z-index: 1;
+    }
+    .rd-temporada__legend {
+      margin-top: 12px;
+      font-family: 'Source Serif 4', serif;
+      font-size: 13px;
+      line-height: 1.6;
+      color: var(--stone);
+    }
+    .rd-temporada__legend strong { color: var(--oxide); }
+
+    /* ─── Posts requirement ──────────────────────────────────── */
+    .rd-posts {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 16px 18px;
+      border: 0.5px solid var(--border);
+      background: var(--bg3);
+    }
+
+    .rd-posts__badge {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: 1.5px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Cinzel', serif;
+      font-size: 18px;
+      font-weight: 900;
+      color: var(--stone);
+      flex-shrink: 0;
+    }
+    .rd-posts.is-ok .rd-posts__badge { border-color: var(--plum3); color: var(--plum2); background: rgba(123,74,184,0.08); }
+
+    .rd-posts__meta { display: flex; flex-direction: column; gap: 3px; }
+    .rd-posts__label { font-family: 'Cinzel', serif; font-size: 8px; font-weight: 700; letter-spacing: 1.6px; text-transform: uppercase; color: var(--mist); }
+    .rd-posts__text  { font-family: 'Source Serif 4', serif; font-size: 14px; color: var(--ink); }
+    .rd-posts__text strong { color: var(--oxide); }
+
+    /* ─── Claim / status ─────────────────────────────────────── */
+    .rd-reward-box {
+      text-align: center;
+      padding: 6px 0 18px;
+    }
+    .rd-reward-box__label { font-family: 'Cinzel', serif; font-size: 8px; font-weight: 700; letter-spacing: 2.2px; text-transform: uppercase; color: var(--mist); margin-bottom: 8px; }
+    .rd-reward-box__value { font-family: 'Cinzel', serif; font-size: 18px; font-weight: 900; letter-spacing: 1px; color: var(--ink); }
+
+    .rd-status {
+      font-family: 'Source Serif 4', serif;
+      font-size: 14px;
+      line-height: 1.7;
+      color: var(--stone);
+      text-align: center;
+    }
+    .rd-status #mytiempo { color: var(--oxide); font-weight: 600; }
+
+    .rd-gif {
+      display: block;
+      margin: 18px auto 0;
+      max-width: 320px;
+      width: 100%;
+      border: 0.5px solid var(--border);
+    }
+
+    .rd-claim-btn { margin-top: 16px; }
+    #rd-claim {
+      font-family: 'Cinzel', serif;
+      font-size: 10px;
+      font-weight: 900;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--lavender);
+      background: var(--plum);
+      border: none;
+      padding: 0 36px;
+      height: 44px;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.12s;
+      outline: none;
+    }
+    #rd-claim:hover  { background: var(--plum2); transform: translateY(-1px); }
+    #rd-claim:active { transform: translateY(0); }
+
+    /* ─── Responsive ─────────────────────────────────────────── */
+    @media (max-width: 700px) {
+      .rd-banner   { padding: 24px 20px 20px; }
+      .rd-banner__title { font-size: 17px; }
+      .rd-section  { padding: 22px 20px; }
+      .rd-stats    { grid-template-columns: 1fr 1fr; }
+      .rd-ladder   { grid-template-columns: 1fr 1fr 1fr; }
+      .rd-banner-kanji { display: none; }
+    }
+
+    @media (max-width: 420px) {
+      .rd-ladder { grid-template-columns: 1fr 1fr; }
+    }
+
+  </style>
+</head>
+
+<body>
+  {$header}
+
+  <div id="rd-page">
+
+    <!-- Banner -->
+    <div class="rd-banner">
+      <div class="rd-banner-kanji">恩</div>
+      <div class="rd-hanko">
+        <span class="rd-hanko__kanji">忍</span>
+        <span class="rd-hanko__sub">SG</span>
+      </div>
+      <div class="rd-banner__text">
+        <div class="rd-banner__label">Shinobi Gaiden · Voluntad de Fuego</div>
+        <h1 class="rd-banner__title">Recompensa Diaria</h1>
+      </div>
+    </div>
+
+    <!-- Contadores -->
+    <div class="rd-section">
+      <div class="rd-head"><span class="rd-head__title">El camino de {$nombre}</span></div>
+      <div class="rd-stats">
+        <div class="rd-stat rd-stat--accent">
+          <div class="rd-stat__value">{$days_count}</div>
+          <div class="rd-stat__label">Racha actual</div>
+        </div>
+        <div class="rd-stat">
+          <div class="rd-stat__value">{$recompensas_racha_maxima}</div>
+          <div class="rd-stat__label">Racha máxima</div>
+        </div>
+        <div class="rd-stat">
+          <div class="rd-stat__value">{$recompensas_temporada_maxima}</div>
+          <div class="rd-stat__label">Racha de temporada</div>
+        </div>
+        <div class="rd-stat">
+          <div class="rd-stat__value">{$recompensas_reclamadas}</div>
+          <div class="rd-stat__label">Total reclamadas</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Escalera de recompensas -->
+    <div class="rd-section">
+      <div class="rd-head"><span class="rd-head__title">Escalera de la racha</span></div>
+      <div class="rd-ladder">
+        <div class="rd-step<if $days_count > 0 then> is-done</if><if $days_count == 0 then> is-current</if>">
+          <span class="rd-step__day">Día 1</span>
+          <span class="rd-step__marker"><if $days_count > 0 then>✓<else>1</if></span>
+          <span class="rd-step__reward">5 Exp</span>
+        </div>
+        <div class="rd-step<if $days_count > 1 then> is-done</if><if $days_count == 1 then> is-current</if>">
+          <span class="rd-step__day">Día 2</span>
+          <span class="rd-step__marker"><if $days_count > 1 then>✓<else>2</if></span>
+          <span class="rd-step__reward">50 Ryos</span>
+        </div>
+        <div class="rd-step<if $days_count > 2 then> is-done</if><if $days_count == 2 then> is-current</if>">
+          <span class="rd-step__day">Día 3</span>
+          <span class="rd-step__marker"><if $days_count > 2 then>✓<else>3</if></span>
+          <span class="rd-step__reward">75 Ryos · 5 Exp</span>
+        </div>
+        <div class="rd-step<if $days_count > 3 then> is-done</if><if $days_count == 3 then> is-current</if>">
+          <span class="rd-step__day">Día 4</span>
+          <span class="rd-step__marker"><if $days_count > 3 then>✓<else>4</if></span>
+          <span class="rd-step__reward">100 Ryos · 10 Exp</span>
+        </div>
+        <div class="rd-step<if $days_count > 4 then> is-done</if><if $days_count == 4 then> is-current</if>">
+          <span class="rd-step__day">Día 5</span>
+          <span class="rd-step__marker"><if $days_count > 4 then>✓<else>5</if></span>
+          <span class="rd-step__reward">150 Ryos · 10 Exp</span>
+        </div>
+        <div class="rd-step<if $days_count >= 5 then> is-current</if>">
+          <span class="rd-step__day">Día 6+</span>
+          <span class="rd-step__marker">∞</span>
+          <span class="rd-step__reward">200 Ryos · 15 Exp</span>
+        </div>
+      </div>
+
+      <if $recompensas_temporada_maxima >= 40 then>
+        <div class="rd-note">Has superado la racha 40. Como un Sannin legendario, tus recompensas ahora son recurrentes y mayores; la próxima exacta aparece más abajo.</div>
+      </if>
+    </div>
+
+    <!-- Racha de temporada -->
+    <div class="rd-section">
+      <div class="rd-head"><span class="rd-head__title">Racha de temporada</span></div>
+      <div class="rd-temporada">
+        <div class="rd-temporada__top">
+          <span class="rd-temporada__count">{$recompensas_temporada_maxima}</span>
+          <span class="rd-temporada__meta">/ 40 hacia la racha veterana</span>
+        </div>
+        <div class="rd-bar">
+          <div class="rd-bar__fill" style="width: {$temporada_pct}%;"></div>
+          <span class="rd-bar__tick" style="left:12.5%"></span>
+          <span class="rd-bar__tick" style="left:25%"></span>
+          <span class="rd-bar__tick" style="left:37.5%"></span>
+          <span class="rd-bar__tick" style="left:50%"></span>
+          <span class="rd-bar__tick" style="left:62.5%"></span>
+          <span class="rd-bar__tick" style="left:75%"></span>
+          <span class="rd-bar__tick" style="left:87.5%"></span>
+        </div>
+        <div class="rd-temporada__legend">Cada recompensa que reclamas sube tu racha de temporada.</div>
+      </div>
+    </div>
+
+    <!-- Posts -->
+    <div class="rd-section">
+      <div class="rd-head"><span class="rd-head__title">Posts en las últimas 48 horas</span></div>
+      <div class="rd-posts<if $num_posts >= 1 then> is-ok</if>">
+        <div class="rd-posts__badge"><if $num_posts >= 1 then>✓<else>{$num_posts}</if></div>
+        <div class="rd-posts__meta">
+          <span class="rd-posts__label">Requisito de la racha</span>
+          <span class="rd-posts__text">
+            <if $num_posts >= 1 then>
+              Llevas <strong>{$num_posts}</strong> post(s). ¡Misión del día completada, futuro Hokage!
+            <else>
+              Llevas <strong>0</strong> posts. Necesitas <strong>1 post</strong> para completar tu misión y reclamar.
+            </if>
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recompensa / reclamar -->
+    <div class="rd-section">
+      <div class="rd-head"><span class="rd-head__title">Recompensa de hoy</span></div>
+
+      <div class="rd-reward-box">
+        <div class="rd-reward-box__label">Próxima recompensa</div>
+        <div class="rd-reward-box__value">{$recompensa_items}</div>
+      </div>
+
+      <div class="rd-status">
+        <if $num_posts == 0 && $days_count == 0 then>
+          Aún no tienes posts en las últimas 48 horas. Un shinobi se forja en las misiones: escribe al menos <strong>1 post</strong> de rol y vuelve a reclamar. Hasta Naruto empezó atrapando a Tora el gato, ¡dattebayo!
+          <img class="rd-gif recompensa_image" src="https://media.giphy.com/media/nVvrI946ZBxS0/giphy.gif" />
+        </if>
+
+        <if $num_posts == 0 && $days_count >= 1 then>
+          ¡Misión cumplida, reclamaste tu recompensa! Pero llevas 0 posts desde entonces. Tienes <span id="mytiempo"></span> para escribir un post y mantener tu racha, o tu chakra se agotará y caerás de rango (contador a 0).
+          <img class="rd-gif recompensa_image" src="https://media.giphy.com/media/Iosc95v7CmeA0/giphy.gif" />
+        </if>
+
+        <if $num_posts >= 1 && $should_accept then>
+          ¡Tu misión está completa y la recompensa te espera! Recógela en <span id="mytiempo"></span> antes de que un nukenin se te adelante, o tu racha volverá a 0.
+          <div class="rd-claim-btn">
+            <form style="display:none" id="recform" method="post" action="recompensa_diaria.php">
+              <input type="text" id="rec_ready" name="rec_ready" value="false">
+            </form>
+            <input id="rd-claim" type="button"
+              onclick="javascript: document.getElementById('rec_ready').value = 'true'; document.getElementById('recform').submit();"
+              value="Reclamar">
+          </div>
+          <img class="rd-gif recompensa_image" src="https://media.giphy.com/media/1dMlPP0fybIZy/giphy.gif" />
+        </if>
+
+        <if $num_posts >= 1 && !$should_accept then>
+          ¡Buen trabajo, shinobi! Pero el pergamino de tu recompensa aún se está sellando: espera <span id="mytiempo"></span> para reclamarla. Paciencia... ni Itachi dominó el Sharingan en un día.
+          <img class="rd-gif recompensa_image" src="https://media.giphy.com/media/Yv6RcuiyHYmn6/giphy.gif" />
+        </if>
+
+        <if $days_count >= 2 then>
+          <br><br>Has reclamado la recompensa {$days_count} veces seguidas. Tu Voluntad de Fuego arde con fuerza, {$nombre}. ¡Ese es el camino del ninja!
+        </if>
+        <if $days_count == 1 then>
+          <br><br>Has reclamado la recompensa 1 vez. El camino del ninja apenas comienza, ¡dattebayo!
+        </if>
+      </div>
+    </div>
+
+  </div>
+
+  <if $log_var != '' then><script>alert(`{$log_var}`);</script></if>
+  {$reload_script}
+  {$footer}
+
+  <script>
+    (function() {
+      var el = document.getElementById('mytiempo');
+      if (!el) { return; }
+
+      var time_left = {$time_left};
+      var one_minute = 60;
+      var one_hour = one_minute * 60;
+      var one_day = one_hour * 24;
+      var timer;
+
+      function calcularSegundos() {
+        var days = Math.floor(time_left / one_day);
+        var hours = Math.floor((time_left % one_day) / one_hour);
+        var minutes = Math.floor((time_left % one_hour) / one_minute);
+        var seconds = Math.floor((time_left % one_minute));
+
+        var out = '';
+        if (days >= 1) { out += days + ' día, '; }
+        out += hours + ' horas, ' + minutes + ' minutos y ' + seconds + ' segundos';
+        el.innerHTML = out;
+
+        time_left = time_left - 1;
+        if (time_left < 0) {
+          clearInterval(timer);
+          location.reload();
+        }
+      }
+
+      calcularSegundos();
+      timer = setInterval(calcularSegundos, 1000);
+    })();
+  </script>
+
+</body>
+
+</html>

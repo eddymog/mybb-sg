@@ -1,0 +1,81 @@
+<html>
+<head>
+  <title>{$thread['subject']}</title>
+  {$headerinclude}
+  {$can_link}
+  <script type="text/javascript">
+    var quickdelete_confirm       = "{$lang->quickdelete_confirm}";
+    var quickrestore_confirm      = "{$lang->quickrestore_confirm}";
+    var allowEditReason           = "{$mybb->settings['alloweditreason']}";
+    lang.save_changes             = "{$lang->save_changes}";
+    lang.cancel_edit              = "{$lang->cancel_edit}";
+    lang.quick_edit_update_error  = "{$lang->quick_edit_update_error}";
+    lang.quick_reply_post_error   = "{$lang->quick_reply_post_error}";
+    lang.quick_delete_error       = "{$lang->quick_delete_error}";
+    lang.quick_delete_success     = "{$lang->quick_delete_success}";
+    lang.quick_delete_thread_success = "{$lang->quick_delete_thread_success}";
+    lang.quick_restore_error      = "{$lang->quick_restore_error}";
+    lang.quick_restore_success    = "{$lang->quick_restore_success}";
+    lang.editreason               = "{$lang->postbit_editreason}";
+    lang.post_deleted_error       = "{$lang->post_deleted_error}";
+    lang.softdelete_thread        = "{$lang->soft_delete_thread}";
+    lang.restore_thread           = "{$lang->restore_thread}";
+  </script>
+  <script type="text/javascript" src="{$mybb->asset_url}/jscripts/report.js?ver=1820"></script>
+  <script src="{$mybb->asset_url}/jscripts/jeditable/jeditable.min.js"></script>
+  <script type="text/javascript" src="{$mybb->asset_url}/jscripts/thread.js?ver=1827"></script>
+</head>
+<body>
+  {$codebutquickedt}
+  {$header}
+  {$threadnotesbox}
+  {$pollbox}
+
+  <!-- Top controls: pagination + new reply -->
+  <div class="thread_Controls">
+    <div>{$multipage}</div>
+    <div class="right_controls">
+      <a class="thread_reply_btn" href="newreply.php?tid={$tid}">{$lang->new_reply}</a>
+    </div>
+  </div>
+
+  <!-- Thread body -->
+  <div class="post_container">
+    <div class="thread_title">{$thread['subject']}</div>
+    <div class="posts_container">
+      <div class="posts">{$posts}</div>
+    </div>
+  </div>
+
+  <!-- Bottom controls: pagination + new reply + moderation -->
+  <div class="thread_bottom_controls">
+    <div class="bottom_controls">
+      <div>{$multipage}</div>
+      <div class="right_controls">
+        <a class="thread_reply_btn" href="newreply.php?tid={$tid}">{$lang->new_reply}</a>
+      </div>
+    </div>
+    <div class="thread_footer">
+      <div class="thread_footer_tools">
+        {$moderationoptions}
+        {$forumjump}
+      </div>
+      {$usersbrowsing}
+    </div>
+  </div>
+
+  <br class="clear">
+  <a name="switch" id="switch"></a><!-- {quickreply} -->
+  {$threadexbox}
+  {$similarthreads}
+  {$footer}
+
+  <script type="text/javascript">
+    var thread_deleted = "{$thread_deleted}";
+    if (thread_deleted == "1") {
+      $("#quick_reply_form, .new_reply_button, .thread_tools, .inline_rating").hide();
+      $("#moderator_options_selector option.option_mirage").attr("disabled", "disabled");
+    }
+  </script>
+</body>
+</html>

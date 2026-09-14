@@ -1,0 +1,51 @@
+<html>
+
+<head>
+  <title>Modificar Objetos</title>
+  {$headerinclude}
+</head>
+
+<body>
+  {$header}
+  <div class="fondo-blanco">
+    <if $objeto_id == '' then>
+      Objeto ID*<br><input type="text" placeholder="1" required id='objeto_id'><button
+        onclick=onClickTid()>Apachúrrame</button><br><br>
+    </if>
+	<if $objeto_id !='' then>
+      Objeto ID<br><input type="text" value='{$objeto_id}' disabled><br>
+        <form method="post" action="/sg/admin/modificar_objetos.php" name="crear_objetos" id="crear_objetos">
+        <div style="display: none">
+           <input type="text" name="objeto_id_old" value="{$objeto_id}">
+        </div><br>
+        Nombre de técnica*: <input value="{$objeto['nombre']}" type="text" name="nombre" id="nombre" required /><br>
+        Objeto ID*: <input value="{$objeto_id}" type="text" name="objeto_id" id="objeto_id" required /><br>
+        Tipo*: <input value="{$objeto['tipo']}" type="text" name="tipo" id="tipo" required /><br>
+        Categoría: <input value="{$objeto['categoria']}" type="text" name="categoria" id="categoria" /><br>
+		Coste:<br>
+		<textarea style="width: 350px;height: 40px;" name="coste">{$objeto['coste']}</textarea><br>
+        Descripcion*:<br>
+        <textarea style="width: 350px;height: 125px;" name="descripcion" minlength="1" required>{$objeto['descripcion']}</textarea><br>
+        Miembro de Staff: <input type="text" name="staff" required><br>
+        Razon: <input type="text" name="razon" required><br><br>
+        <input type="submit" value="Modificar">
+      </form>
+	
+	
+    </if>
+
+  </div>
+  {$footer}
+</body>
+<if $log_var !='' then><script>alert(`{$log_var}`);</script></if>
+{$reload_script}
+<script>
+  function onClickTid() {
+    const objetoId = document.getElementById('objeto_id').value;
+    if (objetoId) {
+		    window.location.href = window.location.pathname + '?objeto_id=' + objetoId;		
+	}
+  }
+</script>
+
+</html>

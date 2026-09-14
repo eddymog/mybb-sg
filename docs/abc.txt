@@ -1,0 +1,64 @@
+
+
+
+
+
+Recompensas para Usuarios No Narradores Oficiales
+
+Misiones Normales:
+Rango E: 250 Ryos, 35 de Exp y un Pergamino Rango E.
+Rango D: 500 Ryos, 50 de Exp y un Pergamino Rango E.
+Rango C: 1,000 Ryos, 65 de Exp y un Pergamino Rango D.
+Rango B: 2,000 Ryos, 80 de Exp y un Pergamino Rango D
+Rango A: 3,000 Ryos, 90 de Exp y un Pergamino Rango C.
+Rango A+: 4,000 Ryos, 105 de Exp y un Pergamino Rango C.
+Rango S: 5,000 Ryos, 140 de Exp y un Pergamino Rango B.
+
+
+Recompensas para Narradores Oficiales
+
+Misiones Normales:
+Rango E: 500 Ryos, 35 de Exp y un Pergamino Rango E.
+Rango D: 750 Ryos, 50 de Exp y un Pergamino Rango D.
+Rango C: 1,500 Ryos, 65 de Exp y un Pergamino Rango C.
+Rango B: 2,500 Ryos, 80 de Exp y un Pergamino Rango B.
+Rango A: 3,500 Ryos, 90 de Exp y un Pergamino Rango A.
+Rango A+: 4,500 Ryos, 105 de Exp y un Pergamino Rango A+
+Rango S: 5,500 Ryos, 140 de Exp y un Pergamino Rango S.
+
+Misiones de Guerra:
+Rango B: 3,000 Ryos, 20 Tobis, 100 de Exp y un Pergamino Rango B.
+Rango A: 4,000 Ryos, 30 Tobis, 120 de Exp y un Pergamino Rango A.
+Rango A+: 5,000 Ryos, 50 Tobis, 130 de Exp y un Pergamino Rango A+.
+Rango S: 6,000 Ryos, 80 Tobis, 160 de Exp y un Pergamino Rango S.
+
+Tramas Oficiales:
+2,500 Ryos, 20 Tobis y 100 de Exp.
+
+Eventos:
+2,500 Ryos, 20 Tobis y 100 de Exp.
+
+Side Quest:
+2,500 Ryos, 20 Tobis y 100 de Exp por tanda.
+
+
+
+Recompensas para usuarios:
+
+Misiones Normales :
+
+Rango E (Nivel 1): 250 Ryos, 2 Tobis, 50 de Exp, 3 Posts mínimos
+Rango D (Nivel 4): 500 Ryos, 5 Tobis, 70 de Exp, 4 Posts mínimos
+Rango C (Nivel 7): 1000 Ryos, 10 Tobis, 90 de Exp, 5 Posts mínimos
+Rango B (Nivel 10): 2000 Ryos, 20 Tobis, 110 de Exp, 6 Posts mínimos
+Rango A (Nivel 13): 3000 Ryos, 30 Tobis, 130 de Exp, 8 Posts mínimos
+Rango A+ (Nivel 14): 4000 Ryos, 45 Tobis, 150 de Exp, 10 Posts mínimos
+Rango S (Nivel 17): 5000 Ryos, 60 Tobis, 200 de Exp, 12 Posts mínimos
+
+Misiones Autonarradas:
+
+Rango E: Desbloqueado desde nivel 1. Mínimo 500 palabras.
+Rango D: Desbloqueado desde nivel 5. Mínimo 750 palabras.
+Rango C: Desbloqueado desde nivel 10. Mínimo 1000 palabras.
+
+Límite: 1 misión autonarrada por semana.

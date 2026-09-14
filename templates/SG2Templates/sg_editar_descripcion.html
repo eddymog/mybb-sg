@@ -1,0 +1,592 @@
+<html>
+
+<head>
+  <title>Editar Descripción — Shinobi Gaiden</title>
+  {$headerinclude}
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Source+Serif+4:ital,wght@0,300;0,400;0,600;1,300&family=Zen+Old+Mincho:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+
+    /* ─── Page wrapper ─────────────────────────────────────────── */
+    #ed-page {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 0 0 60px;
+      color: var(--ink);
+      font-family: 'Source Serif 4', serif;
+    }
+
+    /* ─── Banner ────────────────────────────────────────────────── */
+    .ed-banner {
+      position: relative;
+      overflow: hidden;
+      background: var(--bg2);
+      border-bottom: 0.5px solid var(--border);
+      padding: 40px 40px 32px;
+      display: flex;
+      align-items: flex-end;
+      gap: 24px;
+      min-height: 140px;
+    }
+
+    .ed-banner::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        repeating-linear-gradient(13deg,  transparent 0, transparent 24px, var(--fiber) 24px, var(--fiber) 25px),
+        repeating-linear-gradient(82deg,  transparent 0, transparent 36px, var(--fiber) 36px, var(--fiber) 37px),
+        repeating-linear-gradient(151deg, transparent 0, transparent 19px, var(--fiber) 19px, var(--fiber) 19.5px);
+    }
+
+    .ed-banner::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background:
+        radial-gradient(ellipse at 100% 0%,  rgba(123,74,184,0.07) 0%, transparent 55%),
+        radial-gradient(ellipse at 0%  100%, rgba(192,88,42,0.05)  0%, transparent 40%);
+    }
+
+    .ed-banner-kanji {
+      position: absolute;
+      right: 28px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-family: 'Zen Old Mincho', serif;
+      font-size: 160px;
+      font-weight: 700;
+      line-height: 1;
+      color: var(--plum);
+      opacity: 0.05;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    .ed-hanko {
+      position: relative;
+      z-index: 1;
+      width: 60px;
+      height: 60px;
+      border: 1.5px solid var(--oxide);
+      border-radius: 50%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: rgba(192,88,42,0.07);
+      flex-shrink: 0;
+    }
+
+    .ed-hanko-kanji {
+      font-family: 'Zen Old Mincho', serif;
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--oxide);
+      line-height: 1;
+    }
+
+    .ed-hanko-sub {
+      font-family: 'Cinzel', serif;
+      font-size: 7px;
+      letter-spacing: 1.5px;
+      color: var(--oxide);
+      text-transform: uppercase;
+      margin-top: 2px;
+    }
+
+    .ed-banner-text { position: relative; z-index: 1; }
+
+    .ed-banner-label {
+      font-family: 'Cinzel', serif;
+      font-size: 9px;
+      font-weight: 400;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--mist);
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .ed-banner-label::before {
+      content: '';
+      display: inline-block;
+      width: 32px;
+      height: 1.5px;
+      background: var(--oxide);
+    }
+
+    .ed-banner-title {
+      font-family: 'Cinzel', serif;
+      font-size: 28px;
+      font-weight: 900;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--ink);
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+
+    .ed-banner-subtitle {
+      font-family: 'Cinzel', serif;
+      font-size: 9px;
+      font-weight: 400;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      color: var(--stone);
+    }
+
+    /* ─── Form sections ──────────────────────────────────────────── */
+    #ed-form { padding: 0; }
+
+    .ed-section {
+      border-bottom: 0.5px solid var(--border);
+      padding: 32px 40px;
+      background: var(--bg2);
+    }
+
+    .ed-section:nth-child(odd) { background: var(--bg); }
+
+    .ed-section-head {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .ed-step-badge {
+      font-family: 'Cinzel', serif;
+      font-size: 9px;
+      font-weight: 900;
+      letter-spacing: 1px;
+      color: var(--oxide);
+      flex-shrink: 0;
+      line-height: 1;
+      padding: 4px 8px;
+      border: 0.5px solid var(--oxide);
+      background: rgba(192,88,42,0.06);
+    }
+
+    .ed-step-name {
+      font-family: 'Cinzel', serif;
+      font-size: 15px;
+      font-weight: 900;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      color: var(--ink);
+      line-height: 1;
+    }
+
+    .ed-section-head::after {
+      content: '';
+      flex: 1;
+      height: 0.5px;
+      background: var(--border);
+    }
+
+    /* ─── Field label ────────────────────────────────────────────── */
+    .ed-field-label {
+      display: block;
+      font-family: 'Cinzel', serif;
+      font-size: 8px;
+      font-weight: 700;
+      letter-spacing: 2.2px;
+      text-transform: uppercase;
+      color: var(--mist);
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .ed-field-label::before {
+      content: '';
+      display: inline-block;
+      width: 3px;
+      height: 10px;
+      background: var(--oxide);
+      flex-shrink: 0;
+    }
+
+    .ed-required { color: var(--oxide); }
+
+    /* ─── Text input ─────────────────────────────────────────────── */
+    .ed-input {
+      width: 100%;
+      max-width: 360px;
+      box-sizing: border-box;
+      padding: 9px 12px;
+      background: var(--bg3);
+      border: none;
+      border-bottom: 1.5px solid var(--border);
+      border-left: 1.5px solid var(--border);
+      color: var(--ink);
+      font-family: 'Source Serif 4', serif;
+      font-size: 13px;
+      transition: border-color 0.15s, background 0.15s;
+      outline: none;
+    }
+
+    .ed-input:focus {
+      border-bottom-color: var(--plum3);
+      border-left-color: var(--plum3);
+      background: var(--bg2);
+    }
+
+    /* ─── Textarea ───────────────────────────────────────────────── */
+    .ed-textarea-group { margin-bottom: 24px; }
+    .ed-textarea-group:last-child { margin-bottom: 0; }
+
+    #ed-form textarea {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 12px 14px;
+      background: var(--bg3);
+      border: none;
+      border-bottom: 1.5px solid var(--border);
+      border-left: 1.5px solid var(--border);
+      color: var(--ink);
+      font-family: 'Source Serif 4', serif;
+      font-size: 13px;
+      font-weight: 300;
+      line-height: 1.9;
+      text-align: justify;
+      resize: vertical;
+      transition: border-color 0.15s, background 0.15s;
+      outline: none;
+    }
+
+    #ed-form textarea:focus {
+      border-bottom-color: var(--plum3);
+      border-left-color: var(--plum3);
+      background: var(--bg2);
+    }
+
+    #ed-form textarea::placeholder {
+      color: var(--mist);
+      font-style: italic;
+      font-size: 12px;
+    }
+
+    .ed-ta-small  { height: 72px;  min-height: 72px; }
+    .ed-ta-medium { height: 140px; min-height: 140px; }
+    .ed-ta-large  { height: 200px; min-height: 200px; }
+
+    .ed-fields-wide {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px 24px;
+    }
+
+    /* ─── Staff panel ────────────────────────────────────────────── */
+    .ed-staff {
+      border-bottom: 0.5px solid var(--border);
+      padding: 28px 40px;
+      background: var(--bg3);
+    }
+
+    .ed-staff-head {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .ed-staff-head::before {
+      content: '';
+      width: 3px;
+      height: 14px;
+      background: var(--plum2);
+      flex-shrink: 0;
+    }
+
+    .ed-staff-head::after {
+      content: '';
+      flex: 1;
+      height: 0.5px;
+      background: var(--border);
+    }
+
+    .ed-staff-title {
+      font-family: 'Cinzel', serif;
+      font-size: 9px;
+      font-weight: 900;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--plum2);
+    }
+
+    .ed-staff-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 6px;
+    }
+
+    .ed-staff-list li a {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border: 0.5px solid var(--border);
+      background: var(--bg2);
+      color: var(--stone);
+      font-family: 'Cinzel', serif;
+      font-size: 8px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      text-decoration: none;
+      transition: background 0.15s, border-color 0.15s, color 0.15s;
+    }
+
+    .ed-staff-list li a::before {
+      content: '';
+      width: 5px;
+      height: 5px;
+      background: var(--plum2);
+      clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+      flex-shrink: 0;
+    }
+
+    .ed-staff-list li a:hover {
+      background: var(--bg);
+      border-color: var(--plum3);
+      color: var(--ink);
+    }
+
+    /* ─── Submit strip ───────────────────────────────────────────── */
+    .ed-submit-section {
+      background: var(--bg2);
+      padding: 32px 40px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 20px;
+    }
+
+    .ed-submit-lore {
+      font-family: 'Cinzel', serif;
+      font-size: 9px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--mist);
+      flex: 1;
+    }
+
+    .ed-submit-lore strong {
+      color: var(--stone);
+      display: block;
+      font-size: 11px;
+      margin-bottom: 3px;
+    }
+
+    #guardar_ficha {
+      font-family: 'Cinzel', serif;
+      font-size: 10px;
+      font-weight: 900;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--lavender);
+      background: var(--plum);
+      border: none;
+      padding: 0 32px;
+      height: 42px;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.12s;
+      outline: none;
+    }
+
+    #guardar_ficha:hover  { background: var(--plum2); transform: translateY(-1px); }
+    #guardar_ficha:active { transform: translateY(0); }
+
+    /* ─── Responsive ─────────────────────────────────────────────── */
+    @media (max-width: 700px) {
+      .ed-banner        { padding: 24px 20px 20px; min-height: 100px; }
+      .ed-banner-title  { font-size: 20px; }
+      .ed-section       { padding: 24px 20px; }
+      .ed-fields-wide   { grid-template-columns: 1fr; }
+      .ed-submit-section { padding: 24px 20px; flex-direction: column; align-items: flex-start; }
+      .ed-staff         { padding: 24px 20px; }
+    }
+
+    @media (max-width: 440px) {
+      .ed-banner-kanji { display: none; }
+    }
+
+  </style>
+</head>
+
+<body>
+  {$header}
+
+  <div id="ed-page">
+
+    <div class="ed-banner">
+      <div class="ed-banner-kanji">描</div>
+      <div class="ed-hanko">
+        <span class="ed-hanko-kanji">忍</span>
+        <span class="ed-hanko-sub">SG</span>
+      </div>
+      <div class="ed-banner-text">
+        <div class="ed-banner-label">Shinobi Gaiden · Foro Rol</div>
+        <div class="ed-banner-title">Editar Descripción</div>
+        <div class="ed-banner-subtitle">Actualiza la información de tu personaje</div>
+      </div>
+    </div>
+
+    <form method="post" action="/sg/nueva_descripcion.php" name="newficha" id="ed-form">
+
+      <!-- Hidden fields -->
+      <div style="display:none;">
+        <input type="text" value="false" id="comp" name="submit">
+        <input type="text" id="userid" name="uid" value="{$mybb->user['uid']}">
+      </div>
+
+      <!-- ── 01 · Identidad ──────────────────────────────────────── -->
+      <div class="ed-section">
+        <div class="ed-section-head">
+          <span class="ed-step-badge">01</span>
+          <span class="ed-step-name">Identidad</span>
+        </div>
+
+        <div class="ed-textarea-group">
+          <label class="ed-field-label" for="alias">Apodo / Alias</label>
+          <input class="ed-input" type="text" id="alias" name="alias" value="{$ficha['apodo']}" placeholder="Opcional">
+        </div>
+
+        <div class="ed-textarea-group" style="margin-bottom:0;">
+          <label class="ed-field-label" for="fisico_de_pj">
+            Físico del personaje <span class="ed-required">*</span>
+            <span style="font-weight:400; color:var(--mist); letter-spacing:1px;">&nbsp;— serie / juego de origen</span>
+          </label>
+          <textarea id="fisico_de_pj" name="fisico_de_pj" class="ed-ta-small" required
+            placeholder="Nombre del físico — Serie / Juego de donde proviene">{$ficha['fisico_de_pj']}</textarea>
+        </div>
+      </div>
+
+      <!-- ── 02 · Descripción ────────────────────────────────────── -->
+      <div class="ed-section">
+        <div class="ed-section-head">
+          <span class="ed-step-badge">02</span>
+          <span class="ed-step-name">Descripción</span>
+        </div>
+
+        <div class="ed-textarea-group">
+          <label class="ed-field-label" for="phi">
+            Apariencia física <span class="ed-required">*</span>
+            <span style="font-weight:400; color:var(--mist); letter-spacing:1px;">&nbsp;— mín. 200 caracteres</span>
+          </label>
+          <textarea id="phi" name="phi" class="ed-ta-large" minlength="200" required
+            placeholder="Describe el aspecto físico del personaje con detalle…">{$ficha['apariencia']}</textarea>
+        </div>
+
+        <div class="ed-textarea-group" style="margin-bottom:0;">
+          <label class="ed-field-label" for="psi">
+            Personalidad <span class="ed-required">*</span>
+            <span style="font-weight:400; color:var(--mist); letter-spacing:1px;">&nbsp;— mín. 200 caracteres</span>
+          </label>
+          <textarea id="psi" name="psi" class="ed-ta-large" minlength="200" required
+            placeholder="¿Cómo es tu personaje? ¿Cómo actúa, piensa y siente?…">{$ficha['personalidad']}</textarea>
+        </div>
+      </div>
+
+      <!-- ── 03 · Carácter ───────────────────────────────────────── -->
+      <div class="ed-section">
+        <div class="ed-section-head">
+          <span class="ed-step-badge">03</span>
+          <span class="ed-step-name">Carácter</span>
+        </div>
+
+        <div class="ed-fields-wide">
+          <div class="ed-textarea-group" style="margin-bottom:0;">
+            <label class="ed-field-label" for="virtudes">Virtudes</label>
+            <textarea id="virtudes" name="virtudes" class="ed-ta-medium"
+              placeholder="Cualidades y puntos fuertes…">{$ficha['virtudes']}</textarea>
+          </div>
+          <div class="ed-textarea-group" style="margin-bottom:0;">
+            <label class="ed-field-label" for="defectos">Defectos</label>
+            <textarea id="defectos" name="defectos" class="ed-ta-medium"
+              placeholder="Fallos y debilidades del personaje…">{$ficha['defectos']}</textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── 04 · Historia ──────────────────────────────────────── -->
+      <div class="ed-section">
+        <div class="ed-section-head">
+          <span class="ed-step-badge">04</span>
+          <span class="ed-step-name">Historia</span>
+        </div>
+
+        <div class="ed-textarea-group">
+          <label class="ed-field-label" for="history">
+            Biografía <span class="ed-required">*</span>
+            <span style="font-weight:400; color:var(--mist); letter-spacing:1px;">&nbsp;— mín. 500 caracteres</span>
+          </label>
+          <textarea id="history" name="history" class="ed-ta-large" minlength="500" required
+            placeholder="El pasado del personaje, su formación como shinobi…"
+            style="height:220px; min-height:220px;">{$ficha['historia']}</textarea>
+        </div>
+
+        <div class="ed-textarea-group" style="margin-bottom:0;">
+          <label class="ed-field-label" for="extra">Información extra <span style="font-weight:400;">(opcional)</span></label>
+          <textarea id="extra" name="extra" class="ed-ta-medium"
+            placeholder="- Le gusta el ramen.&#10;- Tiene miedo a los gatos.">{$ficha['extra']}</textarea>
+        </div>
+      </div>
+
+      <!-- ── 05 · Registro ──────────────────────────────────────── -->
+      <div class="ed-section">
+        <div class="ed-section-head">
+          <span class="ed-step-badge">05</span>
+          <span class="ed-step-name">Registro</span>
+        </div>
+
+        <div class="ed-textarea-group" style="margin-bottom:0;">
+          <label class="ed-field-label" for="frase">Frase del personaje <span style="font-weight:400;">(opcional)</span></label>
+          <textarea id="frase" name="frase" class="ed-ta-small"
+            placeholder="Un verdadero héroe siempre llega tarde.">{$ficha['frase']}</textarea>
+        </div>
+      </div>
+
+      <!-- Staff panel -->
+      <if $g_is_staff then>
+      <div class="ed-staff">
+        <div class="ed-staff-head">
+          <span class="ed-staff-title">Área Staff</span>
+        </div>
+        <ul class="ed-staff-list">
+          <li><a href="/sg/admin/ficha_atributos.php?fid={$uid}">Modificar atributos de ficha</a></li>
+          <li><a href="/sg/admin/modificar_ficha.php?fid={$uid}">Modificar variables de la ficha</a></li>
+          <li><a href="/sg/admin/ficha_objetos.php?fid={$uid}&accion=Añadir">Agregar objetos</a></li>
+          <li><a href="/sg/admin/ficha_objetos.php?fid={$uid}&accion=Remover">Quitar objetos</a></li>
+          <li><a href="/sg/admin/ficha_tecnicas.php?fid={$uid}&accion=Añadir">Agregar técnicas</a></li>
+          <li><a href="/sg/admin/ficha_tecnicas.php?fid={$uid}&accion=Remover">Quitar técnicas</a></li>
+        </ul>
+      </div>
+      </if>
+
+      <!-- Submit -->
+      <div class="ed-submit-section">
+        <div class="ed-submit-lore">
+          <strong>¿Todo listo?</strong>
+          Los cambios se aplicarán de inmediato a tu ficha.
+        </div>
+        <input id="guardar_ficha" class="button" type="submit"
+          onclick="document.getElementById('comp').value = 'true';"
+          value="Guardar Cambios">
+      </div>
+
+    </form>
+  </div>
+
+  {$footer}
+</body>
+
+</html>

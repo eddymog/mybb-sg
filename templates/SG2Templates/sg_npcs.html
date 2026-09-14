@@ -1,0 +1,185 @@
+<html>
+
+<head>
+  <title>Bingo Book</title>
+  {$headerinclude}
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Noto+Serif+JP:wght@300;400;700&display=swap" rel="stylesheet">
+  <style>
+    .sg-bb {
+      --bg: #0f0c18; --bg2: #130f1e; --bg3: #171224;
+      --border: rgba(156, 107, 204, 0.12);
+      --border-strong: rgba(156, 107, 204, 0.22);
+      --ink: #e8dff8; --plum: #7b4ab8; --plum2: #9c6bcc; --plum3: #b890e0;
+      --stone: #8a7a9a; --mist: #5a4a6a; --oxide: #c0582a; --lavender: #ede0fa;
+      max-width: 1100px; margin: 24px auto 44px; padding: 0 16px;
+      color: var(--ink); font-family: 'Noto Serif JP', serif;
+    }
+
+    .sg-bb-shell {
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), transparent 16%), var(--bg2);
+      border: 0.5px solid var(--border); overflow: hidden;
+    }
+    .sg-bb-header {
+      display: flex; flex-wrap: wrap; align-items: center; gap: 14px 20px;
+      padding: 20px 24px; background: var(--bg3); border-bottom: 0.5px solid var(--border);
+    }
+    .sg-bb-titles { display: flex; align-items: center; gap: 12px; }
+    .sg-bb-titles::before { content: ''; width: 3px; height: 30px; background: var(--oxide); flex-shrink: 0; }
+    .sg-bb-eyebrow {
+      font-family: 'Cinzel', serif; font-size: 8px; font-weight: 700; letter-spacing: 2px;
+      text-transform: uppercase; color: var(--plum3);
+    }
+    .sg-bb-title {
+      margin: 2px 0 0; font-family: 'Cinzel', serif; font-size: 19px; font-weight: 900;
+      letter-spacing: 1px; text-transform: uppercase; color: var(--ink); line-height: 1;
+    }
+    .sg-bb-search {
+      margin-left: auto; width: 240px; max-width: 100%; height: 38px; padding: 0 12px;
+      background: var(--bg); border: 0.5px solid var(--border-strong); color: var(--ink);
+      font-family: 'Noto Serif JP', serif; font-size: 14px; box-sizing: border-box;
+    }
+    .sg-bb-search:focus { outline: none; border-color: var(--plum3); }
+
+    /* Chips de afiliación */
+    .sg-bb-chips { display: flex; flex-wrap: wrap; gap: 8px; padding: 16px 24px 4px; }
+    .sg-bb-chip {
+      padding: 6px 14px; background: transparent; border: 0.5px solid var(--border-strong);
+      color: var(--stone); font-family: 'Cinzel', serif; font-size: 9px; font-weight: 700;
+      letter-spacing: 1.3px; text-transform: uppercase; cursor: pointer; transition: all 0.15s;
+    }
+    .sg-bb-chip:hover { color: var(--ink); border-color: var(--plum3); }
+    .sg-bb-chip.is-active {
+      color: #fff; background: var(--accent, var(--plum));
+      border-color: var(--accent, var(--plum));
+    }
+
+    .sg-bb-body { padding: 16px 24px 24px; }
+
+    .sg-bb-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 14px;
+    }
+
+    /* Tarjeta bingo book */
+    .sg-bb-card {
+      display: flex; flex-direction: column; border: 0.5px solid var(--border);
+      border-top: 2px solid var(--accent, var(--plum)); background: var(--bg);
+      overflow: hidden; text-decoration: none; color: inherit;
+      transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s;
+    }
+    .sg-bb-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 26px rgba(0,0,0,0.32);
+      border-color: var(--accent, var(--plum3));
+    }
+
+    .sg-bb-media { position: relative; aspect-ratio: 3 / 4; background: var(--bg3); overflow: hidden; }
+    .sg-bb-media::before {
+      content: '人'; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+      font-family: 'Noto Serif JP', serif; font-size: 60px; color: rgba(156, 107, 204, 0.16); pointer-events: none;
+    }
+    .sg-bb-img {
+      position: relative; z-index: 1; width: 100%; height: 100%; object-fit: cover; display: block; background: var(--bg3);
+    }
+    .sg-bb-afil {
+      position: absolute; z-index: 2; top: 8px; left: 8px; padding: 3px 9px;
+      background: var(--accent, var(--plum)); color: #fff;
+      font-family: 'Cinzel', serif; font-size: 8px; font-weight: 700; letter-spacing: 1.3px; text-transform: uppercase;
+    }
+
+    .sg-bb-body-card { }
+    .sg-bb-card .sg-bb-body { padding: 0; }
+    .sg-bb-card > .sg-bb-body { padding: 12px 13px; display: flex; flex-direction: column; gap: 6px; }
+    .sg-bb-name {
+      margin: 0; font-family: 'Cinzel', serif; font-size: 14px; font-weight: 700; letter-spacing: 0.5px; color: var(--ink);
+    }
+    .sg-bb-meta { font-size: 12px; color: var(--stone); line-height: 1.5; }
+    .sg-bb-rank {
+      display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; margin-top: 2px;
+      padding-top: 8px; border-top: 0.5px solid var(--border);
+    }
+    .sg-bb-rango {
+      font-family: 'Cinzel', serif; font-size: 9px; font-weight: 700; letter-spacing: 1px;
+      text-transform: uppercase; color: var(--accent, var(--plum3));
+    }
+    .sg-bb-nivel {
+      margin-left: auto; font-family: 'Cinzel', serif; font-size: 10px; font-weight: 700; color: var(--stone);
+    }
+
+    .sg-bb-empty, .sg-bb-noresults {
+      padding: 36px 20px; text-align: center; color: var(--mist); font-size: 14px;
+      border: 0.5px solid var(--border); background: var(--bg);
+    }
+    .sg-bb-noresults { display: none; margin-top: 12px; }
+
+    @media (max-width: 640px) {
+      .sg-bb-search { margin-left: 0; width: 100%; }
+      .sg-bb-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+    }
+  </style>
+</head>
+
+<body>
+  {$header}
+  <main class="sg-bb">
+    <div class="sg-bb-shell">
+      <div class="sg-bb-header">
+        <div class="sg-bb-titles">
+          <div>
+            <div class="sg-bb-eyebrow">Registro Shinobi</div>
+            <h1 class="sg-bb-title">Bingo Book</h1>
+          </div>
+        </div>
+        <input class="sg-bb-search" type="text" id="sg-bb-search" placeholder="Buscar por nombre, clan o cargo…" oninput="sgBBFilter()">
+      </div>
+
+      <div class="sg-bb-chips" id="sg-bb-chips">
+        {$chips}
+      </div>
+
+      <div class="sg-bb-body">
+        <div class="sg-bb-grid" id="sg-bb-grid">
+          {$cards}
+        </div>
+        <div class="sg-bb-noresults" id="sg-bb-noresults">Ningún NPC coincide con la búsqueda.</div>
+      </div>
+    </div>
+  </main>
+  {$footer}
+
+  <script>
+    var sgBBAfil = '';
+
+    function sgImgFallback(img) {
+      if (!img.dataset.fallback) { img.dataset.fallback = '1'; img.src = '/images/sg/objeto_default.png'; }
+      else { img.style.display = 'none'; }
+    }
+
+    function sgBBFilterAfil(btn) {
+      sgBBAfil = btn.getAttribute('data-afil') || '';
+      document.querySelectorAll('.sg-bb-chip').forEach(function (c) { c.classList.remove('is-active'); });
+      btn.classList.add('is-active');
+      sgBBFilter();
+    }
+
+    function sgBBFilter() {
+      var q = document.getElementById('sg-bb-search').value.trim().toLowerCase();
+      var cards = document.querySelectorAll('.sg-bb-card');
+      var visibles = 0;
+      cards.forEach(function (card) {
+        var name = card.getAttribute('data-name') || '';
+        var afil = card.getAttribute('data-afil') || '';
+        var okText = q === '' || name.indexOf(q) !== -1;
+        var okAfil = sgBBAfil === '' || afil === sgBBAfil;
+        var match = okText && okAfil;
+        card.style.display = match ? '' : 'none';
+        if (match) visibles++;
+      });
+      var nores = document.getElementById('sg-bb-noresults');
+      if (nores) { nores.style.display = (visibles === 0) ? 'block' : 'none'; }
+    }
+  </script>
+</body>
+
+</html>

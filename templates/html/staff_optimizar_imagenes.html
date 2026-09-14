@@ -1,0 +1,187 @@
+<html>
+
+<head>
+  <title>Optimizar Imágenes</title>
+  {$headerinclude}
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Noto+Serif+JP:wght@300;400;700&display=swap" rel="stylesheet">
+  <style>
+    .sg-admin {
+      --bg: #0f0c18; --bg2: #130f1e; --bg3: #171224;
+      --border: rgba(156, 107, 204, 0.12);
+      --border-strong: rgba(156, 107, 204, 0.22);
+      --ink: #e8dff8; --plum: #7b4ab8; --plum2: #9c6bcc; --plum3: #b890e0;
+      --stone: #8a7a9a; --mist: #5a4a6a; --oxide: #c0582a; --lavender: #ede0fa;
+      --green: #4f9d69;
+      max-width: 860px;
+      margin: 24px auto 40px;
+      padding: 0 16px;
+      color: var(--ink);
+      font-family: 'Noto Serif JP', serif;
+    }
+
+    .sg-admin-card {
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), transparent 16%), var(--bg2);
+      border: 0.5px solid var(--border);
+      overflow: hidden;
+    }
+
+    .sg-admin-head {
+      display: flex; align-items: center; gap: 12px;
+      padding: 18px 22px; background: var(--bg3); border-bottom: 0.5px solid var(--border);
+    }
+    .sg-admin-head::before { content: ''; width: 3px; height: 20px; background: var(--oxide); flex-shrink: 0; }
+    .sg-admin-head h1 { margin: 0; font-family: 'Cinzel', serif; font-size: 15px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; color: var(--ink); }
+
+    .sg-admin-body { padding: 22px; }
+
+    .sg-section-label {
+      margin: 0 0 8px; font-family: 'Cinzel', serif; font-size: 8px; font-weight: 700;
+      letter-spacing: 2px; text-transform: uppercase; color: var(--plum3);
+    }
+    .sg-label {
+      font-family: 'Cinzel', serif; font-size: 8px; font-weight: 700;
+      letter-spacing: 1.5px; text-transform: uppercase; color: var(--mist);
+    }
+
+    /* Métricas */
+    .sg-opt-stats { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; }
+    .sg-opt-stat { flex: 1; min-width: 120px; padding: 12px 14px; border: 0.5px solid var(--border); background: var(--bg3); }
+    .sg-opt-stat-v { font-family: 'Cinzel', serif; font-size: 20px; font-weight: 900; color: var(--ink); }
+    .sg-opt-stat-v--warn { color: var(--oxide); }
+    .sg-opt-stat-v--ok { color: var(--green); }
+    .sg-opt-stat-k { margin-top: 3px; font-family: 'Cinzel', serif; font-size: 8px; font-weight: 700; letter-spacing: 1.3px; text-transform: uppercase; color: var(--mist); }
+
+    /* Formulario */
+    .sg-opt-form { padding: 16px; border: 0.5px solid var(--border); background: var(--bg3); }
+    .sg-opt-row { display: flex; flex-wrap: wrap; gap: 16px; margin-bottom: 14px; }
+    .sg-opt-field { display: flex; flex-direction: column; gap: 5px; }
+    .sg-opt-field input {
+      width: 110px; padding: 8px 10px; background: var(--bg); border: 0.5px solid var(--border-strong);
+      color: var(--ink); font-family: 'Noto Serif JP', serif; font-size: 13px; box-sizing: border-box;
+    }
+    .sg-opt-field input:focus { outline: none; border-color: var(--plum3); }
+
+    .sg-btn {
+      display: inline-flex; align-items: center; justify-content: center; height: 40px; padding: 0 22px;
+      background: var(--plum); border: none; color: var(--lavender);
+      font-family: 'Cinzel', serif; font-size: 9px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+      cursor: pointer; transition: background 0.15s; white-space: nowrap;
+    }
+    .sg-btn:hover { background: var(--plum2); }
+    .sg-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .sg-rules { margin: 14px 0 0; padding-left: 18px; color: var(--mist); font-size: 12px; line-height: 1.8; }
+
+    /* Reporte */
+    .sg-opt-report { margin-top: 24px; padding-top: 20px; border-top: 0.5px solid var(--border); }
+    .sg-opt-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12.5px; }
+    .sg-opt-table td { padding: 7px 10px; border-bottom: 0.5px solid var(--border); vertical-align: top; }
+    .sg-opt-table td:first-child { color: var(--ink); font-family: 'Noto Serif JP', serif; word-break: break-all; }
+    .sg-opt-ok td:last-child { color: var(--green); }
+    .sg-opt-error td:last-child { color: var(--oxide); }
+    .sg-opt-empty td { text-align: center; color: var(--mist); padding: 16px; }
+
+    .sg-msg {
+      margin-bottom: 18px; padding: 12px 14px; border: 0.5px solid var(--border-strong);
+      border-left-width: 2px; font-size: 13.5px; line-height: 1.6; color: var(--ink);
+    }
+    .sg-msg--ok { border-left-color: var(--green); background: rgba(79, 157, 105, 0.12); }
+
+    @media (max-width: 640px) {
+      .sg-opt-row { flex-direction: column; }
+      .sg-btn { width: 100%; }
+    }
+  </style>
+</head>
+
+<body>
+  {$header}
+  <main class="sg-admin">
+    <div class="sg-admin-card">
+      <div class="sg-admin-head">
+        <h1>Optimizar Imágenes</h1>
+      </div>
+      <div class="sg-admin-body">
+
+        <if $yaCorrio then>
+          <div class="sg-msg sg-msg--ok">
+            Listo. Optimizadas: <strong>{$resumenProcesadas}</strong> ·
+            Ya estaban hechas: <strong>{$resumenOmitidas}</strong> ·
+            GIF (sin tocar): <strong>{$resumenGif}</strong> ·
+            Errores: <strong>{$resumenErrores}</strong> ·
+            Espacio ahorrado: <strong>{$resumenAhorroMb} MB</strong>
+          </div>
+        </if>
+
+        <div class="sg-opt-stats">
+          <div class="sg-opt-stat">
+            <div class="sg-opt-stat-v">{$totalActual}</div>
+            <div class="sg-opt-stat-k">Imágenes totales</div>
+          </div>
+          <div class="sg-opt-stat">
+            <div class="sg-opt-stat-v">{$pesoActualMb} MB</div>
+            <div class="sg-opt-stat-k">Peso actual</div>
+          </div>
+          <div class="sg-opt-stat">
+            <div class="sg-opt-stat-v sg-opt-stat-v--warn">{$pendientes_v}</div>
+            <div class="sg-opt-stat-k">Pendientes de optimizar</div>
+          </div>
+          <div class="sg-opt-stat">
+            <div class="sg-opt-stat-v">{$pngReprocesables}</div>
+            <div class="sg-opt-stat-k">PNG procesados (reprocesables)</div>
+          </div>
+        </div>
+
+        <div class="sg-section-label">Optimizar imágenes existentes</div>
+        <form method="post" action="/sg/admin/optimizar_imagenes.php" class="sg-opt-form">
+          <input type="hidden" name="accion" value="optimizar">
+          <div class="sg-opt-row">
+            <div class="sg-opt-field">
+              <label class="sg-label" for="max_ancho">Ancho máximo (px)</label>
+              <input type="number" name="max_ancho" id="max_ancho" min="200" max="4000" value="{$maxAncho}">
+            </div>
+            <div class="sg-opt-field">
+              <label class="sg-label" for="calidad">Calidad (1-100)</label>
+              <input type="number" name="calidad" id="calidad" min="1" max="100" value="{$calidad_v}">
+            </div>
+          </div>
+          <button class="sg-btn" type="submit" <if $pendientes_v == '0' then>disabled</if>>Optimizar imágenes pendientes</button>
+          <ul class="sg-rules">
+            <li>Redimensiona a un ancho máximo y recomprime (JPEG/PNG/WebP). <strong>Nunca agranda</strong> una imagen ya más pequeña.</li>
+            <li>Guarda un <strong>backup automático</strong> del original en <code>images/sg/uploads/_originales/</code> antes de tocar nada.</li>
+            <li>Es seguro repetir: las imágenes ya optimizadas (con backup) se <strong>saltan</strong> — solo procesa lo nuevo.</li>
+            <li>Los <strong>GIF no se tocan</strong> (podrían ser animados; no se pueden redimensionar sin perder la animación).</li>
+          </ul>
+        </form>
+
+        <div class="sg-section-label" style="margin-top:24px;">Reprocesar PNG (corrección de compresión)</div>
+        <form method="post" action="/sg/admin/optimizar_imagenes.php" class="sg-opt-form">
+          <input type="hidden" name="accion" value="reprocesar_png">
+          <input type="hidden" name="max_ancho" value="{$maxAncho}">
+          <input type="hidden" name="calidad" value="{$calidad_v}">
+          <button class="sg-btn" type="submit" <if $pngReprocesables == '0' then>disabled</if>>Reprocesar {$pngReprocesables} PNG ya optimizados</button>
+          <ul class="sg-rules">
+            <li>Se corrigió un fallo que hacía que algunos <strong>PNG</strong> no se comprimieran de verdad en corridas anteriores.</li>
+            <li>Este botón <strong>restaura cada PNG desde su backup</strong> y lo vuelve a procesar con la corrección — <strong>no toca JPEG ni WebP</strong> (esos no tenían el fallo).</li>
+            <li>Es seguro repetirlo las veces que haga falta: PNG es un formato <strong>sin pérdida</strong>, así que no hay degradación de calidad por reprocesar de nuevo.</li>
+          </ul>
+        </form>
+
+        <if $reporteHtml != '' then>
+          <div class="sg-opt-report">
+            <div class="sg-section-label">Detalle de esta corrida</div>
+            <table class="sg-opt-table">
+              <tbody>{$reporteHtml}</tbody>
+            </table>
+          </div>
+        </if>
+
+      </div>
+    </div>
+  </main>
+  {$footer}
+</body>
+
+</html>

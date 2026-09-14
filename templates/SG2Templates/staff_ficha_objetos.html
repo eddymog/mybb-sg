@@ -1,0 +1,393 @@
+<html>
+
+<head>
+  <title>Objetos de Ficha</title>
+  {$headerinclude}
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Noto+Serif+JP:wght@300;400;700&display=swap" rel="stylesheet">
+  <style>
+    .sg-admin {
+      --bg: #0f0c18; --bg2: #130f1e; --bg3: #171224;
+      --border: rgba(156, 107, 204, 0.12);
+      --border-strong: rgba(156, 107, 204, 0.22);
+      --ink: #e8dff8; --plum: #7b4ab8; --plum2: #9c6bcc; --plum3: #b890e0;
+      --stone: #8a7a9a; --mist: #5a4a6a; --oxide: #c0582a; --lavender: #ede0fa;
+      max-width: 820px;
+      margin: 24px auto 40px;
+      padding: 0 16px;
+      color: var(--ink);
+      font-family: 'Noto Serif JP', serif;
+    }
+
+    .sg-admin-card {
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), transparent 16%), var(--bg2);
+      border: 0.5px solid var(--border);
+      overflow: hidden;
+    }
+
+    .sg-admin-head {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 18px 22px;
+      background: var(--bg3);
+      border-bottom: 0.5px solid var(--border);
+    }
+
+    .sg-admin-head::before {
+      content: '';
+      width: 3px;
+      height: 20px;
+      background: var(--oxide);
+      flex-shrink: 0;
+    }
+
+    .sg-admin-head h1 {
+      margin: 0;
+      font-family: 'Cinzel', serif;
+      font-size: 15px;
+      font-weight: 900;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--ink);
+    }
+
+    .sg-admin-body { padding: 22px; }
+
+    .sg-lookup {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-end;
+      gap: 10px;
+      margin-bottom: 20px;
+      padding-bottom: 20px;
+      border-bottom: 0.5px solid var(--border);
+    }
+
+    .sg-mode {
+      margin-bottom: 16px;
+      font-family: 'Cinzel', serif;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--stone);
+    }
+
+    .sg-section-label {
+      margin: 22px 0 8px;
+      font-family: 'Cinzel', serif;
+      font-size: 8px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--plum3);
+    }
+
+    .sg-field { display: flex; flex-direction: column; gap: 5px; }
+
+    .sg-label {
+      font-family: 'Cinzel', serif;
+      font-size: 8px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--mist);
+    }
+
+    .sg-label .req { color: var(--oxide); }
+
+    .sg-input, .sg-select {
+      width: 100%;
+      padding: 9px 12px;
+      background: var(--bg);
+      border: 0.5px solid var(--border-strong);
+      color: var(--ink);
+      font-family: 'Noto Serif JP', serif;
+      font-size: 14px;
+      line-height: 1.5;
+      box-sizing: border-box;
+      height: 40px;
+      transition: border-color 0.15s;
+    }
+
+    .sg-input:focus, .sg-select:focus { outline: none; border-color: var(--plum3); }
+
+    .sg-select {
+      -webkit-appearance: none;
+      appearance: none;
+      padding-right: 32px;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%238a7a9a' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+    }
+
+    /* Inventario editable */
+    .sg-inv { border: 0.5px solid var(--border); }
+
+    .sg-inv-head, .sg-inv-row {
+      display: grid;
+      grid-template-columns: 96px 1fr 120px 34px;
+      gap: 12px;
+      align-items: center;
+      padding: 8px 14px;
+    }
+
+    .sg-inv-head {
+      background: var(--bg3);
+      border-bottom: 0.5px solid var(--border);
+      font-family: 'Cinzel', serif;
+      font-size: 8px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--mist);
+    }
+
+    .sg-inv-row { border-bottom: 0.5px solid var(--border); background: var(--bg); }
+    .sg-inv-row:last-child { border-bottom: none; }
+
+    .sg-inv-id {
+      font-family: 'Cinzel', serif;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--plum3);
+    }
+
+    .sg-inv-name { color: var(--ink); font-size: 14px; }
+
+    .sg-qty-wrap { display: flex; align-items: center; gap: 7px; }
+
+    .sg-qty {
+      width: 64px;
+      height: 32px;
+      padding: 4px 8px;
+      background: var(--bg2);
+      border: 0.5px solid var(--border-strong);
+      color: var(--ink);
+      font-family: 'Noto Serif JP', serif;
+      font-size: 13px;
+      text-align: center;
+      box-sizing: border-box;
+    }
+    .sg-qty:focus { outline: none; border-color: var(--plum3); }
+
+    .sg-qty-max { font-size: 11px; color: var(--mist); white-space: nowrap; }
+
+    .sg-row-del {
+      width: 28px;
+      height: 28px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      border: 0.5px solid var(--border-strong);
+      color: var(--stone);
+      font-size: 15px;
+      line-height: 1;
+      cursor: pointer;
+      transition: color 0.15s, border-color 0.15s;
+    }
+    .sg-row-del:hover { color: #fff; border-color: var(--oxide); background: var(--oxide); }
+
+    .sg-inv-empty {
+      padding: 18px 14px;
+      text-align: center;
+      color: var(--mist);
+      font-size: 13px;
+      background: var(--bg);
+    }
+
+    /* Agregar objeto */
+    .sg-add {
+      display: grid;
+      grid-template-columns: 1fr 120px;
+      gap: 10px;
+      align-items: end;
+      padding: 14px;
+      border: 0.5px solid var(--border);
+      background: var(--bg3);
+    }
+
+    .sg-hint {
+      margin: 8px 0 0;
+      font-size: 12px;
+      line-height: 1.6;
+      color: var(--mist);
+    }
+
+    .sg-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      height: 40px;
+      padding: 0 22px;
+      background: var(--plum);
+      border: none;
+      color: var(--lavender);
+      font-family: 'Cinzel', serif;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background 0.15s;
+      white-space: nowrap;
+    }
+    .sg-btn:hover { background: var(--plum2); }
+
+    .sg-btn--ghost {
+      background: transparent;
+      border: 0.5px solid var(--border-strong);
+      color: var(--plum3);
+    }
+    .sg-btn--ghost:hover { background: rgba(123, 74, 184, 0.14); }
+
+    .sg-actions {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      margin-top: 20px;
+      padding-top: 16px;
+      border-top: 0.5px solid var(--border);
+    }
+
+    .sg-credentials {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-top: 18px;
+    }
+
+    @media (max-width: 640px) {
+      .sg-add { grid-template-columns: 1fr; }
+      .sg-credentials { grid-template-columns: 1fr; }
+      .sg-inv-head, .sg-inv-row { grid-template-columns: 1fr auto 34px; }
+      .sg-inv-id { display: none; }
+    }
+  </style>
+</head>
+
+<body>
+  {$header}
+  <main class="sg-admin">
+    <div class="sg-admin-card">
+      <div class="sg-admin-head">
+        <h1>Objetos de Ficha</h1>
+      </div>
+      <div class="sg-admin-body">
+
+        <!-- Cargar la ficha por User ID -->
+        <div class="sg-lookup">
+          <div class="sg-field" style="flex: 1; min-width: 200px;">
+            <label class="sg-label" for="lookup_fid">User ID</label>
+            <input class="sg-input" type="number" min="1" placeholder="196" id="lookup_fid" value="{$fid}">
+          </div>
+          <button class="sg-btn" type="button" onclick="onLoadFicha()">Cargar</button>
+        </div>
+
+        <if $fid != '' then>
+          <div class="sg-mode">
+            Ficha: <a href="/sg/ficha.php?action=profile&uid={$fid}" target="_blank" style="color: var(--plum3); text-decoration: underline;">{$ficha['nombre']}</a> · UID {$fid}
+          </div>
+
+          <form method="post" action="/sg/admin/ficha_objetos.php?fid={$fid}" name="ficha_objetos" id="ficha_objetos">
+            <input type="hidden" name="ficha_id" value="{$fid}">
+
+            <!-- Vista: Inventario -->
+            <div id="sg-mode-inv">
+              <div class="sg-section-label">Inventario</div>
+              <div class="sg-inv">
+                <div class="sg-inv-head">
+                  <span>ID</span><span>Objeto</span><span>Cantidad</span><span></span>
+                </div>
+                {$inventario_objetos}
+              </div>
+            </div>
+
+            <!-- Vista: Agregar un objeto -->
+            <div id="sg-mode-add" style="display: none;">
+              <div class="sg-section-label">Agregar un objeto</div>
+              <div class="sg-add">
+                <div class="sg-field">
+                  <label class="sg-label" for="objeto_input">Objeto ID</label>
+                  <input class="sg-input" type="text" name="objeto_input" id="objeto_input" placeholder="KUN001">
+                </div>
+                <div class="sg-field">
+                  <label class="sg-label" for="objeto_cantidad">Cantidad</label>
+                  <input class="sg-input" type="number" min="1" name="objeto_cantidad" id="objeto_cantidad" value="1">
+                </div>
+              </div>
+              <p class="sg-hint">Si la ficha ya tiene el objeto, la cantidad se suma a la existente. Para reducir o quitar, edita la cantidad (o ponla en 0 / ✕) en el Inventario.</p>
+            </div>
+
+            <!-- Credenciales (compartidas) -->
+            <div class="sg-credentials">
+              <div class="sg-field">
+                <label class="sg-label" for="staff">Miembro de Staff <span class="req">*</span></label>
+                <input class="sg-input" type="text" name="staff" id="staff" required>
+              </div>
+              <div class="sg-field">
+                <label class="sg-label" for="razon">Razón <span class="req">*</span></label>
+                <input class="sg-input" type="text" name="razon" id="razon" required>
+              </div>
+            </div>
+
+            <!-- Acciones: Inventario -->
+            <div class="sg-actions" id="sg-actions-inv">
+              <button class="sg-btn sg-btn--ghost" type="button" onclick="sgShowAdd()">+ Agregar un objeto</button>
+              <button class="sg-btn" type="submit" name="accion" value="Guardar">Guardar cambios</button>
+            </div>
+
+            <!-- Acciones: Agregar -->
+            <div class="sg-actions" id="sg-actions-add" style="display: none;">
+              <button class="sg-btn sg-btn--ghost" type="button" onclick="sgHideAdd()">Cancelar</button>
+              <button class="sg-btn" type="submit" name="accion" value="Añadir">Agregar al inventario</button>
+            </div>
+          </form>
+        </if>
+
+      </div>
+    </div>
+  </main>
+  {$footer}
+</body>
+<if $log_var != '' then><script>alert(`{$log_var}`);</script></if>
+<if $error_var != '' then><script>alert(`⚠ {$error_var}`);</script></if>
+{$reload_script}
+<script>
+  function onLoadFicha() {
+    const fid = document.getElementById('lookup_fid').value;
+    if (fid) {
+      window.location.href = window.location.pathname + '?fid=' + encodeURIComponent(fid);
+    } else {
+      window.location.href = window.location.pathname;
+    }
+  }
+
+  function sgZero(btn) {
+    const row = btn.closest('.sg-inv-row');
+    const input = row ? row.querySelector('.sg-qty') : null;
+    if (input) {
+      input.value = 0;
+      row.style.opacity = '0.45';
+    }
+  }
+
+  function sgShowAdd() {
+    document.getElementById('sg-mode-inv').style.display = 'none';
+    document.getElementById('sg-actions-inv').style.display = 'none';
+    document.getElementById('sg-mode-add').style.display = '';
+    document.getElementById('sg-actions-add').style.display = '';
+  }
+
+  function sgHideAdd() {
+    document.getElementById('sg-mode-add').style.display = 'none';
+    document.getElementById('sg-actions-add').style.display = 'none';
+    document.getElementById('sg-mode-inv').style.display = '';
+    document.getElementById('sg-actions-inv').style.display = '';
+  }
+</script>
+
+</html>

@@ -1,0 +1,221 @@
+<link rel="stylesheet" href="{$mybb->asset_url}/jscripts/sceditor/themes/{$theme['editortheme']}" type="text/css" media="all" />
+<script type="text/javascript" src="{$mybb->asset_url}/jscripts/sceditor/jquery.sceditor.bbcode.min.js?ver=1822"></script>
+{$quickquote}
+{$quickquotesty}
+<script type="text/javascript" src="{$mybb->asset_url}/jscripts/bbcodes_sceditor.js?ver=1824"></script>
+<script type="text/javascript" src="{$mybb->asset_url}/jscripts/sceditor/plugins/undo.js?ver=1821"></script>
+<script type="text/javascript">
+var partialmode = {$mybb->settings['partialmode']},
+MYBB_SMILIES = {
+	{$smilies_json}
+},
+opt_editor = {
+	plugins: "undo",
+	format: "bbcode",
+	bbcodeTrim: false,
+	style: "{$mybb->asset_url}/jscripts/sceditor/styles/jquery.sceditor.{$theme['editortheme']}?ver=1823",
+	rtl: {$lang->settings['rtl']},
+	locale: "mybblang",
+	width: "100%",
+	enablePasteFiltering: true,
+	autoUpdate: true,
+	emoticonsEnabled: {$emoticons_enabled},
+	emoticons: {
+		// Emoticons to be included in the dropdown
+		dropdown: {
+			{$dropdownsmilies}
+		},
+		// Emoticons to be included in the more section
+		more: {
+			{$moresmilies}
+		},
+		// Emoticons that are not shown in the dropdown but will still be converted. Can be used for things like aliases
+		hidden: {
+			{$hiddensmilies}
+		}
+	},
+	emoticonsCompat: true,
+	toolbar: "{$basic1}{$align}{$font}{$size}{$color}{$removeformat}{$basic2}image,{$email}{$link}|video{$emoticon}|{$list}{$code}quote|maximize,source",
+};
+{$editor_language}
+rinvbquote = {$rin_vbquote};
+
+function qae_as() {
+	if (MyBBEditor) {
+		sc_asd = JSON.parse(localStorage.getItem('sc_as'));
+		link_can = document.querySelector("link[rel='canonical']").href;
+		if (!sc_asd) {
+			sc_asd = {};
+		}
+		if (MyBBEditor.val() != sc_asd[link_can]) {
+			if ($.trim(MyBBEditor.val())) {
+				if(!$('#autosave').length) {
+					$('<div/>', { id: 'autosave', class: 'bottom-right' }).appendTo('body');
+				}
+				setTimeout(function() {
+					$('#autosave').jGrowl('{$mybb->settings['quickadveditorplus_save_lang']}', { life: 500, theme: 'jgrowl_success' });
+				},200);
+				sc_asd[link_can] = MyBBEditor.val();
+				localStorage.setItem('sc_as', JSON.stringify(sc_asd));
+			}
+			else {
+				if (sc_asd[link_can]) {
+					delete sc_asd[link_can];
+					localStorage.setItem('sc_as', JSON.stringify(sc_asd));
+				}
+			}
+		}
+	}
+}
+
+function qae_ac() {
+	sc_asd = JSON.parse(localStorage.getItem('sc_as'));
+	link_can = document.querySelector("link[rel='canonical']").href;
+	if (!sc_asd) {
+		sc_asd = {};
+	}
+	if (sc_asd[link_can]) {
+		delete sc_asd[link_can];
+		localStorage.setItem('sc_as', JSON.stringify(sc_asd));
+	}
+}
+
+function qae_ar() {
+	sc_asd = JSON.parse(localStorage.getItem('sc_as'));
+	if (!sc_asd) {
+		sc_asd = {};
+	}
+	if(Object.keys(sc_asd).length > {$mybb->settings['quickadveditorplus_saveamount']}) {
+		delete sc_asd[Object.keys(sc_asd)[0]];
+		localStorage.setItem('sc_as', JSON.stringify(sc_asd));
+	}
+}
+
+if({$mybb->settings['quickadveditorplus_qedit']}!=0) {
+	($.fn.on || $.fn.live).call($(document), 'click', '.quick_edit_button', function () {
+		$.jGrowl('<img src="images/spinner_big.gif" />', {theme: 'jgrowl_success'});
+		ed_id = $(this).attr('id');
+		var pid = ed_id.replace( /[^0-9]/g, '');
+		$('#quickedit_'+pid).height('{$mybb->settings['quickadveditorplus_qued_heigh']}px');
+		setTimeout(function() {
+			$('#quickedit_'+pid).sceditor(opt_editor);
+			if ($('#quickedit_'+pid).sceditor('instance')) {
+				$('#quickedit_'+pid).sceditor('instance').focus();
+				$('#quickedit_'+pid).next().css( "z-index", "5" );
+			}
+			offset = $('#quickedit_'+pid).next().offset().top - '{$mybb->settings['quickadveditorplus_qued_heigh']}';
+			setTimeout(function() {
+				$('html, body').animate({
+					scrollTop: offset
+				}, 700);
+				setTimeout(function() {
+					$('#pid_'+pid).find('button[type="submit"]').attr( 'id', 'quicksub_'+pid );
+				},200);
+				if($(".jGrowl-notification:last-child").length) {
+					$(".jGrowl-notification:last-child").remove();
+				}
+			},200);
+			if('{$sourcemode}' != '') {
+				$('textarea[name*="value"]').sceditor('instance').sourceMode(true);
+			}
+		},400);
+	});
+}
+
+($.fn.on || $.fn.live).call($(document), 'click', 'button[id*="quicksub_"]', function () {
+	ed_id = $(this).attr('id');
+	pid = ed_id.replace( /[^0-9]/g, '');
+	$('#quickedit_'+pid).sceditor('instance').updateOriginal();
+});
+
+($.fn.on || $.fn.live).call($(document), 'click', 'input[accesskey*="s"]', function () {
+	if({$mybb->settings['quickadveditorplus_autosave']}!=0) {
+		qae_ac();
+	}
+});
+
+$(document).ready(function() {
+	$('#message').height('{$mybb->settings['quickadveditorplus_qurp_heigh']}px');
+	$('#message').sceditor(opt_editor);
+	MyBBEditor = $('#message').sceditor('instance');
+	{$sourcemode}
+	if({$mybb->settings['quickadveditorplus_autosave']}!=0) {
+		setInterval(function() {
+			qae_as();
+			qae_ar();
+		},{$mybb->settings['quickadveditorplus_savetime']}*1000);
+
+		setTimeout(function() {
+			sc_asd = JSON.parse(localStorage.getItem('sc_as'));
+			restitem = "";
+			link_can = document.querySelector("link[rel='canonical']").href;
+			if (sc_asd) {
+				restitem = sc_asd[link_can];
+			}
+			if (restitem) {
+				var restorebut = [
+					'<a class="sceditor-button" title="{$mybb->settings['quickadveditorplus_restore_lang']}" onclick="MyBBEditor.insert(restitem);">',
+						'<div style="background-image: url(images/rest.png); opacity: 1; cursor: pointer;">{$mybb->settings['quickadveditorplus_restore_lang']}</div>',
+					'</a>'
+				];
+
+				$(restorebut.join('')).appendTo('.sceditor-group:last');
+			}
+		},600);
+		MyBBEditor.blur(function(e) {
+			if ($.trim(MyBBEditor.val())) {
+				qae_as();
+			}
+			else {
+				qae_ac();
+			}
+		});
+	}
+});
+
+/**********************************
+ * Thread compatibility functions *
+ **********************************/
+if(typeof Thread !== 'undefined')
+{
+	var quickReplyFunc = Thread.quickReply;
+	Thread.quickReply = function(e) {
+		if(MyBBEditor) {
+			MyBBEditor.updateOriginal();
+			if({$mybb->settings['quickadveditorplus_autosave']}!=0) {
+				qae_ac();
+			}
+			$('form[id*="quick_reply_form"]').bind('reset', function() {
+				MyBBEditor.val('').emoticons(true);
+			});
+		}
+
+		return quickReplyFunc.call(this, e);
+	};
+	Thread.multiQuotedLoaded =  function(request)
+	{
+		if(MyBBEditor) {
+			var json = JSON.parse(request.responseText);
+			if(typeof json == 'object')
+			{
+				if(json.hasOwnProperty("errors"))
+				{
+					$.each(json.errors, function(i, message)
+					{
+						$.jGrowl(lang.post_fetch_error + ' ' + message, {theme:'jgrowl_error'});
+					});
+					return false;
+				}
+			}
+
+			MyBBEditor.insert(json.message);
+
+			Thread.clearMultiQuoted();
+			$('#quickreply_multiquote').hide();
+			$('#quoted_ids').val('all');
+
+			$('#message').trigger('focus');
+		}
+	};
+};
+</script>

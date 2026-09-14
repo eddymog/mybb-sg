@@ -1,0 +1,221 @@
+<html>
+
+<head>
+  <title>Registro de Virtudes y Defectos</title>
+  {$headerinclude}
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Noto+Serif+JP:wght@300;400;700&display=swap" rel="stylesheet">
+  <style>
+    .sg-vt {
+      --bg: #0f0c18; --bg2: #130f1e; --bg3: #171224;
+      --border: rgba(156, 107, 204, 0.12);
+      --border-strong: rgba(156, 107, 204, 0.22);
+      --ink: #e8dff8; --plum: #7b4ab8; --plum2: #9c6bcc; --plum3: #b890e0;
+      --stone: #8a7a9a; --mist: #5a4a6a; --oxide: #c0582a; --lavender: #ede0fa;
+      --gold: #c09840; --green: #4f9d69;
+      max-width: 1100px;
+      margin: 24px auto 44px;
+      padding: 0 16px;
+      color: var(--ink);
+      font-family: 'Noto Serif JP', serif;
+    }
+
+    .sg-vt-shell {
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), transparent 16%), var(--bg2);
+      border: 0.5px solid var(--border);
+      overflow: hidden;
+    }
+
+    .sg-vt-header {
+      display: flex; flex-wrap: wrap; align-items: center; gap: 14px 20px;
+      padding: 20px 24px; background: var(--bg3); border-bottom: 0.5px solid var(--border);
+    }
+    .sg-vt-titles { display: flex; align-items: center; gap: 12px; }
+    .sg-vt-titles::before { content: ''; width: 3px; height: 30px; background: var(--oxide); flex-shrink: 0; }
+    .sg-vt-eyebrow {
+      font-family: 'Cinzel', serif; font-size: 8px; font-weight: 700;
+      letter-spacing: 2px; text-transform: uppercase; color: var(--plum3);
+    }
+    .sg-vt-title {
+      margin: 2px 0 0; font-family: 'Cinzel', serif; font-size: 18px; font-weight: 900;
+      letter-spacing: 1px; text-transform: uppercase; color: var(--ink); line-height: 1;
+    }
+    .sg-vt-search {
+      margin-left: auto; width: 240px; max-width: 100%; height: 38px; padding: 0 12px;
+      background: var(--bg); border: 0.5px solid var(--border-strong); color: var(--ink);
+      font-family: 'Noto Serif JP', serif; font-size: 14px; box-sizing: border-box;
+    }
+    .sg-vt-search:focus { outline: none; border-color: var(--plum3); }
+
+    .sg-vt-intro {
+      margin: 0;
+      padding: 13px 24px;
+      background: var(--bg2);
+      border-bottom: 0.5px solid var(--border);
+      color: var(--stone);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+    .sg-vt-intro strong { font-weight: 700; }
+    .sg-vt-intro .v { color: var(--green); }
+    .sg-vt-intro .d { color: var(--oxide); }
+
+    /* Dos columnas */
+    .sg-vt-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 0;
+    }
+    .sg-vt-col { display: flex; flex-direction: column; min-width: 0; }
+    .sg-vt-col + .sg-vt-col { border-left: 0.5px solid var(--border); }
+
+    .sg-vt-col-head {
+      display: flex; align-items: baseline; gap: 10px;
+      padding: 16px 20px 12px;
+      border-bottom: 0.5px solid var(--border);
+      position: sticky; top: 0; background: var(--bg2); z-index: 1;
+    }
+    .sg-vt-col-name {
+      font-family: 'Cinzel', serif; font-size: 12px; font-weight: 700;
+      letter-spacing: 2px; text-transform: uppercase;
+    }
+    .sg-vt-col--v .sg-vt-col-name { color: var(--green); }
+    .sg-vt-col--d .sg-vt-col-name { color: var(--oxide); }
+    .sg-vt-col-count {
+      font-family: 'Cinzel', serif; font-size: 10px; font-weight: 700; color: var(--mist);
+    }
+
+    .sg-vt-col-body {
+      max-height: 72vh; overflow-y: auto; padding: 14px 18px;
+      display: flex; flex-direction: column; gap: 10px;
+    }
+    /* Scrollbar temático */
+    .sg-vt-col-body::-webkit-scrollbar { width: 8px; }
+    .sg-vt-col-body::-webkit-scrollbar-track { background: var(--bg); }
+    .sg-vt-col-body::-webkit-scrollbar-thumb { background: rgba(156, 107, 204, 0.25); }
+    .sg-vt-col-body::-webkit-scrollbar-thumb:hover { background: rgba(156, 107, 204, 0.4); }
+    .sg-vt-col-body { scrollbar-width: thin; scrollbar-color: rgba(156,107,204,0.3) var(--bg); }
+
+    /* Tarjeta */
+    .sg-vt-item {
+      border: 0.5px solid var(--border); background: var(--bg); padding: 12px 14px;
+    }
+    .sg-vt-col--v .sg-vt-item {
+      background: linear-gradient(180deg, rgba(79, 157, 105, 0.14), rgba(79, 157, 105, 0.05) 60%), var(--bg);
+      border-color: rgba(79, 157, 105, 0.28);
+    }
+    .sg-vt-col--d .sg-vt-item {
+      background: linear-gradient(180deg, rgba(192, 88, 42, 0.14), rgba(192, 88, 42, 0.05) 60%), var(--bg);
+      border-color: rgba(192, 88, 42, 0.28);
+    }
+    .sg-vt-head { display: flex; align-items: flex-start; gap: 9px; }
+    .sg-vt-icon { flex-shrink: 0; width: 13px; height: 13px; margin-top: 2px; display: inline-flex; }
+    .sg-vt-icon svg { width: 100%; height: 100%; display: block; }
+    .sg-vt-icon--v { color: var(--green); }
+    .sg-vt-icon--d { color: var(--oxide); }
+    .sg-vt-name {
+      margin: 0; flex: 1; font-family: 'Cinzel', serif; font-size: 13px; font-weight: 700;
+      letter-spacing: 0.5px; color: var(--ink); line-height: 1.3;
+    }
+    .sg-vt-cost {
+      flex-shrink: 0; padding: 3px 9px; font-family: 'Cinzel', serif; font-size: 12px;
+      font-weight: 700; border: 0.5px solid var(--border-strong);
+    }
+    .sg-vt-cost--v { color: var(--green); border-color: rgba(79, 157, 105, 0.45); background: rgba(79, 157, 105, 0.1); }
+    .sg-vt-cost--d { color: var(--oxide); border-color: rgba(192, 88, 42, 0.45); background: rgba(192, 88, 42, 0.1); }
+
+    .sg-vt-meta { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0; }
+    .sg-vt-badge {
+      padding: 3px 10px; border: 0.5px solid rgba(156, 107, 204, 0.45);
+      background: rgba(123, 74, 184, 0.18); color: var(--plum3);
+      font-family: 'Cinzel', serif; font-size: 9px; font-weight: 700; letter-spacing: 1.6px;
+      text-transform: uppercase;
+    }
+    .sg-vt-badge--excl {
+      color: var(--gold); border-color: rgba(192, 152, 64, 0.5); background: rgba(192, 152, 64, 0.14);
+    }
+
+    .sg-vt-desc { margin: 0; color: var(--stone); font-size: 13px; line-height: 1.6; }
+
+    .sg-vt-empty, .sg-vt-noresults {
+      padding: 28px 16px; text-align: center; color: var(--mist); font-size: 14px;
+      border: 0.5px solid var(--border); background: var(--bg);
+    }
+    .sg-vt-noresults { display: none; }
+
+    @media (max-width: 720px) {
+      .sg-vt-search { margin-left: 0; width: 100%; }
+      .sg-vt-grid { grid-template-columns: 1fr; }
+      .sg-vt-col + .sg-vt-col { border-left: none; border-top: 0.5px solid var(--border); }
+      .sg-vt-col-body { max-height: 60vh; }
+    }
+  </style>
+</head>
+
+<body>
+  {$header}
+  <main class="sg-vt">
+    <div class="sg-vt-shell">
+      <div class="sg-vt-header">
+        <div class="sg-vt-titles">
+          <div>
+            <div class="sg-vt-eyebrow">Registro</div>
+            <h1 class="sg-vt-title">Virtudes y Defectos</h1>
+          </div>
+        </div>
+        <input class="sg-vt-search" type="text" id="sg-vt-search" placeholder="Buscar por nombre…" oninput="sgVtFilter()">
+      </div>
+
+      <p class="sg-vt-intro">Referencia de todas las <strong class="v">virtudes</strong> y <strong class="d">defectos</strong> del foro. Las virtudes suman puntos y los defectos los restan; aquí ves el coste y el efecto de cada una. Usa el buscador para encontrar una en concreto.</p>
+
+      <div class="sg-vt-grid">
+        <section class="sg-vt-col sg-vt-col--v">
+          <div class="sg-vt-col-head">
+            <span class="sg-vt-col-name">Virtudes</span>
+            <span class="sg-vt-col-count">{$n_virtudes}</span>
+          </div>
+          <div class="sg-vt-col-body" id="sg-vt-col-v">
+            {$virtudes_html}
+            <div class="sg-vt-noresults" id="sg-vt-nores-v">Sin coincidencias.</div>
+          </div>
+        </section>
+
+        <section class="sg-vt-col sg-vt-col--d">
+          <div class="sg-vt-col-head">
+            <span class="sg-vt-col-name">Defectos</span>
+            <span class="sg-vt-col-count">{$n_defectos}</span>
+          </div>
+          <div class="sg-vt-col-body" id="sg-vt-col-d">
+            {$defectos_html}
+            <div class="sg-vt-noresults" id="sg-vt-nores-d">Sin coincidencias.</div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
+  {$footer}
+
+  <script>
+    function sgVtFilterCol(colId, noresId, q) {
+      var col = document.getElementById(colId);
+      if (!col) return;
+      var items = col.querySelectorAll('.sg-vt-item');
+      var visibles = 0;
+      items.forEach(function (item) {
+        var name = item.getAttribute('data-name') || '';
+        var match = q === '' || name.indexOf(q) !== -1;
+        item.style.display = match ? '' : 'none';
+        if (match) visibles++;
+      });
+      var nores = document.getElementById(noresId);
+      if (nores) { nores.style.display = (visibles === 0) ? 'block' : 'none'; }
+    }
+
+    function sgVtFilter() {
+      var q = document.getElementById('sg-vt-search').value.trim().toLowerCase();
+      sgVtFilterCol('sg-vt-col-v', 'sg-vt-nores-v', q);
+      sgVtFilterCol('sg-vt-col-d', 'sg-vt-nores-d', q);
+    }
+  </script>
+</body>
+
+</html>

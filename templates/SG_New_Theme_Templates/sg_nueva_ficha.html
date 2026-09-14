@@ -1,0 +1,141 @@
+<html>
+
+<head>
+  <title>Ficha Nueva</title>
+  {$headerinclude}
+  <style>
+    #newfichaform {
+      color: white;
+      width: 992px;
+      margin: 0 auto;
+      font-size: 13px;
+      font-family: "Myriad Pro", Myriad, "Liberation Sans", "Nimbus Sans L", "Helvetica Neue", Helvetica, Arial, sans-serif;
+      text-align: center;
+      font-weight: bold;
+      margin-top: 10px;
+      padding: 10px 0;
+    }
+
+    #newfichaform textarea {
+      color: #1A1A1A;
+      width: 500px;
+      height: 175px;
+    }
+
+    #newfichaform input[type="submit"] {
+      border: 0px;
+      width: 80px;
+      height: 30px;
+      border-radius: 3px;
+      color: #fff;
+    }
+
+    #newfichaform input {
+      border-radius: 3px;
+      border: none;
+      padding: 5px;
+    }
+
+    #guardar_ficha:hover {
+      cursor: pointer;
+    }
+
+    #newfichaform textarea {
+      text-align: left;
+      border-radius: 3px;
+	  background-color: #ecf6ff;
+	  width: 800px;
+      height: 150px;
+    }
+
+   #text_frase {
+      height: 55px;
+   }
+   
+  </style>
+</head>
+
+<body>
+  {$header}
+  <div class="fondo-blanco">
+  <table border="0" cellspacing="{$theme['borderwidth']}" cellpadding="{$theme['tablespace']}" class="tborder">
+    <tr>
+      <td class="thead" colspan="1"><strong>Ficha Nueva</strong></td>
+    </tr>
+    <tr>
+      <td class="trow1" valign="top">
+        <div class="div_ficha">
+          <form method="post" action="/sg/nueva_ficha.php" name="newficha" id="newfichaform">
+            Nombre del Personaje*<br><input class="textbox" type="text" name="name" required=""><br>
+            <br>
+            Apodo<br><input class="textbox" type="text" name="alias"><br>
+            <br>
+            Edad*<br><input class="textbox" type="number" name="age" min="12" max="90" required=""><br><br>
+            <fieldset class="listaSeason" required="">
+              <legend>Cumpleaños (Estación)</legend>
+              <label>
+                <input type="radio" name="season" value="1" required="">
+                <img src="https://onepiecegaiden.com/images/op/ficha/InviernoCumple_One_Piece_Gaiden_Foro_Rol.png">
+                <p>Invierno</p>
+              </label>
+              <label>
+                <input type="radio" name="season" value="2" required="">
+                <img src="https://onepiecegaiden.com/images/op/ficha/PrimaveraCumple_One_Piece_Gaiden_Foro_Rol.png">
+                <p>Primavera</p>
+              </label>
+              <label>
+                <input type="radio" name="season" value="3" required="">
+                <img src="https://onepiecegaiden.com/images/op/ficha/VeranoCumple_One_Piece_Gaiden_Foro_Rol.png">
+                <p>Verano</p>
+              </label>
+              <label>
+                <input type="radio" name="season" value="4" required="">
+                <img src="https://onepiecegaiden.com/images/op/ficha/OtonoCumple_One_Piece_Gaiden_Foro_Rol.png">
+                <p>Otoño</p>
+              </label>
+            </fieldset>
+            <fieldset class="listaAldeas" required="">
+              <legend>Aldea</legend>
+            </fieldset>
+            <br>
+            <fieldset class="listaClanes" required="">
+              <legend>Clan</legend>
+            </fieldset>
+            <fieldset class="listaElementos" required="">
+              <legend>Elementos</legend>
+            </fieldset>
+            <br>
+            Apariencia (mínimo 400 carácteres)<br><textarea name="phi" minlength="400" required=""></textarea><br>
+            <br>
+            Personalidad (mínimo 400 carácteres)<br><textarea name="psi" minlength="400" required=""></textarea><br>
+            <br>
+            Biografía (mínimo 800 carácteres)<br><textarea name="history" minlength="800" required=""></textarea><br>
+            <br>
+            Información Extra (opcional)<br><textarea name="extra" placeholder="- Le gusta comer ramen."></textarea><br>
+            <br>
+            Frase que representa al usuario (opcional)<br><textarea style="height: 55px;" name="frase" placeholder="Un verdadero héroe siempre llega tarde."></textarea><br>
+            <br>
+			Origen del físico del personaje (obligatorio)<br><textarea style="height: 55px;" name="fisico_de_pj" required="" placeholder="Por favor, seguir el formato de: Nombre del Físico - Serie/Juego de donde proviene"></textarea><br>
+			<br>
+			¿Cómo conociste/encontraste Shinobi Gaiden? (obligatorio)<br><textarea style="height: 55px;" name="como_nos_conociste" placeholder="Google, afiliado, red social, otro usuario, etc..." required=""></textarea><br>
+			<br>
+            <div style="display: none">
+              <input type="text" value="false" id="comp" name="submit">
+              <input type="text" id="userid" name="uid" value="{$mybb->user['uid']}">
+              <input type="text" name="fichaurl" value="./ficha.php?action=profile&amp;uid={$mybb->user['uid']}">
+            </div>
+            <input id="guardar_ficha" class="button" type="submit" onclick="javascript: document.getElementById('comp').value = 'true';"
+              value="Guardar"><br>
+            <br>
+          </form>
+        </div>
+        <br />
+      </td>
+    </tr>
+  </table>
+	</div>
+  {$footer}
+  {$nueva_ficha_script}
+</body>
+
+</html>

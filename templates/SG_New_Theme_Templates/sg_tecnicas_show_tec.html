@@ -1,0 +1,101 @@
+<div class="spoiler">
+  <div class="spoiler_title" onclick="toggleSpoilerContent(this)">
+	<span class="spoiler_button"><strong>{$tecnica['nombre']}</strong></span>
+  </div>
+  <div class="tecnica_spoiler_content">
+    <div class="content_wrapper">
+      <div class="tecnica_info">
+        <div class="tecnicaLvl"><span>Rango {$tecnica['rango']}</span></div>
+      </div>
+      <div class="tecnica_info">
+        <div class="tecnicaLvl"><span>{$tecnica['requisito']}</span></div>
+      </div>
+      <div class="tecnica_details">
+		<if $g_is_staff then>
+		  <div class='tecnicaId'><span>ID: <a href="/sg/admin/modificar_tecnicas.php?tecnica_id={$tecnica['tid']}">{$tecnica['tid']}</a></span></div> 
+		</if>
+		<if !$g_is_staff then>
+		  <div class='tecnicaId'><span>ID: {$tecnica['tid']}</span></div> 
+		</if>
+        <if $tecnica['sellos'] then><div class='tecnicaType'><span>SELLOS: {$tecnica['sellos']}</span></div></if>
+        <div class='tecnicaType'><span>{$tecnica['tipo']}</span></div> 
+        <if $tecnica['categoria'] && ($tecnica['categoria'] != $tecnica['tipo']) then>
+          <div class='tecnicaType'><span>{$tecnica['categoria']}</span></div>
+        </if>
+        <if $tecnica['balance'] == 1 then>
+          <div class='tecnicaType'><span class="balance_positive">✓</span></div>
+        </if>
+        <if $tecnica['balance'] == 2 then>
+          <div class='tecnicaType'><span class="balance_negative">✖</span></div>
+        </if>
+      </div>  
+      <p class='tecnicaDes'><span>{$tecnica['descripcion']}</span></p>
+      <if $tecnica['coste'] then>
+        <div class='tecnicaCost'><span class='tecnicaLvl'>Coste:</span> <span class='efectoDescripcion'>{$tecnica['coste']}</span></div>
+      </if>
+      <if $tecnica['efecto'] then>
+        <div class='tecnicaEfect'><span class='tecnicaLvl'>Efecto:</span> <span class='efectoDescripcion'>{$tecnica['efecto']}</span></div>
+      </if>
+    </div>
+  </div>
+</div>
+
+<style>
+.spoiler {
+  margin: 10px;
+}
+
+.spoiler_button {
+  text-transform: uppercase;
+}
+
+.tecnica_spoiler_content {
+  display: none;
+}
+
+.content_wrapper {
+  display: flex;
+  flex-direction: column;
+}
+
+.tecnica_info {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.tecnica_info:first-of-type {
+  margin-top: 7px;
+}
+
+.tecnica_info:nth-of-type(2) {
+  margin-top: -11px;
+}
+
+.tecnica_details {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  margin: 9px 8px 10px;
+}
+
+.balance_positive {
+  color: #87ff87;
+}
+
+.balance_negative {
+  color: #ff6666;
+}
+</style>
+
+<script>
+function toggleSpoilerContent(element) {
+  var content = element.parentNode.getElementsByTagName('div')[1];
+  if (content.style.display == 'block') {
+    content.style.display = 'none';
+  } else {
+    content.style.display = 'block';
+  }
+}
+</script>

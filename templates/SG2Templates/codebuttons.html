@@ -1,0 +1,84 @@
+<link rel="stylesheet" href="{$mybb->asset_url}/jscripts/sceditor/themes/{$theme['editortheme']}" type="text/css" media="all" />
+<script type="text/javascript" src="{$mybb->asset_url}/jscripts/sceditor/jquery.sceditor.bbcode.min.js?ver=1822"></script>
+<script type="text/javascript" src="{$mybb->asset_url}/jscripts/bbcodes_sceditor.js"></script>
+<!-- <script type="text/javascript" src="{$mybb->asset_url}/jscripts/bbcodes_sceditor.js?ver=1822"></script>  -->
+<script type="text/javascript" src="{$mybb->asset_url}/jscripts/sceditor/plugins/undo.js?ver=1821"></script>
+<script type="text/javascript" src="{$mybb->asset_url}/jscripts/sceditor/icons/monocons.js?ver=1821"></script>
+<style type="text/css">
+	
+.sceditor-button-personaje div  {
+	background: url(/images/sg/misc/code_personaje.png);
+}
+	
+.sceditor-button-tecnica div  {
+	background: url(/images/sg/misc/code_tecnica.png);
+}
+	
+.sceditor-button-tecnica2 div  {
+	background: url(/images/sg/misc/code_tecnica.png);
+}
+	
+.sceditor-button-spoiler div  {
+	background: url(/images/sg/misc/code_spoiler.png);
+}
+	
+.sceditor-button-hide div  {
+	background: url(/images/sg/misc/code_hide.png);
+}
+	
+.sceditor-button-vida div  {
+	background: url(/images/sg/misc/code_vida.png);
+}
+	
+.sceditor-button-chakra div  {
+	background: url(/images/sg/misc/code_chakra.png);
+}
+	
+.sceditor-button-arma div  {
+	background: url(/images/sg/misc/code_arma.png);
+}
+	
+.sceditor-button-dado div  {
+	background: url(/images/sg/misc/code_dado.png);
+}
+</style>
+<script type="text/javascript">
+var partialmode = {$mybb->settings['partialmode']},
+opt_editor = {
+	plugins: "undo",
+	format: "bbcode",
+	icons: "monocons",
+	bbcodeTrim: true,
+	style: "{$mybb->asset_url}/jscripts/sceditor/styles/jquery.sceditor.{$theme['editortheme']}?ver=1821",
+	rtl: {$lang->settings['rtl']},
+	locale: "mybblang",
+	width: "100%",
+	enablePasteFiltering: true,
+	autoUpdate: true,
+	emoticonsEnabled: {$emoticons_enabled},
+	emoticons: {
+		// Emoticons to be included in the dropdown
+		dropdown: {
+			{$dropdownsmilies}
+		},
+		// Emoticons to be included in the more section
+		more: {
+			{$moresmilies}
+		},
+		// Emoticons that are not shown in the dropdown but will still be converted. Can be used for things like aliases
+		hidden: {
+			{$hiddensmilies}
+		}
+	},
+	emoticonsCompat: true,
+		
+	toolbar: "{$basic1}|tecnica,tecnica2,spoiler,personaje,hide,vida,chakra,arma,dado|{$align}{$font}{$size}{$color}{$removeformat}{$basic2}image,{$link},video,{$list}|{$emoticon}|quote|maximize,source",
+};
+{$editor_language}
+$(function() {
+	$("#{$bind}").sceditor(opt_editor);
+
+	MyBBEditor = $("#{$bind}").sceditor("instance");
+	{$sourcemode}
+});
+</script>

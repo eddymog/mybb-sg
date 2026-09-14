@@ -1,0 +1,140 @@
+
+Referencia de mybb_sg_sg_fichas.arboles_progreso
+{
+    "desbloqueo_arboles": 0, // veces que se ha gastado tobis para desbloquear un arbol (maximo 5 veces)
+    "desbloqueo_ramas": 0, // veces que se ha gastado tobis para desbloquear ramas nuevas
+    "desbloqueo_nivel_ramas": 0, // veces que se ha gastado tobis para desbloquear una subida de nivel a una rama existente
+    "arboles_disponibles": 1, // arboles disponibles para subir de nivel, 1 es por defecto al crear la ficha
+    "ramas_disponibles": 0, // ramas disponibles para subir de nivel
+    "nivel_rama_disponibles": 0 // capacidad para subir de nivel cualquier rama
+}
+
+Referencia de mybb_sg_sg_fichas.arboles:
+
+{
+    "bukijutsu": {
+        "base": "BUKI101B",
+        "rama 1": {
+            "base": "",
+            "mejoras": [],
+            "especialidades": []
+        },
+        "rama 2": {
+            "base": "",
+            "mejoras": [],
+            "especialidades": []
+        },
+        "rama 3": {
+            "base": "",
+            "mejoras": [],
+            "especialidades": []
+        }
+    },
+    "defensivo": {
+        "base": "DEFE101B",
+        "rama 1": {
+            "base": "",
+            "mejoras": [],
+            "especialidades": []
+        },
+        "rama 2": {
+            "base": "",
+            "mejoras": [],
+            "especialidades": []
+        },
+        "rama 3": {
+            "base": "",
+            "mejoras": [],
+            "especialidades": []
+        }
+    },
+    "resistencia": {
+        "base": "RESI101B",
+        "rama 1": {
+            "base": "",
+            "mejoras": [],
+            "especialidades": []
+        },
+        "rama 2": {
+            "base": "",
+            "mejoras": [],
+            "especialidades": []
+        },
+        "rama 3": {
+            "base": "",
+            "mejoras": [],
+            "especialidades": []
+        }
+    },
+    "taijutsu": {
+        "base": "TAIJ101B",
+        "rama 1": {
+            "base": "",
+            "mejoras": [],
+            "especialidades": []
+        },
+        "rama 2": {
+            "base": "",
+            "mejoras": [],
+            "especialidades": []
+        },
+        "rama 3": {
+            "base": "",
+            "mejoras": [],
+            "especialidades": []
+        }
+    },
+    "hoshigaki": {
+        "base": "HOSH101B",
+        "rama 1": {
+            "base": "",
+            "mejoras": [],
+            "especialidades": []
+        },
+        "rama 2": {
+            "base": "",
+            "mejoras": [],
+            "especialidades": []
+        },
+        "rama 3": {
+            "base": "",
+            "mejoras": [],
+            "especialidades": []
+        }
+    }
+}
+
+
+----
+
+Instrucciones:
+
+
+Necesito crear la pagina de "Dojo Shinobi", en el cual el personaje desarrollarse y gastar tobis para mejorar su personaje.
+
+En esta pagina, hay varios features:
+
+- Puedes desbloquear arboles pagando tobis, todos por primera vez tienen arboles_progreso.desbloqueo_arboles con 0. Al hacer una compra, aumenta el contador a 1. 
+La forma en la que funciona la compra, es que aprietas un boton que sea del tipo "Desbloquea un arbol", por primera vez tiene un costo de de 15 Tobis, y cada compra posterior, se le suman +10 tobis, entonces el segundo arbol costaria 25 tobis, el tercer arbol costaria 35 tobis, etc.
+Cuando el valor de desbloqueo_arboles es 0, la primera compra cuesta 15 tobis, se pagan, y ahora desbloqueo_arboles es 1. Entonces, la proxima compra cuesta 25 tobis, y desbloqueo_arboles es 2, etc...
+
+- Puedes desbloquear ramas pagando tobis, todos por primera vez tienen arboles_progreso.desbloqueo_ramas con 0. Al hacer una compra, aumenta el contador a 1. 
+La forma en la que funciona la compra, es que aprietas un boton que sea del tipo "Desbloquea una rama", por primera vez tiene un costo de de 10 Tobis, y cada compra posterior, se le suman +5 tobis, entonces la segunda rama costaria 15 tobis, la tercera rama costaria 20 tobis, etc.
+Cuando el valor de desbloqueo_ramas es 0, la primera compra cuesta 10 tobis, se pagan, y ahora desbloqueo_ramas es 1. Entonces, la proxima compra cuesta 15 tobis, y desbloqueo_ramas es 2, etc...
+
+- Puedes desbloquear poder subir el nivel de las ramas ya compradas pagando tobis, todos por primera vez tienen arboles_progreso.desbloqueo_nivel_ramas con 0. Al hacer una compra, aumenta el contador a 1. 
+La forma en la que funciona la compra, es que aprietas un boton que sea del tipo "Desbloquea poder subir el nivel de una rama", por primera vez tiene un costo de de 5 Tobis, y cada compra posterior, se le suman +2 tobis, entonces la segunda vez que subes de nivel una rama costaria 7 tobis, la tercera costaria 9 tobis, etc.
+Cuando el valor de desbloqueo_nivel_ramas es 0, la primera compra cuesta 5 tobis, se pagan, y ahora desbloqueo_ramas es 1. Entonces, la proxima compra cuesta 7 tobis, y desbloqueo_nivel_ramas es 2, etc...
+
+- Ademas, si eres nivel 1, ya tienes arboles_disponibles = 1, esto te permite comprar un sexto arbol, las opciones son katon, suiton, doton, fuuton, raiton, yin y yang. Puedes comprar cualquier de estos arboles, al nivel 5, si desbloqueo_arboles == 1, puedes comprar otro arbol de esa lista. al nivel 10, si desbloqueo_arboles == 2, puedes comprar otro arbol de esa lista. Al nivel 15 y desbloqueo_arboles == 3, otro mas. Al nivel 20 y desbloqueo_arboles == 4, otro mas.
+
+- En la tabla de la ficha, en el campo de "arboles", si tienes ramas de arboles aun no desbloqueadas (lo puedes saber porque el campo de rama tiene dentro el campo de base como un empty string). En otras palabras, si ramas_disponibles > 0, puedes desbloquear una rama de cualquier de tus arboles que tengas que no haya sido desbloqueada. Desbloquear una rama implica aprender la tecnica base de esa rama. Aprender se hace con un INSERT en `mybb_sg_sg_tec_aprendidas`.
+
+- En la tabla de la ficha, en el campo de "arboles", para una rama que ya haya sido desbloqueada dentro de un arbol, puedes comprar mejoras. Esto se llama subir de nivel la rama. Una rama tiene 6 mejoras, asi que 3 ramas cada una tiene 6 mejoras, para un total de 18 mejoras. Por cada vez que se suba el nivel deu na rama, puedes aprender dos tecnicas de mejoras, puedes seleccionar 2 de cualquier de la rama que esten disponibles, pero tiene que ser 2 de una misma rama. Si la rama ya tiene sus 6 mejoras aprendidas, no se puede aprender mas y se tendria que seleccionar otra rama.
+
+- En la tabla de la ficha, en el campo de "arboles", tambien estan las especializaciones, las cuales se pueden aprender a 0 costo de tobis, siempre y cuando se haya alcanzado nivel 3, 6 o 9 de ramas en un arbol, y se puede elegir cualquiera de las especializaciones. 
+
+- Finalmente, el usuario al principio tras crear la ficha, puede aprender una rama del clan de gratis a 0 costo. Al crear la ficha, la rama del clan es la que no sea ni bukijutsu, ni defensivo, ni resistencia ni taijutsu.
+
+
+

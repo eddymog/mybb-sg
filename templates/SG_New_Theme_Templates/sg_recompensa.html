@@ -1,0 +1,139 @@
+<html>
+
+	<head>
+		<style>
+			.rewards {
+				margin: auto;
+				width: 250px;
+				background-color: #84a4d1;
+				border: 1px solid #6581a8;
+				border-radius: 10px;
+				color: #213d53;
+				padding: 10px;
+			}
+			
+			.rewardtitle {
+				text-decoration: underline;	
+			}
+			
+			.rewardtime {
+				width: 550px;
+			    margin: auto;	
+			}
+			
+			.boton_recompensa input {
+				background-color: #a31520;
+				border: 0px;
+				padding: 0 15px;
+				height: 30px;
+				border-radius: 3px;
+				color: #fff;
+				font-weight: bold;	
+				cursor: pointer;
+			}
+
+		</style>
+		<title>Recompensa Diaria</title>
+		{$headerinclude}
+	</head>
+
+	<body>
+		{$header}
+		<div class="cuerpocentral fondo-blanco" style=" text-align: center; ">
+			<br>
+			<h3>Tu racha máxima ha sido {$recompensas_racha_maxima} recompensas consecutivas.</h3>
+			<h3>Has reclamado en total {$recompensas_reclamadas} recompensas.</h3>
+			<div class="rewards">
+				
+				<h3 class="rewardtitle">Recompensa:</h3>
+				<h4>{$recompensa_items}</h4></div><br>
+				
+				<div class="rewardtime">
+					<if $num_posts == 0 && $days_count == '0' then>
+						Llevas {$num_posts} post en las últimas 48 horas, para cobrar tu recompensa debes realizar 2 posts como mínimo. Vuelve aquí cuando los tengas para cobrar tu recompensa. <br><br>Tírate un rusheo rapidito, no te juzgo. 
+							<br><br><img class="recompensa_image" src="https://media.giphy.com/media/nVvrI946ZBxS0/giphy.gif" />
+					</if>		
+
+					<if $num_posts == 0 && $days_count >= '1' then><br>
+						¡Lograste reclamar la recompensa! <br>...Pero ahora tienes 0 posts desde la última vez que reclamaste. <br><br>Tienes <span id="mytiempo"></span> para rushearte dos posts y mantener la recompensa, o se reiniciará el contador de recompensas a 0. Ahora sí me entró la ansiedad.
+						<br><br><img style="width: 300px;" class="recompensa_image" src="https://media.giphy.com/media/Iosc95v7CmeA0/giphy.gif" />
+					</if>
+					
+					<if $num_posts == 1 && $days_count == '0' then><br>Llevas 1 post en las últimas 48 horas. Para cobrar la recompensa debes postear otra vez en máximo: <span id="mytiempo"></span> o el contador de la recompensa volverá a 0. ¿No serías capaz de perder la racha, o sí?
+						<br><br><img class="recompensa_image" src="https://media.giphy.com/media/8732m3X0kXAw8/giphy.gif" />
+					</if>
+					
+					<if $num_posts == 1 && $days_count >= '1' then><br>Llevas 1 post en las últimas 48 horas desde que reclamaste la última recompensa. <br><br>Para cobrar la recompensa debes postear una vez más en máximo: <br><span id="mytiempo"></span> o el contador de la recompensa volverá a 0.<br><br>¡Vamos, solo un post más!
+						<br><br><img class="recompensa_image" src="https://media.giphy.com/media/hiFrkuBweqx9i8aIc7/giphy.gif" />
+					</if>
+
+					<if $num_posts >= 2 && $should_accept then><br>
+						<div>
+							Llevas {$num_posts} posts en las últimas 48 horas. ¡Ya puedes reclamar tu recompensa! <br><br>Pero cuidadito, tienes <span id="mytiempo"></span> para reclamar tu recompensa, o se reiniciará el contador desde 0. Ayayayayay.<br><br>
+						</div>
+						<div class="boton_recompensa">
+							<form style="display: none" id="recform" method="post" action="recompensa_diaria.php">
+								<input type="text" id="rec_ready" name="rec_ready" value="false">
+							</form>
+							<input type="button" 
+								   onclick="javascript: document.getElementById('rec_ready').value = 'true'; document.getElementById('recform').submit();" value="Reclamar">
+						</div>
+						<br><br><img class="recompensa_image" src="https://media.giphy.com/media/1dMlPP0fybIZy/giphy.gif" />
+					</if>
+
+					<if $num_posts >= 2 && !$should_accept then><br>
+						Llevas {$num_posts} posts en las últimas 48 horas. ¡Te felicito! <br><br>... Sin embargo, debes esperar <span id="mytiempo"></span> para reclamar tu recompensa. Así que toca aguantar la ansiedad de la interminable espera.
+						<br><br><img class="recompensa_image" src="https://media.giphy.com/media/Yv6RcuiyHYmn6/giphy.gif" />
+					</if>
+					
+					<if $days_count >= '2' then>
+						<br><br>Has reclamado la recompensa {$days_count} veces seguidas. Qué crack eres, {$nombre}.
+					</if>
+					
+					<if $days_count == '1' then>
+						<br><br>Has reclamado la recompensa 1 vez, oh là là.
+					</if>
+					
+				</div>
+			</div>
+			<br>
+		</div>
+		<if $log_var !='' then><script>alert(`{$log_var}`);</script></if>
+		{$reload_script}
+		{$footer}
+		<script>
+			let time_left = {$time_left};
+			const one_minute = 60;
+			const one_hour = one_minute * 60;
+			const one_day = one_hour * 24;
+			let timer;
+			document.getElementById('mytiempo').innerHTML = '2 días, 0 horas, 0 minutos y 0 segundos';
+			
+			function calcularSegundos() {
+				var days = Math.floor(time_left / one_day);
+				var hours = Math.floor((time_left % one_day) / one_hour);
+				var minutes = Math.floor((time_left % one_hour) / one_minute);
+				var seconds = Math.floor((time_left % one_minute));
+
+				if (days >= 1) {
+					document.getElementById('mytiempo').innerHTML = days + ' día, ';
+				} else {
+					document.getElementById('mytiempo').innerHTML = '';
+				}
+				document.getElementById('mytiempo').innerHTML += hours + ' horas, ';
+				document.getElementById('mytiempo').innerHTML += minutes + ' minutos y ';
+				document.getElementById('mytiempo').innerHTML += seconds + ' segundos';	
+				time_left = time_left - 1;
+				
+				if (time_left < 0) {
+					clearInterval(timer);
+					location.reload();
+					return;
+				}
+			}
+			
+			timer = setInterval(calcularSegundos, 1000);
+		</script>
+	</body>
+
+</html>

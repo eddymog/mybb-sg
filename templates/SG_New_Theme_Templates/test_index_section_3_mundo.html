@@ -1,0 +1,51 @@
+<section id="section3-mundo">
+    <img src="https://i.ibb.co/5jgp4rH/Mundo.png" alt="Seccion Mundo">
+    <div id="forumSection3">
+        <a href="forumdisplay.php?fid=46">
+            <img src="https://i.ibb.co/pvrx7nH/Pais-del-Fuego.png" alt="Pais del Fuego">
+        </a>
+        <a href="forumdisplay.php?fid=39">
+            <img src="https://i.ibb.co/0Xb9njT/Pais-del-Agua.png" alt="Pais del Agua">
+        </a>
+        <a href="forumdisplay.php?fid=47">
+            <img src="https://i.ibb.co/yQ04WNx/Pais-del-Viento.png" alt="Pais del Viento">
+        </a>
+        <a href="forumdisplay.php?fid=38">
+            <img src="https://i.ibb.co/SwsRSP2/Pais-del-Rayo.png" alt="Pais del Rayo">
+        </a>
+        <a href="forumdisplay.php?fid=48">
+            <img src="https://i.ibb.co/hscn0v0/Pais-de-la-Tierra.png" alt="País de la Tierra">
+        </a>
+        <a href="forumdisplay.php?fid=49">
+            <img src="https://i.ibb.co/JBfXCxk/Resto-del-Mundo.png" alt="Resto del Mundo">
+        </a>
+    </div>
+
+    <style>
+        #section3-mundo{
+            margin-top: 10px;
+
+            img{
+                width: 100%;
+            }
+
+            #forumSection3{
+                margin-top: 10px;
+                display: flex;
+                flex-flow: row wrap;
+                gap: 10px;
+                justify-content: space-between;
+
+                a{
+                    width: 49%;
+                }
+
+                @media (width < 576px){
+                    a{
+                        width: 100%;
+                    }
+                }
+            }
+        }
+    </style>
+</section>

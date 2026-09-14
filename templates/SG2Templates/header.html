@@ -1,0 +1,419 @@
+<script>
+(function() {
+  if (localStorage.getItem('sg-theme') === 'light') {
+    document.documentElement.setAttribute('data-theme', 'light');
+  }
+})();
+
+function toggleSidebar() {
+  var sidebar = document.querySelector('.sidebar'); 
+  sidebar.classList.toggle('active');
+}
+
+function toggleMobileNav() {
+  var menuOp = document.querySelector('.menu-op');
+  var btn = document.getElementById('sg-nav-hamburger');
+  if (menuOp) menuOp.classList.toggle('sg-mobile-open');
+  if (btn) {
+    btn.classList.toggle('sg-mobile-active');
+    btn.setAttribute('aria-expanded', btn.classList.contains('sg-mobile-active') ? 'true' : 'false');
+  }
+}
+
+function toggleTheme() {
+  var html = document.documentElement;
+  var isLight = html.getAttribute('data-theme') === 'light';
+  if (isLight) {
+    html.removeAttribute('data-theme');
+    localStorage.setItem('sg-theme', 'dark');
+  } else {
+    html.setAttribute('data-theme', 'light');
+    localStorage.setItem('sg-theme', 'light');
+  }
+  var btn = document.getElementById('theme-toggle');
+  if (btn) btn.textContent = isLight ? '☀' : '☾';
+}
+</script>
+
+<div id="container">
+<a name="top" id="top"></a>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     FIXED NAVIGATION BAR
+     ═══════════════════════════════════════════════════════════════ -->
+<div class="top-menu">
+  <div class="menu-op">
+    <div class="sg-nav-shell">
+
+      <div class="sg-nav-brand">
+        <a class="sg-nav-brand-link" href="/">
+          <img src="/images/sg/misc/LogoHeader.png" style="height: 36px; filter: drop-shadow(0 2px 10px rgba(0,0,0,0.22));">
+          <span class="sg-nav-brand-copy">
+            <span class="sg-nav-brand-title">Shinobi Gaiden</span>
+            <span class="sg-nav-brand-subtitle">Foro Rol</span>
+          </span>
+        </a>
+      </div>
+
+      <div class="sg-nav-main">
+        <ul class="sg-nav-list sg-nav-primary">
+
+          <li class="sg-nav-item">
+            <a href="{$mybb->settings['bburl']}/forumdisplay.php?fid=25">
+              <span class="sg-nav-spiral"><svg viewBox="0 0 16 16" width="10" height="10" aria-hidden="true" fill="none"><path d="M8 13.2c-2.9 0-5.2-2-5.2-4.9 0-2.5 1.9-4.5 4.5-4.5 2.1 0 3.8 1.4 3.8 3.3 0 1.6-1.2 2.8-2.7 2.8-1.1 0-1.9-.7-1.9-1.7 0-.9.7-1.5 1.5-1.5.7 0 1.2.3 1.6.9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Guías
+            </a>
+          </li>
+
+          <li class="sg-nav-item">
+            <a href="{$mybb->settings['bburl']}/sg/tecnicas.php">
+              <span class="sg-nav-spiral"><svg viewBox="0 0 16 16" width="10" height="10" aria-hidden="true" fill="none"><path d="M8 13.2c-2.9 0-5.2-2-5.2-4.9 0-2.5 1.9-4.5 4.5-4.5 2.1 0 3.8 1.4 3.8 3.3 0 1.6-1.2 2.8-2.7 2.8-1.1 0-1.9-.7-1.9-1.7 0-.9.7-1.5 1.5-1.5.7 0 1.2.3 1.6.9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Técnicas
+            </a>
+          </li>
+
+          <li class="sg-nav-item sg-nav-item-dropdown">
+            <a href="#" id="informacion">
+              <span class="sg-nav-spiral"><svg viewBox="0 0 16 16" width="10" height="10" aria-hidden="true" fill="none"><path d="M8 13.2c-2.9 0-5.2-2-5.2-4.9 0-2.5 1.9-4.5 4.5-4.5 2.1 0 3.8 1.4 3.8 3.3 0 1.6-1.2 2.8-2.7 2.8-1.1 0-1.9-.7-1.9-1.7 0-.9.7-1.5 1.5-1.5.7 0 1.2.3 1.6.9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Información
+              <span class="sg-nav-caret">▾</span>
+            </a>
+            <ul class="sg-nav-dropdown">
+		      <if $g_uid != 0 then><li><a href="{$mybb->settings['bburl']}/sg/recompensa_diaria.php" id="recompensas">Recompensa Diaria</a></li></if>
+			  <li><a href="{$mybb->settings['bburl']}/sg/mapa_mundo.php">Mapa del Mundo</a></li>
+			  <li><a href="{$mybb->settings['bburl']}/sg/registro_virtudes.php">Virtudes y Defectos</a></li>
+			  <li><a href="{$mybb->settings['bburl']}/sg/registro_personajes.php">Registro de Personajes</a></li>
+			  <li><a href="{$mybb->settings['bburl']}/sg/objetos.php">Objetos</a></li>
+              <li><a href="{$mybb->settings['bburl']}/sg/calculadora.php">Calc. de Estadísticas</a></li>
+              <li><a href="{$mybb->settings['bburl']}/sg/censo.php">Censo y Estadísticas</a></li>
+            </ul>
+          </li>
+
+		  <if $g_uid != 0 then>
+          <li class="sg-nav-item sg-nav-item-dropdown">
+            <a href="#" id="rol">
+              <span class="sg-nav-spiral"><svg viewBox="0 0 16 16" width="10" height="10" aria-hidden="true" fill="none"><path d="M8 13.2c-2.9 0-5.2-2-5.2-4.9 0-2.5 1.9-4.5 4.5-4.5 2.1 0 3.8 1.4 3.8 3.3 0 1.6-1.2 2.8-2.7 2.8-1.1 0-1.9-.7-1.9-1.7 0-.9.7-1.5 1.5-1.5.7 0 1.2.3 1.6.9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Rol
+              <span class="sg-nav-caret">▾</span>
+            </a>
+            <ul class="sg-nav-dropdown">
+			  <li><a href="{$mybb->settings['bburl']}/sg/dojo.php">Dojo</a></li>
+              <li><a href="{$mybb->settings['bburl']}/sg/misiones.php" id="misiones">Misiones</a></li>
+			  <li><a href="{$mybb->settings['bburl']}/sg/tienda.php">Tienda</a></li>
+			  <li><a href="{$mybb->settings['bburl']}/sg/tienda_rins.php">Tienda de Rins</a></li>
+			  <li><a href="{$mybb->settings['bburl']}/sg/tienda_tobis.php">Tienda de Tobis</a></li>
+			  <li><a href="{$mybb->settings['bburl']}/sg/pergaminos.php">Pergaminos</a></li>
+	     	  <li><a href="{$mybb->settings['bburl']}/sg/intercambios.php">Intercambios</a></li>
+            </ul>
+          </li>
+     	  </if>
+
+          <if $g_tiene_ficha == false && $g_uid != 0 then>
+          <li class="sg-nav-item sg-nav-item-highlight">
+            <a href="{$mybb->settings['bburl']}/sg/ficha.php?uid={$mybb->user['uid']}">
+              <span class="sg-nav-spiral"><svg viewBox="0 0 16 16" width="10" height="10" aria-hidden="true" fill="none"><path d="M8 13.2c-2.9 0-5.2-2-5.2-4.9 0-2.5 1.9-4.5 4.5-4.5 2.1 0 3.8 1.4 3.8 3.3 0 1.6-1.2 2.8-2.7 2.8-1.1 0-1.9-.7-1.9-1.7 0-.9.7-1.5 1.5-1.5.7 0 1.2.3 1.6.9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Nueva Ficha
+            </a>
+          </li>
+          </if>
+			
+		  <if $g_tiene_ficha == true then>
+          <li class="sg-nav-item">
+            <a href="{$mybb->settings['bburl']}/sg/ficha.php?uid={$mybb->user['uid']}">
+              <span class="sg-nav-spiral"><svg viewBox="0 0 16 16" width="10" height="10" aria-hidden="true" fill="none"><path d="M8 13.2c-2.9 0-5.2-2-5.2-4.9 0-2.5 1.9-4.5 4.5-4.5 2.1 0 3.8 1.4 3.8 3.3 0 1.6-1.2 2.8-2.7 2.8-1.1 0-1.9-.7-1.9-1.7 0-.9.7-1.5 1.5-1.5.7 0 1.2.3 1.6.9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Ficha
+            </a>
+          </li>
+          </if>
+        </ul>
+      </div>
+
+      <div class="sg-nav-actions">
+        <if $mybb->user['uid'] == '0' then>
+        <ul class="sg-nav-list sg-nav-secondary">
+          <li class="sg-nav-item sg-nav-item-ghost">
+            <a href="{$mybb->settings['bburl']}/member.php?action=login"
+               onclick="$('#quick_login').modal({ fadeDuration: 250, keepelement: true, zIndex: (typeof modal_zindex !== 'undefined' ? modal_zindex : 9999) }); return false;">Iniciar Sesión</a>
+          </li>
+          <li class="sg-nav-item sg-nav-item-highlight">
+            <a href="{$mybb->settings['bburl']}/member.php?action=register">Regístrate</a>
+          </li>
+          <li class="sg-nav-item sg-nav-item-ghost">
+            <a href="{$mybb->settings['bburl']}/showthread.php?tid=13384">Primeros pasos</a>
+          </li>
+        </ul>
+        </if>
+
+        <if $mybb->user['uid'] != '0' then>
+        <ul class="sg-nav-list sg-nav-secondary">
+          <li class="sg-nav-item sg-nav-item-dropdown sg-nav-item-user">
+            <a href="#" id="ficha">
+              <span class="sg-nav-user-meta">
+                <span class="sg-nav-user-label">Perfil</span>
+                <span class="sg-nav-user-name">{$mybb->user['username']}</span>
+              </span>
+              <span class="sg-nav-caret">▾</span>
+            </a>
+            <ul class="sg-nav-dropdown sg-nav-dropdown-user">
+              {$as_header_dropdown}
+              <if $mybb->user['uid'] == '196' then><li><a href="{$mybb->settings['bburl']}/admin/index.php">Consola Admin</a></li></if>
+              <if $g_is_staff then><li><a href="{$mybb->settings['bburl']}/sg/admin/consola_mod.php">Consola de Mods</a></li></if>
+              <li><a href="{$mybb->settings['bburl']}/sg/peticiones.php">Petición Administrativa</a></li>
+              <li><a href="{$mybb->settings['bburl']}/private.php">Mensajes Privados</a></li>
+              <li><a href="{$mybb->settings['bburl']}/usercp.php">Panel de Usuario</a></li>
+              <li><a href="{$mybb->settings['bburl']}/search.php">Búsqueda</a></li>
+              <li><a href="{$mybb->settings['bburl']}/usercp.php?action=drafts">Borradores de Posts</a></li>
+              <li><a href="{$mybb->settings['bburl']}/usercp.php?action=subscriptions">Temas Suscritos</a></li>
+              <li><a href="{$mybb->settings['bburl']}/usercp.php?action=as_edit">Gestión Multicuenta</a></li>
+              <if $g_is_staff then><li><a href="{$mybb->settings['bburl']}/forumdisplay.php?fid=282">Guarida Secreta</a></li></if>
+              <li><a href="{$mybb->settings['bburl']}/member.php?action=logout&amp;logoutkey={$mybb->user['logoutkey']}">Desconectarse</a></li>
+            </ul>
+          </li>
+          <li class="sg-nav-avatar-item">
+            <a href="{$mybb->settings['bburl']}/member.php?action=profile&uid={$mybb->user['uid']}" class="sg-nav-avatar-link">
+              <if $mybb->user['avatar'] then>
+                <img src="{$g_avatar}" class="sg-nav-avatar" style="border-color: var({$g_villa_color});">
+              </if>
+              <if !$mybb->user['avatar'] then>
+                <img src="/images/default_avatar.png" class="sg-nav-avatar" style="border-color: var(--border);">
+              </if>
+            </a>
+          </li>
+        </ul>
+        </if>
+
+      </div><!-- /.sg-nav-actions -->
+
+      <div class="sg-nav-controls">
+        <button id="sg-nav-hamburger" class="sg-nav-hamburger" onclick="toggleMobileNav()" aria-label="Menú" aria-expanded="false">
+          <span class="sg-nav-hamburger-bar"></span>
+          <span class="sg-nav-hamburger-bar"></span>
+          <span class="sg-nav-hamburger-bar"></span>
+        </button>
+        <button id="theme-toggle" onclick="toggleTheme()" title="Cambiar tema" class="sg-nav-theme-btn">☀</button>
+      </div>
+
+    </div>
+  </div>
+</div><!-- /.top-menu -->
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     HEADER BLOCK — banner + identity overlay
+     ═══════════════════════════════════════════════════════════════ -->
+<div id="header" style="max-width: 1100px; width: 100%; margin: auto; box-sizing: border-box;">
+
+  <div class="hrDivider"></div>
+
+  <!-- Banner wrapper with identity overlay -->
+  <!-- Sin overflow:hidden aquí: #logo (dentro) ya tiene el suyo propio para
+       recortar el barrido kunai; este overflow extra estaba recortando
+       también el chakra glow (su box-shadow se desborda un poco de #logo,
+       y este contenedor lo cortaba antes de que el navegador lo pintara). -->
+  <div style="position: relative; width: 100%;">
+
+    <!-- Banner image -->
+    <a href="https://shinobigaiden.net/index.php" style="display: block; line-height: 0;">
+      <div id="logo">
+        <if $g_is_banner_horny then>
+          <if $banner_horny_or_not == '1' then>
+            <img src="/images/sg/bannersfreeia/banner{$banner_horny_number}.png">
+          <else />
+            <img src="/images/sg/banners/banner{$banner_number}.jpeg">
+          </if>
+        <elseif $g_enable_hentai == '1' then>
+          <img src="/images/sg/bannershitsu/banner{$banner_hitsu_number}.png">
+        <elseif $g_is_banner_nami then>
+          <!-- nami banners disabled -->
+        <else />
+          <if $g_banner_rotativo then>
+            <img id="sg-banner-rotativo" src="{$g_banner_rotativo_imagen_esc}" alt="{$g_banner_rotativo_titulo_esc}">
+          <else />
+            <img src="/images/banners/sg_banner1.jpg">
+          </if>
+        </if>
+      </div>
+    </a>
+
+    <!-- Identity overlay — bottom edge of banner -->
+    <div style="position: absolute; bottom: 0; left: 0; right: 0; pointer-events: none;
+                background: linear-gradient(to top, rgba(15,12,24,0.88) 0%, rgba(15,12,24,0.4) 50%, transparent 100%);
+                padding: 22px 24px 14px;">
+      <div style="display: flex; align-items: flex-end; justify-content: space-between;">
+
+        <!-- Left: hanko + title block -->
+        <div style="display: flex; align-items: flex-end; gap: 16px; position: relative; top: -13px;">
+
+          <!-- Hanko seal -->
+          <div style="width: 48px; height: 48px; border: 1.5px solid var(--oxide); border-radius: 50%;
+                      display: flex; flex-direction: column; align-items: center; justify-content: center;
+                      background: rgba(192,88,42,0.10); flex-shrink: 0; ">
+            <span style="font-family: 'Source Serif 4', serif; font-size: 16px; font-weight: 700; color: var(--oxide); line-height: 1;">忍</span>
+            <small style="font-family: 'Cinzel', serif; font-size: 7px; letter-spacing: 1.7px; color: var(--oxide); text-transform: uppercase; line-height: 1.5;">SG</small>
+          </div>
+
+        <!-- Right: logged-in user greeting -->
+        <if $mybb->user['uid'] != '0' then>
+        <div style="text-align: right; pointer-events: auto;">
+          <div style="font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 2.2px;
+                      text-transform: uppercase; color: rgba(232,223,248,0.48); margin-bottom: 4px;">Bienvenido</div>
+          <a href="{$mybb->settings['bburl']}/member.php?action=profile&uid={$mybb->user['uid']}"
+             style="font-family: 'Cinzel', serif; font-size: 15px; font-weight: 700; letter-spacing: 1.6px;
+                    color: var(--oxide2); text-transform: uppercase; text-decoration: none;">{$mybb->user['username']}</a>
+        </div>
+        </if>
+
+      </div>
+    </div>
+  </div><!-- /banner wrapper -->
+
+  <!-- Guest CTA banner -->
+  <if $mybb->user['uid'] == '0' then>
+  <div class="sg-guest-cta">
+    <a href="/showthread.php?tid=1938" style="display: block; line-height: 0;">
+      <img style="width: 100%; display: block;" src="/images/sg/misc/inicia_tu_camino.jpg">
+    </a>
+  </div>
+  </if>
+
+  <div class="hrDivider"></div>
+
+</div><!-- /#header -->
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     STAFF ADMIN BAND (staff only)
+     ═══════════════════════════════════════════════════════════════ -->
+<if $g_is_staff then>
+<div style="max-width: 1100px; width: 100%; margin: auto; background: var(--bg3); border-bottom: 0.5px solid var(--border);
+            padding: 8px 24px; box-sizing: border-box; display: flex; align-items: center; gap: 12px;">
+  <div style="width: 2px; height: 18px; background: var(--oxide); flex-shrink: 0;"></div>
+  <span style="font-family: 'Cinzel', serif; font-size: 9px; font-weight: 700; letter-spacing: 2.2px;
+               text-transform: uppercase; color: var(--mist);">Staff</span>
+  <div style="flex: 1; height: 0.5px; background: var(--border);"></div>
+  <span style="font-family: 'Cinzel', serif; font-size: 11px; color: var(--stone); letter-spacing: 0.7px; line-height: 1.5;">
+    <a href="/sg/admin/fichas_en_cola.php" style="color: var(--plum3);">Fichas en cola</a>: {$g_fichas_en_cola}
+    <span style="color: var(--mist); margin: 0 8px;">·</span>
+    <a href="/sg/admin/peticiones_admin.php" style="color: var(--plum3);">Peticiones</a>: {$g_peticiones}
+<!--     <span style="color: var(--mist); margin: 0 8px;">·</span> -->
+<!--     <a href="/sg/admin/tecnicas_creacion.php" style="color: var(--plum3);">Creaciones</a>: {$g_total_creaciones_sin_moderar} / {$g_total_creaciones_pendientes} -->
+  </span>
+</div>
+</if>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     SABÍAS QUE — staff / specific user only (tarjeta compacta)
+     ═══════════════════════════════════════════════════════════════ -->
+<if $current_page != "index.php" then>
+<div style="max-width: 1100px; width: 100%; margin: 0 auto; box-sizing: border-box;">
+  <div style="display: flex; align-items: center; gap: 14px; background: var(--bg2);
+              border-top: 0.5px solid var(--border); border-bottom: 0.5px solid var(--border);
+              padding: 12px 24px;">
+
+    <div style="flex-shrink: 0; width: 38px; height: 38px; border: 1.5px solid var(--oxide); border-radius: 50%;
+                display: flex; align-items: center; justify-content: center;
+                background: rgba(192,88,42,0.10);">
+      <span style="font-family: 'Source Serif 4', serif; font-size: 14px; font-weight: 700; line-height: 1; color: var(--oxide);">知</span>
+    </div>
+
+    <div style="min-width: 0; flex: 1;">
+      <span style="font-family: 'Cinzel', serif; font-size: 10px; font-weight: 900; letter-spacing: 1.6px;
+                  text-transform: uppercase; color: var(--plum); white-space: nowrap; margin-right: 8px;">
+        <if $banner_sabias_que == '1' then>¿Sabías que…</if>
+        <!-- if $banner_sabias_que == '2' then>Hay rumores sobre…/if -->
+        <!-- if $banner_sabias_que == '3' then>En este foro…/if -->
+      </span><span style="font-family: 'Source Serif 4', serif; font-size: 13px; line-height: 1.6; color: var(--ink);
+                  display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; overflow: hidden;">{$g_sabiasque['texto']}</span>
+    </div>
+
+  </div>
+</div>
+</if>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     LOGIN MODAL
+     ═══════════════════════════════════════════════════════════════ -->
+<div class="modal login-modal" id="quick_login" style="display: none; background-color: var(--bg2);">
+  <form method="post" action="{$mybb->settings['bburl']}/member.php">
+    <input name="action" type="hidden" value="do_login" />
+    <input name="url" type="hidden" value="" />
+    <input name="quick_login" type="hidden" value="1" />
+    <input name="my_post_key" type="hidden" value="{$mybb->post_code}" />
+    <table style="background-color: var(--bg2);" width="100%" cellspacing="{$theme['borderwidth']}" cellpadding="{$theme['tablespace']}" border="0" class="tborder">
+      <tr>
+        <td class="thead signin" colspan="3" style="background-color: var(--plum); color: var(--lavender) !important;">{$lang->login}</td>
+      </tr>
+      {$loginform}
+    </table>
+  </form>
+</div>
+
+<script type="text/javascript">
+  $("#quick_login input[name='url']").val($(location).attr('href'));
+  (function() {
+    var btn = document.getElementById('theme-toggle');
+    var saved = localStorage.getItem('sg-theme') || 'dark';
+    if (btn) btn.textContent = saved === 'light' ? '☾' : '☀';
+  })();
+</script>
+
+<script>
+  (function() {
+    // Hue-rotate aleatorio (1-360deg) por hover: la CSS lee --sg-hue vía
+    // var() en #logo y .temporada_index (sg_global.css). Un nuevo mouseenter
+    // siempre recalcula el valor, así cada pasada de mouse es distinta.
+    function sgHueAleatorio(el) {
+      el.addEventListener('mouseenter', function() {
+        var deg = Math.floor(Math.random() * 360) + 1; // 1–360
+        el.style.setProperty('--sg-hue', deg + 'deg');
+      });
+    }
+    var sgLogo = document.getElementById('logo');
+    if (sgLogo) { sgHueAleatorio(sgLogo); }
+    document.querySelectorAll('.temporada_index').forEach(sgHueAleatorio);
+  })();
+</script>
+
+<if $g_banner_rotativo then>
+<script>
+  (function() {
+    // Rotación en vivo del banner del header: el servidor ya calculó el banner
+    // "correcto" para esta ventana de 5 min (sg_banner_rotativo() en
+    // sg_functions.php); este script solo avanza al siguiente en el navegador
+    // sin recargar la página, para quien se queda en la misma página un rato.
+    var sgBanners = {$g_banner_rotativo_json};
+    var sgSlot = {$g_banner_rotativo_slot};
+    var sgDuracionMs = {$g_banner_rotativo_duracion} * 1000;
+    var sgImg = document.getElementById('sg-banner-rotativo');
+    if (!sgImg || sgBanners.length < 2) { return; } // 1 solo banner: nada que rotar
+
+    // opacity 0.3s primero en la lista: gana para esa propiedad específica
+    // (fundido rápido al rotar banner); "all 1s ease-out" cubre el resto
+    // (transform/filter del hover en sg_global.css) para que no se corten.
+    sgImg.style.transition = 'opacity 0.3s, all 1s ease-out';
+
+    function sgSiguienteBanner() {
+      sgSlot = (sgSlot + 1) % sgBanners.length;
+      var b = sgBanners[sgSlot];
+      sgImg.style.opacity = '0';
+      setTimeout(function() {
+        sgImg.src = b.imagen;
+        sgImg.alt = b.titulo || '';
+        sgImg.style.opacity = '1';
+      }, 300);
+    }
+
+    setInterval(sgSiguienteBanner, sgDuracionMs);
+  })();
+</script>
+</if>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     CONTENT AREA
+     ═══════════════════════════════════════════════════════════════ -->
+<div id="content">
+  <div class="wrapper">
+    {$bbclosedwarning}
+    {$modnotice}
+    {$pm_notice}
+    {$remote_avatar_notice}
+    {$bannedwarning}
+    {$pending_joinrequests}
+    {$awaitingusers}
+    <navigation>
