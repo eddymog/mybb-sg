@@ -3329,3 +3329,641 @@ function sg_intercambios_adjuntar_items($rows) {
 
     return array_values($rows);
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Calendario Shinobi Dinámico (Índice). Ver docs/CAMBIOS_AUDITORIA.md [AUDIT-003].
+// 4 temporadas fijas de 90 días (360 días por año ninja) a partir de fecha base.
+// ─────────────────────────────────────────────────────────────────────────────
+if (!defined('SG_CALENDARIO_ANIO_BASE'))  { define('SG_CALENDARIO_ANIO_BASE', 150); }
+if (!defined('SG_CALENDARIO_FECHA_BASE')) { define('SG_CALENDARIO_FECHA_BASE', '2026-10-19'); }
+if (!defined('SG_CALENDARIO_TEMP_BASE'))  { define('SG_CALENDARIO_TEMP_BASE', 'otono'); }
+
+function sg_calendario_shinobi_data() {
+    global $mybb;
+
+    $anio_base      = defined('SG_CALENDARIO_ANIO_BASE')  ? (int) SG_CALENDARIO_ANIO_BASE  : 150;
+    $fecha_base_str = defined('SG_CALENDARIO_FECHA_BASE') ? SG_CALENDARIO_FECHA_BASE       : '2026-10-19';
+    $temp_base      = defined('SG_CALENDARIO_TEMP_BASE')  ? strtolower(SG_CALENDARIO_TEMP_BASE) : 'otono';
+
+    // Permite sobreescritura opcional por ajustes de MyBB en ACP si existieran
+    if (!empty($mybb->settings['sg_calendario_anio_base'])) {
+        $anio_base = (int) $mybb->settings['sg_calendario_anio_base'];
+    }
+    if (!empty($mybb->settings['sg_calendario_fecha_base'])) {
+        $fecha_base_str = $mybb->settings['sg_calendario_fecha_base'];
+    }
+    if (!empty($mybb->settings['sg_calendario_temp_base'])) {
+        $temp_base = strtolower($mybb->settings['sg_calendario_temp_base']);
+    }
+
+    $time_base = @strtotime($fecha_base_str . ' 00:00:00');
+    if (!$time_base) {
+        $time_base = @strtotime('2026-10-19 00:00:00');
+    }
+
+    $time_now = defined('TIME_NOW') ? TIME_NOW : time();
+    $dias_transcurridos = max(0, (int) floor(($time_now - $time_base) / 86400));
+
+    // Catálogo canónico de temporadas y sus imágenes
+    $catalogo_temporadas = array(
+        'otono'     => array('nombre' => 'Otoño',     'slug' => 'otono',     'bg' => '/images/char_create/cfsotono.png'),
+        'invierno'  => array('nombre' => 'Invierno',  'slug' => 'invierno',  'bg' => '/images/char_create/cfsinvierno.png'),
+        'primavera' => array('nombre' => 'Primavera', 'slug' => 'primavera', 'bg' => '/images/char_create/cfsprimavera.png'),
+        'verano'    => array('nombre' => 'Verano',    'slug' => 'verano',    'bg' => 'https://i.ibb.co/kxBKxcp/verano.png'),
+    );
+
+    // Ciclo secuencial canónico de 4 estaciones
+    $orden_slugs = array('otono', 'invierno', 'primavera', 'verano');
+    $offset_base = array_search($temp_base, $orden_slugs);
+    if ($offset_base === false) { $offset_base = 0; }
+
+    // 4 temporadas fijas de 90 días = ciclo de 360 días por año de rol
+    $dias_temporada = 90;
+    $dias_ciclo_anio = $dias_temporada * 4; // 360
+
+    $anios_extra = (int) floor($dias_transcurridos / $dias_ciclo_anio);
+    $anio_actual = $anio_base + $anios_extra;
+
+    $dia_en_ciclo = $dias_transcurridos % $dias_ciclo_anio; // 0..359
+    $temporadas_avanzadas = (int) floor($dia_en_ciclo / $dias_temporada);
+
+    $indice_temporada = ($offset_base + $temporadas_avanzadas) % 4;
+    $slug_actual = $orden_slugs[$indice_temporada];
+    $temp_info = isset($catalogo_temporadas[$slug_actual]) ? $catalogo_temporadas[$slug_actual] : $catalogo_temporadas['otono'];
+
+    $dia_actual = ($dia_en_ciclo % $dias_temporada) + 1; // 1..90
+    $fill_pct   = min(100, max(0, (int) round(($dia_actual / $dias_temporada) * 100)));
+
+    return array(
+        'anio'         => $anio_actual,
+        'temporada'    => $temp_info['nombre'],
+        'slug'         => $temp_info['slug'],
+        'dia_actual'   => $dia_actual,
+        'dias_totales' => $dias_temporada,
+        'fill_pct'     => $fill_pct,
+        'imagen_bg'    => $temp_info['bg'],
+    );
+}
+
+function sg_calendario_index_html() {
+    $cal = sg_calendario_shinobi_data();
+
+    $temporada    = htmlspecialchars($cal['temporada']);
+    $anio         = (int) $cal['anio'];
+    $dia_actual   = (int) $cal['dia_actual'];
+    $dias_totales = (int) $cal['dias_totales'];
+    $fill_pct     = (int) $cal['fill_pct'];
+    $bg           = htmlspecialchars($cal['imagen_bg'], ENT_QUOTES);
+
+    return '
+          <article class="sg-index-panel sg-index-season" style="--sg-season-bg: url(\'' . $bg . '\');">
+            <div class="sg-index-season__copy">
+              <div class="sg-index-season__eyebrow">Calendario Shinobi</div>
+              <div class="sg-index-season__title">' . $temporada . '</div>
+
+              <div class="sg-index-season__row">
+                <span class="sg-index-season__chip">Año ' . $anio . '</span>
+                <span class="sg-index-season__chip">Días 1–' . $dias_totales . '</span>
+              </div>
+
+              <!-- Al cambiar de temporada, se actualiza automáticamente según el ciclo de 90 días -->
+              <div class="sg-index-limit">
+                <div class="sg-index-limit__head">
+                  Fecha límite de rol: <span class="sg-index-limit__value">día ' . $dia_actual . '</span> de ' . $dias_totales . '
+                </div>
+                <div class="sg-index-limit__bar" style="--fill:' . $fill_pct . '%;">
+                  <div class="sg-index-limit__fill"></div>
+                  <div class="sg-index-limit__marker"></div>
+                </div>
+              </div>
+            </div>
+          </article>';
+}
+
+// ============================================================================
+// GESTIÓN DINÁMICA DE TÉCNICAS Y ÁRBOLES EN EL FORO (sg/tecnicas.php)
+// ============================================================================
+
+function sg_tecnicas_secciones_defecto() {
+    return array(
+        'elementales' => array(
+            'id'      => 'elementales',
+            'titulo'  => 'Técnicas elementales',
+            'eyebrow' => 'Afinidades base',
+            'desc'    => 'La base del ninjutsu clásico. Aquí se agrupan las naturalezas elementales y las corrientes Yin-Yang.',
+            'arboles' => array('katon', 'suiton', 'doton', 'fuuton', 'raiton', 'yin', 'yang')
+        ),
+        'konoha' => array(
+            'id'      => 'konoha',
+            'titulo'  => 'Clanes Konoha',
+            'eyebrow' => 'Linajes del fuego',
+            'desc'    => 'Selección de árboles heredados por las familias más influyentes de la Hoja.',
+            'arboles' => array('aburame', 'akimichi', 'hyuga', 'nara', 'senju', 'uchiha', 'yamanaka', 'inuzuka', 'sarutobi')
+        ),
+        'kiri' => array(
+            'id'      => 'kiri',
+            'titulo'  => 'Clanes Kiri',
+            'eyebrow' => 'Linajes de la niebla',
+            'desc'    => 'Un compendio de ramas asociadas a Kirigakure y estilos de combate de la Niebla.',
+            'arboles' => array('hoshigaki', 'kaguya', 'yuki', 'hozuki', 'heizu', 'terumi', 'akizu', 'funato', 'kodon')
+        ),
+        'generales' => array(
+            'id'      => 'generales',
+            'titulo'  => 'Jutsus generales',
+            'eyebrow' => 'Estilos abiertos',
+            'desc'    => 'Ramas versátiles de arma, defensa, aguante físico y combate cuerpo a cuerpo.',
+            'arboles' => array('bukijutsu', 'defensivo', 'resistencia', 'taijutsu')
+        ),
+    );
+}
+
+function sg_get_arboles_agrupados($db) {
+    global $cache;
+    $secciones = sg_tecnicas_secciones_defecto();
+
+    $mapa_guardado = array();
+    if (is_object($cache)) {
+        $cached = $cache->read('sg_arboles_secciones');
+        if (is_array($cached)) { $mapa_guardado = $cached; }
+    }
+
+    foreach ($mapa_guardado as $arbol_k => $sec_id) {
+        if (isset($secciones[$sec_id]) && !in_array($arbol_k, $secciones[$sec_id]['arboles'], true)) {
+            $secciones[$sec_id]['arboles'][] = $arbol_k;
+        }
+    }
+
+    $arboles_bd = array();
+    $q = $db->query("
+        SELECT DISTINCT LOWER(TRIM(arbol)) as a
+        FROM mybb_sg_sg_tecnicas
+        WHERE TRIM(arbol) <> ''
+        ORDER BY a
+    ");
+    while ($r = $db->fetch_array($q)) {
+        $arboles_bd[] = $r['a'];
+    }
+
+    $asignados = array();
+    foreach ($secciones as $sec) {
+        foreach ($sec['arboles'] as $a) { $asignados[$a] = true; }
+    }
+
+    $no_asignados = array();
+    foreach ($arboles_bd as $a) {
+        if (!isset($asignados[$a])) {
+            $no_asignados[] = $a;
+        }
+    }
+
+    if (!empty($no_asignados)) {
+        $secciones['especiales'] = array(
+            'id'      => 'especiales',
+            'titulo'  => 'Árboles Adicionales y Clanes Especiales',
+            'eyebrow' => 'Nuevas creaciones',
+            'desc'    => 'Árboles de habilidades y disciplinas especiales agregadas por el Staff.',
+            'arboles' => $no_asignados
+        );
+    }
+
+    return $secciones;
+}
+
+function sg_crear_arbol_rapido($db, $params, $staff_uid) {
+    $err = function($m) { return array('ok' => false, 'tipo' => 'error', 'msg' => $m); };
+    $ok  = function($m) { return array('ok' => true,  'tipo' => 'ok',    'msg' => $m); };
+
+    $arbol_raw  = isset($params['arbol_nombre']) ? trim($params['arbol_nombre']) : '';
+    $arbol_slug = strtolower($arbol_raw);
+    $seccion    = isset($params['seccion']) ? trim($params['seccion']) : 'generales';
+
+    $base_tid   = strtoupper(trim(isset($params['base_tid']) ? $params['base_tid'] : ''));
+    $base_nombre= trim(isset($params['base_nombre']) ? $params['base_nombre'] : '');
+    $base_coste = (int) (isset($params['base_coste']) ? $params['base_coste'] : 100);
+    $base_desc  = trim(isset($params['base_desc']) ? $params['base_desc'] : '');
+
+    $r1_nombre  = trim(isset($params['rama1_nombre']) ? $params['rama1_nombre'] : 'Rama 1');
+    $r2_nombre  = trim(isset($params['rama2_nombre']) ? $params['rama2_nombre'] : 'Rama 2');
+    $r3_nombre  = trim(isset($params['rama3_nombre']) ? $params['rama3_nombre'] : 'Rama 3');
+
+    if ($arbol_slug === '') { return $err("El nombre del árbol es obligatorio."); }
+    if ($base_tid === '')   { return $err("El ID (TID) de la técnica base es obligatorio."); }
+    if ($base_nombre === '') { return $err("El nombre de la técnica base es obligatorio."); }
+
+    $base_tid_esc = $db->escape_string($base_tid);
+    $q_existe = $db->query("SELECT tid FROM mybb_sg_sg_tecnicas WHERE tid='$base_tid_esc'");
+    if ($db->num_rows($q_existe) > 0) {
+        return $err("El ID de técnica $base_tid ya existe en la base de datos.");
+    }
+
+    $arbol_esc   = $db->escape_string($arbol_slug);
+    $nombre_esc  = $db->escape_string($base_nombre);
+    $desc_esc    = $db->escape_string($base_desc !== '' ? $base_desc : "Técnica base para el árbol de $arbol_raw.");
+
+    // 1. Inserta la técnica base del árbol (rama='Base', categoria='Base')
+    $db->query("
+        INSERT INTO `mybb_sg_sg_tecnicas`
+            (`tid`, `nombre`, `arbol`, `rama`, `categoria`, `coste`, `descripcion`)
+        VALUES
+            ('$base_tid_esc', '$nombre_esc', '$arbol_esc', 'Base', 'Base', '$base_coste', '$desc_esc')
+    ");
+
+    // 2. Inserta las 3 técnicas base de cada rama para estructurar el árbol
+    $r1_tid = $base_tid . '_R1';
+    $r2_tid = $base_tid . '_R2';
+    $r3_tid = $base_tid . '_R3';
+
+    $db->query("
+        INSERT IGNORE INTO `mybb_sg_sg_tecnicas`
+            (`tid`, `nombre`, `arbol`, `rama`, `categoria`, `coste`, `descripcion`)
+        VALUES
+            ('$r1_tid', '" . $db->escape_string($r1_nombre) . "', '$arbol_esc', 'Rama 1', 'Base', '$base_coste', 'Técnica inicial de " . $db->escape_string($r1_nombre) . "'),
+            ('$r2_tid', '" . $db->escape_string($r2_nombre) . "', '$arbol_esc', 'Rama 2', 'Base', '$base_coste', 'Técnica inicial de " . $db->escape_string($r2_nombre) . "'),
+            ('$r3_tid', '" . $db->escape_string($r3_nombre) . "', '$arbol_esc', 'Rama 3', 'Base', '$base_coste', 'Técnica inicial de " . $db->escape_string($r3_nombre) . "')
+    ");
+
+    // 3. Guarda la sección asignada en la caché
+    global $cache;
+    if (is_object($cache)) {
+        $secciones_map = $cache->read('sg_arboles_secciones');
+        if (!is_array($secciones_map)) { $secciones_map = array(); }
+        $secciones_map[$arbol_slug] = $seccion;
+        $cache->update('sg_arboles_secciones', $secciones_map);
+    }
+
+    // 4. Reconstruye el catálogo del Dojo
+    sg_rebuild_catalogo_arboles($db);
+
+    // 5. Registra auditoría
+    $log = "Nuevo árbol de habilidades creado: $arbol_raw (TID Base: $base_tid). Ramas: $r1_nombre, $r2_nombre, $r3_nombre.";
+    $log_esc = $db->escape_string($log);
+    $db->query("INSERT INTO `mybb_sg_sg_audit_consola` (`staff`, `razon`, `log`) VALUES ('1', 'Creación de Árbol', '$log_esc')");
+
+    return $ok("¡El árbol " . htmlspecialchars($arbol_raw) . " fue creado con éxito y ya está publicado!");
+}
+
+function sg_eliminar_arbol($db, $arbol_raw, $staff_uid) {
+    $err = function($m) { return array('ok' => false, 'tipo' => 'error', 'msg' => $m); };
+    $ok  = function($m) { return array('ok' => true,  'tipo' => 'ok',    'msg' => $m); };
+
+    $staff_uid = (int) $staff_uid;
+    if (!(is_mod($staff_uid) || is_staff($staff_uid))) {
+        return $err("Sin permisos de Staff.");
+    }
+
+    $arbol_slug = strtolower(trim($arbol_raw));
+    if ($arbol_slug === '') {
+        return $err("Debes especificar el árbol a eliminar.");
+    }
+
+    $protegidos = array('katon', 'suiton', 'doton', 'fuuton', 'raiton', 'yin', 'yang');
+    if (in_array($arbol_slug, $protegidos, true)) {
+        return $err("Los árboles elementales base (Katon, Suiton, Doton, Fuuton, Raiton, Yin, Yang) están protegidos del sistema y no pueden ser eliminados.");
+    }
+
+    $arbol_esc = $db->escape_string($arbol_slug);
+
+    $tids = array();
+    $q = $db->query("SELECT tid FROM `mybb_sg_sg_tecnicas` WHERE LOWER(arbol)='$arbol_esc'");
+    while ($r = $db->fetch_array($q)) {
+        $tids[] = "'" . $db->escape_string($r['tid']) . "'";
+    }
+
+    if (empty($tids)) {
+        return $err("El árbol '$arbol_raw' no existe o no tiene técnicas registradas.");
+    }
+
+    $db->query("DELETE FROM `mybb_sg_sg_tecnicas` WHERE LOWER(arbol)='$arbol_esc'");
+
+    $in_tids = implode(',', $tids);
+    $db->query("DELETE FROM `mybb_sg_sg_tec_aprendidas` WHERE tid IN ($in_tids)");
+
+    sg_rebuild_catalogo_arboles($db);
+
+    $log_esc = $db->escape_string("Árbol de habilidades eliminado: $arbol_raw (" . count($tids) . " técnicas eliminadas).");
+    $db->query("INSERT INTO `mybb_sg_sg_audit_consola` (`staff`, `razon`, `log`) VALUES ('$staff_uid', 'Eliminación de Árbol', '$log_esc')");
+
+    return $ok("¡El árbol '" . htmlspecialchars($arbol_raw) . "' fue eliminado correctamente!");
+}
+
+function sg_tecnicas_render_grid($db, $bburl) {
+    $secciones = sg_get_arboles_agrupados($db);
+    $html = '<section class="sg-grid">';
+
+    foreach ($secciones as $sec_id => $sec) {
+        $eyebrow = htmlspecialchars($sec['eyebrow']);
+        $titulo  = htmlspecialchars($sec['titulo']);
+        $desc    = htmlspecialchars($sec['desc']);
+
+        $html .= '<article class="sg-category" id="' . htmlspecialchars($sec_id) . '">';
+        $html .= '  <div class="sg-category-head">';
+        $html .= '    <div class="sg-category-eyebrow">' . $eyebrow . '</div>';
+        $html .= '    <h2>' . $titulo . '</h2>';
+        $html .= '    <p>' . $desc . '</p>';
+        $html .= '  </div>';
+        $html .= '  <div class="sg-links">';
+
+        foreach ($sec['arboles'] as $a) {
+            $nombre_mostrar = ucfirst(htmlspecialchars($a));
+            $url = htmlspecialchars($bburl . '/sg/tecnicas_lista.php?arbol=' . urlencode($a));
+            $html .= '<a class="sg-link" href="' . $url . '">';
+            $html .= '  <span class="sg-link-name">' . $nombre_mostrar . '</span>';
+            $html .= '  <span class="sg-link-count">Ver árbol</span>';
+            $html .= '</a>';
+        }
+
+        $html .= '  </div>';
+        $html .= '</article>';
+    }
+
+    $html .= '</section>';
+    return $html;
+}
+
+function sg_tecnicas_render_staff_toolbar($bburl, $msg = '', $msg_tipo = '') {
+    $out = '';
+    if ($msg !== '') {
+        $out .= '<div style="margin: 0 0 16px; padding: 12px 18px; border-radius: 8px; font-size: 13.5px; font-weight: 600; ' .
+                ($msg_tipo === 'ok' ? 'background: rgba(46, 125, 50, 0.15); border: 1px solid #4caf50; color: #a5d6a7;' : 'background: rgba(198, 40, 40, 0.15); border: 1px solid #ef5350; color: #ffcdd2;') . '">' .
+                htmlspecialchars($msg) . '</div>';
+    }
+
+    $out .= '
+    <div style="background: rgba(123, 74, 184, 0.08); border: 1px solid rgba(156, 107, 204, 0.25); border-radius: 12px; padding: 14px 20px; margin-bottom: 24px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px;">
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <span style="font-size: 18px;">⚡</span>
+        <div>
+          <strong style="font-family: \'Cinzel\', serif; font-size: 12px; letter-spacing: 1.5px; text-transform: uppercase; color: #d4b8f0;">Herramientas Staff · Árboles</strong>
+          <div style="font-size: 12px; color: #8a7a9a;">Crea árboles o refresca la caché del Dojo al instante.</div>
+        </div>
+      </div>
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <button type="button" onclick="document.getElementById(\'modal-crear-arbol\').style.display=\'flex\'" style="cursor: pointer; font-family: \'Cinzel\', serif; font-size: 11px; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase; padding: 8px 14px; background: #7b4ab8; color: #fff; border: 1px solid #9c6bcc; border-radius: 6px;">
+          + Crear Nuevo Árbol
+        </button>
+        <button type="button" onclick="document.getElementById(\'modal-eliminar-arbol\').style.display=\'flex\'" style="cursor: pointer; font-family: \'Cinzel\', serif; font-size: 11px; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase; padding: 8px 14px; background: rgba(198, 40, 40, 0.25); color: #ffcdd2; border: 1px solid #ef5350; border-radius: 6px;">
+          🗑️ Eliminar Árbol
+        </button>
+        <form method="post" action="' . htmlspecialchars($bburl . '/sg/tecnicas.php') . '" style="margin: 0; display: inline;">
+          <input type="hidden" name="action_tecnicas" value="rebuild_cache">
+          <button type="submit" style="cursor: pointer; font-family: \'Cinzel\', serif; font-size: 11px; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase; padding: 8px 14px; background: transparent; color: #c9bfe0; border: 1px solid rgba(156, 107, 204, 0.3); border-radius: 6px;">
+            Reconstruir Caché
+          </button>
+        </form>
+        <a href="' . htmlspecialchars($bburl . '/sg/admin/crear_tecnicas.php') . '" target="_blank" style="font-family: \'Cinzel\', serif; font-size: 11px; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase; padding: 8px 14px; background: transparent; color: #8a7a9a; border: 1px solid rgba(156, 107, 204, 0.2); border-radius: 6px; text-decoration: none;">
+          Técnicas detalladas ↗
+        </a>
+      </div>
+    </div>
+
+    <!-- Modal para Eliminar Árbol -->
+    <div id="modal-eliminar-arbol" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75); backdrop-filter: blur(4px); z-index: 99999; align-items: center; justify-content: center; padding: 16px;">
+      <div style="background: #1a0f18; border: 1px solid rgba(239, 83, 80, 0.35); border-radius: 16px; width: 100%; max-width: 480px; box-shadow: 0 20px 50px rgba(0,0,0,0.6); overflow: hidden;">
+        <div style="padding: 18px 24px; background: #150b12; border-bottom: 1px solid rgba(239, 83, 80, 0.2); display: flex; justify-content: space-between; align-items: center;">
+          <h3 style="margin: 0; font-family: \'Cinzel\', serif; font-size: 14px; letter-spacing: 1px; color: #ffcdd2;">Eliminar Árbol de Técnicas</h3>
+          <button type="button" onclick="document.getElementById(\'modal-eliminar-arbol\').style.display=\'none\'" style="background: transparent; border: none; font-size: 20px; color: #8a7a9a; cursor: pointer;">&times;</button>
+        </div>
+        <form method="post" action="' . htmlspecialchars($bburl . '/sg/tecnicas.php') . '" style="padding: 20px 24px; margin: 0;">
+          <input type="hidden" name="action_tecnicas" value="eliminar_arbol">
+          <p style="font-size: 12.5px; color: #c9bfe0; margin-top: 0;">Escribe el slug del árbol que deseas eliminar del catálogo público. Los 7 árboles elementales base están protegidos.</p>
+          <div style="margin-bottom: 16px;">
+            <label style="display: block; font-size: 11px; text-transform: uppercase; color: #ef5350; font-weight: 700; margin-bottom: 5px;">Nombre del Árbol (slug)</label>
+            <input type="text" name="arbol_nombre" placeholder="ej. senjutsu" required style="width: 100%; padding: 8px 12px; background: #0f0c18; border: 1px solid rgba(239, 83, 80, 0.4); border-radius: 6px; color: #fff; box-sizing: border-box;">
+          </div>
+          <div style="display: flex; justify-content: flex-end; gap: 10px;">
+            <button type="button" onclick="document.getElementById(\'modal-eliminar-arbol\').style.display=\'none\'" style="cursor: pointer; padding: 8px 16px; background: transparent; border: 1px solid rgba(156, 107, 204, 0.3); border-radius: 6px; color: #8a7a9a;">Cancelar</button>
+            <button type="submit" style="cursor: pointer; padding: 8px 18px; background: #c62828; border: 1px solid #ef5350; border-radius: 6px; color: #fff; font-weight: 700;">Eliminar Árbol</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Modal para Crear Nuevo Árbol -->
+    <div id="modal-crear-arbol" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75); backdrop-filter: blur(4px); z-index: 99999; align-items: center; justify-content: center; padding: 16px;">
+      <div style="background: #171224; border: 1px solid rgba(156, 107, 204, 0.35); border-radius: 16px; width: 100%; max-width: 580px; box-shadow: 0 20px 50px rgba(0,0,0,0.6); overflow: hidden;">
+        <div style="padding: 18px 24px; background: #130f1e; border-bottom: 1px solid rgba(156, 107, 204, 0.2); display: flex; justify-content: space-between; align-items: center;">
+          <h3 style="margin: 0; font-family: \'Cinzel\', serif; font-size: 14px; letter-spacing: 1px; color: #e8dff8;">Crear Nuevo Árbol de Habilidades</h3>
+          <button type="button" onclick="document.getElementById(\'modal-crear-arbol\').style.display=\'none\'" style="background: transparent; border: none; font-size: 20px; color: #8a7a9a; cursor: pointer;">&times;</button>
+        </div>
+        <form method="post" action="' . htmlspecialchars($bburl . '/sg/tecnicas.php') . '" style="padding: 20px 24px; margin: 0;">
+          <input type="hidden" name="action_tecnicas" value="crear_arbol">
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px;">
+            <div>
+              <label style="display: block; font-size: 11px; text-transform: uppercase; color: #b890e0; font-weight: 700; margin-bottom: 5px;">Nombre del Árbol (slug)</label>
+              <input type="text" name="arbol_nombre" placeholder="ej. senjutsu" required style="width: 100%; padding: 8px 12px; background: #0f0c18; border: 1px solid rgba(156, 107, 204, 0.3); border-radius: 6px; color: #fff; box-sizing: border-box;">
+            </div>
+            <div>
+              <label style="display: block; font-size: 11px; text-transform: uppercase; color: #b890e0; font-weight: 700; margin-bottom: 5px;">Sección en Técnicas</label>
+              <select name="seccion" style="width: 100%; padding: 8px 12px; background: #0f0c18; border: 1px solid rgba(156, 107, 204, 0.3); border-radius: 6px; color: #fff; box-sizing: border-box;">
+                <option value="generales">Jutsus Generales</option>
+                <option value="elementales">Técnicas Elementales</option>
+                <option value="konoha">Clanes Konoha</option>
+                <option value="kiri">Clanes Kiri</option>
+                <option value="especiales">Árboles Adicionales / Nuevos</option>
+              </select>
+            </div>
+          </div>
+
+          <div style="border-top: 1px dashed rgba(156, 107, 204, 0.2); padding-top: 12px; margin-top: 12px;">
+            <div style="font-size: 12px; font-weight: 700; color: #d4b8f0; margin-bottom: 10px;">Técnica Base del Árbol</div>
+            <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 14px; margin-bottom: 10px;">
+              <div>
+                <label style="display: block; font-size: 11px; color: #8a7a9a; margin-bottom: 4px;">Nombre Técnica Base</label>
+                <input type="text" name="base_nombre" placeholder="ej. Iniciación al Senjutsu" required style="width: 100%; padding: 7px 10px; background: #0f0c18; border: 1px solid rgba(156, 107, 204, 0.3); border-radius: 6px; color: #fff; box-sizing: border-box;">
+              </div>
+              <div>
+                <label style="display: block; font-size: 11px; color: #8a7a9a; margin-bottom: 4px;">ID Técnica (TID)</label>
+                <input type="text" name="base_tid" placeholder="ej. SENJ101B" required style="width: 100%; padding: 7px 10px; background: #0f0c18; border: 1px solid rgba(156, 107, 204, 0.3); border-radius: 6px; color: #fff; box-sizing: border-box;">
+              </div>
+            </div>
+            <div style="margin-bottom: 14px;">
+              <label style="display: block; font-size: 11px; color: #8a7a9a; margin-bottom: 4px;">Descripción de la técnica base</label>
+              <textarea name="base_desc" rows="2" placeholder="Breve descripción o efectos de la técnica base..." style="width: 100%; padding: 7px 10px; background: #0f0c18; border: 1px solid rgba(156, 107, 204, 0.3); border-radius: 6px; color: #fff; box-sizing: border-box;"></textarea>
+            </div>
+          </div>
+
+          <div style="border-top: 1px dashed rgba(156, 107, 204, 0.2); padding-top: 12px;">
+            <div style="font-size: 12px; font-weight: 700; color: #d4b8f0; margin-bottom: 8px;">Nombres de las 3 Ramas</div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px;">
+              <input type="text" name="rama1_nombre" placeholder="Rama 1 (ej. Ofensiva)" required style="padding: 7px 8px; background: #0f0c18; border: 1px solid rgba(156, 107, 204, 0.3); border-radius: 6px; color: #fff; font-size: 12px;">
+              <input type="text" name="rama2_nombre" placeholder="Rama 2 (ej. Defensiva)" required style="padding: 7px 8px; background: #0f0c18; border: 1px solid rgba(156, 107, 204, 0.3); border-radius: 6px; color: #fff; font-size: 12px;">
+              <input type="text" name="rama3_nombre" placeholder="Rama 3 (ej. Sensorial)" required style="padding: 7px 8px; background: #0f0c18; border: 1px solid rgba(156, 107, 204, 0.3); border-radius: 6px; color: #fff; font-size: 12px;">
+            </div>
+          </div>
+
+          <div style="margin-top: 20px; display: flex; justify-content: flex-end; gap: 10px;">
+            <button type="button" onclick="document.getElementById(\'modal-crear-arbol\').style.display=\'none\'" style="cursor: pointer; padding: 8px 16px; background: transparent; border: 1px solid rgba(156, 107, 204, 0.3); border-radius: 6px; color: #8a7a9a;">Cancelar</button>
+            <button type="submit" style="cursor: pointer; padding: 8px 18px; background: #7b4ab8; border: 1px solid #9c6bcc; border-radius: 6px; color: #fff; font-weight: 700;">Crear y Publicar Árbol</button>
+          </div>
+        </form>
+      </div>
+    </div>';
+
+    return $out;
+}
+
+// ============================================================================
+// PANEL DE ADMINISTRACIÓN DE DOJO (sg/dojo.php?uid=X)
+// ============================================================================
+
+function sg_dojo_staff_acciones($db, $target_uid, $accion, $staff_uid, $params) {
+    $err = function($m) { return array('ok' => false, 'tipo' => 'error', 'msg' => $m); };
+    $ok  = function($m) { return array('ok' => true,  'tipo' => 'ok',    'msg' => $m); };
+
+    $target_uid = (int) $target_uid;
+    $staff_uid  = (int) $staff_uid;
+
+    if ($target_uid <= 0) { return $err("Ficha de usuario inválida."); }
+    if (!(is_mod($staff_uid) || is_staff($staff_uid))) { return $err("Sin permisos de Staff."); }
+
+    $catalogo = sg_get_catalogo_arboles($db);
+
+    switch ($accion) {
+        case 'staff_otorgar_arbol':
+            $arbol = isset($params['staff_arbol']) ? strtolower(trim($params['staff_arbol'])) : '';
+            if ($arbol === '' || !isset($catalogo[$arbol])) {
+                return $err("El árbol seleccionado no existe en el catálogo.");
+            }
+            $base_tid = isset($catalogo[$arbol]['base']) ? $catalogo[$arbol]['base'] : null;
+            if ($base_tid === null) {
+                return $err("Ese árbol no tiene técnica base configurada.");
+            }
+
+            sg_dojo_aprender($target_uid, $base_tid, 'staff', SG_ORIGEN_ADMIN, "Árbol $arbol otorgado por staff", null, $staff_uid);
+            return $ok("¡Árbol " . ucfirst($arbol) . " otorgado exitosamente al usuario!");
+
+        case 'staff_revocar_arbol':
+            $arbol = isset($params['staff_arbol']) ? strtolower(trim($params['staff_arbol'])) : '';
+            if ($arbol === '') {
+                return $err("Debes seleccionar el árbol a revocar.");
+            }
+            $arbol_esc = $db->escape_string($arbol);
+            $q_tids = $db->query("SELECT t.tid FROM mybb_sg_sg_tecnicas t 
+                                  INNER JOIN mybb_sg_sg_tec_aprendidas a ON t.tid = a.tid 
+                                  WHERE LOWER(t.arbol)='$arbol_esc' AND a.uid='$target_uid'");
+            $del_tids = array();
+            while ($r = $db->fetch_array($q_tids)) {
+                $del_tids[] = "'" . $db->escape_string($r['tid']) . "'";
+            }
+            if (!empty($del_tids)) {
+                $in = implode(',', $del_tids);
+                $db->query("DELETE FROM mybb_sg_sg_tec_aprendidas WHERE uid='$target_uid' AND tid IN ($in)");
+            }
+            $log_esc = $db->escape_string("Árbol $arbol revocado al usuario #$target_uid por staff #$staff_uid.");
+            $db->query("INSERT INTO `mybb_sg_sg_audit_consola` (`staff`, `razon`, `log`) VALUES ('$staff_uid', 'Revocación de Árbol Dojo', '$log_esc')");
+            return $ok("Se ha revocado el árbol " . ucfirst($arbol) . " de la ficha del usuario.");
+
+        case 'staff_toggle_dojo':
+            $q_pd = $db->query("SELECT puede_usar_dojo FROM mybb_sg_sg_fichas WHERE fid='$target_uid'");
+            $actual = 0;
+            while ($r = $db->fetch_array($q_pd)) { $actual = (int) $r['puede_usar_dojo']; }
+            $nuevo = ($actual === 1) ? 0 : 1;
+            $db->query("UPDATE mybb_sg_sg_fichas SET puede_usar_dojo='$nuevo' WHERE fid='$target_uid'");
+            return $ok($nuevo === 1 ? "Dojo habilitado para este usuario." : "Dojo bloqueado para este usuario.");
+
+        case 'staff_dar_credito':
+            $ficha = select_one_query_with_id('mybb_sg_sg_fichas', 'fid', $target_uid);
+            $prog = sg_progreso_parse(isset($ficha['arboles_progreso']) ? $ficha['arboles_progreso'] : '');
+            $prog['nivel_rama_disponibles'] = (int) $prog['nivel_rama_disponibles'] + 1;
+            $prog_json = $db->escape_string(json_encode($prog, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+            $db->query("UPDATE mybb_sg_sg_fichas SET arboles_progreso='$prog_json' WHERE fid='$target_uid'");
+            return $ok("Se añadió +1 crédito de mejora de rama gratis.");
+
+        case 'staff_rebuild_cache':
+            sg_rebuild_catalogo_arboles($db);
+            return $ok("Caché de catálogo de árboles reconstruida correctamente.");
+
+        default:
+            return $err("Acción de staff desconocida.");
+    }
+}
+
+function sg_dojo_render_staff_panel($db, $target_uid, $estado, $puede_usar_dojo, $bburl) {
+    $target_uid = (int) $target_uid;
+    $catalogo = sg_get_catalogo_arboles($db);
+
+    $poseidos = array_keys(isset($estado['arboles']) ? $estado['arboles'] : array());
+
+    $options = '';
+    foreach ($catalogo as $arbol_k => $cinfo) {
+        $ya_lo_tiene = in_array($arbol_k, $poseidos, true);
+        $label = ucfirst($arbol_k) . ($ya_lo_tiene ? ' (Ya lo posee)' : '');
+        $disabled = $ya_lo_tiene ? 'disabled style="color: #666;"' : '';
+        $options .= '<option value="' . htmlspecialchars($arbol_k) . '" ' . $disabled . '>' . htmlspecialchars($label) . '</option>';
+    }
+
+    $estado_dojo_lbl = $puede_usar_dojo ? 'Bloquear Acceso al Dojo' : 'Habilitar Acceso al Dojo';
+    $estado_dojo_btn_cls = $puede_usar_dojo ? 'background: rgba(198, 40, 40, 0.2); border: 1px solid #ef5350; color: #ffcdd2;' : 'background: rgba(46, 125, 50, 0.2); border: 1px solid #4caf50; color: #a5d6a7;';
+
+    $revoke_options = '';
+    foreach ($poseidos as $p_arbol) {
+        $revoke_options .= '<option value="' . htmlspecialchars($p_arbol) . '">' . htmlspecialchars(ucfirst($p_arbol)) . '</option>';
+    }
+
+    $html = '
+    <div style="background: rgba(123, 74, 184, 0.1); border: 1px solid rgba(156, 107, 204, 0.35); border-radius: 14px; padding: 18px 22px; margin-bottom: 24px; box-shadow: 0 8px 24px rgba(0,0,0,0.25);">
+      <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(156, 107, 204, 0.2); padding-bottom: 12px; margin-bottom: 14px; flex-wrap: wrap; gap: 10px;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span style="font-size: 20px;">🥋</span>
+          <div>
+            <strong style="font-family: \'Cinzel\', serif; font-size: 13px; letter-spacing: 1.5px; text-transform: uppercase; color: #e8dff8;">Panel de Gestión Staff del Dojo</strong>
+            <div style="font-size: 12px; color: #8a7a9a;">Administrando la ficha del usuario #<b>' . $target_uid . '</b></div>
+          </div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <form method="post" action="' . htmlspecialchars($bburl . '/sg/dojo.php?uid=' . $target_uid) . '" style="margin: 0;">
+            <input type="hidden" name="action_staff" value="staff_toggle_dojo">
+            <button type="submit" style="cursor: pointer; font-family: \'Cinzel\', serif; font-size: 10px; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase; padding: 6px 12px; border-radius: 6px; ' . $estado_dojo_btn_cls . '">
+              ' . $estado_dojo_lbl . '
+            </button>
+          </form>
+          <form method="post" action="' . htmlspecialchars($bburl . '/sg/dojo.php?uid=' . $target_uid) . '" style="margin: 0;">
+            <input type="hidden" name="action_staff" value="staff_dar_credito">
+            <button type="submit" style="cursor: pointer; font-family: \'Cinzel\', serif; font-size: 10px; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase; padding: 6px 12px; background: rgba(123, 74, 184, 0.25); border: 1px solid #9c6bcc; border-radius: 6px; color: #d4b8f0;">
+              +1 Crédito Mejora
+            </button>
+          </form>
+          <form method="post" action="' . htmlspecialchars($bburl . '/sg/dojo.php?uid=' . $target_uid) . '" style="margin: 0;">
+            <input type="hidden" name="action_staff" value="staff_rebuild_cache">
+            <button type="submit" style="cursor: pointer; font-family: \'Cinzel\', serif; font-size: 10px; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase; padding: 6px 12px; background: transparent; border: 1px solid rgba(156, 107, 204, 0.3); border-radius: 6px; color: #8a7a9a;">
+              Refrescar Caché
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Formulario para Otorgar Árbol Directo -->
+      <form method="post" action="' . htmlspecialchars($bburl . '/sg/dojo.php?uid=' . $target_uid) . '" style="margin: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 12px; background: rgba(0,0,0,0.25); padding: 12px 16px; border-radius: 8px; border: 1px solid rgba(156, 107, 204, 0.15);">
+        <input type="hidden" name="action_staff" value="staff_otorgar_arbol">
+        <label style="font-family: \'Cinzel\', serif; font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: #b890e0;">
+          Otorgar Árbol al Usuario:
+        </label>
+        <select name="staff_arbol" required style="padding: 7px 12px; background: #0f0c18; border: 1px solid rgba(156, 107, 204, 0.35); border-radius: 6px; color: #fff; font-size: 13px; min-width: 220px;">
+          <option value="">-- Selecciona un árbol --</option>
+          ' . $options . '
+        </select>
+        <button type="submit" style="cursor: pointer; font-family: \'Cinzel\', serif; font-size: 11px; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase; padding: 8px 16px; background: #7b4ab8; color: #fff; border: 1px solid #9c6bcc; border-radius: 6px;">
+          Otorgar Árbol
+        </button>
+      </form>
+
+      <!-- Formulario para Revocar Árbol -->
+      <form method="post" action="' . htmlspecialchars($bburl . '/sg/dojo.php?uid=' . $target_uid) . '" style="margin-top: 10px; display: flex; flex-wrap: wrap; align-items: center; gap: 12px; background: rgba(0,0,0,0.25); padding: 12px 16px; border-radius: 8px; border: 1px solid rgba(239, 83, 80, 0.2);">
+        <input type="hidden" name="action_staff" value="staff_revocar_arbol">
+        <label style="font-family: \'Cinzel\', serif; font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: #ef5350;">
+          Revocar Árbol del Usuario:
+        </label>
+        <select name="staff_arbol" required style="padding: 7px 12px; background: #0f0c18; border: 1px solid rgba(239, 83, 80, 0.35); border-radius: 6px; color: #fff; font-size: 13px; min-width: 220px;">
+          <option value="">-- Selecciona árbol a revocar --</option>
+          ' . $revoke_options . '
+        </select>
+        <button type="submit" style="cursor: pointer; font-family: \'Cinzel\', serif; font-size: 11px; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase; padding: 8px 16px; background: rgba(198,40,40,0.4); border: 1px solid #ef5350; border-radius: 6px; color: #ffcdd2;">
+          Revocar Árbol
+        </button>
+      </form>
+    </div>';
+
+    return $html;
+}
+

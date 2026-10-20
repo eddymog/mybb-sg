@@ -56,6 +56,15 @@ if ($db->num_rows($q_pud) > 0) {
 // refresh posterior sea un GET inofensivo y no reenvíe el POST (esto
 // importa sobre todo para la ruleta, que sí puede repetirse de verdad
 // si el mismo POST se reenvía con slots/Tobis suficientes).
+// ── Procesa la acción de Staff (POST) ─────────────────────────
+$action_staff = isset($_POST['action_staff']) ? trim($_POST['action_staff']) : '';
+if ($action_staff !== '' && $es_staff && $uid > 0) {
+    $res = sg_dojo_staff_acciones($db, $uid, $action_staff, $s_uid, $_POST);
+    $redir = "dojo.php" . ($impersonando ? "?uid=" . $uid . "&" : "?") . "resultado=" . urlencode($res['tipo']) . "&texto=" . urlencode($res['msg']);
+    header("Location: $redir");
+    exit;
+}
+
 $action = isset($_POST['action']) ? trim($_POST['action']) : '';
 // Vista de staff (?uid): solo lectura, ninguna acción se procesa.
 if ($action !== '' && $impersonando) {
@@ -364,6 +373,11 @@ if ($dojo_bloqueado) { $dojo_html = ''; }
 
 // Vista de staff (solo lectura): bandera para la alerta del template.
 $dojo_impersonando = $impersonando ? 1 : 0;
+
+$dojo_staff_panel = '';
+if ($es_staff) {
+    $dojo_staff_panel = sg_dojo_render_staff_panel($db, $uid, $estado, $puede_usar_dojo, $mybb->settings['bburl']);
+}
 
 eval("\$page = \"".$templates->get("sg_dojo")."\";");
 output_page($page);

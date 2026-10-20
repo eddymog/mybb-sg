@@ -1,0 +1,1257 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simulador de Cambios · Shinobi Gaiden</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Noto+Serif+JP:wght@300;400;700&family=Source+Serif+4:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0b0813;
+      --bg2: #130f1e;
+      --bg3: #1a1429;
+      --panel: #161124;
+      --border: rgba(156, 107, 204, 0.2);
+      --border-strong: rgba(156, 107, 204, 0.4);
+      --ink: #e8dff8;
+      --stone: #8a7a9a;
+      --plum: #7b4ab8;
+      --plum2: #9c6bcc;
+      --plum3: #b890e0;
+      --gold: #c09840;
+      --green: #4caf50;
+      --red: #ef5350;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: radial-gradient(circle at top center, #1e1333 0%, var(--bg) 60%);
+      color: var(--ink);
+      font-family: 'Noto Serif JP', 'Source Serif 4', serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Barra Superior del Simulador */
+    .sim-bar {
+      background: #110c1c;
+      border-bottom: 1px solid var(--border);
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+    }
+    .sim-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .sim-badge {
+      background: rgba(123, 74, 184, 0.25);
+      border: 1px solid var(--plum2);
+      color: var(--plum3);
+      font-family: 'Cinzel', serif;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 4px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+    }
+    .sim-title {
+      font-family: 'Cinzel', serif;
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      color: #fff;
+    }
+
+    /* Pestañas de Navegación */
+    .sim-tabs {
+      display: flex;
+      gap: 6px;
+      background: rgba(0,0,0,0.3);
+      padding: 4px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+    }
+    .sim-tab {
+      background: transparent;
+      border: none;
+      color: var(--stone);
+      padding: 8px 16px;
+      font-family: 'Cinzel', serif;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      cursor: pointer;
+      border-radius: 6px;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .sim-tab:hover {
+      color: #fff;
+      background: rgba(255,255,255,0.05);
+    }
+    .sim-tab.active {
+      background: var(--plum);
+      color: #fff;
+      box-shadow: 0 2px 10px rgba(123, 74, 184, 0.4);
+    }
+
+    .sim-content {
+      flex: 1;
+      padding: 24px;
+      max-width: 1140px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    .sim-view { display: none; }
+    .sim-view.active { display: block; animation: fadeIn 0.25s ease; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* Notificaciones Toast */
+    #sim-toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: #1e1333;
+      border: 1px solid var(--plum2);
+      color: #fff;
+      padding: 12px 20px;
+      border-radius: 8px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+      font-size: 13px;
+      display: none;
+      z-index: 99999;
+      animation: fadeIn 0.3s;
+    }
+
+    /* Estilos del Dojo */
+    .sg-dojo-box {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+    }
+    .sg-staff-panel {
+      background: rgba(123, 74, 184, 0.12);
+      border: 1px solid rgba(156, 107, 204, 0.35);
+      border-radius: 12px;
+      padding: 18px 22px;
+      margin-bottom: 24px;
+    }
+    .sg-btn {
+      cursor: pointer;
+      font-family: 'Cinzel', serif;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      padding: 8px 14px;
+      border-radius: 6px;
+      border: 1px solid transparent;
+      transition: all 0.15s;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .sg-btn-primary {
+      background: var(--plum);
+      color: #fff;
+      border-color: var(--plum2);
+    }
+    .sg-btn-primary:hover { background: var(--plum2); }
+    .sg-btn-outline {
+      background: transparent;
+      color: #c9bfe0;
+      border-color: var(--border-strong);
+    }
+    .sg-btn-outline:hover { background: rgba(255,255,255,0.06); }
+    .sg-btn-danger {
+      background: rgba(198, 40, 40, 0.2);
+      border-color: #ef5350;
+      color: #ffcdd2;
+    }
+    .sg-btn-danger:hover { background: rgba(198, 40, 40, 0.4); }
+    .sg-btn-success {
+      background: rgba(46, 125, 50, 0.2);
+      border-color: #4caf50;
+      color: #a5d6a7;
+    }
+    .sg-btn-success:hover { background: rgba(46, 125, 50, 0.4); }
+    .sg-btn-reset {
+      background: rgba(255, 255, 255, 0.05);
+      border-color: rgba(156, 107, 204, 0.3);
+      color: #b890e0;
+    }
+    .sg-btn-reset:hover { background: rgba(156, 107, 204, 0.2); color: #fff; }
+
+    /* Acordeón de Árboles en Dojo */
+    .sg-tree {
+      background: #171224;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      margin-bottom: 16px;
+      overflow: hidden;
+      transition: border-color 0.2s;
+    }
+    .sg-tree-head {
+      padding: 16px 20px;
+      background: #1c162c;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      user-select: none;
+      border-bottom: 1px solid var(--border);
+    }
+    .sg-tree-head:hover { background: #221b36; }
+    .sg-tree-title {
+      font-family: 'Cinzel', serif;
+      font-size: 15px;
+      font-weight: 700;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .sg-tree-body {
+      padding: 20px;
+      display: block;
+    }
+    .sg-tree.is-collapsed .sg-tree-body {
+      display: none;
+    }
+    .sg-tree.is-collapsed .sg-tree-head {
+      border-bottom: none;
+    }
+    .sg-tree-chevron {
+      transition: transform 0.2s;
+    }
+    .sg-tree.is-collapsed .sg-tree-chevron {
+      transform: rotate(-90deg);
+    }
+
+    /* Grid de Técnicas */
+    .tec-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 20px;
+    }
+    .tec-card {
+      background: #171224;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+    }
+    .tec-card-head {
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 12px;
+      margin-bottom: 14px;
+    }
+    .tec-eyebrow {
+      font-size: 10px;
+      font-family: 'Cinzel', serif;
+      color: var(--plum3);
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+    }
+    .tec-title {
+      margin: 4px 0 0;
+      font-family: 'Cinzel', serif;
+      font-size: 18px;
+      font-weight: 700;
+      color: #fff;
+    }
+    .tec-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .tec-chip {
+      background: rgba(28, 22, 44, 0.8);
+      border: 1px solid var(--border);
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 13px;
+      color: var(--plum3);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      min-width: 150px;
+    }
+
+    /* Modal */
+    .modal-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.8);
+      backdrop-filter: blur(5px);
+      z-index: 10000;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    .modal-box {
+      background: #171224;
+      border: 1px solid var(--border-strong);
+      border-radius: 16px;
+      width: 100%;
+      max-width: 600px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.8);
+      overflow: hidden;
+    }
+
+    /* Ficha Staff Bar */
+    .fx-staffbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 18px;
+      background: rgba(24, 18, 36, 0.95);
+      border: 1px solid var(--border-strong);
+      border-radius: 10px;
+      margin-top: 24px;
+    }
+    .fx-staffbar__label {
+      font-family: 'Cinzel', serif;
+      font-size: 11px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: #e07040;
+      font-weight: 700;
+      margin-right: 8px;
+    }
+    .fx-staffbar__link {
+      color: #ede0fa;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border);
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .fx-staffbar__link:hover {
+      background: rgba(123, 74, 184, 0.3);
+      border-color: var(--plum2);
+      color: #fff;
+    }
+
+    /* Encabezado con Deshacer */
+    .section-head-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Barra Superior -->
+  <header class="sim-bar">
+    <div class="sim-brand">
+      <span class="sim-badge">Simulador Local</span>
+      <span class="sim-title">Shinobi Gaiden · Auditoría & Cambios</span>
+    </div>
+    <nav class="sim-tabs">
+      <button class="sim-tab active" onclick="switchTab('tab-tecnicas')">📜 Técnicas</button>
+      <button class="sim-tab" onclick="switchTab('tab-dojo')">🥋 Dojo (Staff)</button>
+      <button class="sim-tab" onclick="switchTab('tab-ficha')">🥷 Ficha</button>
+      <button class="sim-tab" onclick="switchTab('tab-calendario')">🍁 Calendario</button>
+      <button class="sim-tab" onclick="switchTab('tab-calc')">🧮 Calculadora</button>
+    </nav>
+  </header>
+
+  <main class="sim-content">
+
+    <!-- ========================================== -->
+    <!-- TAB: TÉCNICAS (AUDIT-006)                  -->
+    <!-- ========================================== -->
+    <section id="tab-tecnicas" class="sim-view active">
+      <div class="section-head-bar">
+        <div>
+          <h2 style="font-family: 'Cinzel', serif; margin: 0 0 6px;">Biblioteca de Técnicas & Catálogo de Árboles</h2>
+          <p style="color: var(--stone); margin: 0; font-size: 14px;">Toolbar de Staff con creación, eliminación de árboles y visualización en tiempo real.</p>
+        </div>
+        <button type="button" onclick="deshacerTecnicas()" class="sg-btn sg-btn-reset">
+          ↺ Deshacer / Resetear Catálogo
+        </button>
+      </div>
+
+      <!-- Toolbar Staff -->
+      <div style="background: rgba(123, 74, 184, 0.08); border: 1px solid rgba(156, 107, 204, 0.25); border-radius: 12px; padding: 14px 20px; margin-bottom: 24px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span style="font-size: 18px;">⚡</span>
+          <div>
+            <strong style="font-family: 'Cinzel', serif; font-size: 12px; letter-spacing: 1.5px; text-transform: uppercase; color: #d4b8f0;">Herramientas Staff · Árboles</strong>
+            <div style="font-size: 12px; color: #8a7a9a;">Crea, elimina árboles o refresca la caché al instante.</div>
+          </div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <button type="button" onclick="openModalTec()" class="sg-btn sg-btn-primary">
+            + Crear Nuevo Árbol
+          </button>
+          <button type="button" onclick="openModalEliminarTec()" class="sg-btn sg-btn-danger">
+            🗑️ Eliminar Árbol
+          </button>
+          <button type="button" onclick="showToast('✅ Caché de catálogo reconstruida correctamente en el Dojo')" class="sg-btn sg-btn-outline">
+            Reconstruir Caché
+          </button>
+        </div>
+      </div>
+
+      <!-- Grid de Técnicas Dinámico -->
+      <div class="tec-grid" id="grid-arboles">
+        <!-- Elementales -->
+        <article class="tec-card">
+          <div class="tec-card-head">
+            <span class="tec-eyebrow">Afinidades Base</span>
+            <h3 class="tec-title">Técnicas Elementales</h3>
+          </div>
+          <div class="tec-chips">
+            <div class="tec-chip"><span>Katon</span><small style="color:var(--plum2)">Ver árbol ↗</small></div>
+            <div class="tec-chip"><span>Suiton</span><small style="color:var(--plum2)">Ver árbol ↗</small></div>
+            <div class="tec-chip"><span>Doton</span><small style="color:var(--plum2)">Ver árbol ↗</small></div>
+            <div class="tec-chip"><span>Fuuton</span><small style="color:var(--plum2)">Ver árbol ↗</small></div>
+            <div class="tec-chip"><span>Raiton</span><small style="color:var(--plum2)">Ver árbol ↗</small></div>
+            <div class="tec-chip"><span>Yin</span><small style="color:var(--plum2)">Ver árbol ↗</small></div>
+            <div class="tec-chip"><span>Yang</span><small style="color:var(--plum2)">Ver árbol ↗</small></div>
+          </div>
+        </article>
+
+        <!-- Konoha -->
+        <article class="tec-card">
+          <div class="tec-card-head">
+            <span class="tec-eyebrow">Linajes del Fuego</span>
+            <h3 class="tec-title">Clanes Konoha</h3>
+          </div>
+          <div class="tec-chips">
+            <div class="tec-chip"><span>Uchiha</span><small style="color:var(--plum2)">Ver árbol ↗</small></div>
+            <div class="tec-chip"><span>Hyūga</span><small style="color:var(--plum2)">Ver árbol ↗</small></div>
+            <div class="tec-chip"><span>Senju</span><small style="color:var(--plum2)">Ver árbol ↗</small></div>
+            <div class="tec-chip"><span>Nara</span><small style="color:var(--plum2)">Ver árbol ↗</small></div>
+            <div class="tec-chip"><span>Aburame</span><small style="color:var(--plum2)">Ver árbol ↗</small></div>
+            <div class="tec-chip"><span>Akimichi</span><small style="color:var(--plum2)">Ver árbol ↗</small></div>
+            <div class="tec-chip"><span>Yamanaka</span><small style="color:var(--plum2)">Ver árbol ↗</small></div>
+          </div>
+        </article>
+
+        <!-- Kiri -->
+        <article class="tec-card">
+          <div class="tec-card-head">
+            <span class="tec-eyebrow">Linajes de la Niebla</span>
+            <h3 class="tec-title">Clanes Kiri</h3>
+          </div>
+          <div class="tec-chips">
+            <div class="tec-chip"><span>Hoshigaki</span><small style="color:var(--plum2)">Ver árbol ↗</small></div>
+            <div class="tec-chip"><span>Kaguya</span><small style="color:var(--plum2)">Ver árbol ↗</small></div>
+            <div class="tec-chip"><span>Yuki</span><small style="color:var(--plum2)">Ver árbol ↗</small></div>
+            <div class="tec-chip"><span>Hozuki</span><small style="color:var(--plum2)">Ver árbol ↗</small></div>
+            <div class="tec-chip"><span>Terumi</span><small style="color:var(--plum2)">Ver árbol ↗</small></div>
+          </div>
+        </article>
+
+        <!-- Generales -->
+        <article class="tec-card">
+          <div class="tec-card-head">
+            <span class="tec-eyebrow">Estilos Abiertos</span>
+            <h3 class="tec-title">Jutsus Generales</h3>
+          </div>
+          <div class="tec-chips">
+            <div class="tec-chip"><span>Taijutsu</span><small style="color:var(--plum2)">Ver árbol ↗</small></div>
+            <div class="tec-chip"><span>Bukijutsu</span><small style="color:var(--plum2)">Ver árbol ↗</small></div>
+            <div class="tec-chip"><span>Defensivo</span><small style="color:var(--plum2)">Ver árbol ↗</small></div>
+            <div class="tec-chip"><span>Resistencia</span><small style="color:var(--plum2)">Ver árbol ↗</small></div>
+          </div>
+        </article>
+
+        <!-- Sección de Árboles Nuevos Creados Dinámicamente -->
+        <article class="tec-card" id="card-nuevos-arboles" style="display:none; border-color: var(--plum2);">
+          <div class="tec-card-head">
+            <span class="tec-eyebrow" style="color:#4caf50;">Creados por Staff</span>
+            <h3 class="tec-title">Árboles Adicionales / Creados</h3>
+          </div>
+          <div class="tec-chips" id="chips-nuevos-arboles"></div>
+        </article>
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- TAB: DOJO & PANEL STAFF (AUDIT-005 & 007)  -->
+    <!-- ========================================== -->
+    <section id="tab-dojo" class="sim-view">
+      <div class="section-head-bar">
+        <div>
+          <h2 style="font-family: 'Cinzel', serif; margin: 0 0 6px;">Dojo Shinobi · Gestión Staff</h2>
+          <p style="color: var(--stone); margin: 0; font-size: 14px;">Administrando la ficha del usuario #42 (Naruto Uzumaki). Otorga o quita árboles, alterna permisos y colapsa ramas.</p>
+        </div>
+        <button type="button" onclick="deshacerDojo()" class="sg-btn sg-btn-reset">
+          ↺ Deshacer / Resetear Usuario
+        </button>
+      </div>
+
+      <div class="sg-dojo-box">
+        <!-- Panel Staff del Dojo -->
+        <div class="sg-staff-panel">
+          <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(156, 107, 204, 0.2); padding-bottom: 12px; margin-bottom: 14px; flex-wrap: wrap; gap: 10px;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <span style="font-size: 20px;">🥋</span>
+              <div>
+                <strong style="font-family: 'Cinzel', serif; font-size: 13px; letter-spacing: 1.5px; text-transform: uppercase; color: #e8dff8;">Panel de Gestión Staff del Dojo</strong>
+                <div style="font-size: 12px; color: #8a7a9a;">Administrando la ficha del usuario #<b>42</b></div>
+              </div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <button type="button" id="btn-toggle-dojo" onclick="toggleDojoAccess()" class="sg-btn sg-btn-danger">
+                Bloquear Acceso al Dojo
+              </button>
+              <button type="button" onclick="darCreditoMejora()" class="sg-btn sg-btn-primary">
+                +1 Crédito Mejora
+              </button>
+              <button type="button" onclick="showToast('✅ Caché de árboles refrescada correctamente')" class="sg-btn sg-btn-outline">
+                Refrescar Caché
+              </button>
+            </div>
+          </div>
+
+          <!-- Formularios Staff: Otorgar y Revocar Árbol -->
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px;">
+            <!-- Otorgar -->
+            <form onsubmit="otorgarArbol(event)" style="margin: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; background: rgba(0,0,0,0.25); padding: 12px 14px; border-radius: 8px; border: 1px solid rgba(156, 107, 204, 0.15);">
+              <label style="font-family: 'Cinzel', serif; font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: #b890e0; width: 100%;">
+                Otorgar Árbol al Usuario:
+              </label>
+              <select id="select-arbol-otorgar" required style="flex: 1; padding: 7px 10px; background: #0f0c18; border: 1px solid rgba(156, 107, 204, 0.35); border-radius: 6px; color: #fff; font-size: 12px;">
+                <option value="">-- Selecciona un árbol --</option>
+                <option value="Fuuton">Fuuton</option>
+                <option value="Katon">Katon</option>
+                <option value="Suiton">Suiton</option>
+                <option value="Senjutsu">Senjutsu (Especial)</option>
+                <option value="Uchiha">Uchiha (Clan)</option>
+                <option value="Taijutsu">Taijutsu</option>
+              </select>
+              <button type="submit" class="sg-btn sg-btn-primary">
+                Otorgar
+              </button>
+            </form>
+
+            <!-- Revocar -->
+            <form onsubmit="revocarArbolForm(event)" style="margin: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; background: rgba(0,0,0,0.25); padding: 12px 14px; border-radius: 8px; border: 1px solid rgba(198, 40, 40, 0.25);">
+              <label style="font-family: 'Cinzel', serif; font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: #ef5350; width: 100%;">
+                Revocar Árbol del Usuario:
+              </label>
+              <select id="select-arbol-revocar" required style="flex: 1; padding: 7px 10px; background: #0f0c18; border: 1px solid rgba(198, 40, 40, 0.35); border-radius: 6px; color: #fff; font-size: 12px;">
+                <option value="">-- Árbol a revocar --</option>
+                <option value="Fuuton">Fuuton</option>
+              </select>
+              <button type="submit" class="sg-btn sg-btn-danger">
+                Revocar
+              </button>
+            </form>
+          </div>
+        </div>
+
+        <!-- Banner si el dojo está bloqueado -->
+        <div id="banner-dojo-bloqueado" style="display:none; background: rgba(198, 40, 40, 0.15); border: 1px solid #ef5350; border-radius: 8px; padding: 14px 18px; margin-bottom: 20px; color: #ffcdd2;">
+          🔒 <strong>Dojo Bloqueado:</strong> El usuario actualmente tiene el acceso al Dojo deshabilitado.
+        </div>
+
+        <!-- Toolbar de árboles: Colapsar / Expandir Todo -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+          <div style="font-family: 'Cinzel', serif; font-size: 13px; color: var(--stone); letter-spacing: 1px;">
+            Árboles Poseídos por el Shinobi: <b id="count-arboles" style="color:#fff;">1</b>
+          </div>
+          <button type="button" class="sg-btn sg-btn-outline" id="btn-toggle-all-trees" onclick="toggleAllTrees()">
+            Colapsar todo
+          </button>
+        </div>
+
+        <!-- Lista de Árboles Poseídos -->
+        <div id="lista-arboles-poseidos">
+          <section class="sg-tree" id="tree-fuuton">
+            <div class="sg-tree-head" onclick="toggleTree('tree-fuuton')">
+              <div class="sg-tree-title">
+                <span>🍃 Árbol Elemental: Fuuton</span>
+                <small style="font-size: 11px; color: var(--plum3); background: rgba(123, 74, 184, 0.2); padding: 2px 8px; border-radius: 4px;">Nivel 2</small>
+              </div>
+              <div style="display: flex; align-items: center; gap: 12px;">
+                <button type="button" onclick="event.stopPropagation(); revocarArbolDirecto('Fuuton')" style="background: rgba(198,40,40,0.25); border: 1px solid #ef5350; color: #ffcdd2; font-size: 10px; padding: 3px 8px; border-radius: 4px; cursor: pointer;">
+                  Quitar árbol ✕
+                </button>
+                <div class="sg-tree-chevron">▾</div>
+              </div>
+            </div>
+            <div class="sg-tree-body">
+              <p style="font-size: 13px; color: var(--stone); margin-top: 0;">Técnica Base: <b>Dominio del Viento (FUT101)</b> · Aprendida</p>
+              <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;">
+                <div style="background: rgba(0,0,0,0.3); padding: 12px; border-radius: 6px; border: 1px solid var(--border);">
+                  <strong style="color: #fff; font-size: 12px;">Rama Ofensiva</strong>
+                  <div style="font-size: 11px; color: var(--green); margin-top: 4px;">2/6 Mejoras (Nivel 1)</div>
+                </div>
+                <div style="background: rgba(0,0,0,0.3); padding: 12px; border-radius: 6px; border: 1px solid var(--border);">
+                  <strong style="color: #fff; font-size: 12px;">Rama Cortante</strong>
+                  <div style="font-size: 11px; color: var(--green); margin-top: 4px;">2/6 Mejoras (Nivel 1)</div>
+                </div>
+                <div style="background: rgba(0,0,0,0.3); padding: 12px; border-radius: 6px; border: 1px solid var(--border);">
+                  <strong style="color: #8a7a9a; font-size: 12px;">Rama Defensiva</strong>
+                  <div style="font-size: 11px; color: var(--stone); margin-top: 4px;">Bloqueada (15 Tobis)</div>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- TAB: FICHA (AUDIT-007 SHORTCUT)            -->
+    <!-- ========================================== -->
+    <section id="tab-ficha" class="sim-view">
+      <div class="section-head-bar">
+        <div>
+          <h2 style="font-family: 'Cinzel', serif; margin: 0 0 6px;">Ficha de Personaje (Vista Staff)</h2>
+          <p style="color: var(--stone); margin: 0; font-size: 14px;">Barra inferior exclusiva de moderadores con el nuevo acceso directo al Dojo.</p>
+        </div>
+      </div>
+
+      <div style="background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; padding: 24px;">
+        <div style="display: flex; gap: 20px; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 20px;">
+          <div style="width: 80px; height: 80px; border-radius: 50%; background: #2a1a45; border: 2px solid var(--plum2); display: flex; align-items: center; justify-content: center; font-size: 32px;">
+            🥷
+          </div>
+          <div>
+            <div style="font-size: 11px; font-family: 'Cinzel', serif; letter-spacing: 2px; color: var(--plum3); text-transform: uppercase;">Shinobi de Konohagakure · Genin</div>
+            <h1 style="margin: 2px 0 6px; font-family: 'Cinzel', serif; font-size: 24px; color: #fff;">Naruto Uzumaki</h1>
+            <div style="font-size: 13px; color: var(--stone);">Ficha ID #42 · Nivel 1 · 150 Tobis · 1.200 Ryos</div>
+          </div>
+        </div>
+
+        <div style="margin: 20px 0; font-size: 14px; color: #c9bfe0; line-height: 1.8;">
+          <p>Esta es la vista pública de la ficha de personaje. Cuando un moderador o administrador visita este perfil, al pie de página se activa automáticamente la barra de herramientas del Staff.</p>
+        </div>
+
+        <!-- Barra Staff con el Atajo -->
+        <div class="fx-staffbar">
+          <span class="fx-staffbar__label">Staff</span>
+          <button type="button" class="fx-staffbar__link" onclick="switchTab('tab-dojo')" style="border-color: var(--plum2); background: rgba(123, 74, 184, 0.25); font-weight: 700;">
+            🥋 Administrar Dojo ↗
+          </button>
+          <a class="fx-staffbar__link" href="javascript:void(0)" onclick="showToast('Abriendo editor de técnicas...')">Modificar técnicas</a>
+          <a class="fx-staffbar__link" href="javascript:void(0)" onclick="showToast('Abriendo editor de ficha...')">Modificar ficha</a>
+          <a class="fx-staffbar__link" href="javascript:void(0)" onclick="showToast('Abriendo editor de virtudes...')">Modificar virtudes</a>
+          <a class="fx-staffbar__link" href="javascript:void(0)" onclick="showToast('Abriendo editor de objetos...')">Modificar objetos</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- TAB: CALENDARIO (AUDIT-003)                -->
+    <!-- ========================================== -->
+    <section id="tab-calendario" class="sim-view">
+      <div class="section-head-bar">
+        <div>
+          <h2 style="font-family: 'Cinzel', serif; margin: 0 0 6px;">Calendario Shinobi Dinámico</h2>
+          <p style="color: var(--stone); margin: 0; font-size: 14px;">Simulación con selector de temporada, selector de año y saltos de -15, -1, +1 y +15 días.</p>
+        </div>
+        <button type="button" onclick="deshacerCalendario()" class="sg-btn sg-btn-reset">
+          ↺ Deshacer / Resetear a Hoy
+        </button>
+      </div>
+
+      <div style="background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; padding: 24px; max-width: 720px; margin: 0 auto;">
+        
+        <!-- Selectores de Temporada y Año -->
+        <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 14px; margin-bottom: 20px; background: rgba(0,0,0,0.3); padding: 14px; border-radius: 10px; border: 1px solid var(--border);">
+          <div>
+            <label style="display: block; font-size: 11px; font-family: 'Cinzel', serif; text-transform: uppercase; color: var(--plum3); font-weight: 700; margin-bottom: 5px;">
+              Temporada del Año:
+            </label>
+            <select id="sel-temporada" onchange="cambiarTemporada(this.value)" style="width: 100%; padding: 8px 12px; background: #0f0c18; border: 1px solid var(--border-strong); border-radius: 6px; color: #fff; font-size: 13px;">
+              <option value="otono" selected>🍁 Otoño (Temporada Actual)</option>
+              <option value="invierno">❄️ Invierno</option>
+              <option value="primavera">🌸 Primavera</option>
+              <option value="verano">☀️ Verano</option>
+            </select>
+          </div>
+          <div>
+            <label style="display: block; font-size: 11px; font-family: 'Cinzel', serif; text-transform: uppercase; color: var(--plum3); font-weight: 700; margin-bottom: 5px;">
+              Año Shinobi:
+            </label>
+            <div style="display: flex; gap: 6px;">
+              <button class="sg-btn sg-btn-outline" onclick="modificarAno(-1)" style="padding: 7px 10px;">-1</button>
+              <input type="number" id="input-ano" value="150" min="1" max="999" onchange="cambiarAno(this.value)" style="flex: 1; text-align: center; background: #0f0c18; border: 1px solid var(--border-strong); border-radius: 6px; color: #fff; font-family: 'Cinzel', serif; font-size: 14px; font-weight: 700;">
+              <button class="sg-btn sg-btn-outline" onclick="modificarAno(1)" style="padding: 7px 10px;">+1</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Widget de Calendario -->
+        <div id="cal-widget" style="background: #150f24; border: 1px solid var(--border-strong); border-radius: 12px; padding: 22px; box-shadow: 0 8px 30px rgba(0,0,0,0.5); transition: border-color 0.3s;">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px;">
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <span id="cal-icono" style="font-size: 32px;">🍁</span>
+              <div>
+                <div id="cal-estacion-label" style="font-size: 10px; font-family: 'Cinzel', serif; letter-spacing: 2px; color: #d08850; text-transform: uppercase; font-weight: 700;">
+                  Estación Actual · Otoño
+                </div>
+                <div id="cal-titulo" style="font-family: 'Cinzel', serif; font-size: 21px; font-weight: 900; color: #fff;">
+                  Año 150, Día 1 de Otoño
+                </div>
+              </div>
+            </div>
+            <div style="text-align: right;">
+              <div style="font-size: 11px; color: var(--stone);">Progreso</div>
+              <div id="cal-porcentaje" style="font-family: 'Cinzel', serif; font-size: 18px; font-weight: 700; color: #d08850;">1%</div>
+            </div>
+          </div>
+
+          <!-- Barra de Progreso -->
+          <div style="height: 10px; background: rgba(0,0,0,0.4); border-radius: 999px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1);">
+            <div id="cal-barra" style="height: 100%; width: 1.1%; background: linear-gradient(90deg, #c0582a, #d08850); border-radius: 999px; transition: all 0.3s;"></div>
+          </div>
+
+          <div style="margin-top: 14px; font-size: 12px; color: var(--stone); display: flex; justify-content: space-between;">
+            <span>Día <b id="cal-dia" style="color:#fff;">1</b> de 90</span>
+            <span id="cal-proxima-estacion">Próxima estación: <b>Invierno (Día 91)</b></span>
+          </div>
+        </div>
+
+        <!-- Controles de Días (+1, +15, -1, -15) -->
+        <div style="margin-top: 24px; padding-top: 20px; border-top: 1px dashed var(--border); display: flex; flex-direction: column; gap: 12px;">
+          <div style="font-size: 11px; font-family: 'Cinzel', serif; text-transform: uppercase; color: var(--stone); letter-spacing: 1px;">
+            Ajustar días de la estación:
+          </div>
+          <div style="display: flex; gap: 8px; flex-wrap: wrap; justify-content: space-between;">
+            <div style="display: flex; gap: 8px;">
+              <button class="sg-btn sg-btn-danger" onclick="avanzarDias(-15)">-15 Días</button>
+              <button class="sg-btn sg-btn-danger" onclick="avanzarDias(-1)">-1 Día</button>
+            </div>
+            <div style="display: flex; gap: 8px;">
+              <button class="sg-btn sg-btn-success" onclick="avanzarDias(1)">+1 Día</button>
+              <button class="sg-btn sg-btn-success" onclick="avanzarDias(15)">+15 Días</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- TAB: CALCULADORA (AUDIT-004)               -->
+    <!-- ========================================== -->
+    <section id="tab-calc" class="sim-view">
+      <div class="section-head-bar">
+        <div>
+          <h2 style="font-family: 'Cinzel', serif; margin: 0 0 6px;">Calculadora de Estadísticas · Corrección de Nivel</h2>
+          <p style="color: var(--stone); margin: 0; font-size: 14px;">Asigna los primeros 15 puntos de estadísticas: el nivel se mantiene correctamente en <b>Nivel 1</b>.</p>
+        </div>
+        <button type="button" onclick="deshacerCalculadora()" class="sg-btn sg-btn-reset">
+          ↺ Deshacer / Resetear a 15 Pts
+        </button>
+      </div>
+
+      <div style="background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; padding: 24px; max-width: 550px; margin: 0 auto;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; background: rgba(0,0,0,0.3); padding: 14px 20px; border-radius: 8px; border: 1px solid var(--border);">
+          <div>
+            <div style="font-size: 11px; font-family: 'Cinzel', serif; letter-spacing: 1.5px; color: var(--stone); text-transform: uppercase;">Puntos Asignados</div>
+            <div id="calc-total-pts" style="font-family: 'Cinzel', serif; font-size: 26px; font-weight: 900; color: #fff;">15</div>
+          </div>
+          <div style="text-align: right;">
+            <div style="font-size: 11px; font-family: 'Cinzel', serif; letter-spacing: 1.5px; color: var(--plum3); text-transform: uppercase;">Nivel Resultante</div>
+            <div id="calc-nivel" style="font-family: 'Cinzel', serif; font-size: 26px; font-weight: 900; color: #4caf50;">Nivel 1</div>
+          </div>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 14px;">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <label style="font-size: 14px;">Fuerza (Taijutsu):</label>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <button class="sg-btn sg-btn-outline" onclick="modStat('str', -1)">-</button>
+              <span id="stat-str" style="font-family: 'Cinzel', serif; width: 24px; text-align: center;">5</span>
+              <button class="sg-btn sg-btn-outline" onclick="modStat('str', 1)">+</button>
+            </div>
+          </div>
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <label style="font-size: 14px;">Destreza (Velocidad):</label>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <button class="sg-btn sg-btn-outline" onclick="modStat('dex', -1)">-</button>
+              <span id="stat-dex" style="font-family: 'Cinzel', serif; width: 24px; text-align: center;">5</span>
+              <button class="sg-btn sg-btn-outline" onclick="modStat('dex', 1)">+</button>
+            </div>
+          </div>
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <label style="font-size: 14px;">Chakra (Control):</label>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <button class="sg-btn sg-btn-outline" onclick="modStat('cha', -1)">-</button>
+              <span id="stat-cha" style="font-family: 'Cinzel', serif; width: 24px; text-align: center;">5</span>
+              <button class="sg-btn sg-btn-outline" onclick="modStat('cha', 1)">+</button>
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-top: 20px; padding: 12px; background: rgba(76, 175, 80, 0.1); border: 1px solid rgba(76, 175, 80, 0.3); border-radius: 6px; font-size: 12px; color: #a5d6a7;">
+          ℹ️ Con la fórmula anterior `((pts)/15)+1`, 15 puntos arrojaban erróneamente <b>Nivel 2</b>. Con `Math.max(1, Math.floor(pts/15))`, los 15 puntos iniciales dan correctamente <b>Nivel 1</b> y requiere alcanzar 30 puntos para subir a Nivel 2.
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Modal para Crear Nuevo Árbol (Técnicas) -->
+  <div class="modal-backdrop" id="modal-crear-arbol">
+    <div class="modal-box">
+      <div style="padding: 18px 24px; background: #130f1e; border-bottom: 1px solid rgba(156, 107, 204, 0.2); display: flex; justify-content: space-between; align-items: center;">
+        <h3 style="margin: 0; font-family: 'Cinzel', serif; font-size: 14px; letter-spacing: 1px; color: #e8dff8;">Crear Nuevo Árbol de Habilidades</h3>
+        <button type="button" onclick="closeModalTec()" style="background: transparent; border: none; font-size: 20px; color: #8a7a9a; cursor: pointer;">&times;</button>
+      </div>
+      <form onsubmit="crearArbolSimulado(event)" style="padding: 20px 24px; margin: 0;">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px;">
+          <div>
+            <label style="display: block; font-size: 11px; text-transform: uppercase; color: #b890e0; font-weight: 700; margin-bottom: 5px;">Nombre del Árbol (slug)</label>
+            <input type="text" id="arbol-nombre" placeholder="ej. senjutsu" required style="width: 100%; padding: 8px 12px; background: #0f0c18; border: 1px solid rgba(156, 107, 204, 0.3); border-radius: 6px; color: #fff;">
+          </div>
+          <div>
+            <label style="display: block; font-size: 11px; text-transform: uppercase; color: #b890e0; font-weight: 700; margin-bottom: 5px;">Sección en Técnicas</label>
+            <select id="arbol-seccion" style="width: 100%; padding: 8px 12px; background: #0f0c18; border: 1px solid rgba(156, 107, 204, 0.3); border-radius: 6px; color: #fff;">
+              <option value="especiales">Árboles Adicionales / Nuevos</option>
+              <option value="generales">Jutsus Generales</option>
+              <option value="elementales">Técnicas Elementales</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="border-top: 1px dashed rgba(156, 107, 204, 0.2); padding-top: 12px; margin-top: 12px;">
+          <div style="font-size: 12px; font-weight: 700; color: #d4b8f0; margin-bottom: 10px;">Técnica Base del Árbol</div>
+          <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 14px; margin-bottom: 10px;">
+            <div>
+              <label style="display: block; font-size: 11px; color: #8a7a9a; margin-bottom: 4px;">Nombre Técnica Base</label>
+              <input type="text" id="arbol-base-nombre" placeholder="ej. Modo Sabio Básico" required style="width: 100%; padding: 7px 10px; background: #0f0c18; border: 1px solid rgba(156, 107, 204, 0.3); border-radius: 6px; color: #fff;">
+            </div>
+            <div>
+              <label style="display: block; font-size: 11px; color: #8a7a9a; margin-bottom: 4px;">ID Técnica (TID)</label>
+              <input type="text" id="arbol-base-tid" placeholder="ej. SENJ101B" required style="width: 100%; padding: 7px 10px; background: #0f0c18; border: 1px solid rgba(156, 107, 204, 0.3); border-radius: 6px; color: #fff;">
+            </div>
+          </div>
+        </div>
+
+        <div style="border-top: 1px dashed rgba(156, 107, 204, 0.2); padding-top: 12px;">
+          <div style="font-size: 12px; font-weight: 700; color: #d4b8f0; margin-bottom: 8px;">Nombres de las 3 Ramas</div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px;">
+            <input type="text" placeholder="Rama 1" value="Kawasemi" required style="padding: 7px 8px; background: #0f0c18; border: 1px solid rgba(156, 107, 204, 0.3); border-radius: 6px; color: #fff; font-size: 12px;">
+            <input type="text" placeholder="Rama 2" value="Sensorial" required style="padding: 7px 8px; background: #0f0c18; border: 1px solid rgba(156, 107, 204, 0.3); border-radius: 6px; color: #fff; font-size: 12px;">
+            <input type="text" placeholder="Rama 3" value="Energía Natural" required style="padding: 7px 8px; background: #0f0c18; border: 1px solid rgba(156, 107, 204, 0.3); border-radius: 6px; color: #fff; font-size: 12px;">
+          </div>
+        </div>
+
+        <div style="margin-top: 20px; display: flex; justify-content: flex-end; gap: 10px;">
+          <button type="button" onclick="closeModalTec()" class="sg-btn sg-btn-outline">Cancelar</button>
+          <button type="submit" class="sg-btn sg-btn-primary">Crear y Publicar Árbol</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal para Eliminar Árbol (Técnicas) -->
+  <div class="modal-backdrop" id="modal-eliminar-arbol">
+    <div class="modal-box">
+      <div style="padding: 18px 24px; background: #1a0f18; border-bottom: 1px solid rgba(239, 83, 80, 0.3); display: flex; justify-content: space-between; align-items: center;">
+        <h3 style="margin: 0; font-family: 'Cinzel', serif; font-size: 14px; letter-spacing: 1px; color: #ffcdd2;">Eliminar Árbol de Técnicas</h3>
+        <button type="button" onclick="closeModalEliminarTec()" style="background: transparent; border: none; font-size: 20px; color: #8a7a9a; cursor: pointer;">&times;</button>
+      </div>
+      <form onsubmit="eliminarArbolModal(event)" style="padding: 20px 24px; margin: 0;">
+        <p style="font-size: 13px; color: #c9bfe0; margin-top: 0;">
+          Selecciona el árbol que deseas eliminar del catálogo público y de las técnicas registradas. Los árboles elementales base están protegidos.
+        </p>
+        <div style="margin-bottom: 18px;">
+          <label style="display: block; font-size: 11px; text-transform: uppercase; color: #ef5350; font-weight: 700; margin-bottom: 6px;">Árbol a eliminar:</label>
+          <select id="select-eliminar-arbol" required style="width: 100%; padding: 8px 12px; background: #0f0c18; border: 1px solid rgba(239, 83, 80, 0.4); border-radius: 6px; color: #fff; font-size: 13px;">
+            <option value="">-- Selecciona un árbol --</option>
+          </select>
+        </div>
+        <div style="display: flex; justify-content: flex-end; gap: 10px;">
+          <button type="button" onclick="closeModalEliminarTec()" class="sg-btn sg-btn-outline">Cancelar</button>
+          <button type="submit" class="sg-btn sg-btn-danger">Confirmar Eliminación</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="sim-toast"></div>
+
+  <script>
+    function switchTab(tabId) {
+      document.querySelectorAll('.sim-tab').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.sim-view').forEach(v => v.classList.remove('active'));
+      event.currentTarget.classList.add('active');
+      document.getElementById(tabId).classList.add('active');
+    }
+
+    function showToast(msg) {
+      const t = document.getElementById('sim-toast');
+      t.innerHTML = msg;
+      t.style.display = 'block';
+      setTimeout(() => { t.style.display = 'none'; }, 3500);
+    }
+
+    // ==========================================
+    // TÉCNICAS (CREAR / ELIMINAR / DESHACER)
+    // ==========================================
+    let arbolesCreados = [];
+
+    function openModalTec() { document.getElementById('modal-crear-arbol').style.display = 'flex'; }
+    function closeModalTec() { document.getElementById('modal-crear-arbol').style.display = 'none'; }
+
+    function openModalEliminarTec() {
+      const sel = document.getElementById('select-eliminar-arbol');
+      sel.innerHTML = '<option value="">-- Selecciona un árbol --</option>';
+      
+      // Añadir creados
+      arbolesCreados.forEach(a => {
+        sel.innerHTML += `<option value="${a}">${a.charAt(0).toUpperCase() + a.slice(1)} (Creado recientemente)</option>`;
+      });
+      // Añadir opciones existentes borrables
+      sel.innerHTML += '<option value="Bukijutsu">Bukijutsu</option>';
+      sel.innerHTML += '<option value="Defensivo">Defensivo</option>';
+      sel.innerHTML += '<option value="Resistencia">Resistencia</option>';
+      sel.innerHTML += '<option value="Taijutsu">Taijutsu</option>';
+      sel.innerHTML += '<option value="Kodon">Kodon</option>';
+      sel.innerHTML += '<option value="Akizu">Akizu</option>';
+
+      document.getElementById('modal-eliminar-arbol').style.display = 'flex';
+    }
+    function closeModalEliminarTec() { document.getElementById('modal-eliminar-arbol').style.display = 'none'; }
+
+    function crearArbolSimulado(e) {
+      e.preventDefault();
+      const nombre = document.getElementById('arbol-nombre').value.trim();
+      const baseNom = document.getElementById('arbol-base-nombre').value.trim();
+      const slug = nombre.toLowerCase();
+
+      if (arbolesCreados.includes(slug)) {
+        showToast(`⚠️ El árbol <b>${nombre}</b> ya existe.`);
+        return;
+      }
+      arbolesCreados.push(slug);
+
+      renderNuevosArboles();
+      closeModalTec();
+      showToast(`✨ ¡Árbol <b>${nombre}</b> creado con éxito! Ya aparece en la biblioteca pública.`);
+    }
+
+    function renderNuevosArboles() {
+      const card = document.getElementById('card-nuevos-arboles');
+      const chips = document.getElementById('chips-nuevos-arboles');
+      chips.innerHTML = '';
+
+      if (arbolesCreados.length === 0) {
+        card.style.display = 'none';
+        return;
+      }
+
+      card.style.display = 'block';
+      arbolesCreados.forEach(a => {
+        const nom = a.charAt(0).toUpperCase() + a.slice(1);
+        const div = document.createElement('div');
+        div.className = 'tec-chip';
+        div.style.borderColor = 'var(--plum2)';
+        div.innerHTML = `
+          <span>⚡ ${nom}</span>
+          <div style="display:flex; align-items:center; gap:6px;">
+            <small style="color:#a5d6a7">Nuevo</small>
+            <button type="button" onclick="eliminarArbolDirecto('${a}')" title="Eliminar árbol" style="background:rgba(198,40,40,0.3); border:none; color:#ef5350; cursor:pointer; border-radius:4px; padding:2px 6px; font-size:11px;">✕</button>
+          </div>
+        `;
+        chips.appendChild(div);
+      });
+    }
+
+    function eliminarArbolDirecto(slug) {
+      arbolesCreados = arbolesCreados.filter(x => x !== slug);
+      renderNuevosArboles();
+      showToast(`🗑️ Árbol <b>${slug}</b> eliminado correctamente.`);
+    }
+
+    function eliminarArbolModal(e) {
+      e.preventDefault();
+      const sel = document.getElementById('select-eliminar-arbol');
+      const val = sel.value;
+      if (!val) return;
+      eliminarArbolDirecto(val.toLowerCase());
+      closeModalEliminarTec();
+      showToast(`🗑️ Árbol <b>${val}</b> eliminado de técnicas.`);
+    }
+
+    function deshacerTecnicas() {
+      arbolesCreados = [];
+      renderNuevosArboles();
+      showToast('↺ Catálogo de Técnicas restaurado a su estado inicial.');
+    }
+
+    // ==========================================
+    // DOJO (OTORGAR / REVOCAR / DESHACER)
+    // ==========================================
+    let dojoActivo = true;
+    let creditos = 0;
+    let arbolesDojo = ['Fuuton'];
+
+    function toggleDojoAccess() {
+      dojoActivo = !dojoActivo;
+      actualizarEstadoDojo();
+      showToast(dojoActivo ? '🔓 Dojo habilitado para el usuario #42' : '🔒 Dojo bloqueado para el usuario #42');
+    }
+
+    function actualizarEstadoDojo() {
+      const btn = document.getElementById('btn-toggle-dojo');
+      const banner = document.getElementById('banner-dojo-bloqueado');
+      if (dojoActivo) {
+        btn.textContent = 'Bloquear Acceso al Dojo';
+        btn.className = 'sg-btn sg-btn-danger';
+        banner.style.display = 'none';
+      } else {
+        btn.textContent = 'Habilitar Acceso al Dojo';
+        btn.className = 'sg-btn sg-btn-success';
+        banner.style.display = 'block';
+      }
+    }
+
+    function darCreditoMejora() {
+      creditos++;
+      showToast(`🎁 Otorgado +1 crédito de mejora gratis al usuario. Total acumulado: <b>${creditos}</b>`);
+    }
+
+    function otorgarArbol(e) {
+      e.preventDefault();
+      const sel = document.getElementById('select-arbol-otorgar');
+      const val = sel.value;
+      if (!val) return;
+
+      if (arbolesDojo.includes(val)) {
+        showToast(`⚠️ El usuario ya posee el árbol <b>${val}</b>`);
+        return;
+      }
+
+      arbolesDojo.push(val);
+      renderArbolesDojo();
+      sel.value = '';
+      showToast(`🥋 ¡Árbol <b>${val}</b> otorgado exitosamente al usuario #42!`);
+    }
+
+    function revocarArbolDirecto(arbol) {
+      arbolesDojo = arbolesDojo.filter(x => x !== arbol);
+      renderArbolesDojo();
+      showToast(`🗑️ Se ha revocado el árbol <b>${arbol}</b> del usuario #42.`);
+    }
+
+    function revocarArbolForm(e) {
+      e.preventDefault();
+      const sel = document.getElementById('select-arbol-revocar');
+      const val = sel.value;
+      if (!val) return;
+      revocarArbolDirecto(val);
+    }
+
+    function renderArbolesDojo() {
+      const container = document.getElementById('lista-arboles-poseidos');
+      const selRevocar = document.getElementById('select-arbol-revocar');
+      container.innerHTML = '';
+      selRevocar.innerHTML = '<option value="">-- Árbol a revocar --</option>';
+
+      document.getElementById('count-arboles').textContent = arbolesDojo.length;
+
+      arbolesDojo.forEach(a => {
+        selRevocar.innerHTML += `<option value="${a}">${a}</option>`;
+
+        const sec = document.createElement('section');
+        const treeId = 'tree-' + a.toLowerCase();
+        sec.className = 'sg-tree';
+        sec.id = treeId;
+        sec.innerHTML = `
+          <div class="sg-tree-head" onclick="toggleTree('${treeId}')">
+            <div class="sg-tree-title">
+              <span>✨ Árbol: ${a}</span>
+              <small style="font-size: 11px; color: ${a === 'Fuuton' ? 'var(--plum3)' : '#a5d6a7'}; background: rgba(123, 74, 184, 0.2); padding: 2px 8px; border-radius: 4px;">
+                ${a === 'Fuuton' ? 'Nivel 2' : 'Otorgado por Staff'}
+              </small>
+            </div>
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <button type="button" onclick="event.stopPropagation(); revocarArbolDirecto('${a}')" style="background: rgba(198,40,40,0.25); border: 1px solid #ef5350; color: #ffcdd2; font-size: 10px; padding: 3px 8px; border-radius: 4px; cursor: pointer;">
+                Quitar árbol ✕
+              </button>
+              <div class="sg-tree-chevron">▾</div>
+            </div>
+          </div>
+          <div class="sg-tree-body">
+            <p style="font-size: 13px; color: var(--stone); margin-top: 0;">Técnica Base adquirida · 3 Ramas disponibles para entrenar.</p>
+          </div>
+        `;
+        container.appendChild(sec);
+      });
+    }
+
+    function toggleTree(id) {
+      const el = document.getElementById(id);
+      if (el) el.classList.toggle('is-collapsed');
+    }
+
+    let allCollapsed = false;
+    function toggleAllTrees() {
+      allCollapsed = !allCollapsed;
+      const trees = document.querySelectorAll('.sg-tree');
+      trees.forEach(t => {
+        if (allCollapsed) t.classList.add('is-collapsed');
+        else t.classList.remove('is-collapsed');
+      });
+      document.getElementById('btn-toggle-all-trees').textContent = allCollapsed ? 'Expandir todo' : 'Colapsar todo';
+    }
+
+    function deshacerDojo() {
+      dojoActivo = true;
+      creditos = 0;
+      arbolesDojo = ['Fuuton'];
+      actualizarEstadoDojo();
+      renderArbolesDojo();
+      showToast('↺ Estado del Dojo del usuario #42 restaurado al inicio.');
+    }
+
+    // ==========================================
+    // CALENDARIO (DÍAS, SELECTOR TEMPORADA, AÑO, DESHACER)
+    // ==========================================
+    const estacionesConfig = {
+      otono: {
+        nombre: 'Otoño',
+        icono: '🍁',
+        colorTexto: '#d08850',
+        gradienteBarra: 'linear-gradient(90deg, #c0582a, #d08850)',
+        bordeWidget: 'rgba(208, 136, 80, 0.4)',
+        proxima: 'Invierno'
+      },
+      invierno: {
+        nombre: 'Invierno',
+        icono: '❄️',
+        colorTexto: '#70b0e0',
+        gradienteBarra: 'linear-gradient(90deg, #2b6cb0, #70b0e0)',
+        bordeWidget: 'rgba(112, 176, 224, 0.4)',
+        proxima: 'Primavera'
+      },
+      primavera: {
+        nombre: 'Primavera',
+        icono: '🌸',
+        colorTexto: '#50c878',
+        gradienteBarra: 'linear-gradient(90deg, #2e7d32, #66bb6a)',
+        bordeWidget: 'rgba(80, 200, 120, 0.4)',
+        proxima: 'Verano'
+      },
+      verano: {
+        nombre: 'Verano',
+        icono: '☀️',
+        colorTexto: '#e0a030',
+        gradienteBarra: 'linear-gradient(90deg, #d48806, #faad14)',
+        bordeWidget: 'rgba(224, 160, 48, 0.4)',
+        proxima: 'Otoño'
+      }
+    };
+
+    let estActual = 'otono';
+    let anoActual = 150;
+    let diaActual = 1;
+
+    function cambiarTemporada(est) {
+      estActual = est;
+      actualizarCalendario();
+      showToast(`Temporada cambiada a <b>${estacionesConfig[est].nombre}</b>`);
+    }
+
+    function cambiarAno(val) {
+      anoActual = parseInt(val) || 150;
+      actualizarCalendario();
+    }
+
+    function modificarAno(diff) {
+      anoActual = Math.max(1, anoActual + diff);
+      document.getElementById('input-ano').value = anoActual;
+      actualizarCalendario();
+    }
+
+    function avanzarDias(d) {
+      diaActual = Math.max(1, Math.min(90, diaActual + d));
+      actualizarCalendario();
+      showToast(`${d > 0 ? '+' : ''}${d} días (Ahora en Día ${diaActual})`);
+    }
+
+    function deshacerCalendario() {
+      estActual = 'otono';
+      anoActual = 150;
+      diaActual = 1;
+      document.getElementById('sel-temporada').value = 'otono';
+      document.getElementById('input-ano').value = 150;
+      actualizarCalendario();
+      showToast('↺ Calendario reiniciado a Año 150, Día 1 de Otoño.');
+    }
+
+    function actualizarCalendario() {
+      const cfg = estacionesConfig[estActual];
+      const pct = Math.max(1, Math.min(100, Math.round((diaActual / 90) * 100)));
+
+      document.getElementById('cal-icono').textContent = cfg.icono;
+      document.getElementById('cal-estacion-label').textContent = `Estación Actual · ${cfg.nombre}`;
+      document.getElementById('cal-estacion-label').style.color = cfg.colorTexto;
+      document.getElementById('cal-titulo').textContent = `Año ${anoActual}, Día ${diaActual} de ${cfg.nombre}`;
+      document.getElementById('cal-porcentaje').textContent = pct + '%';
+      document.getElementById('cal-porcentaje').style.color = cfg.colorTexto;
+      document.getElementById('cal-dia').textContent = diaActual;
+      document.getElementById('cal-barra').style.width = pct + '%';
+      document.getElementById('cal-barra').style.background = cfg.gradienteBarra;
+      document.getElementById('cal-widget').style.borderColor = cfg.bordeWidget;
+      document.getElementById('cal-proxima-estacion').innerHTML = `Próxima estación: <b>${cfg.proxima} (Día 91)</b>`;
+    }
+
+    // ==========================================
+    // CALCULADORA (DESHACER)
+    // ==========================================
+    let stats = { str: 5, dex: 5, cha: 5 };
+    function modStat(k, v) {
+      stats[k] = Math.max(0, stats[k] + v);
+      document.getElementById('stat-' + k).textContent = stats[k];
+      const total = stats.str + stats.dex + stats.cha;
+      document.getElementById('calc-total-pts').textContent = total;
+      const nivel = Math.max(1, Math.floor(total / 15));
+      document.getElementById('calc-nivel').textContent = 'Nivel ' + nivel;
+    }
+
+    function deshacerCalculadora() {
+      stats = { str: 5, dex: 5, cha: 5 };
+      document.getElementById('stat-str').textContent = 5;
+      document.getElementById('stat-dex').textContent = 5;
+      document.getElementById('stat-cha').textContent = 5;
+      document.getElementById('calc-total-pts').textContent = 15;
+      document.getElementById('calc-nivel').textContent = 'Nivel 1';
+      showToast('↺ Calculadora restaurada a 15 puntos iniciales (Nivel 1).');
+    }
+
+    // Inicialización
+    actualizarCalendario();
+  </script>
+</body>
+</html>

@@ -547,8 +547,9 @@
   var nivelida = document.getElementById('n');
 
   function nivelvalue(fuerza, destreza, cchakra, inteligencia) {
-    var prom = ((fuerza + destreza + cchakra + inteligencia) / 15) + 1;
-    nivelida.innerHTML = Math.floor(prom);
+    var puntos = fuerza + destreza + cchakra + inteligencia;
+    var nivel = Math.max(1, Math.floor(puntos / 15));
+    nivelida.innerHTML = nivel;
   }
 
   function statsvalue() {

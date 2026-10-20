@@ -471,5 +471,9 @@ $plugins->run_hooks('index_end');
 // está cargado (global.php lo require_once en cada request).
 $index_section_final = function_exists('sg_afiliados_index_html') ? sg_afiliados_index_html() : '';
 
+// Calendario Shinobi Dinámico (índice). Ver docs/CAMBIOS_AUDITORIA.md [AUDIT-003].
+// Llena el hook {$index_calendario_shinobi} en la plantilla index.
+$index_calendario_shinobi = function_exists('sg_calendario_index_html') ? sg_calendario_index_html() : '';
+
 eval('$index = "'.$templates->get('index').'";');
 output_page($index);

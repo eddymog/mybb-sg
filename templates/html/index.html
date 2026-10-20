@@ -358,7 +358,7 @@
     inset: 0;
     background:
       linear-gradient(180deg, rgba(18, 14, 28, 0.12) 0%, rgba(18, 14, 28, 0.82) 100%),
-      url('https://i.ibb.co/kxBKxcp/verano.png') center/cover no-repeat;
+      var(--sg-season-bg, url('https://i.ibb.co/kxBKxcp/verano.png')) center/cover no-repeat;
     z-index: 0;
   }
 
@@ -1040,30 +1040,7 @@
 
       <section class="sg-index-dashboard">
         <div class="sg-index-dashboard-stack">
-          <article class="sg-index-panel sg-index-season">
-            <div class="sg-index-season__copy">
-              <div class="sg-index-season__eyebrow">Calendario Shinobi</div>
-              <div class="sg-index-season__title">Verano</div>
-
-              <div class="sg-index-season__row">
-                <span class="sg-index-season__chip">Año 150</span>
-                <span class="sg-index-season__chip">Días 1–90</span>
-              </div>
-
-              <!-- Al cambiar de temporada, actualiza 2 cosas:
-                   1) "45" y "90" en el texto (día límite / total de días).
-                   2) --fill: (día límite / total de días) × 100%. Hoy 45/90 = 50%. -->
-              <div class="sg-index-limit">
-                <div class="sg-index-limit__head">
-                  Fecha límite de rol: <span class="sg-index-limit__value">día 45</span> de 90
-                </div>
-                <div class="sg-index-limit__bar" style="--fill:50%;">
-                  <div class="sg-index-limit__fill"></div>
-                  <div class="sg-index-limit__marker"></div>
-                </div>
-              </div>
-            </div>
-          </article>
+          {$index_calendario_shinobi}
 
           <article class="sg-index-panel">
             <div class="sg-index-panel__header">

@@ -493,6 +493,7 @@
     </section>
 
     <div class="sg-content">
+      {$staff_toolbar_html}
       <section class="sg-overview">
         <div class="sg-chip">
           <strong>Elementales</strong>
@@ -516,76 +517,7 @@
         </div>
       </section>
 
-      <section class="sg-grid">
-        <article class="sg-category" id="elementales">
-          <div class="sg-category-head">
-            <div class="sg-category-eyebrow">Afinidades base</div>
-            <h2>Técnicas elementales</h2>
-            <p>La base del ninjutsu clásico. Aquí se agrupan las naturalezas elementales y las corrientes Yin-Yang para construir estilos versátiles o especializaciones puras.</p>
-          </div>
-          <div class="sg-links">
-            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_lista.php?arbol=Katon"><span class="sg-link-name">Katon</span><span class="sg-link-count">Ver árbol</span></a>
-            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_lista.php?arbol=Suiton"><span class="sg-link-name">Suiton</span><span class="sg-link-count">Ver árbol</span></a>
-            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_lista.php?arbol=Doton"><span class="sg-link-name">Doton</span><span class="sg-link-count">Ver árbol</span></a>
-            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_lista.php?arbol=Fuuton"><span class="sg-link-name">Fuuton</span><span class="sg-link-count">Ver árbol</span></a>
-            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_lista.php?arbol=Raiton"><span class="sg-link-name">Raiton</span><span class="sg-link-count">Ver árbol</span></a>
-            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_lista.php?arbol=Yin"><span class="sg-link-name">Yin</span><span class="sg-link-count">Ver árbol</span></a>
-            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_lista.php?arbol=Yang"><span class="sg-link-name">Yang</span><span class="sg-link-count">Ver árbol</span></a>
-          </div>
-        </article>
-
-        <article class="sg-category" id="konoha">
-          <div class="sg-category-head">
-            <div class="sg-category-eyebrow">Linajes del fuego</div>
-            <h2>Clanes Konoha</h2>
-            <p>Selección de árboles heredados por las familias más influyentes de la Hoja. Ideal para ubicar de inmediato rutas de identidad, legado y especialización de clan.</p>
-          </div>
-          <div class="sg-links">
-            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_lista.php?arbol=aburame"><span class="sg-link-name">Aburame</span><span class="sg-link-count">Ver árbol</span></a>
-            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_lista.php?arbol=akimichi"><span class="sg-link-name">Akimichi</span><span class="sg-link-count">Ver árbol</span></a>
-            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_lista.php?arbol=hyuga"><span class="sg-link-name">Hyuga</span><span class="sg-link-count">Ver árbol</span></a>
-            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_lista.php?arbol=Nara"><span class="sg-link-name">Nara</span><span class="sg-link-count">Ver árbol</span></a>
-            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_lista.php?arbol=Senju"><span class="sg-link-name">Senju</span><span class="sg-link-count">Ver árbol</span></a>
-            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_lista.php?arbol=Uchiha"><span class="sg-link-name">Uchiha</span><span class="sg-link-count">Ver árbol</span></a>
-            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_lista.php?arbol=Yamanaka"><span class="sg-link-name">Yamanaka</span><span class="sg-link-count">Ver árbol</span></a>
-            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_lista.php?arbol=Inuzuka"><span class="sg-link-name">Inuzuka</span><span class="sg-link-count">Ver árbol</span></a>
-            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_lista.php?arbol=Sarutobi"><span class="sg-link-name">Sarutobi</span><span class="sg-link-count">Ver árbol</span></a>
-          </div>
-        </article>
-
-        <article class="sg-category" id="kiri">
-          <div class="sg-category-head">
-            <div class="sg-category-eyebrow">Linajes de la niebla</div>
-            <h2>Clanes Kiri</h2>
-            <p>Un compendio de ramas asociadas a Kirigakure, con énfasis en herencias de sangre, técnicas singulares y estilos de combate marcados por la brutalidad o la adaptabilidad.</p>
-          </div>
-          <div class="sg-links">
-            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_lista.php?arbol=Hoshigaki"><span class="sg-link-name">Hoshigaki</span><span class="sg-link-count">Ver árbol</span></a>
-            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_lista.php?arbol=Kaguya"><span class="sg-link-name">Kaguya</span><span class="sg-link-count">Ver árbol</span></a>
-            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_lista.php?arbol=Yuki"><span class="sg-link-name">Yuki</span><span class="sg-link-count">Ver árbol</span></a>
-            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_lista.php?arbol=Hozuki"><span class="sg-link-name">Hozuki</span><span class="sg-link-count">Ver árbol</span></a>
-            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_lista.php?arbol=Heizu"><span class="sg-link-name">Heizu</span><span class="sg-link-count">Ver árbol</span></a>
-            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_lista.php?arbol=Terumi"><span class="sg-link-name">Terumi</span><span class="sg-link-count">Ver árbol</span></a>
-            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_lista.php?arbol=Akizu"><span class="sg-link-name">Akizu</span><span class="sg-link-count">Ver árbol</span></a>
-            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_lista.php?arbol=Funato"><span class="sg-link-name">Funato</span><span class="sg-link-count">Ver árbol</span></a>
-            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_lista.php?arbol=Kodon"><span class="sg-link-name">Kodon</span><span class="sg-link-count">Ver árbol</span></a>
-          </div>
-        </article>
-
-        <article class="sg-category" id="generales">
-          <div class="sg-category-head">
-            <div class="sg-category-eyebrow">Estilos abiertos</div>
-            <h2>Jutsus generales</h2>
-            <p>Ramas versátiles para personajes de múltiples perfiles. Reúnen caminos amplios de arma, defensa, aguante físico y combate cuerpo a cuerpo.</p>
-          </div>
-          <div class="sg-links">
-            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_lista.php?arbol=Bukijutsu"><span class="sg-link-name">Bukijutsu</span><span class="sg-link-count">Ver árbol</span></a>
-            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_lista.php?arbol=Defensivo"><span class="sg-link-name">Defensivo</span><span class="sg-link-count">Ver árbol</span></a>
-            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_lista.php?arbol=Resistencia"><span class="sg-link-name">Resistencia</span><span class="sg-link-count">Ver árbol</span></a>
-            <a class="sg-link" href="{$mybb->settings['bburl']}/sg/tecnicas_lista.php?arbol=Taijutsu"><span class="sg-link-name">Taijutsu</span><span class="sg-link-count">Ver árbol</span></a>
-          </div>
-        </article>
-      </section>
+      {$tecnicas_grid_html}
 
       <section class="sg-archive" id="archivo-antiguo">
         <div class="sg-archive-copy">

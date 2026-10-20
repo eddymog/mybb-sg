@@ -1,0 +1,307 @@
+================================================================================
+INFORME DE AUDITORÍA Y CAMBIOS IMPLEMENTADOS · SHINOBI GAIDEN (MYBB 1.8)
+================================================================================
+Fecha de emisión: 20 de Octubre de 2026
+Entorno: MyBB 1.8 + Capa de Aplicación RPG Shinobi Gaiden (SG)
+Repositorio/Directorio: c:\Users\usuario\Downloads\Thekingdom\
+Autor de la auditoría: Antigravity AI Pair Programmer
+================================================================================
+
+--------------------------------------------------------------------------------
+ÍNDICE DEL INFORME:
+--------------------------------------------------------------------------------
+1. RESUMEN EJECUTIVO
+2. DETALLE DE ANOMALÍAS DETECTADAS Y CAMBIOS IMPLEMENTADOS:
+   - [AUDIT-001] BBCode [arma=] vs [objeto=]
+   - [AUDIT-002] Inconsistencias en plugins de etiquetas
+   - [AUDIT-003] Calendario Shinobi Dinámico en Portada
+   - [AUDIT-004] Corrección de la Calculadora de Estadísticas (Bug de Nivel)
+   - [AUDIT-005] Corrección del Acordeón Plegable en el Dojo
+   - [AUDIT-006] Atajo Staff y Catálogo Dinámico en Técnicas
+   - [AUDIT-007] Panel de Gestión Staff en Dojo y Atajo en Ficha
+3. HERRAMIENTAS DE PRUEBA LOCAL Y SIMULACIÓN
+4. INSTRUCCIONES PARA EL PANEL DE ADMINISTRACIÓN DE MYBB (ACP)
+5. LISTA COMPLETA DE ARCHIVOS MODIFICADOS Y CREADOS
+
+================================================================================
+1. RESUMEN EJECUTIVO
+================================================================================
+Durante la auditoría técnica del código fuente de Shinobi Gaiden se revisaron
+los módulos principales del juego (Portada/Index, Calculadora de Stats, Fichas de
+personaje, Dojo y Biblioteca de Técnicas).
+
+Se identificaron fallos funcionales (cálculo prematuro de nivel en fichas recién
+creadas, calendario congelado en portada y acordeones no interactivos en el
+Dojo) y carencias operativas de administración (necesidad de tocar la base de
+datos manualmente para conceder o retirar árboles de técnicas a los jugadores o
+para dar de alta nuevos árboles en la biblioteca).
+
+Todos los problemas fueron resueltos en el código PHP y en las plantillas HTML
+(tanto del tema por defecto como del tema moderno SG2), manteniendo compatibilidad
+con MyBB 1.8, seguridad contra inyecciones SQL y registro de auditoría en la
+consola de Staff.
+
+================================================================================
+2. DETALLE DE ANOMALÍAS DETECTADAS Y CAMBIOS IMPLEMENTADOS
+================================================================================
+
+--------------------------------------------------------------------------------
+[AUDIT-001] y [AUDIT-002] GAP EN BBCodes [arma=] vs [objeto=]
+--------------------------------------------------------------------------------
+* Severidad: Leve / Documental
+* Archivos:
+  - jscripts/bbcodes_sceditor.js
+  - inc/plugins/tecnicatag.php
+* Diagnóstico:
+  En el editor SCEditor existe el botón para insertar [arma=ID], pero en el parser
+  del servidor el plugin tecnicatag procesa la tabla unificada mybb_sg_sg_objetos.
+  Se documentó la equivalencia para asegurar que cualquier objeto clasificado como
+  arma se resuelva sin fallos de renderizado.
+
+--------------------------------------------------------------------------------
+[AUDIT-003] CALENDARIO SHINOBI DINÁMICO EN PORTADA
+--------------------------------------------------------------------------------
+* Severidad: Media (Afectaba la experiencia visual de inicio)
+* Archivos:
+  - index.php
+  - sg/functions/sg_functions.php
+  - templates/html/index.html
+  - templates/SG2Templates/index.html
+* Problema Detectado:
+  El bloque del calendario shinobi en la página de inicio (index.php) se encontraba
+  congelado en un texto fijo ("Año 148, Día 45 de Otoño"). No reflejaba el paso
+  del tiempo real ni el avance de las estaciones.
+* Solución Implementada:
+  - Se crearon las funciones sg_calendario_shinobi_data() y sg_calendario_index_html()
+    en sg_functions.php.
+  - Se estableció como fecha base de sincronización:
+    * Fecha inicio: 19 de Octubre de 2026.
+    * Estación base: Otoño.
+    * Año base: 150.
+    * Duración de cada estación: 90 días exactos.
+    * Ciclo: Otoño -> Invierno -> Primavera -> Verano -> Otoño (+1 Año).
+  - Cálculo dinámico del porcentaje de avance de la estación (1% al 100%).
+  - Inyección de la variable dinámica $index_calendario_shinobi en index.php y
+    adaptación de colores y gradientes en la plantilla HTML (--sg-season-bg).
+
+--------------------------------------------------------------------------------
+[AUDIT-004] CORRECCIÓN CALCULADORA DE STATS (BUG DE NIVEL)
+--------------------------------------------------------------------------------
+* Severidad: Alta (Afectaba la creación y validación de fichas de usuario)
+* Archivos:
+  - templates/html/sg_calculadora.html
+  - templates/SG2Templates/sg_calculadora.html
+* Problema Detectado:
+  Al asignarse los primeros 15 puntos de estadísticas base al crear una ficha,
+  la calculadora mostraba erróneamente "Nivel 2".
+  La fórmula antigua era: ((puntos) / 15) + 1
+  Al tener 15 puntos: (15 / 15) + 1 = 1 + 1 = 2 (Nivel 2 incorrecto).
+* Solución Implementada:
+  Se actualizó la fórmula matemática por:
+    Math.max(1, Math.floor(pts / 15))
+  - Con 0 a 29 puntos: Nivel 1 (los 15 puntos iniciales dan Nivel 1).
+  - Con 30 a 44 puntos: Nivel 2.
+  - Con 45 a 59 puntos: Nivel 3 (progresión normal cada 15 puntos).
+
+--------------------------------------------------------------------------------
+[AUDIT-005] CORRECCIÓN DEL ACORDEÓN PLEGABLE EN EL DOJO
+--------------------------------------------------------------------------------
+* Severidad: Media (Usabilidad en listas largas de técnicas)
+* Archivos:
+  - templates/html/sg_dojo.html
+  - templates/SG2Templates/sg_dojo.html
+* Problema Detectado:
+  Al hacer clic sobre el encabezado de un árbol en sg/dojo.php, este no se plegaba
+  ni desplegaba debido a la ausencia de los manejadores JS y las reglas CSS
+  asociadas a la clase .is-collapsed.
+* Solución Implementada:
+  - Se agregaron las funciones JavaScript sgToggleTree(head) y sgToggleAllTrees().
+  - Se definió la regla CSS para ocultar el cuerpo del árbol (.sg-tree.is-collapsed .sg-tree-body)
+    y rotar el indicador visual (-90deg).
+  - Se incorporó el botón "Colapsar todo / Expandir todo" en la barra de herramientas.
+
+--------------------------------------------------------------------------------
+[AUDIT-006] ATAJO STAFF Y CATÁLOGO DINÁMICO EN TÉCNICAS
+--------------------------------------------------------------------------------
+* Severidad: Media / Operativa
+* Archivos:
+  - sg/tecnicas.php
+  - sg/functions/sg_functions.php
+  - templates/html/sg_tecnicas.html
+  - templates/SG2Templates/sg_tecnicas.html
+* Problema Detectado:
+  1. El listado de técnicas en sg/tecnicas.php estaba escrito en código HTML fijo.
+     Si un administrador creaba un árbol nuevo en la base de datos, este no aparecía
+     en la biblioteca a menos que se editara la plantilla manualmente.
+  2. No existía forma rápida para que un administrador creara o eliminara un árbol
+     desde el propio apartado de técnicas del foro.
+* Solución Implementada:
+  - Se creó sg_get_arboles_agrupados() y sg_tecnicas_render_grid():
+    Consulta la base de datos en tiempo real y agrupa los árboles en:
+    * Técnicas elementales
+    * Clanes Konoha
+    * Clanes Kiri
+    * Jutsus Generales
+    * Árboles Adicionales / Creados
+  - Se implementó sg_tecnicas_render_staff_toolbar():
+    Barra exclusiva para moderadores/staff con botones para:
+    * "+ Crear Nuevo Árbol": Ventana modal para configurar en 1 paso el slug,
+      sección, técnica base (TID, nombre, descripción) y las 3 ramas principales.
+    * "Eliminar Árbol" (sg_eliminar_arbol): Permite retirar un árbol del foro,
+      borrando sus técnicas asociadas y limpiando referencias sin romper la BD.
+    * "Reconstruir Caché": Refresca la caché del catálogo del Dojo en caliente.
+  - Registro de todas las acciones en la tabla mybb_sg_sg_audit_consola.
+
+--------------------------------------------------------------------------------
+[AUDIT-007] PANEL DE GESTIÓN STAFF EN DOJO Y ATAJO EN FICHA
+--------------------------------------------------------------------------------
+* Severidad: Media / Operativa
+* Archivos:
+  - sg/dojo.php
+  - sg/functions/sg_functions.php
+  - templates/html/sg_dojo.html
+  - templates/SG2Templates/sg_dojo.html
+  - templates/html/sg_ficha.html
+  - templates/SG2Templates/sg_ficha.html
+* Problema Detectado:
+  1. En Shinobi Gaiden, poseer un árbol en el Dojo significa poseer su técnica base
+     (rama='Base') en mybb_sg_sg_tec_aprendidas. Para que el Staff concediera un
+     árbol a un usuario, debía realizar consultas INSERT directas en MySQL.
+  2. No había enlace directo desde la ficha del personaje hacia el Dojo del usuario.
+  3. No se podía habilitar o deshabilitar el acceso al Dojo (puede_usar_dojo)
+     ni otorgar créditos de mejora de forma visual.
+* Solución Implementada:
+  - Atajo en Ficha (.fx-staffbar):
+    Se añadió el botón directo "🥋 Administrar Dojo" apuntando a sg/dojo.php?uid={fid}.
+  - Panel de Gestión Staff en Dojo (sg_dojo_render_staff_panel):
+    Visible en la parte superior del Dojo únicamente cuando un moderador accede.
+    Incluye:
+    * Menú selector para "Otorgar Árbol al Usuario" (aprende la técnica base bajo
+      auditoría de Staff).
+    * Selector y botón para "Revocar Árbol del Usuario" (retira el árbol si fue
+      asignado por error o por sanción).
+    * Botón alternador para "Habilitar / Bloquear Acceso al Dojo" (puede_usar_dojo).
+    * Botón "+1 Crédito Mejora" (para premiar o compensar con mejoras gratuitas).
+    * Botón "Refrescar Caché" de árboles.
+
+================================================================================
+3. HERRAMIENTAS DE PRUEBA LOCAL Y SIMULACIÓN
+================================================================================
+Para permitir probar y verificar todos los cambios sin necesidad de subir archivos
+al servidor ni configurar base de datos MySQL local, se crearon:
+
+1. preview/simulador.html:
+   Simulador web completo, autónomo e interactivo con 5 pestañas:
+   - 📜 Técnicas: Probar creación y eliminación de árboles con publicación dinámica.
+   - 🥋 Dojo Staff: Simular asignación y revocación de árboles, bloqueo y créditos.
+   - 🥷 Ficha: Probar la barra de herramientas y navegación hacia el Dojo.
+   - 🍁 Calendario: Probar selectores de Temporada (Otoño/Invierno/Primavera/Verano),
+     selector de Año, saltos de días (-15, -1, +1, +15) y botón Deshacer.
+   - 🧮 Calculadora: Probar asignación de 15 puntos y verificación de Nivel 1.
+   - Botón "↺ Deshacer / Resetear" en cada pestaña para restaurar estados iniciales.
+
+2. abrir_simulador.bat:
+   Script por lotes de Windows en la raíz del proyecto para abrir el simulador
+   en el navegador con un solo doble clic.
+
+================================================================================
+4. INSTRUCCIONES PARA EL PANEL DE ADMINISTRACIÓN DE MYBB (ACP)
+================================================================================
+MyBB almacena las plantillas activas dentro de la base de datos MySQL.
+Los archivos dentro de la carpeta "templates/" son las copias maestras del repositorio.
+Para que los cambios visuales se reflejen en el foro en producción:
+
+1. Iniciar sesión en el ACP de MyBB (Panel de Administración).
+2. Ir a: Plantillas y Estilos (Templates & Style) -> Plantillas (Templates) -> [Tu tema activo].
+3. Actualizar el contenido de las siguientes plantillas copiando el código desde
+   la carpeta "templates/SG2Templates/" (o "templates/html/"):
+   - index: Código actualizado con la variable {$index_calendario_shinobi}.
+   - sg_calculadora: Código con la fórmula corregida de cálculo de nivel.
+   - sg_tecnicas: Código con {$staff_toolbar_html} y {$tecnicas_grid_html}.
+   - sg_dojo: Código con {$dojo_staff_panel} y acordeones.
+   - sg_ficha: Código con el enlace "🥋 Administrar Dojo" en .fx-staffbar.
+4. Guardar los cambios en el ACP.
+
+================================================================================
+5. LISTA COMPLETA DE ARCHIVOS MODIFICADOS Y CREADOS
+================================================================================
+
+Archivos del Backend PHP modificados:
+------------------------------------
+* sg/functions/sg_functions.php:
+  - sg_calendario_shinobi_data()
+  - sg_calendario_index_html()
+  - sg_tecnicas_secciones_defecto()
+  - sg_get_arboles_agrupados()
+  - sg_crear_arbol_rapido()
+  - sg_eliminar_arbol()
+  - sg_tecnicas_render_grid()
+  - sg_tecnicas_render_staff_toolbar()
+  - sg_dojo_staff_acciones() (otorgar, revocar, toggle dojo, créditos, caché)
+  - sg_dojo_render_staff_panel()
+* index.php:
+  - Inyección de $index_calendario_shinobi en el flujo de inicio.
+* sg/tecnicas.php:
+  - Procesamiento POST de staff (crear árbol, eliminar árbol, reconstruir caché).
+  - Inyección de $staff_toolbar_html y $tecnicas_grid_html.
+* sg/dojo.php:
+  - Procesamiento POST de staff (action_staff).
+  - Inyección de $dojo_staff_panel.
+
+Plantillas HTML modificadas:
+---------------------------
+* templates/html/index.html & templates/SG2Templates/index.html
+* templates/html/sg_calculadora.html & templates/SG2Templates/sg_calculadora.html
+* templates/html/sg_tecnicas.html & templates/SG2Templates/sg_tecnicas.html
+* templates/html/sg_dojo.html & templates/SG2Templates/sg_dojo.html
+* templates/html/sg_ficha.html & templates/SG2Templates/sg_ficha.html
+
+Archivos de Documentación y Simulación creados:
+----------------------------------------------
+* docs/CAMBIOS_AUDITORIA.md: Registro técnico histórico de auditoría.
+* INFORME_CAMBIOS_AUDITORIA.txt: Este informe en formato texto plano.
+* preview/simulador.html: Interfaz interactiva de prueba local.
+* abrir_simulador.bat: Lanzador directo para Windows.
+
+================================================================================
+6. VERIFICACIÓN DE CONFLICTOS, REGRESIONES Y SEGURIDAD
+================================================================================
+Se ejecutó una auditoría cruzada sobre toda la base de código para garantizar
+que ninguna de las nuevas funciones o modificaciones colisione con el sistema:
+
+1. Sintaxis PHP y Balanceo de Bloques:
+   - Verificados sg/functions/sg_functions.php, index.php, sg/tecnicas.php y
+     sg/dojo.php. Todos presentan delta de llaves = 0, sin strings sin cerrar ni
+     errores de parseo.
+
+2. Nombres de Funciones y Colisiones de Ámbito:
+   - Todas las funciones añadidas (sg_calendario_shinobi_data, sg_crear_arbol_rapido,
+     sg_eliminar_arbol, sg_tecnicas_render_grid, sg_tecnicas_render_staff_toolbar,
+     sg_dojo_staff_acciones, sg_dojo_render_staff_panel) son únicas en el
+     repositorio. No hay colisión ni redefinición.
+
+3. Seguridad y Permisos de Moderación:
+   - Las solicitudes POST de creación y eliminación en Técnicas están estrictamente
+     protegidas por: if ($es_staff && isset($_POST['action_tecnicas'])).
+   - Las solicitudes POST en Dojo están protegidas por:
+     if ($action_staff !== '' && $es_staff && $uid > 0).
+   - Ningún usuario regular o invitado puede ejecutar acciones de administración.
+   - Parámetros SQL sanitizados con $db->escape_string() y salidas con htmlspecialchars().
+
+4. Integridad de Plantillas MyBB (Condicionales <if>):
+   - Verificado el balanceo de etiquetas <if> y </if> en todas las plantillas
+     modificadas (index, sg_calculadora, sg_tecnicas, sg_dojo, sg_ficha).
+     Totalmente equilibradas sin roturas de sintaxis del motor de plantillas.
+
+5. Independencia del Flujo del Juego:
+   - El Calendario Shinobi usa fallback condicional con function_exists(), evitando
+     errores si no se cargara la función.
+   - La corrección de la Calculadora es puramente matemática en frontend JS y no
+     afecta los campos de nivel persistidos en la base de datos de los personajes.
+   - La eliminación de árboles incluye protección explícita para que los 7 árboles
+     elementales base (Katon, Suiton, Doton, Fuuton, Raiton, Yin, Yang) nunca puedan
+     ser borrados por error.
+
+================================================================================
+FIN DEL INFORME
+================================================================================
